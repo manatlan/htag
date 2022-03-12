@@ -22,7 +22,7 @@ See the [demo source code](https://github.com/manatlan/thag/blob/main/examples/d
 To try it :
 
     $ pip3 install thag pywebview
-    $ wget https://github.com/manatlan/thag/blob/main/examples/demo.py
+    $ wget https://raw.githubusercontent.com/manatlan/thag/main/examples/demo.py
     $ python3 demo.py
 
 There will be docs in the future ;-)
