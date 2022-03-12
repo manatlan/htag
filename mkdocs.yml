@@ -1,0 +1,20 @@
+site_name: Thag's Docs
+site_description: GUI toolkit for building GUI toolikit (for building applications for desktop, web, and mobile from a single python3 codebase)
+
+theme:
+    name: 'material'
+    palette:
+        primary: 'black'
+        accent: 'black'
+
+repo_name: manatlan/thag
+repo_url: https://github.com/manatlan/thag
+edit_uri: ""
+
+nav:
+    - Introduction: 'index.md'
+
+markdown_extensions:
+  - markdown.extensions.codehilite:
+      guess_lang: false
+  - admonition
