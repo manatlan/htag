@@ -92,6 +92,16 @@ class TagBase:
             [image(i) for i in self._contents],
         )
 
+    def _getTree(self) -> dict:
+        """ return a tree of TagBase childs """
+        ll=[]
+
+        for i in self._contents:
+            if isinstance(i,TagBase):
+                ll.append( i._getTree() )
+
+        return {self:ll}
+
     def __repr__(self):
         return f"<{self.__class__.__name__}'{self.tag} {self._attrs} (childs:{len(self._contents)})>"
 
@@ -160,12 +170,4 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
     def _genIIFEScript(self,js:str) -> str:
         return f"(function(tag){{ {js} }})(document.getElementById('{id(self)}'));"
 
-    def _getTree(self) -> dict: #or None
-        ll=[]
-
-        for i in self._contents:
-            if isinstance(i,Tag):
-                ll.append( i._getTree() )
-
-        return {self:ll}
 

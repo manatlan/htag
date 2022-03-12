@@ -75,10 +75,11 @@ class HRenderer:
         # compute a real list of unique import
         self._statics=[]
         for child in children:
-            statics = child.statics if type(child.statics )==list else [child.statics ]
-            for i in statics:
-                if getattr(i,"md5") not in [j.md5 for j in self._statics]:
-                    self._statics.append( i )
+            if isinstance(child,Tag):
+                statics = child.statics if type(child.statics )==list else [child.statics ]
+                for i in statics:
+                    if getattr(i,"md5") not in [j.md5 for j in self._statics]:
+                        self._statics.append( i )
 
         js_base="""
 function start() { %s }
