@@ -15,6 +15,18 @@ It's a GUI toolkit for building GUI toolkits ;-)
 
 **Thag** provides somes [`runners`](thag/runners) ootb. But they are here just for the show. IRL, you should build your own, for your needs.
 
+## To have a look
+
+See the [demo source code](https://github.com/manatlan/thag/blob/main/examples/demo.py)
+
+To try it :
+
+    $ pip3 install thag pywebview
+    $ wget https://github.com/manatlan/thag/blob/main/examples/demo.py
+    $ python3 demo.py
+
+There will be docs in the future ;-)
+
 ## In French
 Sorte de FWK (orienté composants), où on code (coté backend) des objets python (en fait des objets "Tag"), qui ont une representation HTML avec des interactions, qui peuvent s'executer dans tout ce qui est capable d'afficher du html/js/css (pywebview, cefpython3, a browser, ....)
 
