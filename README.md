@@ -1,16 +1,17 @@
-THAG : "[T]he [H]TML [A]ttributs [G]UI"
+# THAG : "[T]he [H]TML [A]ttributs [G]UI"
 
 The descendant of [gtag](https://github.com/manatlan/gtag) ... but :
 
  * Not tied to [guy](https://github.com/manatlan/guy)
  * Able to be used in anything which can display html/js/css (pywebview, cefpython3, a browser, ....)
  * A lot lot lot better and simpler (better abstractions/code/concepts)
+ * "intelligent rendering" (redraw only component with states changes)
 
 It's a GUI toolkit for building GUI toolkits ;-)
 
 [Changelog](changelog.md)
 
-**Thag** provides somes `runners` ootb, see [thag/runners](thag/runners). But there are here just for the show. IRL, you should build your own, for your needs.
+**Thag** provides somes [`runners`](thag/runners) ootb. But they are here just for the show. IRL, you should build your own, for your needs.
 
 ## In French
 Sorte de FWK (orienté composants), où on code (coté backend) des objets python (en fait des objets "Tag"), qui ont une representation HTML avec des interactions, qui peuvent s'executer dans tout ce qui est capable d'afficher du html/js/css (pywebview, cefpython3, a browser, ....)
