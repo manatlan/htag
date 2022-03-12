@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "thag"
-version = "0.0.2"
+version = "0.0.3"
 description = "GUI toolkit for building GUI toolkits (and create beautiful applications for mobile, web, and desktop from a single python3 codebase)"
 authors = ["manatlan <manatlan@gmail.com>"]
 readme = 'README.md'
@@ -19,7 +19,7 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.7"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.dev-dependencie s]
 pytest = "^3.0"
 pytest-cov = "^2.6"
 

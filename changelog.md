@@ -1,3 +1,7 @@
+### 0.0.3 "the first patch" 2022/03/12
+
+ * "Intelligent rendering" didn't work for Tags "builded lately" (whose override __str__)
+
 ### 0.0.2 "initial public release" 2022/03/12
 
  * initial public release

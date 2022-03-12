@@ -1,5 +1,6 @@
 #!/usr/bin/python3 -u
 # -*- coding: utf-8 -*-
+from dataclasses import replace
 import pytest
 import asyncio
 import re
@@ -236,6 +237,44 @@ def test_intelligent_rendering():
     assert s.guess() == [t]
 
 
+def test_intelligent_rendering2():
+
+    class Obj(Tag):
+
+        def __init__(self,**a):
+            super().__init__(**a)
+            self.nb = 0
+
+        def inc(self):
+            self.nb += 1
+
+        def __str__(self):
+            self.clear()
+            self <= self.nb
+            return Tag.__str__(self)
+
+    # test that the base feature works ;-)
+    o=Obj()
+    assert anon(o)=='<div id="<id>">0</div>'
+    o.inc()
+    assert anon(o)=='<div id="<id>">1</div>'
+
+    # test that the state image mechanism works as expected
+    s_before=o._getStateImage()
+    o.inc()
+    s_after=o._getStateImage()
+    assert s_after == s_before.replace("['1']","['2']")
+
+    # test the stater
+    o=Obj()
+    s=Stater(o)
+    assert s.guess() == []
+
+    s=Stater(o)
+    o.inc()
+    assert s.guess() == [o]
+
+
 def test_build_immediatly_vs_lately():
     """ test same behaviour """
 
@@ -316,3 +355,5 @@ def test_renderer_same_str():
 # test_intelligent_rendering()
 # test_build_immediatly_vs_lately()
 # test_renderer_same_str()
+
+# test_intelligent_rendering2()

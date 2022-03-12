@@ -84,11 +84,12 @@ class TagBase:
 
     def _getStateImage(self) -> str:
         """Return a str'image (state) of the object, for quick detection (see Stater())"""
+        str(self) # force a re-rendering (for builded lately)
         image=lambda x: "[%s]"%id(x) if isinstance(x,Tag) else str(x)
-        return """<%(tag)s%(attrs)s>%(content)s</%(tag)s>""" % dict(
-            tag=self.tag,
-            attrs=str(self._attrs),
-            content=" ".join([image(i) for i in self._contents]),
+        return """%s%s:%s""" % (
+            self.tag,
+            self._attrs,
+            [image(i) for i in self._contents],
         )
 
     def __repr__(self):
