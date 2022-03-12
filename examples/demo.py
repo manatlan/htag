@@ -1,7 +1,8 @@
-from thag import Tag
+from thag import Tag # the only thing you'll need ;-)
 
 
 class Button(Tag):
+    """ It's a button component, rendered as <button onclick=''>txt</button>"""
 
     # this Tag will be rendered as a <button>, so we set its attribut "tag" <- "button"
     tag="button"
@@ -16,8 +17,11 @@ class Button(Tag):
         # we set some html attributs
         self["class"]="my"                      # set @class to "my"
         self["onclick"]=self.bind.onclick()     # bind a js event on @onclick
+                                                # "self.bind.<method>()" is the trick to generate a js interaction
+                                                # binded to this component
 
         self <= txt                             # put a text into the button
+                                                # it's a shortcut for "self.add( txt )"
 
         self.callback=callback                  # save the py callback for later use
 
@@ -27,6 +31,9 @@ class Button(Tag):
         self.callback()
 
 class Star(Tag):
+    """ This Star component display 2 buttons to decrease/increase a value
+        (it displays nb x star according the value)
+    """
     # it doesn't define its "tag" attribut, so it will be a <div> (the default)
 
     def __init__(self,value=0):
@@ -49,10 +56,12 @@ class Star(Tag):
 
         # we draw the stars
         self <= "⭐"*self.nb
+
         return super().__str__()
 
 
 class Page(Tag):
+    """ This is the main Tag, it will be rendered as <body> by the thag/renderer """
     # it doesn't define its "tag" attribut
     # but as long as it's the main tag ...
     # it will be rendered as <body>
@@ -75,7 +84,8 @@ class Page(Tag):
         self.clear()
 
         # we put a title
-        self <= Tag.h1("Best movies ;-)")
+        self <= Tag.h1("Best movies ;-)")   # here is shortcut to create "<h1>Best movies ;-)</h1>"
+                                            # (it works for any html tag you want ;-)
 
         # and add our stuff, sorted by nb of stars
         for name,star in sorted( self.movies, key=lambda x: -x[1].nb ):
@@ -83,11 +93,12 @@ class Page(Tag):
 
         return super().__str__()
 
+# instanciate the main component
 obj=Page()
 
-
-# here, the demo is executed in a pywebview instance
+# and execute it in a pywebview instance
 from thag.runners import *
 PyWebWiew( obj ).run()
 
+# here is another runner, in a simple browser (thru ajax calls)
 # BrowserHTTP( obj ).run()
