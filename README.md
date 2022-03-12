@@ -11,6 +11,8 @@ It's a GUI toolkit for building GUI toolkits ;-)
 
 [Changelog](changelog.md)
 
+[Available on pypi.org](https://pypi.org/project/thag/)
+
 **Thag** provides somes [`runners`](thag/runners) ootb. But they are here just for the show. IRL, you should build your own, for your needs.
 
 ## In French
