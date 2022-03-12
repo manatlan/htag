@@ -1,0 +1,63 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build dist for pypi",
+            "type": "shell",
+            "command": [
+                    "python3 -m pytest . && python3 -c 'from thag import _majVersion; _majVersion()' && poetry build",
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "panel": "new",
+                "focus": true
+            }
+        },
+        {
+            "label": "upload to pypi",
+            "type": "shell",
+            "command": "poetry publish",
+            "problemMatcher": [],
+            "presentation": {
+                "panel": "new",
+                "focus": true
+            }
+        },
+        {
+            "label": "Test Coverage",
+            "type": "shell",
+            "command": "python3 -m pytest --cov-report html --cov=thag . && google-chrome htmlcov/index.html",
+            "problemMatcher": [],
+            "presentation": {
+                "panel": "new",
+                "focus": true
+            }
+        },
+        {
+            "label": "clean repo",
+            "type": "shell",
+            "command": "rm -rf build __pycache__ thag/__pycache__ thag/runners/__pycache__ .pytest_cache .coverage htmlcov",
+            "problemMatcher": [],
+            "presentation": {
+                "panel": "new",
+                "focus": true
+            }
+        },
+        {
+            "label": "Build zip with all",
+            "type": "shell",
+            "command": "rm -rf build __pycache__ thag/__pycache__ thag/runners/__pycache__ .pytest_cache .coverage htmlcov;  zip -r src.zip thag examples test_*",
+            "problemMatcher": [],
+            "presentation": {
+                "panel": "new",
+                "focus": true
+            }
+        },
+    ]
+}
