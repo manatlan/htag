@@ -3,9 +3,9 @@
 The descendant of [gtag](https://github.com/manatlan/gtag) ... but :
 
  * Not tied to [guy](https://github.com/manatlan/guy)
- * Able to be used in anything which can display html/js/css (pywebview, cefpython3, a browser, ....)
- * A lot lot lot better and simpler (better abstractions/code/concepts)
- * "intelligent rendering" (redraw only component with states changes)
+ * Able to be used in anything which can display html/js/css (pywebview, cefpython3, a browser, .... or guy)
+ * A **lot lot lot better and simpler** (better abstractions/code/concepts)
+ * "intelligent rendering" (redraw only component on state changes)
 
 It's a GUI toolkit for building GUI toolkits ;-)
 
@@ -13,7 +13,7 @@ It's a GUI toolkit for building GUI toolkits ;-)
 
 [Available on pypi.org](https://pypi.org/project/thag/)
 
-**Thag** provides somes [`runners`](thag/runners) ootb. But they are here just for the show. IRL, you should build your own, for your needs.
+**Thag** provides somes [`runners`](thag/runners) ootb. But they are just here, for the show. IRL: you should build your own, for your needs.
 
 ## To have a look
 
