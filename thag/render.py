@@ -62,6 +62,8 @@ class HRenderer:
             # add an .exit() method on the tag !!!!!!!!!!!!!!!!!!!!!!
             self.tag.exit = exit_callback
 
+        str(tag) # force rendering (for "builded lately" tags)
+
         # get all statics in the tree from the root tag
         children=[]
         if isinstance( tag, Tag):

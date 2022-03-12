@@ -1,3 +1,7 @@
+### 0.0.5 "the third patch" 2022/03/12
+
+ * Statics discovering didn't work well for Tags "builded lately" (whose override __str__)
+
 ### 0.0.4 "the second patch" 2022/03/12
 
  * Statics discovering couldn't include those inside TagBase ;-(
