@@ -1,3 +1,7 @@
+### 0.0.6 "new name" 2022/03/14
+
+ * Rename all from "thag" to new name : "htag"
+
 ### 0.0.5 "the third patch" 2022/03/12
 
  * Statics discovering didn't work well for Tags "builded lately" (whose override __str__)
