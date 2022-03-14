@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-from thag import Tag,ThagException
-from thag.tag import TagBase
+from htag import Tag,HTagException
+from htag.tag import TagBase
 
 anon=lambda t: str(t).replace( str(id(t)),"<id>" )
 
@@ -17,7 +17,7 @@ def test_base():
     assert str(Tag.my_div("test")) == "<my-div>test</my-div>"
 
 def test_ko():
-    with pytest.raises(ThagException):
+    with pytest.raises(HTagException):
         Tag.span(no="kk")
 
 
@@ -77,13 +77,13 @@ def test_tag_generation_with_opt_params():
                 self.add( Tag.li(f"{i} {self.txt}",_id=i) )
 
     # can't set an html attribut id
-    with pytest.raises(ThagException):
+    with pytest.raises(HTagException):
         NewTag(2,_id=12313213)
 
     # but can set an attribut on instance
     x=NewTag(2,id=12313213)
     assert x.id==12313213
-    assert x["id"] == id(x) # it's a real thag.tag, so it got a real html attribut
+    assert x["id"] == id(x) # it's a real htag.tag, so it got a real html attribut
 
     # can set attributs
     x=NewTag(2,param1="jiji",param2=42)
@@ -150,7 +150,7 @@ def test_generate_js_interact():
 
     c=NewTag()
 
-    with pytest.raises(ThagException):
+    with pytest.raises(HTagException):
         c.bind.onclick_unknown(12)
 
     js=c.bind.onclick(12)

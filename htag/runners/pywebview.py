@@ -4,7 +4,7 @@
 #
 # MIT licence
 #
-# https://github.com/manatlan/thag
+# https://github.com/manatlan/htag
 # #############################################################################
 
 from .. import Tag
@@ -16,7 +16,7 @@ try:
     import webview
 except ImportError:
     import sys
-    print("You should install 'pywebview' for this thag runner")
+    print("You should install 'pywebview' for this htag runner")
     sys.exit(-1)
 
 

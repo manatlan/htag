@@ -1,8 +1,8 @@
 import os,sys; sys.path.insert(0,os.path.dirname(os.path.dirname(__file__)))
-from thag import Tag
+from htag import Tag
 
 """
-This is exaclty why thag is done for ...
+This is exaclty why htag is done for ...
 
 You can build you "Components" to create the gui you want ;-)
 (The main idea is to make it the simpler (without html, js or css) in the using.)
@@ -273,7 +273,7 @@ class Toaster(TagBulma):
     def close(self):
         self.clear()
 
-class InputText(TagBulma): # not THAG OPTIMIZED
+class InputText(TagBulma): # not HTAG OPTIMIZED
     tag="input"
 
     def __init__(self, value, type="text", disabled=False, onchange=None,**a):
@@ -298,7 +298,7 @@ class InputText(TagBulma): # not THAG OPTIMIZED
         self.update()
 
 
-class TextArea(TagBulma):    # not THAG OPTIMIZED
+class TextArea(TagBulma):    # not HTAG OPTIMIZED
     tag="textarea"
 
     def __init__(self, value, disabled=False, onchange=None,**a):
@@ -322,7 +322,7 @@ class TextArea(TagBulma):    # not THAG OPTIMIZED
             self.onchange(self.value)
         self.update()
 
-class _Selector(TagBulma): # not THAG OPTIMIZED, and others too!
+class _Selector(TagBulma): # not HTAG OPTIMIZED, and others too!
     def __init__(self, value, choices: list, disabled=False, onchange=None,**a):
         super().__init__(**a)
         assert value in choices
@@ -479,7 +479,7 @@ import math
 
 class Table(TagBulma):
     """ adapted as is, from gtag.gtags.Table
-        NOT OPTIMIZED for thag ... but works as is ;-)
+        NOT OPTIMIZED for htag ... but works as is ;-)
     """
     tag="div"
 
@@ -672,7 +672,7 @@ if __name__=="__main__":
             tab.addTab("Tab3", table)
             tab.selected = "Tab2"
 
-            nav= Nav("Thag Demo")
+            nav= Nav("HTag Demo")
             nav.addEntry( "Page1", self.affmodal )
             nav.addEntry( "exit", lambda: self.exit(), True )
 
@@ -696,7 +696,7 @@ if __name__=="__main__":
 
     app=Page()
 
-    from thag.runners import *
+    from htag.runners import *
     # r=GuyApp( app )
     # r=PyWebWiew( app )
     # r=BrowserStarletteHTTP( app )

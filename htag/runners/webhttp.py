@@ -4,7 +4,7 @@
 #
 # MIT licence
 #
-# https://github.com/manatlan/thag
+# https://github.com/manatlan/htag
 # #############################################################################
 
 from .. import Tag
@@ -30,12 +30,12 @@ try:
     from starlette.routing import Route
 except ImportError:
     import sys
-    print("You should install 'starlette' & 'uvicorn' for this thag runner")
+    print("You should install 'starlette' & 'uvicorn' for this htag runner")
     sys.exit(-1)
 
 
 class WebHTTP:
-    """ Simple ASync Web Server (with starlette) with HTTP interactions with Thag.
+    """ Simple ASync Web Server (with starlette) with HTTP interactions with htag.
         can handle multiple instances !!!
     """
     def __init__(self,callback_tag_creator):

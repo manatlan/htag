@@ -1,4 +1,4 @@
-# THAG : "[T]he [H]TML [A]ttributs [G]UI"
+# HTag : "[H]TML Tag"
 
 The descendant of [gtag](https://github.com/manatlan/gtag) ... but :
 
@@ -11,18 +11,18 @@ It's a GUI toolkit for building GUI toolkits ;-)
 
 [Changelog](changelog.md)
 
-[Available on pypi.org](https://pypi.org/project/thag/)
+[Available on pypi.org](https://pypi.org/project/htag/)
 
-**Thag** provides somes [`runners`](thag/runners) ootb. But they are just here, for the show. IRL: you should build your own, for your needs.
+**HTag** provides somes [`runners`](htag/runners) ootb. But they are just here, for the show. IRL: you should build your own, for your needs.
 
 ## To have a look
 
-See the [demo source code](https://github.com/manatlan/thag/blob/main/examples/demo.py)
+See the [demo source code](https://github.com/manatlan/htag/blob/main/examples/demo.py)
 
 To try it :
 
-    $ pip3 install thag pywebview
-    $ wget https://raw.githubusercontent.com/manatlan/thag/main/examples/demo.py
+    $ pip3 install htag pywebview
+    $ wget https://raw.githubusercontent.com/manatlan/htag/main/examples/demo.py
     $ python3 demo.py
 
 There will be docs in the future ;-)

@@ -4,7 +4,7 @@
 #
 # MIT licence
 #
-# https://github.com/manatlan/thag
+# https://github.com/manatlan/htag
 # #############################################################################
 
 # mono instance

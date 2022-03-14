@@ -1,5 +1,5 @@
 import os,sys; sys.path.insert(0,os.path.dirname(os.path.dirname(__file__)))
-from thag import Tag
+from htag import Tag
 
 # "https://cdn.jsdelivr.net/npm/bulma@0.8.2/css/bulma.min.css"
 # css=Tag.style("""/*! bulma.io v0.8.2 | MIT License | github.com/jgthms/bulma *""")
@@ -116,7 +116,7 @@ if __name__=="__main__":
 
     app=Page()
 
-    from thag.runners import *
+    from htag.runners import *
     # r=GuyApp( app )
     # r=PyWebWiew( app )
     # r=BrowserStarletteHTTP( app )

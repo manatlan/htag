@@ -4,7 +4,7 @@
 #
 # MIT licence
 #
-# https://github.com/manatlan/thag
+# https://github.com/manatlan/htag
 # #############################################################################
 import json,ctypes,asyncio,types
 
@@ -205,7 +205,7 @@ function action( o ) {
         head=Tag.head()
         head <= Tag.meta(_charset="utf-8")
         head <= Tag.meta(_name="viewport",_content="width=device-width, initial-scale=1")
-        head <= Tag.meta(_name="version",_content=f"Thag {__version__}")
+        head <= Tag.meta(_name="version",_content=f"HTag {__version__}")
         head <= Tag.title( self.title )
         head <= self._statics
 

@@ -5,8 +5,8 @@ import pytest
 import asyncio
 import re
 
-from thag import Tag
-from thag.render import Stater,HRenderer
+from htag import Tag
+from htag.render import Stater,HRenderer
 
 
 anon=lambda t: str(t).replace( str(id(t)),"<id>" )

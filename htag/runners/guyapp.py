@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-# # #############################################################################
+# #############################################################################
 # Copyright (C) 2022 manatlan manatlan[at]gmail(dot)com
 #
 # MIT licence
 #
-# https://github.com/manatlan/thag
+# https://github.com/manatlan/htag
 # #############################################################################
 from .. import Tag
 from ..render import HRenderer
@@ -21,7 +21,7 @@ try:
     import guy
 except ImportError:
     import sys
-    print("You should install 'guy' for this thag runner")
+    print("You should install 'guy' for this htag runner")
     sys.exit(-1)
 
 class GuyApp(guy.Guy):

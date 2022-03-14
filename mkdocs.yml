@@ -1,4 +1,4 @@
-site_name: Thag's Docs
+site_name: HTag's Docs
 site_description: GUI toolkit for building GUI toolikit (for building applications for desktop, web, and mobile from a single python3 codebase)
 
 theme:
@@ -7,8 +7,8 @@ theme:
         primary: 'black'
         accent: 'black'
 
-repo_name: manatlan/thag
-repo_url: https://github.com/manatlan/thag
+repo_name: manatlan/htag
+repo_url: https://github.com/manatlan/htag
 edit_uri: ""
 
 nav:

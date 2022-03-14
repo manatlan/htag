@@ -1,4 +1,4 @@
-from thag import Tag # the only thing you'll need ;-)
+from htag import Tag # the only thing you'll need ;-)
 
 
 class Button(Tag):
@@ -61,7 +61,7 @@ class Star(Tag):
 
 
 class Page(Tag):
-    """ This is the main Tag, it will be rendered as <body> by the thag/renderer """
+    """ This is the main Tag, it will be rendered as <body> by the htag/renderer """
     # it doesn't define its "tag" attribut
     # but as long as it's the main tag ...
     # it will be rendered as <body>
@@ -97,7 +97,7 @@ class Page(Tag):
 obj=Page()
 
 # and execute it in a pywebview instance
-from thag.runners import *
+from htag.runners import *
 PyWebWiew( obj ).run()
 
 # here is another runner, in a simple browser (thru ajax calls)

@@ -1,5 +1,5 @@
-from thag import Tag
-from thag.render import HRenderer
+from htag import Tag
+from htag.render import HRenderer
 
 def test_built_immediatly():
     ################################################################

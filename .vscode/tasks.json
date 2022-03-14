@@ -7,7 +7,7 @@
             "label": "build dist for pypi",
             "type": "shell",
             "command": [
-                    "python3 -m pytest . && python3 -c 'from thag import _majVersion; _majVersion()' && poetry build",
+                    "python3 -m pytest . && python3 -c 'from htag import _majVersion; _majVersion()' && poetry build",
             ],
             "group": {
                 "kind": "build",
@@ -32,7 +32,7 @@
         {
             "label": "Test Coverage",
             "type": "shell",
-            "command": "python3 -m pytest --cov-report html --cov=thag . && google-chrome htmlcov/index.html",
+            "command": "python3 -m pytest --cov-report html --cov=htag . && google-chrome htmlcov/index.html",
             "problemMatcher": [],
             "presentation": {
                 "panel": "new",
@@ -42,7 +42,7 @@
         {
             "label": "clean repo",
             "type": "shell",
-            "command": "rm -rf build __pycache__ thag/__pycache__ thag/runners/__pycache__ .pytest_cache .coverage htmlcov",
+            "command": "rm -rf build __pycache__ htag/__pycache__ htag/runners/__pycache__ .pytest_cache .coverage htmlcov",
             "problemMatcher": [],
             "presentation": {
                 "panel": "new",
@@ -52,7 +52,7 @@
         {
             "label": "Build zip with all",
             "type": "shell",
-            "command": "rm -rf build __pycache__ thag/__pycache__ thag/runners/__pycache__ .pytest_cache .coverage htmlcov;  zip -r src.zip thag examples test_*",
+            "command": "rm -rf build __pycache__ htag/__pycache__ htag/runners/__pycache__ .pytest_cache .coverage htmlcov;  zip -r src.zip htag examples test_*",
             "problemMatcher": [],
             "presentation": {
                 "panel": "new",

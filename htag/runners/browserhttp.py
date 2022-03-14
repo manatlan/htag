@@ -4,7 +4,7 @@
 #
 # MIT licence
 #
-# https://github.com/manatlan/thag
+# https://github.com/manatlan/htag
 # #############################################################################
 
 from .. import Tag
@@ -15,7 +15,7 @@ import socket
 import webbrowser,os,json
 
 class BrowserHTTP:
-    """ Simple ASync Web Server with HTTP interactions with Thag. (only stdlib!)
+    """ Simple ASync Web Server with HTTP interactions with HTag. (only stdlib!)
         Open the rendering in a browser tab.
 
         Should not be used AS IS in a real app ...

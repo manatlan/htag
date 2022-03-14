@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-# # #############################################################################
+# #############################################################################
 # Copyright (C) 2022 manatlan manatlan[at]gmail(dot)com
 #
 # MIT licence
 #
-# https://github.com/manatlan/thag
+# https://github.com/manatlan/htag
 # #############################################################################
 
 from .. import Tag
@@ -18,12 +18,12 @@ try:
     from starlette.responses import HTMLResponse
 except ImportError:
     import sys
-    print("You should install 'starlette' & 'uvicorn' for this thag runner")
+    print("You should install 'starlette' & 'uvicorn' for this htag runner")
     sys.exit(-1)
 
 
 class BrowserStarletteWS:
-    """ Simple ASync Web Server (with starlette) with WebSocket interactions with Thag.
+    """ Simple ASync Web Server (with starlette) with WebSocket interactions with HTag.
         Open the rendering in a browser tab.
     """
     def __init__(self,tag:Tag):

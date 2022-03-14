@@ -1,2 +1,2 @@
 See docs here :
-https://manatlan.github.io/thag/
+https://manatlan.github.io/htag/

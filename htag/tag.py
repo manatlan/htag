@@ -4,11 +4,11 @@
 #
 # MIT licence
 #
-# https://github.com/manatlan/thag
+# https://github.com/manatlan/htag
 # #############################################################################
 import html,json,hashlib
 
-class ThagException(Exception): pass
+class HTagException(Exception): pass
 
 md5= lambda x: hashlib.md5(x.encode('utf-8')).hexdigest()
 
@@ -39,7 +39,7 @@ class TagBase:
         self._attrs={}
         for k,v in _attrs.items():
             if not k.startswith("_"):
-                raise ThagException(f"Can't set attribus without underscore ('{k}' should be '_{k}')") # for convention only ;-(
+                raise HTagException(f"Can't set attribus without underscore ('{k}' should be '_{k}')") # for convention only ;-(
             else:
                 self[ k[1:].replace("_","-") ] = v
 
@@ -120,7 +120,7 @@ class Binder:
                 return genJsInteraction(id(self.__instance),method,args,kargs)
             return _
         else:
-            raise ThagException("Unknown method '%s' in '%s'"%(method,self.__instance.__class__.__name__))
+            raise HTagException("Unknown method '%s' in '%s'"%(method,self.__instance.__class__.__name__))
 
 class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
     statics = [] # list of "Tag", imported at start
@@ -139,7 +139,7 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
         self.__dict__.update(auto)
 
         if "_id" in attrs:
-            raise ThagException("can't set the html attribut '_id'")
+            raise HTagException("can't set the html attribut '_id'")
         else:
             attrs["_id"]=id(self)   # force an @id !
         TagBase.__init__(self,None, **attrs)
