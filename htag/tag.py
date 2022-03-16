@@ -7,6 +7,8 @@
 # https://github.com/manatlan/htag
 # #############################################################################
 import html,json,hashlib
+import logging
+logger = logging.getLogger(__name__) # not used yet
 
 class HTagException(Exception): pass
 
@@ -39,7 +41,7 @@ class TagBase:
         self._attrs={}
         for k,v in _attrs.items():
             if not k.startswith("_"):
-                raise HTagException(f"Can't set attribus without underscore ('{k}' should be '_{k}')") # for convention only ;-(
+                raise HTagException(f"Can't set attributs without underscore ('{k}' should be '_{k}')") # for convention only ;-(
             else:
                 self[ k[1:].replace("_","-") ] = v
 
@@ -168,6 +170,6 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
         return ll
 
     def _genIIFEScript(self,js:str) -> str:
-        return f"(function(tag){{ {js} }})(document.getElementById('{id(self)}'));"
+        return f"(function(tag){{ {js}\n }})(document.getElementById('{id(self)}'));"
 
 

@@ -1,3 +1,9 @@
+
+### 0.0.7 "use logging" 2022/03/16
+
+ * use logging
+ * IIFE can be generated for "//comment"
+
 ### 0.0.6 "new name" 2022/03/14
 
  * Rename all from "thag" to new name : "htag"

@@ -235,6 +235,34 @@ def test_base_concepts():
     assert anon(o) == '<h2 class="ya" id="<id>" name="yo"><div>yo</div></h2>'
 
 
+def test_state_yield():
+    class TEST(Tag):
+        tag="div"
+
+        def __init__(self):
+            super().__init__()
+            self <= Tag.button("go", _onclick=self.bind.test())
+
+        def test(self):
+            self.clear()
+            self <= Tag.h1("hello1")
+            self("/*JS1*/")
+            yield
+            self.clear()
+            self <= Tag.h1("hello2")
+            self("/*JS2*/")
+
+    s=TEST()
+
+    jss=[]
+    TEST.__call__=lambda self,js: jss.append(js)
+    for i in s.test():
+        assert "<h1>hello1</h1>" in str(s)
+        assert jss.pop()=="/*JS1*/" and len(jss)==0
+
+    # state of the instance has changed
+    assert "<h1>hello2</h1>" in str(s)
+    assert jss.pop()=="/*JS2*/" and len(jss)==0
 
 # test_base()
 # test_ko()

@@ -11,6 +11,9 @@ import json,ctypes,asyncio,types
 from . import __version__
 from .tag import Tag, genJsInteraction
 
+import logging
+logger = logging.getLogger(__name__)
+
 class Stater:
     """ Class to save all states of 'tag' and children/embbeded Tags, before interaction!
         so, after interaction : .guess() can guess modified one
@@ -48,6 +51,7 @@ class Stater:
                     rec(childs)
 
         rec( [self.tag._getTree()] )
+        logger.debug("Stater.guess(), modifieds components : %s", [repr(i) for i in modifieds])
         return modifieds
 
 
@@ -82,6 +86,7 @@ class HRenderer:
                 for i in statics:
                     if getattr(i,"md5") not in [j.md5 for j in self._statics]:
                         self._statics.append( i )
+        logger.debug("Hrenderer(), statics found : %s", [repr(i) for i in self._statics])
 
         js_base="""
 function start() { %s }
@@ -111,7 +116,7 @@ function action( o ) {
 
         if oid==0:
             # start (not a real interaction, just produce the first rendering of the main tag (will be a body))
-            print("INTERACT INITIAL:",repr(self.tag))
+            logger.info("INTERACT INITIAL: %s",repr(self.tag))
             rep = self._mkReponse( [self.tag] )
             rep["update"][0]["id"] = 0  #INPERSONNATE (for first interact on id#0)
         else:
@@ -124,7 +129,7 @@ function action( o ) {
             setattr(Tag,"__call__", hookInteractScripts) # not great (with concurrencies)
             try:
                 if isinstance(obj,Tag):
-                    print("INTERACT with",repr(obj),f", calling: {method_name}({args},{kargs})")
+                    logger.info(f"INTERACT with %s, calling: {method_name}({args},{kargs})", repr(obj))
 
                     # call the method
                     method=getattr(obj,method_name)
@@ -134,7 +139,7 @@ function action( o ) {
                     else:
                         r=method(*args,**kargs)
                 else:
-                    print("INTERACT with GENERATOR",obj.__name__)
+                    logger.info("INTERACT with GENERATOR %s",obj.__name__)
                     r=obj
 
                 if isinstance(r, types.AsyncGeneratorType):
@@ -178,7 +183,7 @@ function action( o ) {
             # if there was generator, set the next js call !
             rep["next"]=next_js_call
 
-        print("--->",json.dumps(rep,indent=4))
+        logger.info("RETURN --> %s",json.dumps(rep,indent=4))
 
         return rep
 
