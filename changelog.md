@@ -1,4 +1,11 @@
 
+### 0.0.8 "use logging" 2022/03/16
+
+ * log/debug for Tag.__str__()
+ * log/error for exceptions in py interactions.
+ * front display a console.log for server err
+ * more tests
+
 ### 0.0.7 "use logging" 2022/03/16
 
  * use logging

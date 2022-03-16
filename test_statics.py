@@ -48,3 +48,25 @@ def test_build_lately():
 
     assert "/*S1*/" in str(HRenderer( OO(), "//"))
     ################################################################
+
+def test_TagBase_md5():
+
+    sameContent="hello"
+    sameattrs=dict(_class="hello")
+    t1=Tag.a(sameContent,**sameattrs)
+    t2=Tag.a(sameContent,**sameattrs)
+
+    assert t1.md5 == t2.md5
+
+def test_Tag_md5():
+    class My(Tag):
+        def __init__(self,txt,**a):
+            Tag.__init__(self,**a)
+            self <= txt
+
+    sameContent="hello"
+    sameattrs=dict(_class="hello")
+    t1=My(sameContent,**sameattrs)
+    t2=My(sameContent,**sameattrs)
+
+    assert t1.md5 != t2.md5

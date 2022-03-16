@@ -174,6 +174,29 @@ def test_render_yield_with_scripts():
     asyncio.run( testGenerator("as_action") )
 
 
+def test_interact_error():
+    class MyDiv(Tag):
+        def action(self):
+            return 12/0
+
+        async def as_action(self):
+            return 12/0
+
+    t=MyDiv()
+    r=HRenderer(t,"function interact() {}; start(); // the starter", lambda: "ok")
+
+    assert t.exit() == "ok", "tag.exit() doesn't work !?"
+
+    async def testGenerator(method):
+        resp = await r.interact( 0, None, None, None)
+        assert resp["update"][0]["id"] == 0
+
+        resp = await r.interact( id(t), method, [],{})
+        assert "err" in resp
+
+    asyncio.run( testGenerator("action") )
+    asyncio.run( testGenerator("as_action") )
+
 def test_intelligent_rendering():
 
     class Obj(Tag):

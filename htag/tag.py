@@ -8,7 +8,7 @@
 # #############################################################################
 import html,json,hashlib
 import logging
-logger = logging.getLogger(__name__) # not used yet
+logger = logging.getLogger(__name__)
 
 class HTagException(Exception): pass
 
@@ -172,4 +172,6 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
     def _genIIFEScript(self,js:str) -> str:
         return f"(function(tag){{ {js}\n }})(document.getElementById('{id(self)}'));"
 
-
+    def __str__(self):
+        logger.debug("Tag.__str__() : render str for %s", repr(self))
+        return TagBase.__str__(self)
