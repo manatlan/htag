@@ -40,11 +40,11 @@ class Stater:
         def rec( childs):
             for obj in childs:
                 tag,childs= list(obj.items())[0]
-                state = tag._getStateImage()
-                if state != self._states.get( id(tag) ):
-                    # print("AVANT",self._states.get( id(tag) ))
-                    # print("APRES",state)
-                    # state has changed
+                state_after = tag._getStateImage()
+                state_before= self._states.get( id(tag) )
+                if state_after != state_before:
+                    logger.debug("STATE BEFORE for %s = '%s'", repr(tag), state_before )
+                    logger.debug("STATE AFTER  for %s = '%s'", repr(tag), state_after )
                     modifieds.append(tag)
                 else:
                     # no need to see childs, coz the parent will redraw all (childs too)
@@ -87,6 +87,7 @@ class HRenderer:
                 for i in statics:
                     if getattr(i,"md5") not in [j.md5 for j in self._statics]:
                         self._statics.append( i )
+                        
         logger.debug("Hrenderer(), statics found : %s", [repr(i) for i in self._statics])
 
         js_base="""

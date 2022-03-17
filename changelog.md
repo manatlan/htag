@@ -1,5 +1,8 @@
+### 0.0.9 "state log" 2022/03/17
 
-### 0.0.8 "use logging" 2022/03/16
+ * log/debug for Stater.guess() (before+after state of changeds tags)
+
+### 0.0.8 "catch interact error" 2022/03/16
 
  * log/debug for Tag.__str__()
  * log/error for exceptions in py interactions.

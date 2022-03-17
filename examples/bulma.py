@@ -3,9 +3,10 @@ from htag import Tag
 
 """
 This is exaclty why htag is done for ...
+(btw, it exists now, in https://github.com/manatlan/htbulma and pypi too !)
 
 You can build you "Components" to create the gui you want ;-)
-(The main idea is to make it the simpler (without html, js or css) in the using.)
+(The main idea is to make it the simpler (without html, js or css) in the use.)
 
 Here, it's based on "bulma css", with some custom javascript inside
 (but you can make them using any html/js/css frameworks)
