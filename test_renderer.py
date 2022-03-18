@@ -99,7 +99,7 @@ def test_render_a_tag_with_child_interactions():
 
     t=MyDiv()
     r=HRenderer(t,"function interact() {}; start(); // the starter")
-    assert str(r).count("<script>my</script> ") == 1 # it's the same static, ensure just one !
+    assert str(r).count("<script>my</script>") == 1 # it's the same static, ensure just one !
 
     # START
     resp = asyncio.run( r.interact( 0, None, None, None) )

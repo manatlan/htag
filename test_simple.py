@@ -13,8 +13,36 @@ def test_base():
     assert str(Tag.div(None)) == "<div></div>"
     assert str(Tag.div([])) == "<div></div>"
     assert str(Tag.div("hello")) == "<div>hello</div>"
-    assert str(Tag.div([1,2,3])) == "<div>1 2 3</div>"
+    assert str(Tag.div([1,2,3])) == "<div>123</div>"
     assert str(Tag.my_div("test")) == "<my-div>test</my-div>"
+
+def test_base2():
+    d=Tag.div("hello")
+    assert str(d) == "<div>hello</div>"
+    d.set("world")
+    assert str(d) == "<div>world</div>"
+    d.set( ("hello","world"))
+    assert str(d) == "<div>helloworld</div>"
+    d.set( ["hello","world"])
+    assert str(d) == "<div>helloworld</div>"
+    d.set(None) # like clear()
+    assert str(d) == "<div></div>"
+
+    def gen():
+        for i in range(3):
+            yield i
+    d=Tag.div()
+    d.add( gen() )
+    assert str(d) == "<div>012</div>"
+    d.set( gen() )
+    assert str(d) == "<div>012</div>"
+
+    d.clear()
+    d <= gen()
+    assert str(d) == "<div>012</div>"
+
+    d=Tag.div( gen() )
+    assert str(d) == "<div>012</div>"
 
 def test_ko():
     with pytest.raises(HTagException):
@@ -47,7 +75,7 @@ def test_attrs():
     d.clear()
     d.add("bye")
     d.add("bye")
-    assert str(d) == "<div>bye bye</div>"
+    assert str(d) == "<div>byebye</div>"
 
     div=Tag.div("hello",_style="border:1px solid red")
     div["id"] = "mydiv"
@@ -100,11 +128,11 @@ def test_tag_generation_with_opt_params():
     assert g["id"] == id(g)
 
     assert anon(g) == \
-         '''<h1 class="jo" style="border:1px solid red" id="<id>"><li id="1">1 torchon</li> <li id="2">2 torchon</li> <li id="3">3 torchon</li></h1>'''
+         '''<h1 class="jo" style="border:1px solid red" id="<id>"><li id="1">1 torchon</li><li id="2">2 torchon</li><li id="3">3 torchon</li></h1>'''
 
     g=NewTag(3,txt="serviette",_class="jo",_style="border:1px solid red")
     assert anon(g) == \
-        '''<h1 class="jo" style="border:1px solid red" id="<id>"><li id="1">1 serviette</li> <li id="2">2 serviette</li> <li id="3">3 serviette</li></h1>'''
+        '''<h1 class="jo" style="border:1px solid red" id="<id>"><li id="1">1 serviette</li><li id="2">2 serviette</li><li id="3">3 serviette</li></h1>'''
 
 
 def test_tag_generation_override_attr_at_construct():

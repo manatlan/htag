@@ -30,13 +30,7 @@ class TagBase:
     tag="div" # default one
 
     def __init__(self, content=None,**_attrs):
-        if content is None:
-            self._contents=[]
-        elif type(content) in [list,tuple]:
-            self._contents=list(content)
-        else:
-            self._contents=[content]
-
+        self.set(content)
 
         self._attrs={}
         for k,v in _attrs.items():
@@ -46,6 +40,7 @@ class TagBase:
                 self[ k[1:].replace("_","-") ] = v
 
         # compute a md5 (to indentify state for statics only now)
+        # WARN : attrs or content change -> doesn't affect md5 !
         self.md5 = md5( str(self._attrs) + str(self._contents))
 
     def __le__(self, o):
@@ -55,8 +50,20 @@ class TagBase:
     def clear(self):
         self._contents=[]
 
+    def set(self,elt):
+        """ a bit like .innerHTML setting (avoid clear+add)"""
+        if elt is None:
+            self._contents=[]
+        elif not isinstance(elt,str) and hasattr(elt,"__iter__"):
+            self._contents = list(elt)
+        else:
+            self._contents = [elt]
+
     def add(self,elt):
-        if type(elt) in [list,tuple]:
+        """ add an object or a list/tuple of objects """
+        if elt is None:
+            pass
+        elif not isinstance(elt,str) and hasattr(elt,"__iter__"):
             for i in elt:
                 self._contents.append(i)
         else:
@@ -81,7 +88,7 @@ class TagBase:
         return """<%(tag)s%(attrs)s>%(content)s</%(tag)s>""" % dict(
             tag=self.tag.replace("_","-"),
             attrs=" ".join([""]+rattrs) if rattrs else "",
-            content=" ".join([str(i) for i in self._contents if i is not None]),
+            content="".join([str(i) for i in self._contents if i is not None]),
         )
 
     def _getStateImage(self) -> str:
@@ -154,8 +161,7 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
 
     #to override
     def exit(self):
-        pass
-
+        print("exit() DOES NOTHING (should be overrided)")
 
     def _getAllJs(self) -> list:
         """ get a list of IIFE js declared script of this tag and its children"""

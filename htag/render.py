@@ -87,7 +87,7 @@ class HRenderer:
                 for i in statics:
                     if getattr(i,"md5") not in [j.md5 for j in self._statics]:
                         self._statics.append( i )
-                        
+
         logger.debug("Hrenderer(), statics found : %s", [repr(i) for i in self._statics])
 
         js_base="""
@@ -187,15 +187,14 @@ function action( o ) {
                 # if there was generator, set the next js call !
                 rep["next"]=next_js_call
 
-            logger.info("RETURN --> %s",json.dumps(rep,indent=4))
-
-            return rep
         except Exception as e:
             print("ERROR",e)
-            detail = traceback.format_exc()
-            logger.error("Exception %s:\n%s", e, detail)
-            logger.info("RETURN --> {}")
-            return {"err": str(e) }
+            logger.error("Exception %s:\n%s", e, traceback.format_exc())
+            rep={"err": str(e) }
+
+        logger.info("RETURN --> %s",json.dumps(rep,indent=4))
+
+        return rep
 
     def _mkReponse(self, tags) -> dict: # can't set a "script" key -> so named "post" (coz guy)
         rep={}

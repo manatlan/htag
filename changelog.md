@@ -1,3 +1,11 @@
+### 0.0.10 "tagbase setter!" 2022/03/18
+
+ * no more "space" between childs in tagbase.__str__ (rendering)
+ * Add tagbase.set(), to clear+add objects
+ * tagbase.set() & tagbase.add() & tagbase() can takes iterables now ;-)
+ * FIX : when error in interact, log/info the return {err:"xxx"}
+ * minor comments
+
 ### 0.0.9 "state log" 2022/03/17
 
  * log/debug for Stater.guess() (before+after state of changeds tags)
