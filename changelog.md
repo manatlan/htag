@@ -1,6 +1,6 @@
-### 0.0.11 "EN COURS"
+### 0.0.11 "better js discovering" 2022/03/19
 
- * now, it's able to find (init)script/js in Tag embbed in TagBase !!!
+ * now, it's able to find (init)script/js from Tag embbeded in TagBase !!!
  * tagbase.__repr__ shortened (no more all attrs, juste the @id if present)
  * logger.debug for tag rendering, in general
  * logger.debug for state/guesser

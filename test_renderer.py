@@ -416,6 +416,47 @@ def test_discovering_js():
     r=HRenderer(OOOL(),"//js interact")
     asyncio.run(test(r))
 
+
+def test_discovering_css():
+    class O(Tag):
+        statics=[Tag.style("/*CSS1*/")]
+
+    class OOI(Tag): # immediate rendering
+        def __init__(self):
+            Tag.__init__(self)
+            self.set( O() )             # Tag directly in Tag
+
+    class OOOI(Tag):  # immediate rendering
+        def __init__(self):
+            Tag.__init__(self)
+            self.set( Tag.div( O() ) )  # Tag in a TagBase
+
+    class OOL(Tag):   # lately rendering
+        def __str__(self):
+            self.set( O() )             # Tag directly in Tag
+            return Tag.__str__(self)
+
+    class OOOL(Tag):  # lately rendering
+        def __str__(self):
+            self.set( Tag.div(O()) )    # Tag in a TagBase
+            return Tag.__str__(self)
+
+    def test(r): # first call (init obj)
+        assert "/*CSS1*/" in str(r)
+
+
+    r=HRenderer(OOI(),"//js interact")
+    test(r)
+
+    r=HRenderer(OOOI(),"//js interact")
+    test(r)
+
+    r=HRenderer(OOL(),"//js interact")
+    test(r)
+
+    r=HRenderer(OOOL(),"//js interact")
+    test(r)
+
 # test_ko_try_render_a_tagbase()
 # test_render_a_tag_with_interaction()
 # test_render_a_tag_with_child_interactions()

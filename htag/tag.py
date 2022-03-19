@@ -27,7 +27,7 @@ def genJsInteraction(id,method=None,args=None,kargs=None):
 
 class TagBase:
     """ This is a class helper to produce a "HTML TAG" """
-    tag="div" # default one
+    tag: str="div" # default one
 
     def __init__(self, content=None,**_attrs):
         self.set(content)
@@ -85,7 +85,7 @@ class TagBase:
             content="".join([str(i) for i in self._contents if i is not None]),
         )
 
-    def _getStateImage(self) -> str:
+    def _getStateImage(self) -> str: #TODO: could disapear (can make something more inteligent here!)
         """Return a str'image (state) of the object, for quick detection (see Stater())"""
 
         logger.debug("Force Tag rendering (for state image): %s",repr(self))
@@ -129,9 +129,9 @@ class Binder:
             raise HTagException("Unknown method '%s' in '%s'"%(method,self.__instance.__class__.__name__))
 
 class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
-    statics = [] # list of "Tag", imported at start
+    statics: list = [] # list of "Tag", imported at start
 
-    js=None  # post script, useful for js/init when tag is rendered
+    js: str = None  # post script, useful for js/init when tag is rendered
 
     def __init__(self, **_attrs):
         attrs={}
