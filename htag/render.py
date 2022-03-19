@@ -20,6 +20,7 @@ class Stater:
         (intelligent rendering)
     """
     def __init__(self, tag: Tag ):
+        logger.debug("Stater.__init__(), save state before interactions ")
         self.tag=tag
         self._states={}
 
@@ -30,11 +31,13 @@ class Stater:
                 rec( childs )
 
         rec( [self.tag._getTree()])
+        logger.debug("Stater.__init__(), save %s states", len(self._states))
 
     def guess(self): # -> list<Tag>
         """ to be runned after interactions to guess whose are modifieds
             return modifieds tags
         """
+        logger.debug("Stater.guess(), start guessing ....")
         modifieds=[]
 
         def rec( childs):
@@ -66,6 +69,7 @@ class HRenderer:
             # add an .exit() method on the tag !!!!!!!!!!!!!!!!!!!!!!
             self.tag.exit = exit_callback
 
+        logger.debug("Force Tag rendering (for init statics): %s",repr(tag))
         str(tag) # force rendering (for "builded lately" tags)
 
         #TODO: discovering from childs is not a good idea ... should revert to static discovering ;-(
@@ -88,7 +92,7 @@ class HRenderer:
                     if getattr(i,"md5") not in [j.md5 for j in self._statics]:
                         self._statics.append( i )
 
-        logger.debug("Hrenderer(), statics found : %s", [repr(i) for i in self._statics])
+        logger.debug("HRenderer(), statics found : %s", [repr(i) for i in self._statics])
 
         js_base="""
 function start() { %s }
@@ -203,6 +207,7 @@ function action( o ) {
 
         if tags:
             rep["update"]=[]
+            logger.debug("Force Tag rendering (for response): %s",[repr(i) for i in tags])
             for tag in tags:
                 html = str(tag)
                 if isinstance(tag,Tag):

@@ -52,12 +52,8 @@ class TagBase:
 
     def set(self,elt):
         """ a bit like .innerHTML setting (avoid clear+add)"""
-        if elt is None:
-            self._contents=[]
-        elif not isinstance(elt,str) and hasattr(elt,"__iter__"):
-            self._contents = list(elt)
-        else:
-            self._contents = [elt]
+        self.clear()
+        self.add( elt)
 
     def add(self,elt):
         """ add an object or a list/tuple of objects """
@@ -75,8 +71,6 @@ class TagBase:
         return self._attrs.get(attr,None)
 
     def __str__(self):
-        self._image=None
-
         rattrs=[]
         for k,v in self._attrs.items():
             if v is not None:
@@ -93,7 +87,10 @@ class TagBase:
 
     def _getStateImage(self) -> str:
         """Return a str'image (state) of the object, for quick detection (see Stater())"""
+
+        logger.debug("Force Tag rendering (for state image): %s",repr(self))
         str(self) # force a re-rendering (for builded lately)
+
         image=lambda x: "[%s]"%id(x) if isinstance(x,Tag) else str(x)
         return """%s%s:%s""" % (
             self.tag,
@@ -112,7 +109,7 @@ class TagBase:
         return {self:ll}
 
     def __repr__(self):
-        return f"<{self.__class__.__name__}'{self.tag} {self._attrs} (childs:{len(self._contents)})>"
+        return f"<{self.__class__.__name__}'{self.tag} {self._attrs.get('id')} (childs:{len(self._contents)})>"
 
 class TagCreator(type):
     def __getattr__(self,name:str):
@@ -167,11 +164,17 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
         """ get a list of IIFE js declared script of this tag and its children"""
         ll=[]
         if self.js:
+            logger.debug("Init Script (.js) found in %s --> '%s'",repr(self),self.js)
             ll.append( self._genIIFEScript( self.js ) ) #IIFE !
 
-        for i in self._contents:
-            if isinstance(i,Tag):
-                ll.extend( i._getAllJs() )
+        def rec(childs):
+            for i in childs:
+                if isinstance(i,Tag):
+                    ll.extend( i._getAllJs() )
+                elif isinstance(i,TagBase):
+                    rec(i._contents)
+
+        rec(self._contents)
 
         return ll
 

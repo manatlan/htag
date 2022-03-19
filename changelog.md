@@ -1,3 +1,11 @@
+### 0.0.11 "EN COURS"
+
+ * now, it's able to find (init)script/js in Tag embbed in TagBase !!!
+ * tagbase.__repr__ shortened (no more all attrs, juste the @id if present)
+ * logger.debug for tag rendering, in general
+ * logger.debug for state/guesser
+ * more tests
+
 ### 0.0.10 "tagbase setter!" 2022/03/18
 
  * no more "space" between childs in tagbase.__str__ (rendering)

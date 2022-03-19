@@ -70,3 +70,5 @@ def test_Tag_md5():
     t2=My(sameContent,**sameattrs)
 
     assert t1.md5 != t2.md5
+
+

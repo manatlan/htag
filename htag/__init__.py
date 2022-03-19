@@ -9,7 +9,7 @@
 
 from .tag import Tag,HTagException
 
-__version__ = "0.0.10" # updated from pypoetry.toml
+__version__ = "0.0.11" # updated from pypoetry.toml
 
 __all__= ["Tag","HTagException"]
 
