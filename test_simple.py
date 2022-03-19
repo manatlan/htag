@@ -292,6 +292,23 @@ def test_state_yield():
     assert "<h1>hello2</h1>" in str(s)
     assert jss.pop()=="/*JS2*/" and len(jss)==0
 
+def test_auto_instanciate_attributs():
+    class My(Tag):
+        js="/*js1*/"
+
+    t=My()
+    assert t.js == "/*js1*/"
+
+    t=My(js="/*js2*/")  # here, we override self.js ;-)
+    assert t.js == "/*js2*/"
+
+    t=My(value=42)      # here we create a new attribut (avoid to create an __init__ for that)
+    assert t.js == "/*js1*/"
+    assert t.value == 42
+
+
+
+
 if __name__=="__main__":
 
     import logging
