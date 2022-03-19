@@ -1,3 +1,7 @@
+### 0.0.12 "Back to the source" 2022/03/19
+
+ * statics discovering is now based on static class declaration (no more dynamic)
+
 ### 0.0.11 "better js discovering" 2022/03/19
 
  * now, it's able to find (init)script/js from Tag embbeded in TagBase !!!

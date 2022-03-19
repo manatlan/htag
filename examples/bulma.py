@@ -703,9 +703,9 @@ if __name__=="__main__":
 
     from htag.runners import *
     # r=GuyApp( app )
-    r=PyWebWiew( app )
+    # r=PyWebWiew( app )
     # r=BrowserStarletteHTTP( app )
     # r=BrowserStarletteWS( app )
-    # r=BrowserHTTP( app )
+    r=BrowserHTTP( app )
     # r=WebHTTP( lambda: Page() )
     r.run()

@@ -9,7 +9,7 @@
 import json,ctypes,asyncio,types,traceback
 
 from . import __version__
-from .tag import Tag, genJsInteraction
+from .tag import HTagException, Tag, TagBase, genJsInteraction
 
 import logging
 logger = logging.getLogger(__name__)
@@ -69,28 +69,20 @@ class HRenderer:
             # add an .exit() method on the tag !!!!!!!!!!!!!!!!!!!!!!
             self.tag.exit = exit_callback
 
-        logger.debug("Force Tag rendering (for init statics): %s",repr(tag))
-        str(tag) # force rendering (for "builded lately" tags)
-
-        #TODO: discovering from childs is not a good idea ... should revert to static discovering ;-(
-        # get all statics in the tree from the root tag
-        children=[]
-        if isinstance( tag, Tag):
-            def rec( childs ):
-                for obj in childs:
-                    tag,childs= list(obj.items())[0]
-                    children.append(tag)
-                    rec( childs )
-            rec( [self.tag._getTree()])
-
-        # compute a real list of unique import
         self._statics=[]
-        for child in children:
-            if isinstance(child,Tag):
-                statics = child.statics if type(child.statics )==list else [child.statics ]
-                for i in statics:
-                    if getattr(i,"md5") not in [j.md5 for j in self._statics]:
-                        self._statics.append( i )
+        ensureList=lambda x: x if isinstance(x,list) else [x]
+        def rec( subclasses ):
+            for c in subclasses:
+                for i in ensureList(c.statics):
+                    if isinstance(i,TagBase):
+                        if isinstance(i,Tag):
+                            logger.warning("Don't include dynamic Tag in statics! (it's ignored)")
+                            continue
+                        if i.md5 not in [j.md5 for j in self._statics]:
+                            self._statics.append( i )
+                rec(c.__subclasses__())
+
+        rec(Tag.__subclasses__())
 
         logger.debug("HRenderer(), statics found : %s", [repr(i) for i in self._statics])
 

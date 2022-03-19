@@ -5,7 +5,7 @@ import pytest
 import asyncio
 import re
 
-from htag import Tag
+from htag import Tag,HTagException
 from htag.render import Stater,HRenderer
 
 
@@ -20,6 +20,18 @@ def test_ko_try_render_a_tagbase():
 
     with pytest.raises(Exception):
         HRenderer(t,"function interact() {}; start(); // the starter")
+
+def test_ko_including_a_Tag_in_statics():
+    class Style(Tag):
+        tag="mystyle"
+
+    class O(Tag):
+        statics= [Style()]  # <= avoid that (does nothing!!!)
+
+    r=HRenderer(O(),"function interact() {}; start(); // the starter")
+    assert "<mystyle>" not in str(r) # will not be included
+    # and a logger.warning is outputed
+
 
 
 def test_render_a_tag_with_interaction():
@@ -417,6 +429,9 @@ def test_discovering_js():
     asyncio.run(test(r))
 
 
+# this test is NON SENSE, til statics are imported in static (not dynamic anymore)
+# this test is NON SENSE, til statics are imported in static (not dynamic anymore)
+# this test is NON SENSE, til statics are imported in static (not dynamic anymore)
 def test_discovering_css():
     class O(Tag):
         statics=[Tag.style("/*CSS1*/")]
@@ -472,4 +487,5 @@ if __name__=="__main__":
     logging.basicConfig(format='[%(levelname)-5s] %(name)s: %(message)s',level=logging.DEBUG)
     # logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.DEBUG)
 
-    test_intelligent_rendering()
+    # test_intelligent_rendering()
+    test_ko_including_a_Tag_in_statics()
