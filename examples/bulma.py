@@ -693,15 +693,19 @@ if __name__=="__main__":
 
 
 
+    import logging
+    logging.basicConfig(format='[%(levelname)-5s] %(name)s: %(message)s',level=logging.DEBUG)
+    # logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.DEBUG)
+
 
 
     app=Page()
 
     from htag.runners import *
     # r=GuyApp( app )
-    # r=PyWebWiew( app )
+    r=PyWebWiew( app )
     # r=BrowserStarletteHTTP( app )
     # r=BrowserStarletteWS( app )
-    r=BrowserHTTP( app )
+    # r=BrowserHTTP( app )
     # r=WebHTTP( lambda: Page() )
     r.run()
