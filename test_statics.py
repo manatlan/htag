@@ -72,3 +72,9 @@ def test_Tag_md5():
     assert t1.md5 != t2.md5
 
 
+if __name__=="__main__":
+
+    import logging
+    logging.basicConfig(format='[%(levelname)-5s] %(name)s: %(message)s',level=logging.DEBUG)
+    # logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.DEBUG)
+    # test_Tag_md5()

@@ -292,14 +292,20 @@ def test_state_yield():
     assert "<h1>hello2</h1>" in str(s)
     assert jss.pop()=="/*JS2*/" and len(jss)==0
 
-# test_base()
-# test_ko()
-# test_attrs()
-# test_bad_tag_instanciation()
-# test_tag_generation_with_opt_params()
-# test_tag_generation_override_attr_at_construct()
-# test_generate_js_interact()
-# test_generate_real_js()
-# test_its_the_same_tagbase_exactly()
+if __name__=="__main__":
 
-# test_base_concepts()
+    import logging
+    logging.basicConfig(format='[%(levelname)-5s] %(name)s: %(message)s',level=logging.DEBUG)
+    # logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.DEBUG)
+
+    # test_base()
+    # test_ko()
+    # test_attrs()
+    # test_bad_tag_instanciation()
+    # test_tag_generation_with_opt_params()
+    # test_tag_generation_override_attr_at_construct()
+    # test_generate_js_interact()
+    # test_generate_real_js()
+    # test_its_the_same_tagbase_exactly()
+
+    # test_base_concepts()

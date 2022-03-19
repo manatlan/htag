@@ -457,12 +457,19 @@ def test_discovering_css():
     r=HRenderer(OOOL(),"//js interact")
     test(r)
 
-# test_ko_try_render_a_tagbase()
-# test_render_a_tag_with_interaction()
-# test_render_a_tag_with_child_interactions()
-# test_render_yield_with_scripts()
-# test_intelligent_rendering()
-# test_build_immediatly_vs_lately()
-# test_renderer_same_str()
+if __name__=="__main__":
+    # test_ko_try_render_a_tagbase()
+    # test_render_a_tag_with_interaction()
+    # test_render_a_tag_with_child_interactions()
+    # test_render_yield_with_scripts()
+    # test_intelligent_rendering()
+    # test_build_immediatly_vs_lately()
+    # test_renderer_same_str()
 
-# test_intelligent_rendering2()
+    # test_intelligent_rendering2()
+
+    import logging
+    logging.basicConfig(format='[%(levelname)-5s] %(name)s: %(message)s',level=logging.DEBUG)
+    # logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.DEBUG)
+
+    test_intelligent_rendering()
