@@ -1,3 +1,7 @@
+### 0.0.14 "return of return, act1" 2022/03/20
+
+ * FIX : avoid redrawing itself is more clever
+
 ### 0.0.13 "return of return, act1" 2022/03/20
 
  * actions.update is now a dict

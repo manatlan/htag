@@ -169,7 +169,7 @@ function action( o ) {
                     rep= self._mkReponse(state.guess() )
                     if dontRedraw:
                         logger.debug("Don't redraw (%s) on interaction '%s'", repr(dontRedraw),method)
-                        del rep[ id(dontRedraw) ]
+                        if id(dontRedraw) in rep: del rep[ id(dontRedraw) ]
 
                 finally:
                     # clean the (fucking) situation ;-)
