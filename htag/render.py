@@ -92,9 +92,9 @@ function start() { %s }
 function action( o ) {
 
     if(o.hasOwnProperty("update"))
-        o["update"].forEach( i => {
-            document.getElementById( i["id"] ).outerHTML = i["content"]
-        })
+        Object.keys(o["update"]).forEach(key => {
+            document.getElementById( key ).outerHTML = o["update"][key];
+        });
 
     if(o.hasOwnProperty("post")) eval( o["post"] );
     if(o.hasOwnProperty("next")) eval( o["next"] );
@@ -118,7 +118,7 @@ function action( o ) {
                 # start (not a real interaction, just produce the first rendering of the main tag (will be a body))
                 logger.info("INTERACT INITIAL: %s",repr(self.tag))
                 rep = self._mkReponse( [self.tag] )
-                rep["update"][0]["id"] = 0  #INPERSONNATE (for first interact on id#0)
+                rep["update"][0]=list(rep["update"].values())[0]  #INPERSONNATE (for first interact on id#0)
             else:
                 obj = ctypes.cast(oid, ctypes.py_object).value    # /!\
 
@@ -128,6 +128,8 @@ function action( o ) {
                 state = Stater(self.tag)
                 setattr(Tag,"__call__", hookInteractScripts) # not great (with concurrencies)
                 try:
+                    dontRedraw = None
+
                     if isinstance(obj,Tag):
                         logger.info(f"INTERACT with %s, calling: {method_name}({args},{kargs})", repr(obj))
 
@@ -160,9 +162,14 @@ function action( o ) {
                             del self._loop[ id(r) ]
                     else:
                         # it's a simple method
-                        assert r is None
+                        assert r in [0,None]    #ensure method returning 0 or None
+                        if r==0:
+                            dontRedraw = obj
 
                     rep= self._mkReponse(state.guess() )
+                    if dontRedraw:
+                        logger.debug("Don't redraw (%s) on interaction '%s'", repr(dontRedraw),method)
+                        del rep[ id(dontRedraw) ]
 
                 finally:
                     # clean the (fucking) situation ;-)
@@ -198,13 +205,13 @@ function action( o ) {
         scripts = []
 
         if tags:
-            rep["update"]=[]
+            rep["update"]={}
             logger.debug("Force Tag rendering (for response): %s",[repr(i) for i in tags])
             for tag in tags:
                 html = str(tag)
                 if isinstance(tag,Tag):
                     scripts.extend( tag._getAllJs() )
-                rep["update"].append( dict(id=id(tag),content=html) )
+                rep["update"][id(tag)]=html
 
         if scripts:
             rep["post"]="\n".join( scripts )

@@ -66,14 +66,14 @@ def test_render_a_tag_with_interaction():
 
     # START
     resp = asyncio.run( r.interact( 0, None, None, None) )
-    assert resp["update"][0]["id"] == 0
+    assert 0 in resp["update"]
     assert "SCRIPT1" in resp["post"]
     assert "SCRIPT2" not in resp["post"]    # action not executed ... S2 not present
     assert t["class"] == "my"
 
     # # 1st interaction
     resp = asyncio.run( r.interact( id(t), "action", [], {}) )
-    assert resp["update"][0]["id"] == id(t)
+    assert id(t) in resp["update"]
     assert "SCRIPT1" in resp["post"]    #\_ The 2 scripts are here
     assert "SCRIPT2" in resp["post"]    #/
     assert t["class"] == "my2"  # the class has changed
@@ -115,7 +115,7 @@ def test_render_a_tag_with_child_interactions():
 
     # START
     resp = asyncio.run( r.interact( 0, None, None, None) )
-    assert resp["update"][0]["id"] == 0
+    assert 0 in resp["update"]
     assert "SCRIPT1" in resp["post"]
     assert "INITA" in resp["post"]
     assert "INITB" in resp["post"]
@@ -157,7 +157,7 @@ def test_render_yield_with_scripts():
 
     async def testGenerator(method):
         resp = await r.interact( 0, None, None, None)
-        assert resp["update"][0]["id"] == 0
+        assert 0 in resp["update"]
         assert "SCRIPT0" in resp["post"]
         assert "next" not in resp
 
@@ -201,7 +201,7 @@ def test_interact_error():
 
     async def testGenerator(method):
         resp = await r.interact( 0, None, None, None)
-        assert resp["update"][0]["id"] == 0
+        assert 0 in resp["update"]
 
         resp = await r.interact( id(t), method, [],{})
         assert "err" in resp
@@ -413,7 +413,7 @@ def test_discovering_js():
 
     async def test(r): # first call (init obj)
         resp = await r.interact( 0, None, None, None)
-        assert resp["update"][0]["id"] == 0
+        assert 0 in resp["update"]
         assert "/*JS1*/" in resp["post"]
 
     r=HRenderer(OOI(),"//js interact")

@@ -1,3 +1,8 @@
+### 0.0.13 "return of return, act1" 2022/03/20
+
+ * actions.update is now a dict
+ * interaction can now "return 0" to avoid redrawing itself
+
 ### 0.0.12 "Back to the source" 2022/03/19
 
  * statics discovering is now based on static class declaration (no more dynamic)
