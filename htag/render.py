@@ -33,7 +33,7 @@ class Stater:
         rec( [self.tag._getTree()])
         logger.debug("Stater.__init__(), save %s states", len(self._states))
 
-    def guess(self): # -> list<Tag>
+    def guess(self,dontRedraw=None): # -> list<Tag>
         """ to be runned after interactions to guess whose are modifieds
             return modifieds tags
         """
@@ -46,9 +46,14 @@ class Stater:
                 state_after = tag._getStateImage()
                 state_before= self._states.get( id(tag) )
                 if state_after != state_before:
-                    logger.debug("STATE BEFORE for %s = '%s'", repr(tag), state_before )
-                    logger.debug("STATE AFTER  for %s = '%s'", repr(tag), state_after )
-                    modifieds.append(tag)
+                    if id(tag)==id(dontRedraw):
+                        logger.debug("Don't redraw %s (but modified)", repr(dontRedraw))
+                        # but perhaps childs ...
+                        rec(childs)
+                    else:
+                        logger.debug("STATE BEFORE for %s = '%s'", repr(tag), state_before )
+                        logger.debug("STATE AFTER  for %s = '%s'", repr(tag), state_after )
+                        modifieds.append(tag)
                 else:
                     # no need to see childs, coz the parent will redraw all (childs too)
                     rec(childs)
@@ -118,7 +123,7 @@ function action( o ) {
                 # start (not a real interaction, just produce the first rendering of the main tag (will be a body))
                 logger.info("INTERACT INITIAL: %s",repr(self.tag))
                 rep = self._mkReponse( [self.tag] )
-                rep["update"][0]=list(rep["update"].values())[0]  #INPERSONNATE (for first interact on id#0)
+                rep["update"]={0: list(rep["update"].values())[0]}  #INPERSONNATE (for first interact on id#0)
             else:
                 obj = ctypes.cast(oid, ctypes.py_object).value    # /!\
 
@@ -142,13 +147,14 @@ function action( o ) {
                             r=method(*args,**kargs)
                     else:
                         logger.info("INTERACT with GENERATOR %s",obj.__name__)
-                        r=obj
+                        r=obj # r is the generator !
 
                     if isinstance(r, types.AsyncGeneratorType):
                         # it's a "async def yield"
                         self._loop[id(r)] = r # save it, to avoid GC
                         try:
-                            await r.__anext__()
+                            ret = await r.__anext__()
+                            if ret is not None: raise HTagException("This generator yield something ?!") #TODO: to implement ?
                             next_js_call = genJsInteraction(id(r))
                         except StopAsyncIteration:
                             del self._loop[ id(r) ]
@@ -156,7 +162,8 @@ function action( o ) {
                         # it's a "def yield"
                         self._loop[id(r)] = r # save it, to avoid GC
                         try:
-                            r.__next__()
+                            ret = r.__next__()
+                            if ret is not None: raise HTagException("This generator yield something ?!") #TODO: to implement ?
                             next_js_call = genJsInteraction(id(r))
                         except StopIteration:
                             del self._loop[ id(r) ]
@@ -166,10 +173,7 @@ function action( o ) {
                         if r==0:
                             dontRedraw = obj
 
-                    rep= self._mkReponse(state.guess() )
-                    if dontRedraw:
-                        logger.debug("Don't redraw (%s) on interaction '%s'", repr(dontRedraw),method)
-                        if id(dontRedraw) in rep: del rep[ id(dontRedraw) ]
+                    rep= self._mkReponse(state.guess(dontRedraw) )
 
                 finally:
                     # clean the (fucking) situation ;-)
@@ -203,15 +207,18 @@ function action( o ) {
         rep={}
 
         scripts = []
+        updates={}
 
         if tags:
-            rep["update"]={}
             logger.debug("Force Tag rendering (for response): %s",[repr(i) for i in tags])
             for tag in tags:
-                html = str(tag)
+                updates[id(tag)]=str(tag)
+
                 if isinstance(tag,Tag):
                     scripts.extend( tag._getAllJs() )
-                rep["update"][id(tag)]=html
+
+        if updates:
+            rep["update"]=updates
 
         if scripts:
             rep["post"]="\n".join( scripts )

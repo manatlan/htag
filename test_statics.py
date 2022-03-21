@@ -69,7 +69,9 @@ def test_Tag_md5():
     t1=My(sameContent,**sameattrs)
     t2=My(sameContent,**sameattrs)
 
-    assert t1.md5 != t2.md5
+    #md5 is computed, but not useful
+    #(as it's only for tagbase in statics)
+    assert t1.md5 != t2.md5 # so, it's different
 
 
 if __name__=="__main__":

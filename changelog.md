@@ -1,4 +1,10 @@
-### 0.0.14 "return of return, act1" 2022/03/20
+### 0.0.15 "return of return, act final" 2022/03/20
+
+ * BUT I DON'T LIKE THAT, and it will probably change (return is not the good way !)
+ * the "don't redraw itself" is more clever (now, in stater.guess)
+ * with unittests ^^
+
+### 0.0.14 "return of return, act2" 2022/03/20
 
  * FIX : avoid redrawing itself is more clever
 
