@@ -60,9 +60,9 @@ class Object(Tag):
     def incNormal(self):
         self["nb"]+=1
 
+    @Tag.NoRender
     def incNoRedraw(self):
         self["nb"]+=1
-        return 0
 
 
 @pytest.mark.asyncio
@@ -107,10 +107,10 @@ async def test_rendering():
             self["my"]+=1
             self.o1.incNormal()     # has no efect
 
+        @Tag.NoRender
         def testModMe_2(self):
             self["my"]+=1
             self.o1.incNormal()     # has no efect
-            return 0
 
 
         # use incNoRedraw from o1
@@ -122,10 +122,10 @@ async def test_rendering():
             self["my"]+=1
             self.o1.incNoRedraw()   # has no efect
 
+        @Tag.NoRender
         def testModMe_12(self):
             self["my"]+=1
             self.o1.incNoRedraw()   # has no efect
-            return 0
 
     #====================================================================
     o=P()
@@ -152,7 +152,7 @@ async def test_rendering():
     r=await hr.interact( o ).testModMe_2()
     assert id(o.o1) in r["update"]  # redraw just the child # not the main, coz main return 0
 
-    #========================
+    # #========================
 
     r=await hr.interact( o ).testModMe_10()
     assert id(o) in r["update"]
@@ -174,10 +174,10 @@ async def test_simplest_async():
             Tag.__init__(self)
             self["nb"]=0
 
+        @Tag.NoRender
         def inc(self):
             self["nb"]+=1
-            yield 0             # not possible yet ;-(
-            return 0
+            yield
 
     o=Object()
 
@@ -186,9 +186,10 @@ async def test_simplest_async():
     r=await hr.init()
 
     r=await hr.interact(o).inc()
-    assert "err" in r # "err": "This generator yield something ?!"
+    assert "update" not in r
 
-    #TODO: continue HERE (it's completly broken here)
+    await hr.doNext( r)
+    assert "update" not in r
 
 if __name__=="__main__":
 

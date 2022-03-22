@@ -1,4 +1,9 @@
-### 0.0.15 "return of return, act final" 2022/03/20
+### 0.0.16 "@Tag.NoRender" 2022/03/22
+
+ * the decoraton "@Tag.NoRender" for an interaction, avoid rendering itself !
+ * the return thing is gone (yield or return should return none only)
+
+### 0.0.15 "return of return, act final" 2022/03/21
 
  * BUT I DON'T LIKE THAT, and it will probably change (return is not the good way !)
  * the "don't redraw itself" is more clever (now, in stater.guess)

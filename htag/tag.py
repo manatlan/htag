@@ -128,10 +128,18 @@ class Binder:
         else:
             raise HTagException("Unknown method '%s' in '%s'"%(method,self.__instance.__class__.__name__))
 
+
+
+
 class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
     statics: list = [] # list of "Tag", imported at start
 
     js: str = None  # post script, useful for js/init when tag is rendered
+
+    @classmethod
+    def NoRender(cls,f):
+        f._norender = True
+        return f
 
     def __init__(self, **_attrs):
         attrs={}

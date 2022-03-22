@@ -133,45 +133,53 @@ function action( o ) {
                 state = Stater(self.tag)
                 setattr(Tag,"__call__", hookInteractScripts) # not great (with concurrencies)
                 try:
-                    dontRedraw = None
-
+                    norender=False
                     if isinstance(obj,Tag):
                         logger.info(f"INTERACT with %s, calling: {method_name}({args},{kargs})", repr(obj))
 
                         # call the method
                         method=getattr(obj,method_name)
 
+                        if hasattr(method,"_norender"):
+                            norender = True
+
                         if asyncio.iscoroutinefunction( method ):
                             r=await method(*args,**kargs)
                         else:
                             r=method(*args,**kargs)
+
+                        if isinstance(r, types.AsyncGeneratorType) or isinstance(r, types.GeneratorType):
+                            self._loop[id(r)] = dict(gen=r,tag=obj,norender= norender) # save it, to avoid GC (and save the Tag/norender)
                     else:
-                        logger.info("INTERACT with GENERATOR %s",obj.__name__)
                         r=obj # r is the generator !
+                        obj = self._loop[id(r)]["tag"]
+                        logger.info("INTERACT with GENERATOR %s of %s",r.__name__,repr(obj))
+                        norender = self._loop[id(r)]["norender"]
 
                     if isinstance(r, types.AsyncGeneratorType):
                         # it's a "async def yield"
-                        self._loop[id(r)] = r # save it, to avoid GC
                         try:
                             ret = await r.__anext__()
-                            if ret is not None: raise HTagException("This generator yield something ?!") #TODO: to implement ?
+                            assert ret is None
                             next_js_call = genJsInteraction(id(r))
                         except StopAsyncIteration:
                             del self._loop[ id(r) ]
                     elif isinstance(r, types.GeneratorType):
                         # it's a "def yield"
-                        self._loop[id(r)] = r # save it, to avoid GC
                         try:
                             ret = r.__next__()
-                            if ret is not None: raise HTagException("This generator yield something ?!") #TODO: to implement ?
+                            assert ret is None
                             next_js_call = genJsInteraction(id(r))
                         except StopIteration:
                             del self._loop[ id(r) ]
                     else:
                         # it's a simple method
-                        assert r in [0,None]    #ensure method returning 0 or None
-                        if r==0:
-                            dontRedraw = obj
+                        assert r is None
+
+                    if norender:
+                        dontRedraw = obj
+                    else:
+                        dontRedraw = None
 
                     rep= self._mkReponse(state.guess(dontRedraw) )
 
