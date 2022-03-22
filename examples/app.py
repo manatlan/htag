@@ -1,25 +1,26 @@
+from ctypes.wintypes import HACCEL
 import os,sys; sys.path.insert(0,os.path.dirname(os.path.dirname(__file__)))
-from htag import Tag
+from htag import H,Tag
 
 # "https://cdn.jsdelivr.net/npm/bulma@0.8.2/css/bulma.min.css"
 # css=Tag.style("""/*! bulma.io v0.8.2 | MIT License | github.com/jgthms/bulma *""")
 
-css=Tag.link( _href="https://cdn.jsdelivr.net/npm/bulma@0.8.2/css/bulma.min.css",_rel="stylesheet")
+css=[H.link( _href="https://cdn.jsdelivr.net/npm/bulma@0.8.2/css/bulma.min.css",_rel="stylesheet"),]
 
-class CptWithStars(Tag):
+class CptWithStars(Tag.div):
     statics=css
 
     def __init__(self,value=0,**a):
-        Tag.__init__(self,**a)
+        Tag.div.__init__(self,**a)
 
         self.nb=value
         self.build()
 
     def build(self): # special method
         self.clear()
-        self.add( Tag.button( "-",_onclick=self.bind.onclick(-1) ))
+        self.add( H.button( "-",_onclick=self.bind.onclick(-1) ))
         self.add( self.nb )
-        self.add( Tag.button( "+",_onclick=self.bind.onclick(1) ))
+        self.add( H.button( "+",_onclick=self.bind.onclick(1) ))
         for i in range(self.nb):
             self.add("*")
 
@@ -28,18 +29,18 @@ class CptWithStars(Tag):
         self.build()
 
 
-class Cpt(Tag):
+class Cpt(Tag.div):
     statics=css
 
     def __init__(self,value=0,**a):
-        Tag.__init__(self,**a)
+        Tag.div.__init__(self,**a)
         self.nb=value
 
-        self.ocpt = Tag.span( self.nb )
+        self.ocpt = H.span( self.nb )
 
-        self <= Tag.button( "-",_onclick=self.bind.onclick(-1) )
+        self <= H.button( "-",_onclick=self.bind.onclick(-1) )
         self <= self.ocpt
-        self <= Tag.button( "+",_onclick=self.bind.onclick(1) )
+        self <= H.button( "+",_onclick=self.bind.onclick(1) )
 
     def onclick(self,v):
         self.nb+=v
@@ -58,21 +59,21 @@ class Page(Tag):
 
         self.add( self.c1 )
         self.add( self.c2 )
-        self.add( Tag.button("alert",_onclick="alert(document.querySelector('input').value)",_class="button") )
+        self.add( H.button("alert",_onclick="alert(document.querySelector('input').value)",_class="button") )
 
-        self.t=Tag.input(_value="",_onchange=self.bind.press(b"this.value"))
+        self.t=H.input(_value="",_onchange=self.bind.press(b"this.value"))
         self.add( self.t )
 
-        s=Tag.div()
-        s<= Tag.button("BUG JS pre",_onclick=self.bind.bugjs(txt=b"gfdsfsgfds()"),_class="button")
-        s<= Tag.button("BUG JS post",_onclick=self.bind.bugjs(),_class="button")
-        s<= Tag.button("BUG PY (normal)",_onclick=self.bind.bugpy(),_class="button")
-        s<= Tag.button("BUG PY (gen)",_onclick=self.bind.bugpysg(),_class="button")
-        s<= Tag.button("BUG PY (async gen)",_onclick=self.bind.bugpyag(),_class="button")
+        s=H.div()
+        s<= H.button("BUG JS pre",_onclick=self.bind.bugjs(txt=b"gfdsfsgfds()"),_class="button")
+        s<= H.button("BUG JS post",_onclick=self.bind.bugjs(),_class="button")
+        s<= H.button("BUG PY (normal)",_onclick=self.bind.bugpy(),_class="button")
+        s<= H.button("BUG PY (gen)",_onclick=self.bind.bugpysg(),_class="button")
+        s<= H.button("BUG PY (async gen)",_onclick=self.bind.bugpyag(),_class="button")
         self <= s
 
-        self.add( Tag.button("Sync Yield",_onclick=self.bind.testSYield(),_class="button") )
-        self.add( Tag.button("ASync Yield",_onclick=self.bind.testAYield(),_class="button") )
+        self.add( H.button("Sync Yield",_onclick=self.bind.testSYield(),_class="button") )
+        self.add( H.button("ASync Yield",_onclick=self.bind.testAYield(),_class="button") )
 
         self.js="console.log(42)"
 

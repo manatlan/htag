@@ -1,25 +1,25 @@
-from htag import Tag
+from htag import H,Tag
 from htag.render import HRenderer
 
 def test_built_immediatly():
     ################################################################
     # test static discovering (in built immediatly)
     ################################################################
-    class O(Tag):
-        statics=Tag.style("/*S1*/")
+    class O(Tag.div):
+        statics=H.style("/*S1*/")
 
     assert "/*S1*/" in str(HRenderer( O(), "//"))
     ################################################################
-    class OO(Tag):
+    class OO(Tag.div):
         def __init__(self):
-            Tag.__init__(self)
+            Tag.div.__init__(self)
             self <= O() # "O" is a direct child
 
     assert "/*S1*/" in str(HRenderer( OO(), "//"))
     ################################################################
-    class OO(Tag):
+    class OO(Tag.div):
         def __init__(self):
-            Tag.__init__(self)
+            Tag.div.__init__(self)
             self <= Tag.div( O() ) # "O" is a non-direct child
 
     assert "/*S1*/" in str(HRenderer( OO(), "//"))
@@ -29,19 +29,19 @@ def test_build_lately():
     ################################################################
     # test static discovering (in built lately)
     ################################################################
-    class O(Tag):
-        statics=Tag.style("/*S1*/")
+    class O(Tag.div):
+        statics=H.style("/*S1*/")
 
     assert "/*S1*/" in str(HRenderer( O(), "//"))
     ################################################################
-    class OO(Tag):
+    class OO(Tag.div):
         def __str__(self):
             self <= O() # "O" is a direct child
             return str(super())
 
     assert "/*S1*/" in str(HRenderer( OO(), "//"))
     ################################################################
-    class OO(Tag):
+    class OO(Tag.div):
         def __str__(self):
             self <= Tag.div( O() ) # "O" is a non-direct child
             return str(super())
@@ -53,15 +53,15 @@ def test_TagBase_md5():
 
     sameContent="hello"
     sameattrs=dict(_class="hello")
-    t1=Tag.a(sameContent,**sameattrs)
-    t2=Tag.a(sameContent,**sameattrs)
+    t1=H.a(sameContent,**sameattrs)
+    t2=H.a(sameContent,**sameattrs)
 
     assert t1.md5 == t2.md5
 
 def test_Tag_md5():
-    class My(Tag):
+    class My(Tag.div):
         def __init__(self,txt,**a):
-            Tag.__init__(self,**a)
+            Tag.div.__init__(self,**a)
             self <= txt
 
     sameContent="hello"

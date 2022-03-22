@@ -5,8 +5,9 @@ import pytest
 import asyncio
 import re
 
-from htag import Tag,HTagException
+from htag import H,Tag,HTagException
 from htag.render import Stater,HRenderer
+from htag.tag import H
 
 
 anon=lambda t: str(t).replace( str(id(t)),"<id>" )
@@ -16,7 +17,8 @@ def getGeneratorId(resp):
     return int(re.findall( r"(\d+)", resp["next"])[0])
 
 def test_ko_try_render_a_tagbase():
-    t=Tag.div("hello")
+    t=H.div("hello")
+    print(isinstance(t,Tag))
 
     with pytest.raises(Exception):
         HRenderer(t,"function interact() {}; start(); // the starter")
@@ -82,7 +84,7 @@ def test_render_a_tag_with_interaction():
 
 def test_render_a_tag_with_child_interactions():
     class Obj(Tag):
-        statics=Tag.script("my")
+        statics=H.script("my")
 
         def __init__(self,name,**a):
             Tag.__init__(self,**a)
@@ -94,7 +96,7 @@ def test_render_a_tag_with_child_interactions():
 
 
     class MyDiv(Tag):
-        statics=Tag.script("my")
+        statics=H.script("my")
         js="SCRIPT1"
 
         def __init__(self,**a):
@@ -317,7 +319,7 @@ def test_build_immediatly_vs_lately():
         """ build immediatly """
 
         def __init__(self,name,**a):
-            Tag.__init__(self,**a)
+            Tag.div.__init__(self,**a)
             self["name"]=name
             self["nb"] = 0
 
@@ -325,7 +327,7 @@ def test_build_immediatly_vs_lately():
             self["nb"] += 1
             self.clear()
             for i in range(self["nb"]):
-                self <= Tag.span("*")
+                self <= H.span("*")
 
     class Obj2(Tag.div):
         """ build lately """
@@ -343,7 +345,7 @@ def test_build_immediatly_vs_lately():
             self["nb"]=self.nb
             self.clear()
             for i in range(self.nb):
-                self <= Tag.span("*")
+                self <= H.span("*")
             return Tag.__str__(self)
 
 
@@ -434,27 +436,27 @@ def test_discovering_js():
 # this test is NON SENSE, til statics are imported in static (not dynamic anymore)
 def test_discovering_css():
     class O(Tag):
-        statics=[Tag.style("/*CSS1*/")]
+        statics=[H.style("/*CSS1*/")]
 
-    class OOI(Tag): # immediate rendering
+    class OOI(Tag.div): # immediate rendering
         def __init__(self):
-            Tag.__init__(self)
+            Tag.div.__init__(self)
             self.set( O() )             # Tag directly in Tag
 
-    class OOOI(Tag):  # immediate rendering
+    class OOOI(Tag.div):  # immediate rendering
         def __init__(self):
-            Tag.__init__(self)
-            self.set( Tag.div( O() ) )  # Tag in a TagBase
+            Tag.div.__init__(self)
+            self.set( H.div( O() ) )  # Tag in a TagBase
 
-    class OOL(Tag):   # lately rendering
+    class OOL(Tag.div):   # lately rendering
         def __str__(self):
             self.set( O() )             # Tag directly in Tag
-            return Tag.__str__(self)
+            return Tag.div.__str__(self)
 
-    class OOOL(Tag):  # lately rendering
+    class OOOL(Tag.div):  # lately rendering
         def __str__(self):
             self.set( Tag.div(O()) )    # Tag in a TagBase
-            return Tag.__str__(self)
+            return Tag.div.__str__(self)
 
     def test(r): # first call (init obj)
         assert "/*CSS1*/" in str(r)
@@ -488,4 +490,4 @@ if __name__=="__main__":
     # logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.DEBUG)
 
     # test_intelligent_rendering()
-    test_ko_including_a_Tag_in_statics()
+    test_ko_try_render_a_tagbase()
