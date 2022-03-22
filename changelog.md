@@ -1,3 +1,7 @@
+### 0.0.17 "better logging" 2022/03/22
+
+ * better logging.info to see `**NoRender**`
+
 ### 0.0.16 "@Tag.NoRender" 2022/03/22
 
  * the decoraton "@Tag.NoRender" for an interaction, avoid rendering itself !

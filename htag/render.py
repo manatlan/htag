@@ -135,13 +135,14 @@ function action( o ) {
                 try:
                     norender=False
                     if isinstance(obj,Tag):
-                        logger.info(f"INTERACT with %s, calling: {method_name}({args},{kargs})", repr(obj))
 
                         # call the method
                         method=getattr(obj,method_name)
 
                         if hasattr(method,"_norender"):
                             norender = True
+
+                        logger.info(f"INTERACT with METHOD of %s, calling: {method_name}({args},{kargs}) %s", repr(obj), "**NoRender**" if norender else "")
 
                         if asyncio.iscoroutinefunction( method ):
                             r=await method(*args,**kargs)
@@ -153,8 +154,8 @@ function action( o ) {
                     else:
                         r=obj # r is the generator !
                         obj = self._loop[id(r)]["tag"]
-                        logger.info("INTERACT with GENERATOR %s of %s",r.__name__,repr(obj))
                         norender = self._loop[id(r)]["norender"]
+                        logger.info("INTERACT with GENERATOR of %s, calling: %s %s",repr(obj),r.__name__, "**NoRender**" if norender else "")
 
                     if isinstance(r, types.AsyncGeneratorType):
                         # it's a "async def yield"
@@ -177,11 +178,10 @@ function action( o ) {
                         assert r is None
 
                     if norender:
-                        dontRedraw = obj
+                        rep= self._mkReponse(state.guess(obj) ) # avoid redraw obj
                     else:
-                        dontRedraw = None
+                        rep= self._mkReponse(state.guess() )
 
-                    rep= self._mkReponse(state.guess(dontRedraw) )
 
                 finally:
                     # clean the (fucking) situation ;-)

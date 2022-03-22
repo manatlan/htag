@@ -60,7 +60,7 @@ class Page(Tag):
         self.add( self.c2 )
         self.add( Tag.button("alert",_onclick="alert(document.querySelector('input').value)",_class="button") )
 
-        self.t=Tag.input(_value="",_onkeyup=self.bind.press(b"this.value"))
+        self.t=Tag.input(_value="",_onchange=self.bind.press(b"this.value"))
         self.add( self.t )
 
         s=Tag.div()
@@ -76,11 +76,10 @@ class Page(Tag):
 
         self.js="console.log(42)"
 
-
+    @Tag.NoRender
     def press(self,v):
         self.t["value"]=v
         print(v)
-        return
 
     def testSYield(self):
         for i in list("ABCDEF"):
