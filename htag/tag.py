@@ -111,9 +111,6 @@ class TagBase:
     def __repr__(self):
         return f"<{self.__class__.__name__}'{self.tag} {self._attrs.get('id')} (childs:{len(self._contents)})>"
 
-class TagCreator(type):
-    def __getattr__(self,name:str):
-        return type('TagBaseClone', (TagBase,), {**TagBase.__dict__,"tag":name})
 
 
 class Binder:
@@ -128,8 +125,18 @@ class Binder:
         else:
             raise HTagException("Unknown method '%s' in '%s'"%(method,self.__instance.__class__.__name__))
 
+class TagBaseCreator(type):
+    def __getattr__(self,name:str):
+        return type('TagBaseClone', (TagBase,), {**TagBase.__dict__,"tag":name})
+
+class H(metaclass=TagBaseCreator): # Html
+    def __init__(self):
+        raise HTagException("no!")
 
 
+class TagCreator(type):
+    def __getattr__(self,name:str):
+        return type('TagClone', (Tag,), {**Tag.__dict__,"tag":name})
 
 class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
     statics: list = [] # list of "Tag", imported at start
@@ -141,7 +148,7 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
         f._norender = True
         return f
 
-    def __init__(self, **_attrs):
+    def __init__(self, content=None,**_attrs):
         attrs={}
         auto={}
         for k,v in _attrs.items():
@@ -157,6 +164,7 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
         else:
             attrs["_id"]=id(self)   # force an @id !
         TagBase.__init__(self,None, **attrs)
+        self.set(content)
 
 
     @property

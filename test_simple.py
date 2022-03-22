@@ -2,22 +2,22 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-from htag import Tag,HTagException
+from htag import H,Tag,HTagException
 from htag.tag import TagBase
 
 anon=lambda t: str(t).replace( str(id(t)),"<id>" )
 
 ################################################################################################################
 def test_base():
-    assert str(Tag.div()) == "<div></div>"
-    assert str(Tag.div(None)) == "<div></div>"
-    assert str(Tag.div([])) == "<div></div>"
-    assert str(Tag.div("hello")) == "<div>hello</div>"
-    assert str(Tag.div([1,2,3])) == "<div>123</div>"
-    assert str(Tag.my_div("test")) == "<my-div>test</my-div>"
+    assert str(H.div()) == "<div></div>"
+    assert str(H.div(None)) == "<div></div>"
+    assert str(H.div([])) == "<div></div>"
+    assert str(H.div("hello")) == "<div>hello</div>"
+    assert str(H.div([1,2,3])) == "<div>123</div>"
+    assert str(H.my_div("test")) == "<my-div>test</my-div>"
 
 def test_base2():
-    d=Tag.div("hello")
+    d=H.div("hello")
     assert str(d) == "<div>hello</div>"
     d.set("world")
     assert str(d) == "<div>world</div>"
@@ -31,7 +31,7 @@ def test_base2():
     def gen():
         for i in range(3):
             yield i
-    d=Tag.div()
+    d=H.div()
     d.add( gen() )
     assert str(d) == "<div>012</div>"
     d.set( gen() )
@@ -41,56 +41,52 @@ def test_base2():
     d <= gen()
     assert str(d) == "<div>012</div>"
 
-    d=Tag.div( gen() )
+    d=H.div( gen() )
     assert str(d) == "<div>012</div>"
 
 def test_ko():
     with pytest.raises(HTagException):
-        Tag.span(no="kk")
+        H() #explicitly forbiddent
+
+    with pytest.raises(HTagException):
+        H.span(no="kk")
+
 
 
 def test_attrs():
-    d=Tag.div(_data_text=12)
+    d=H.div(_data_text=12)
     assert d["data-text"]==12
     d["data-text"]+=1
     assert str(d) == '<div data-text="13"></div>'
 
-    d=Tag.div(_checked=True)
+    d=H.div(_checked=True)
     assert d["checked"]
     assert str(d) == '<div checked></div>'
 
-    d=Tag.div(_checked=False)
+    d=H.div(_checked=False)
     assert not d["checked"]
     assert str(d) == '<div></div>'
 
-    d=Tag.my_div( "hello")
+    d=H.my_div( "hello")
     assert str(d) == "<my-div>hello</my-div>"
 
-    d=Tag.div(_id="d1",_class="click")
+    d=H.div(_id="d1",_class="click")
     assert d["id"]=="d1"
     assert d["class"]=="click"
     assert str(d) == '<div id="d1" class="click"></div>'
 
-    d=Tag.div( "hello")
+    d=H.div( "hello")
     d.clear()
     d.add("bye")
     d.add("bye")
     assert str(d) == "<div>byebye</div>"
 
-    div=Tag.div("hello",_style="border:1px solid red")
+    div=H.div("hello",_style="border:1px solid red")
     div["id"] = "mydiv"
-    div.add(Tag.h1("world"))
+    div.add(H.h1("world"))
 
 
 
-
-
-def test_bad_tag_instanciation():
-    class NewTag(Tag):
-        tag="h1"
-
-    with pytest.raises(TypeError):
-        NewTag(2)
 
 def test_tag_generation_with_opt_params():
     class NewTag(Tag.h1):
@@ -102,7 +98,7 @@ def test_tag_generation_with_opt_params():
             self.txt=txt
             # self["class"]="12"
             for i in range(1,self.nb+1):
-                self.add( Tag.li(f"{i} {self.txt}",_id=i) )
+                self.add( H.li(f"{i} {self.txt}",_id=i) )
 
     # can't set an html attribut id
     with pytest.raises(HTagException):
@@ -188,10 +184,10 @@ def test_generate_js_interact():
 
 def test_generate_real_js():
 
-    class NewTag(Tag):
+    class NewTag(Tag.div):
         def __init__(self,**a):
-            Tag.__init__(self,**a)
-            self.add( Tag.button( "width?",_onclick=self.bind.test( "width", b"window.innerWidth") ))
+            Tag.div.__init__(self,**a)
+            self.add( H.button( "width?",_onclick=self.bind.test( "width", b"window.innerWidth") ))
 
         def test(self,txt,width):
             print(txt,"=",width)
@@ -217,13 +213,13 @@ def test_its_the_same_tagbase_exactly():
             self <= "hello"
             self["id"] = 42
 
-    class Test3(Tag.h1):
+    class Test3(H.h1):
         def __init__(self):
             Tag.h1.__init__(self)
             self <= "hello"
             self["id"] = 42
 
-    t1 = Tag.h1("hello",_id=42)
+    t1 = H.h1("hello",_id=42)
     t2 = Test2()
     t3 = Test3()
 
@@ -233,14 +229,13 @@ def test_its_the_same_tagbase_exactly():
 
 def test_base_concepts():
     # Build a TagBase
-    o=Tag.h1("yo",_class="ya")
+    o=H.h1("yo",_class="ya")
     assert isinstance(o, TagBase)
     assert not isinstance(o, Tag)
     assert str(o) == '<h1 class="ya">yo</h1>'
 
     # build a tag
-    o=Tag( _class="ya")
-    o.tag="h1"
+    o=Tag.h1( _class="ya")
     o<= "yo"
     assert isinstance(o, TagBase)
     assert isinstance(o, Tag)
@@ -248,13 +243,12 @@ def test_base_concepts():
 
 
     # INHERIT A REAL TAG
-    class Nimp2(Tag):
-        tag="h2"
+    class Nimp2(Tag.h2):
 
         def __init__(self,name,**attrs):
-            Tag.__init__(self,**attrs)
+            Tag.h2.__init__(self,**attrs)
             self["name"] = name
-            self <= Tag.div(name)
+            self <= H.div(name)
 
     o=Nimp2("yo",_class="ya")
     print( type(o),o.__class__,o )
@@ -264,20 +258,18 @@ def test_base_concepts():
 
 
 def test_state_yield():
-    class TEST(Tag):
-        tag="div"
-
+    class TEST(Tag.div):
         def __init__(self):
             super().__init__()
             self <= Tag.button("go", _onclick=self.bind.test())
 
         def test(self):
             self.clear()
-            self <= Tag.h1("hello1")
+            self <= H.h1("hello1")
             self("/*JS1*/")
             yield
             self.clear()
-            self <= Tag.h1("hello2")
+            self <= H.h1("hello2")
             self("/*JS2*/")
 
     s=TEST()

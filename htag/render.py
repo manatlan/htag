@@ -9,7 +9,7 @@
 import json,ctypes,asyncio,types,traceback
 
 from . import __version__
-from .tag import HTagException, Tag, TagBase, genJsInteraction
+from .tag import HTagException,H, Tag, TagBase, genJsInteraction
 
 import logging
 logger = logging.getLogger(__name__)
@@ -67,7 +67,7 @@ class HRenderer:
     def __init__(self, tag: Tag, js:str, exit_callback=None):
         """ tag object will be setted as a 'body' tag ! """
         """ js should containt an interact method, and an initializer to call the start()"""
-        assert isinstance(tag, Tag)
+        if not isinstance(tag, Tag): raise HTagException("Can only render a Tag !")
         self.tag=tag
         self.tag.tag="body" # force first tag as body !!
         if exit_callback:
@@ -109,7 +109,7 @@ function action( o ) {
 %s
 """ % (genJsInteraction(0), js)
 
-        self._statics.append( Tag.script( js_base ))
+        self._statics.append( H.script( js_base ))
 
         self._loop={}   # for savng generator, to keep them during GC
 
@@ -234,15 +234,15 @@ function action( o ) {
         return rep
 
     def __str__(self) -> str:
-        head=Tag.head()
-        head <= Tag.meta(_charset="utf-8")
-        head <= Tag.meta(_name="viewport",_content="width=device-width, initial-scale=1")
-        head <= Tag.meta(_name="version",_content=f"HTag {__version__}")
-        head <= Tag.title( self.title )
+        head=H.head()
+        head <= H.meta(_charset="utf-8")
+        head <= H.meta(_name="viewport",_content="width=device-width, initial-scale=1")
+        head <= H.meta(_name="version",_content=f"HTag {__version__}")
+        head <= H.title( self.title )
         head <= self._statics
 
-        body=Tag.body( "Loading...", _id=0 ) # #INPERSONNATE (first interact on id #0)
-        return "<!DOCTYPE html>"+str(Tag.html( [head,body] ))
+        body=H.body( "Loading...", _id=0 ) # #INPERSONNATE (first interact on id #0)
+        return "<!DOCTYPE html>"+str(H.html( [head,body] ))
 
     @property
     def title(self):

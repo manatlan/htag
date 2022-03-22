@@ -1,7 +1,13 @@
-from htag import Tag # the only thing you'll need ;-)
+import sys
+try:
+    from htag import H,Tag # the only thing you'll need ;-)
+except:
+    print("ERROR: You'll need to 'pip install htag'")
+    sys.exit(-1)
 
 
-class Button(Tag):
+
+class Button(Tag.div):
     """ It's a button component, rendered as <button onclick=''>txt</button>"""
 
     # this Tag will be rendered as a <button>, so we set its attribut "tag" <- "button"
@@ -9,7 +15,7 @@ class Button(Tag):
 
     # this allow you to include statics in headers
     # (it will be included only once !!!)
-    statics = [Tag.style("button.my {background:yellow; border:1px solid black; border-radius:4px}")]
+    statics = [H.style("button.my {background:yellow; border:1px solid black; border-radius:4px}")]
 
     def __init__(self,txt, callback):
         super().__init__()
@@ -30,7 +36,7 @@ class Button(Tag):
         # it will call the py callback
         self.callback()
 
-class Star(Tag):
+class Star(Tag.div):
     """ This Star component display 2 buttons to decrease/increase a value
         (it displays nb x star according the value)
     """
@@ -84,12 +90,12 @@ class Page(Tag):
         self.clear()
 
         # we put a title
-        self <= Tag.h1("Best movies ;-)")   # here is shortcut to create "<h1>Best movies ;-)</h1>"
+        self <= H.h1("Best movies ;-)")   # here is shortcut to create "<h1>Best movies ;-)</h1>"
                                             # (it works for any html tag you want ;-)
 
         # and add our stuff, sorted by nb of stars
         for name,star in sorted( self.movies, key=lambda x: -x[1].nb ):
-            self <= Tag.div( [name,star] )
+            self <= H.div( [name,star] )
 
         return super().__str__()
 
