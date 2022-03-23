@@ -136,7 +136,10 @@ class H(metaclass=TagBaseCreator): # Html
 
 class TagCreator(type):
     def __getattr__(self,name:str):
-        return type('TagClone', (Tag,), {**Tag.__dict__,"tag":name})
+        if name == "H":
+            return H
+        else:
+            return type('TagClone', (Tag,), {**Tag.__dict__,"tag":name})
 
 class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
     statics: list = [] # list of "Tag", imported at start
@@ -200,3 +203,5 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
     def __str__(self):
         logger.debug("Tag.__str__() : render str for %s", repr(self))
         return TagBase.__str__(self)
+
+

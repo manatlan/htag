@@ -81,8 +81,8 @@ class HRenderer:
                 for i in ensureList(c.statics):
                     if isinstance(i,TagBase):
                         if isinstance(i,Tag):
-                            logger.warning("Don't include dynamic Tag in statics! (it's ignored)")
-                            continue
+                            logger.warning("Avoid to include dynamic Tag in statics! (it's converted)")
+                            #TODO: implement a real conversion !
                         if i.md5 not in [j.md5 for j in self._statics]:
                             self._statics.append( i )
                 rec(c.__subclasses__())

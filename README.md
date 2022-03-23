@@ -30,7 +30,7 @@ There will be docs in the future ;-)
 ## ROADMAP to 1.0.0
 
  * rock solid (need more tests)
- * top level api could change (Tag() -> create a Tag, Tag.mytag() -> create a TagBase ... can be a little bit ambiguous)
+ * ~~top level api could change (Tag() -> create a Tag, Tag.mytag() -> create a TagBase ... can be a little bit ambiguous)~~
  * add a runner with WS with stdlib ? (not starlette!)
  * I don't really like the current way to generate js in interaction : need to found something more solid.
  * ~~the current way to initiate the statics is odd (only on real (embedded) Tag's) : should find a better way (static like gtag ?!)~~
