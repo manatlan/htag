@@ -1,17 +1,18 @@
 from ctypes.wintypes import HACCEL
 import os,sys; sys.path.insert(0,os.path.dirname(os.path.dirname(__file__)))
-from htag import H,Tag
+from htag import Tag
+H=Tag.H
 
 # "https://cdn.jsdelivr.net/npm/bulma@0.8.2/css/bulma.min.css"
 # css=Tag.style("""/*! bulma.io v0.8.2 | MIT License | github.com/jgthms/bulma *""")
 
-css=[H.link( _href="https://cdn.jsdelivr.net/npm/bulma@0.8.2/css/bulma.min.css",_rel="stylesheet"),]
+css=[Tag.link( _href="https://cdn.jsdelivr.net/npm/bulma@0.8.2/css/bulma.min.css",_rel="stylesheet"),]
 
 class CptWithStars(Tag.div):
     statics=css
 
     def __init__(self,value=0,**a):
-        Tag.div.__init__(self,**a)
+        super().__init__(self,**a)
 
         self.nb=value
         self.build()
@@ -33,7 +34,7 @@ class Cpt(Tag.div):
     statics=css
 
     def __init__(self,value=0,**a):
-        Tag.div.__init__(self,**a)
+        super().__init__(**a)
         self.nb=value
 
         self.ocpt = H.span( self.nb )
@@ -49,11 +50,11 @@ class Cpt(Tag.div):
 
 import time,asyncio
 
-class Page(Tag):
+class Page(Tag.body):
     statics=css
 
     def __init__(self,**a):
-        Tag.__init__(self,**a)
+        super().__init__(**a)
         self.c1=CptWithStars(0)
         self.c2=Cpt(0)
 

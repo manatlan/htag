@@ -1,5 +1,6 @@
 import os,sys; sys.path.insert(0,os.path.dirname(os.path.dirname(__file__)))
-from htag import H,Tag
+from htag import Tag
+H=Tag.H
 
 """
 This is exaclty why htag is done for ...

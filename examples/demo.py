@@ -1,21 +1,18 @@
 import sys
 try:
-    from htag import H,Tag # the only thing you'll need ;-)
+    from htag import Tag # the only thing you'll need ;-)
 except:
     print("ERROR: You'll need to 'pip install htag'")
     sys.exit(-1)
 
 
 
-class Button(Tag.div):
+class Button(Tag.button): # this Tag will be rendered as a <button>
     """ It's a button component, rendered as <button onclick=''>txt</button>"""
-
-    # this Tag will be rendered as a <button>, so we set its attribut "tag" <- "button"
-    tag="button"
 
     # this allow you to include statics in headers
     # (it will be included only once !!!)
-    statics = [H.style("button.my {background:yellow; border:1px solid black; border-radius:4px}")]
+    statics = [Tag.H.style("button.my {background:yellow; border:1px solid black; border-radius:4px}")]
 
     def __init__(self,txt, callback):
         super().__init__()
@@ -36,11 +33,10 @@ class Button(Tag.div):
         # it will call the py callback
         self.callback()
 
-class Star(Tag.div):
+class Star(Tag.div): # it's a div tag
     """ This Star component display 2 buttons to decrease/increase a value
         (it displays nb x star according the value)
     """
-    # it doesn't define its "tag" attribut, so it will be a <div> (the default)
 
     def __init__(self,value=0):
         super().__init__()
@@ -66,11 +62,8 @@ class Star(Tag.div):
         return super().__str__()
 
 
-class Page(Tag):
+class Page(Tag.body): # define a <body>, but the renderer will force it to <body> in all cases
     """ This is the main Tag, it will be rendered as <body> by the htag/renderer """
-    # it doesn't define its "tag" attribut
-    # but as long as it's the main tag ...
-    # it will be rendered as <body>
 
     def __init__(self):
         super().__init__()
@@ -90,12 +83,12 @@ class Page(Tag):
         self.clear()
 
         # we put a title
-        self <= H.h1("Best movies ;-)")   # here is shortcut to create "<h1>Best movies ;-)</h1>"
+        self <= Tag.H.h1("Best movies ;-)")   # here is shortcut to create "<h1>Best movies ;-)</h1>"
                                             # (it works for any html tag you want ;-)
 
         # and add our stuff, sorted by nb of stars
         for name,star in sorted( self.movies, key=lambda x: -x[1].nb ):
-            self <= H.div( [name,star] )
+            self <= Tag.H.div( [name,star] )
 
         return super().__str__()
 

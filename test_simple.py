@@ -51,7 +51,26 @@ def test_ko():
     with pytest.raises(HTagException):
         H.span(no="kk")
 
+def test_H():
+    # Tag.H is special, it's a shortcut to H
+    assert  Tag.H == H
+    assert  not issubclass(Tag.H, Tag)
 
+    # ensure constructor, constructs well
+    assert  issubclass(Tag.H.div, TagBase)
+    assert  not issubclass(Tag.H.div, Tag)
+
+    #whereas Tag.<> is dynamic (with @id), and inherit boths
+    assert  issubclass(Tag.div, TagBase)
+    assert  issubclass(Tag.div, Tag)
+
+    #the main diff ... Tag.H.<> has no @id
+    assert "id=" not in str(Tag.H.span("hello",_class="hello"))
+    #whereas ... Tag.<> has an @id
+    assert "id=" in str(Tag.span("hello",_class="hello"))
+
+    # it's the same construction
+    assert str(Tag.H.span("hello",_class="hello")) == str(H.span("hello",_class="hello"))
 
 def test_attrs():
     d=H.div(_data_text=12)
