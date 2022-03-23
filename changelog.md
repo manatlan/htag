@@ -4,6 +4,8 @@
  * Now, "Tag" is for dynamic Html Tag (with @id/interactions)
  * And, "H" is for static Html tag (without @id/interactions)
  * BTW, Tag.H is a shortcut to H class
+ * runner.BrowserHTTP is more solid, and can handle message <= 8Mo
+ * the renderer force statics as real static !!!
 
 ### 0.0.17 "better logging" 2022/03/22
 

@@ -46,18 +46,23 @@ window.addEventListener('DOMContentLoaded', start );
             return header
 
         async def handler(conn):
-            req = await loop.sock_recv(conn, 8192)
-            if req.startswith(b"GET / HTTP"):
-                resp = make_header()
-                resp += str(self.renderer)
-            elif req.startswith(b"POST / HTTP"):
-                _,content = req.split(b"\r\n\r\n")
-                data = json.loads(content.decode())
-                dico = await self.renderer.interact(data["id"],data["method"],data["args"],data["kargs"] )
-                resp = make_header("application/json")
-                resp += json.dumps(dico)
-            else:
-                resp = "HTTP/1.1 404 NOT FOUND\r\n"
+            req = await loop.sock_recv(conn, 8_192_000)
+            try:
+                if req.startswith(b"GET / HTTP"):
+                    resp = make_header()
+                    resp += str(self.renderer)
+                elif req.startswith(b"POST / HTTP"):
+                    _,content = req.split(b"\r\n\r\n")
+                    data = json.loads(content.decode())
+                    dico = await self.renderer.interact(data["id"],data["method"],data["args"],data["kargs"] )
+                    resp = make_header("application/json")
+                    resp += json.dumps(dico)
+                else:
+                    resp = "HTTP/1.1 404 NOT FOUND\r\n"
+            except Exception as e:
+                print("SERVER ERROR:",e)
+                resp = "HTTP/1.1 500 SERVER ERROR\r\n"
+
             await loop.sock_sendall(conn, resp.encode())
             conn.close()
 

@@ -71,8 +71,17 @@ class TagBase:
         return self._attrs.get(attr,None)
 
     def __str__(self):
+        return self.__render__( self._attrs.items() , str )
+
+    def _renderStatic(self):
+        """ IT REMOVES @ID on tagbase too ;-( """
+        mystr = lambda x: x._renderStatic() if isinstance(x,TagBase) else str(x)
+        attrs = [(k,v) for k,v in self._attrs.items() if k != "id" ]
+        return self.__render__(attrs,mystr)
+
+    def __render__(self, attrs, mystr ):
         rattrs=[]
-        for k,v in self._attrs.items():
+        for k,v in attrs:
             if v is not None:
                 if isinstance(v,bool):
                     if v == True:
@@ -82,8 +91,10 @@ class TagBase:
         return """<%(tag)s%(attrs)s>%(content)s</%(tag)s>""" % dict(
             tag=self.tag.replace("_","-"),
             attrs=" ".join([""]+rattrs) if rattrs else "",
-            content="".join([str(i) for i in self._contents if i is not None]),
+            content="".join([mystr(i) for i in self._contents if i is not None]),
         )
+
+
 
     def _getStateImage(self) -> str: #TODO: could disapear (can make something more inteligent here!)
         """Return a str'image (state) of the object, for quick detection (see Stater())"""
