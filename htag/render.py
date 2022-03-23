@@ -239,7 +239,8 @@ function action( o ) {
         head <= H.meta(_name="viewport",_content="width=device-width, initial-scale=1")
         head <= H.meta(_name="version",_content=f"HTag {__version__}")
         head <= H.title( self.title )
-        head <= self._statics
+        for i in self._statics:
+            head <= i._renderStatic()
 
         body=H.body( "Loading...", _id=0 ) # #INPERSONNATE (first interact on id #0)
         return "<!DOCTYPE html>"+str(H.html( [head,body] ))
