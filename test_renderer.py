@@ -6,12 +6,23 @@ import asyncio
 import re
 
 from htag import H,Tag,HTagException
-from htag.render import Stater,HRenderer
+from htag.render import Stater,HRenderer,fmtcaller
 from htag.tag import H
 
 
 anon=lambda t: str(t).replace( str(id(t)),"<id>" )
 
+def test_fmtcaller():
+    fmtcaller("jo",(b"yo","yo",b'nom et prenom du gars', 'nom et prenom du gars',42,True,3.2, None), {'test': 3,"byt":b"jkjjkjkjkjjkjkjkjkjkj"})
+    fmtcaller("jo",(42,),{})
+    fmtcaller("jo",("court",),{})
+    fmtcaller("jo",("court, mais tres long",),{})
+    fmtcaller("jo",(b"court",),{})
+    fmtcaller("jo",(b"court, mais tres long",),{})
+    fmtcaller("jo",(),dict(a="court"))
+    fmtcaller("jo",(),dict(a="court, mais tres long"))
+    fmtcaller("jo",(),dict(a=42,b=None,c=True,d=3.14))
+    fmtcaller("jo",(),dict(a=[1,2,3],b=dict(a=42)))
 
 def getGeneratorId(resp):
     return int(re.findall( r"(\d+)", resp["next"])[0])
@@ -498,4 +509,5 @@ if __name__=="__main__":
     # logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.DEBUG)
 
     # test_intelligent_rendering()
-    test_statics_in_real_statics()
+    # test_statics_in_real_statics()
+    test_fmtcaller()

@@ -14,6 +14,22 @@ from .tag import HTagException,H, Tag, TagBase, genJsInteraction
 import logging
 logger = logging.getLogger(__name__)
 
+def fmtcaller(method,a,k) -> str:
+    """ pretty format caller method( a:tuple, k:dict) -> str"""
+    MAX=15
+    def show(x):
+        if isinstance(x,str):
+            if len(x)>=MAX:
+                x=x[:MAX-3]+"..."
+            return json.dumps(x)
+        elif isinstance(x,bytes):
+            if len(x)>=MAX:
+                x= x[:MAX-3]+b"..."
+        return str(x)
+
+    args = [show(i) for i in a]+[f"{k}={show(v)}" for k,v in k.items()]
+    return f'{method}( %s )' % ", ".join(args)
+
 class Stater:
     """ Class to save all states of 'tag' and children/embbeded Tags, before interaction!
         so, after interaction : .guess() can guess modified one
@@ -142,7 +158,7 @@ function action( o ) {
                         if hasattr(method,"_norender"):
                             norender = True
 
-                        logger.info(f"INTERACT with METHOD of %s, calling: {method_name}({args},{kargs}) %s", repr(obj), "**NoRender**" if norender else "")
+                        logger.info(f"INTERACT with METHOD {fmtcaller(method_name,args,kargs)} %s, of %s", "**NoRender**" if norender else "", repr(obj) )
 
                         if asyncio.iscoroutinefunction( method ):
                             r=await method(*args,**kargs)
@@ -155,7 +171,7 @@ function action( o ) {
                         r=obj # r is the generator !
                         obj = self._loop[id(r)]["tag"]
                         norender = self._loop[id(r)]["norender"]
-                        logger.info("INTERACT with GENERATOR of %s, calling: %s %s",repr(obj),r.__name__, "**NoRender**" if norender else "")
+                        logger.info("INTERACT with GENERATOR %s(...) %s, of %s",r.__name__, "**NoRender**" if norender else "", repr(obj) )
 
                     if isinstance(r, types.AsyncGeneratorType):
                         # it's a "async def yield"

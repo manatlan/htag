@@ -1,3 +1,8 @@
+### 0.1.1 "improve it" 2022/03/24
+
+ * runner's BrowserHTTP is more solid (better handle short chunks on http socket) !
+ * better logging/info for interaction (describe the method and its args)
+
 ### 0.1.0 "Api Changed !" 2022/03/23
 
  * btw, it should be compatible (at this time !)
