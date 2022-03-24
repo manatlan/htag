@@ -46,7 +46,19 @@ window.addEventListener('DOMContentLoaded', start );
             return header
 
         async def handler(conn):
-            req = await loop.sock_recv(conn, 8_192_000)
+            
+            CHUNK_LIMIT=256 # must be minimal
+            req = b''
+            while True:
+                chunk = await loop.sock_recv(conn, CHUNK_LIMIT)
+                if chunk:
+                    req += chunk
+                    if len(chunk) < CHUNK_LIMIT:
+                        break                    
+                else:
+                    break
+            
+            
             try:
                 if req.startswith(b"GET / HTTP"):
                     resp = make_header()
