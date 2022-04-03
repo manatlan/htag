@@ -1,7 +1,7 @@
-### Future 0.2
+### 0.1.2 "game changer"
 
  * self.bind.<method>(*a,**k) could disappear in next version, replaced
-   by the new, more natural, version
+   by the new, more natural, way to bind callbacks
 
 ### 0.1.1 "improve it" 2022/03/24
 

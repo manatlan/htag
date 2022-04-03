@@ -1,14 +1,12 @@
 import sys
-from htag import Tag # the only thing you'll need ;-)
+from htag import Tag,Caller # the only thing you'll need ;-)
 
 def nimp(obj):
     print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
-def caller(method,*a,**k):
-    return ( method, (a,k) )
 
-class Page(Tag.body): # define a <body>, but the renderer will force it to <body> in all cases
-    """ This is the main Tag, it will be rendered as <body> by the htag/renderer """
+
+class Page(Tag.body):
 
     def __init__(self):
         super().__init__()
@@ -20,17 +18,20 @@ class Page(Tag.body): # define a <body>, but the renderer will force it to <body
             self <= "f%s" %size
 
         # EVEN NEW MECHANISM
-        self <= Tag.button( "TOP", _onclick=caller(ffw,b"window.innerWidth") )
+        self <= Tag.button( "TOP", _onclick=Caller(ffw,b"window.innerWidth") )
+        self <= Tag.button( "TOP2", _onclick=Caller(ffw,"toto") )
         self <= "<hr>"
+
         # NEW MECHANISM
         self <= Tag.button( "externe", _onclick=nimp )
-        self <= Tag.button( "lambda", _onclick=lambda o: self.add("lambda") )
+        self <= Tag.button( "lambda", _onclick=lambda o: ffw(o,"lambda") )
         self <= Tag.button( "ff", _onclick=ff )
         self <= Tag.button( "mm", _onclick=self.mm )
         self <= Tag.button( "ymm", _onclick=self.ymm )
         self <= Tag.button( "amm", _onclick=self.amm )
         self <= Tag.button( "aymm", _onclick=self.aymm )
         self <= "<hr>"
+
         # OLD MECHANISM
         self <= Tag.button( "mm", _onclick=self.bind.mm("x") )
         self <= Tag.button( "ymm", _onclick=self.bind.ymm("x") )
