@@ -1,4 +1,4 @@
-### 0.1.2 "game changer"
+### 0.1.2 "game changer" 2022/04/03
 
  * self.bind.<method>(*a,**k) could disappear in next version, replaced
    by the new, more natural, way to bind callbacks
