@@ -152,6 +152,13 @@ class TagCreator(type):
         else:
             return type('TagClone', (Tag,), {**Tag.__dict__,"tag":name})
 
+class Caller:
+    def __init__(self,method,*a,**ka):
+        self.method=method
+        self.args=a
+        self.kargs=ka
+
+
 
 class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
     statics: list = [] # list of "Tag", imported at start
@@ -182,6 +189,7 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
         TagBase.__init__(self,None, **attrs)
         self.set(content)
 
+    # new mechanism (could replace self.bind.<m>())
     #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     async def __on__(self,eventjs,*params):
         method = self.__callbacks__[eventjs]
@@ -203,10 +211,11 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
             self.__callbacks__[attr]=value
             cb=self.bind.__on__(attr)
             TagBase.__setitem__(self,attr, cb )
-        elif type(value) == tuple:
+        elif isinstance(value,Caller):
             logger.debug("Assign event '%s' (with params) on %s" % (attr,repr(self)))
-            callback,params = value
-            a,k=params
+            callback = value.method
+            a        = value.args
+            k        = value.kargs
             self.__callbacks__[attr]=callback
             cb=self.bind.__on__(attr,*a,**k)
             TagBase.__setitem__(self,attr, cb )

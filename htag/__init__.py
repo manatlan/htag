@@ -7,11 +7,11 @@
 # https://github.com/manatlan/htag
 # #############################################################################
 
-from .tag import H,Tag,HTagException
+from .tag import H,Tag,Caller,HTagException
 
-__version__ = "0.2.0" # updated from pypoetry.toml
+__version__ = "0.1.2" # updated from pypoetry.toml
 
-__all__= ["Tag","HTagException"]
+__all__= ["Tag","Caller","HTagException"]
 
 def _majVersion():
     """ called by build script (to update __version__ from toml)
