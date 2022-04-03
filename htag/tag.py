@@ -7,7 +7,7 @@
 # https://github.com/manatlan/htag
 # #############################################################################
 import html,json,hashlib
-import logging
+import logging,types,asyncio
 logger = logging.getLogger(__name__)
 
 class HTagException(Exception): pass
@@ -152,6 +152,7 @@ class TagCreator(type):
         else:
             return type('TagClone', (Tag,), {**Tag.__dict__,"tag":name})
 
+
 class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
     statics: list = [] # list of "Tag", imported at start
 
@@ -163,6 +164,7 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
         return f
 
     def __init__(self, content=None,**_attrs):
+        self.__callbacks__={}
         attrs={}
         auto={}
         for k,v in _attrs.items():
@@ -179,6 +181,38 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
             attrs["_id"]=id(self)   # force an @id !
         TagBase.__init__(self,None, **attrs)
         self.set(content)
+
+    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    async def __on__(self,eventjs,*params):
+        method = self.__callbacks__[eventjs]
+        if asyncio.iscoroutinefunction( method ):
+            r=await method(self,*params)
+        else:
+            r=method(self,*params)
+
+        if isinstance(r, types.AsyncGeneratorType):
+            async for i in r:
+                yield
+        elif isinstance(r, types.GeneratorType):
+            for i in r:
+                yield
+
+    def __setitem__(self,attr,value):
+        if type(value) in [types.FunctionType,types.MethodType]:
+            logger.debug("Assign event '%s' (callback:%s) on %s" % (attr,value,repr(self)))
+            self.__callbacks__[attr]=value
+            cb=self.bind.__on__(attr)
+            TagBase.__setitem__(self,attr, cb )
+        elif type(value) == tuple:
+            logger.debug("Assign event '%s' (with params) on %s" % (attr,repr(self)))
+            callback,params = value
+            a,k=params
+            self.__callbacks__[attr]=callback
+            cb=self.bind.__on__(attr,*a,**k)
+            TagBase.__setitem__(self,attr, cb )
+        else:
+            TagBase.__setitem__(self,attr,value)
+    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 
     @property

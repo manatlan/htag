@@ -1,3 +1,8 @@
+### Future 0.2
+
+ * self.bind.<method>(*a,**k) could disappear in next version, replaced
+   by the new, more natural, version
+
 ### 0.1.1 "improve it" 2022/03/24
 
  * runner's BrowserHTTP is more solid (better handle short chunks on http socket) !
