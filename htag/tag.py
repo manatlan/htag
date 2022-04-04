@@ -8,6 +8,7 @@
 # #############################################################################
 import html,json,hashlib
 import logging,types,asyncio
+from collections import namedtuple
 logger = logging.getLogger(__name__)
 
 class HTagException(Exception): pass
@@ -136,9 +137,13 @@ class Binder:
         else:
             raise HTagException("Unknown method '%s' in '%s'"%(method,self.__instance.__class__.__name__))
 
+    def __call__(self,callback,*args,**kargs):
+        return Caller(self.__instance,callback,args,kargs)
+
+
 class TagBaseCreator(type):
     def __getattr__(self,name:str):
-        return type('TagBaseClone', (TagBase,), {**TagBase.__dict__,"tag":name})
+        return type('TagBase%s' % name.capitalize(), (TagBase,), {**TagBase.__dict__,"tag":name})
 
 class H(metaclass=TagBaseCreator): # Html
     def __init__(self):
@@ -150,15 +155,9 @@ class TagCreator(type):
         if name == "H":
             return H
         else:
-            return type('TagClone', (Tag,), {**Tag.__dict__,"tag":name})
+            return type('Tag%s' % name.capitalize(), (Tag,), {**Tag.__dict__,"tag":name})
 
-class Caller:
-    def __init__(self,method,*a,**ka):
-        self.method=method
-        self.args=a
-        self.kargs=ka
-
-
+Caller =  namedtuple('Caller', ('parent', 'callback', 'args', 'kargs'))
 
 class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
     statics: list = [] # list of "Tag", imported at start
@@ -171,7 +170,7 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
         return f
 
     def __init__(self, content=None,**_attrs):
-        self.__callbacks__={}
+        self._callbacks_={}
         attrs={}
         auto={}
         for k,v in _attrs.items():
@@ -191,12 +190,13 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
 
     # new mechanism (could replace self.bind.<m>())
     #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    async def __on__(self,eventjs,*params):
-        method = self.__callbacks__[eventjs]
+    
+    async def __on__(self,eventjs,*a,**ka):
+        method = self._callbacks_[eventjs]
         if asyncio.iscoroutinefunction( method ):
-            r=await method(self,*params)
+            r=await method(self,*a,**ka)
         else:
-            r=method(self,*params)
+            r=method(self,*a,**ka)
 
         if isinstance(r, types.AsyncGeneratorType):
             async for i in r:
@@ -207,20 +207,16 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
 
     def __setitem__(self,attr,value):
         if type(value) in [types.FunctionType,types.MethodType]:
-            logger.debug("Assign event '%s' (callback:%s) on %s" % (attr,value,repr(self)))
-            self.__callbacks__[attr]=value
-            cb=self.bind.__on__(attr)
-            TagBase.__setitem__(self,attr, cb )
+            self._callbacks_[attr]=value
+            newvalue = self.bind.__on__(attr)
+            logger.debug("Assign event '%s' (simple callback) on %s" % (attr,repr(self)))
         elif isinstance(value,Caller):
-            logger.debug("Assign event '%s' (with params) on %s" % (attr,repr(self)))
-            callback = value.method
-            a        = value.args
-            k        = value.kargs
-            self.__callbacks__[attr]=callback
-            cb=self.bind.__on__(attr,*a,**k)
-            TagBase.__setitem__(self,attr, cb )
+            value.parent._callbacks_[attr]=value.callback
+            newvalue=value.parent.bind.__on__(attr,*value.args,**value.kargs)
+            logger.debug("Assign event '%s' (handled) on %s" % (attr,repr(value.parent)))
         else:
-            TagBase.__setitem__(self,attr,value)
+            newvalue = value
+        TagBase.__setitem__(self,attr,newvalue)
     #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 
