@@ -1,9 +1,14 @@
 import sys
-from htag import Tag,Caller # the only thing you'll need ;-)
+from htag import Tag # the only thing you'll need ;-)
 
 def nimp(obj):
     print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
+
+class MyTag(Tag.span):
+    def __init__(self,titre,callback):
+        self.titre = titre
+        super().__init__( [titre,Tag.Button("x",_class="delete",_onclick=callback)], _class="tag",_style="margin:4px" )
 
 
 class Page(Tag.body):
@@ -17,9 +22,16 @@ class Page(Tag.body):
         def ffw(obj,size):
             self <= "f%s" %size
 
+        def aeff(obj):
+            print(obj)
+            obj <= "b"
+
+
         # EVEN NEW MECHANISM
-        self <= Tag.button( "TOP", _onclick=Caller(ffw,b"window.innerWidth") )
-        self <= Tag.button( "TOP2", _onclick=Caller(ffw,"toto") )
+        self <= Tag.button( "TOP", _onclick=self.bind(ffw,b"window.innerWidth") )
+        self <= Tag.button( "TOP2", _onclick=self.bind(ffw,"toto") )
+        self <= MyTag( "test", aeff )
+
         self <= "<hr>"
 
         # NEW MECHANISM

@@ -1,3 +1,7 @@
+### 0.1.3 "bind changer" 2022/04/04
+
+ * add a new sig : self.bind( callback, *a,**k) to bind in context
+
 ### 0.1.2 "game changer" 2022/04/03
 
  * self.bind.<method>(*a,**k) could disappear in next version, replaced
