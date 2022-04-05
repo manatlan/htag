@@ -204,8 +204,11 @@ function action( o ) {
                         rep= self._mkReponse(state.guess() )
 
                     if ret:
-                        obj <= ret # add content in object
-                        rep.setdefault("stream",{})[ id(obj) ] = str(ret)
+                        obj.add(ret) # add content in object
+                        if not isinstance(ret,str) and hasattr(ret,"__iter__"):
+                            rep.setdefault("stream",{})[ id(obj) ] = "".join([str(i) for i in ret])
+                        else:
+                            rep.setdefault("stream",{})[ id(obj) ] = str(ret)
 
                 finally:
                     # clean the (fucking) situation ;-)

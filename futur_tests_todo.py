@@ -73,7 +73,7 @@ class Page(Tag.body):
     def stream(self):
         yield "a"
         yield "b"
-        yield "c"
+        yield ["c","d"]
         yield MyTag("kiki", nimp)
 
 import logging

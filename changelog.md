@@ -1,3 +1,7 @@
+### 0.1.5 "stream/yield fix" 2022/04/05
+
+ * FIX: yielding list was buggued (in visual stream, not in real content !)
+
 ### 0.1.4 "big chamboulement" 2022/04/05
 
  * The renderer is now "rock solid". Use a custom mechanism to hold weakref to 'id' of tags/generators
