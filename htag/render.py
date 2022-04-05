@@ -6,7 +6,7 @@
 #
 # https://github.com/manatlan/htag
 # #############################################################################
-import json,ctypes,asyncio,types,traceback
+import json,asyncio,types,traceback
 
 from . import __version__
 from .tag import HTagException,H, Tag, TagBase, genJsInteraction
@@ -98,7 +98,6 @@ class HRenderer:
                     if isinstance(i,TagBase):
                         if isinstance(i,Tag):
                             logger.warning("Avoid to include dynamic Tag in statics! (it's converted)")
-                            #TODO: implement a real conversion !
                         if i.md5 not in [j.md5 for j in self._statics]:
                             self._statics.append( i )
                 rec(c.__subclasses__())
@@ -115,6 +114,10 @@ function action( o ) {
     if(o.hasOwnProperty("update"))
         Object.keys(o["update"]).forEach(key => {
             document.getElementById( key ).outerHTML = o["update"][key];
+        });
+    if(o.hasOwnProperty("stream"))
+        Object.keys(o["stream"]).forEach(key => {
+            document.getElementById( key ).innerHTML += o["stream"][key];
         });
 
     if(o.hasOwnProperty("post")) eval( o["post"] );
@@ -141,8 +144,6 @@ function action( o ) {
                 rep = self._mkReponse( [self.tag] )
                 rep["update"]={0: list(rep["update"].values())[0]}  #INPERSONNATE (for first interact on id#0)
             else:
-                obj = ctypes.cast(oid, ctypes.py_object).value    # /!\
-
                 def hookInteractScripts(obj,js):
                     interaction_scripts.append( obj._genIIFEScript(js) ) #IIFE !
 
@@ -150,13 +151,13 @@ function action( o ) {
                 setattr(Tag,"__call__", hookInteractScripts) # not great (with concurrencies)
                 try:
                     norender=False
-                    if isinstance(obj,Tag):
 
+                    obj = Tag.find_tag(oid)
+                    if obj:
                         # call the method
                         method=getattr(obj,method_name)
 
-                        if hasattr(method,"_norender"):
-                            norender = True
+                        norender = hasattr(method,"_norender")
 
                         logger.info(f"INTERACT with METHOD {fmtcaller(method_name,args,kargs)} %s, of %s", "**NoRender**" if norender else "", repr(obj) )
 
@@ -166,18 +167,22 @@ function action( o ) {
                             r=method(*args,**kargs)
 
                         if isinstance(r, types.AsyncGeneratorType) or isinstance(r, types.GeneratorType):
-                            self._loop[id(r)] = dict(gen=r,tag=obj,norender= norender) # save it, to avoid GC (and save the Tag/norender)
-                    else:
-                        r=obj # r is the generator !
-                        obj = self._loop[id(r)]["tag"]
-                        norender = self._loop[id(r)]["norender"]
-                        logger.info("INTERACT with GENERATOR %s(...) %s, of %s",r.__name__, "**NoRender**" if norender else "", repr(obj) )
+                            # save it, to avoid GC (and save the Tag/norender)
+                            self._loop[id(r)] = dict(gen=r,tag=obj,norender= norender)
 
+                    else:
+                        obj = self._loop.get(oid,None)
+                        if obj: # it's a existing generator
+                            r, obj, norender = obj["gen"], obj["tag"], obj["norender"]
+                            logger.info("INTERACT with GENERATOR %s(...) %s, of %s",r.__name__, "**NoRender**" if norender else "", repr(obj) )
+                        else:
+                            raise Exception(f"{oid} is not an existing Tag or generator (dead objects ?)?!")
+
+                    ret=None
                     if isinstance(r, types.AsyncGeneratorType):
                         # it's a "async def yield"
                         try:
                             ret = await r.__anext__()
-                            assert ret is None
                             next_js_call = genJsInteraction(id(r))
                         except StopAsyncIteration:
                             del self._loop[ id(r) ]
@@ -185,19 +190,22 @@ function action( o ) {
                         # it's a "def yield"
                         try:
                             ret = r.__next__()
-                            assert ret is None
                             next_js_call = genJsInteraction(id(r))
                         except StopIteration:
                             del self._loop[ id(r) ]
                     else:
                         # it's a simple method
                         assert r is None
+                        ret=None
 
                     if norender:
                         rep= self._mkReponse(state.guess(obj) ) # avoid redraw obj
                     else:
                         rep= self._mkReponse(state.guess() )
 
+                    if ret:
+                        obj <= ret # add content in object
+                        rep.setdefault("stream",{})[ id(obj) ] = str(ret)
 
                 finally:
                     # clean the (fucking) situation ;-)

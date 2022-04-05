@@ -31,6 +31,9 @@ class Page(Tag.body):
         self <= Tag.button( "TOP", _onclick=self.bind(ffw,b"window.innerWidth") )
         self <= Tag.button( "TOP2", _onclick=self.bind(ffw,"toto") )
         self <= MyTag( "test", aeff )
+        self <= Tag.button( "Stream In", _onclick=lambda o: self.stream() ) # stream in current button !
+        self <= Tag.button( "Stream Out", _onclick=self.bind( self.stream ))    # stream in parent obj
+        self <= Tag.button( "Stream Out", _onclick=self.bind.stream() )
 
         self <= "<hr>"
 
@@ -67,8 +70,15 @@ class Page(Tag.body):
         yield
         self <= "aymm2"
 
+    def stream(self):
+        yield "a"
+        yield "b"
+        yield "c"
+        yield MyTag("kiki", nimp)
+
 import logging
 logging.basicConfig(format='[%(levelname)-5s] %(name)s: %(message)s',level=logging.DEBUG)
+logging.getLogger("htag.tag").setLevel( logging.INFO )
 
 # instanciate the main component
 obj=Page()

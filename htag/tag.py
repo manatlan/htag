@@ -8,7 +8,7 @@
 # #############################################################################
 import html,json,hashlib
 import logging,types,asyncio
-from collections import namedtuple
+import weakref
 logger = logging.getLogger(__name__)
 
 class HTagException(Exception): pass
@@ -157,10 +157,17 @@ class TagCreator(type):
         else:
             return type('Tag%s' % name.capitalize(), (Tag,), {**Tag.__dict__,"tag":name})
 
-Caller =  namedtuple('Caller', ('parent', 'callback', 'args', 'kargs'))
+class Caller:
+    def __init__(self,instance, callback, args, kargs):
+        self.instance = instance
+        self.callback = callback
+        self.args = args
+        self.kargs = kargs
 
 class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
     statics: list = [] # list of "Tag", imported at start
+
+    __instances__ = weakref.WeakValueDictionary()
 
     js: str = None  # post script, useful for js/init when tag is rendered
 
@@ -168,6 +175,10 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
     def NoRender(cls,f):
         f._norender = True
         return f
+
+    @classmethod
+    def find_tag(cls, obj_id):
+        return cls.__instances__.get(obj_id, None)
 
     def __init__(self, content=None,**_attrs):
         self._callbacks_={}
@@ -187,33 +198,44 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
             attrs["_id"]=id(self)   # force an @id !
         TagBase.__init__(self,None, **attrs)
         self.set(content)
+        Tag.__instances__[id(self)]=self
 
     # new mechanism (could replace self.bind.<m>())
     #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    
+
     async def __on__(self,eventjs,*a,**ka):
+        logger.info(f"callback __on__ {eventjs} {a} {ka}")
         method = self._callbacks_[eventjs]
-        if asyncio.iscoroutinefunction( method ):
-            r=await method(self,*a,**ka)
+
+        if hasattr(method, '__self__') and method.__self__ == self:
+            if asyncio.iscoroutinefunction( method ):
+                r=await method(*a,**ka)
+            else:
+                r=method(*a,**ka)
         else:
-            r=method(self,*a,**ka)
+            if asyncio.iscoroutinefunction( method ):
+                r=await method(self,*a,**ka)
+            else:
+                r=method(self,*a,**ka)
 
         if isinstance(r, types.AsyncGeneratorType):
             async for i in r:
-                yield
+                yield i
         elif isinstance(r, types.GeneratorType):
             for i in r:
-                yield
+                yield i
 
     def __setitem__(self,attr,value):
         if type(value) in [types.FunctionType,types.MethodType]:
-            self._callbacks_[attr]=value
-            newvalue = self.bind.__on__(attr)
-            logger.debug("Assign event '%s' (simple callback) on %s" % (attr,repr(self)))
+            key = "%s-%s" % (attr,id(self))
+            self._callbacks_[key]=value
+            newvalue = self.bind.__on__(key)
+            logger.info("Assign event '%s' (simple callback) on %s" % (attr,repr(self)))
         elif isinstance(value,Caller):
-            value.parent._callbacks_[attr]=value.callback
-            newvalue=value.parent.bind.__on__(attr,*value.args,**value.kargs)
-            logger.debug("Assign event '%s' (handled) on %s" % (attr,repr(value.parent)))
+            key = "%s-%s" % (attr,id(self))
+            value.instance._callbacks_[key]=value.callback
+            newvalue=value.instance.bind.__on__(key,*value.args,**value.kargs)
+            logger.info("Assign event '%s' (handled) on %s" % (attr,repr(value.instance)))
         else:
             newvalue = value
         TagBase.__setitem__(self,attr,newvalue)

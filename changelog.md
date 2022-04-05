@@ -1,3 +1,12 @@
+### 0.1.4 "big chamboulement" 2022/04/05
+
+ * The renderer is now "rock solid". Use a custom mechanism to hold weakref to 'id' of tags/generators
+   (can't crash silently when "ctypes.cast(oid, ctypes.py_object).value " fail)
+ * the newer __on__ (for callbacks) yield correctly now !
+ * FIX: multiple self.bind(...) were overriding previous one ;-(
+ * ability to stream content (with yield statement in interaction)
+ * IMPORTANT : don't call bounded method with double "self" !
+
 ### 0.1.3 "bind changer" 2022/04/04
 
  * add a new sig : self.bind( callback, *a,**k) to bind in context
