@@ -1,3 +1,8 @@
+### 0.1.6 "multi bind" 2022/04/05
+
+ * Multi bind : ability to chain (ex: self.bind(..).bind(..) ). Only the first bind may contains b"js_code" !
+ * first TU on new callback system (oufffff)
+
 ### 0.1.5 "stream/yield fix" 2022/04/05
 
  * FIX: yielding list was buggued (in visual stream, not in real content !)

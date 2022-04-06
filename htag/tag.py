@@ -125,21 +125,6 @@ class TagBase:
 
 
 
-class Binder:
-    def __init__(self,btag_instance):
-        self.__instance=btag_instance
-    def __getattr__(self,method:str):
-        m=hasattr(self.__instance,method) and getattr(self.__instance,method)
-        if m and callable( m ):
-            def _(*args,**kargs):
-                return genJsInteraction(id(self.__instance),method,args,kargs)
-            return _
-        else:
-            raise HTagException("Unknown method '%s' in '%s'"%(method,self.__instance.__class__.__name__))
-
-    def __call__(self,callback,*args,**kargs):
-        return Caller(self.__instance,callback,args,kargs)
-
 
 class TagBaseCreator(type):
     def __getattr__(self,name:str):
@@ -163,6 +148,41 @@ class Caller:
         self.callback = callback
         self.args = args
         self.kargs = kargs
+        
+        self._others=[]
+        self._assigned = None
+    
+    def bind(self,callback,*args,**kargs): # -> Caller
+        if any( [isinstance(i,bytes) for i in args] ) or any( [isinstance(i,bytes) for k,i in kargs.items()] ):
+            raise HTagException("Can't bind (bytes)'js_arg' in next binders !")
+        self._others.append( (callback,args,kargs) )
+        return self
+
+    def assignEventOnTag(self, object, event):
+        self._assigned = "%s-%s" % (event,id(object)) # unique identifier for the event 'event' of the tag 'object'
+        self.instance._callbacks_[self._assigned]=self   # save the Caller in _callbacks_ of self.instance
+        return self
+
+    def __str__(self) -> str:
+        if not self._assigned: 
+            raise HTagException("Caller can't be serizalized, it's not _assign'ed to an event !")
+        return self.instance.bind.__on__(self._assigned,*self.args,**self.kargs)
+
+class Binder:
+    def __init__(self,btag_instance):
+        self.__instance=btag_instance
+    def __getattr__(self,method:str):
+        m=hasattr(self.__instance,method) and getattr(self.__instance,method)
+        if m and callable( m ):
+            def _(*args,**kargs) -> str:
+                return genJsInteraction(id(self.__instance),method,args,kargs)
+            return _
+        else:
+            raise HTagException("Unknown method '%s' in '%s'"%(method,self.__instance.__class__.__name__))
+
+    def __call__(self,callback,*args,**kargs) -> Caller:
+        return Caller(self.__instance,callback,args,kargs)
+
 
 class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
     statics: list = [] # list of "Tag", imported at start
@@ -200,45 +220,45 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
         self.set(content)
         Tag.__instances__[id(self)]=self
 
-    # new mechanism (could replace self.bind.<m>())
+    # new mechanism (could replace self.bind.<m>()) ... one day
     #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
     async def __on__(self,eventjs,*a,**ka):
         logger.info(f"callback __on__ {eventjs} {a} {ka}")
-        method = self._callbacks_[eventjs]
+        caller = self._callbacks_[eventjs]
 
-        if hasattr(method, '__self__') and method.__self__ == self:
-            if asyncio.iscoroutinefunction( method ):
-                r=await method(*a,**ka)
+        for method,a,ka in [(caller.callback,a,ka)] + caller._others:
+            if hasattr(method, '__self__') and method.__self__ == self:
+                if asyncio.iscoroutinefunction( method ):
+                    r=await method(*a,**ka)
+                else:
+                    r=method(*a,**ka)
             else:
-                r=method(*a,**ka)
-        else:
-            if asyncio.iscoroutinefunction( method ):
-                r=await method(self,*a,**ka)
-            else:
-                r=method(self,*a,**ka)
+                if asyncio.iscoroutinefunction( method ):
+                    r=await method(self,*a,**ka)
+                else:
+                    r=method(self,*a,**ka)
 
-        if isinstance(r, types.AsyncGeneratorType):
-            async for i in r:
-                yield i
-        elif isinstance(r, types.GeneratorType):
-            for i in r:
-                yield i
+            if isinstance(r, types.AsyncGeneratorType):
+                async for i in r:
+                    yield i
+            elif isinstance(r, types.GeneratorType):
+                for i in r:
+                    yield i
+            else:
+                assert r is None
 
     def __setitem__(self,attr,value):
         if type(value) in [types.FunctionType,types.MethodType]:
-            key = "%s-%s" % (attr,id(self))
-            self._callbacks_[key]=value
-            newvalue = self.bind.__on__(key)
+            value = Caller( self, value, (), {})
+            value.assignEventOnTag( self, attr )
             logger.info("Assign event '%s' (simple callback) on %s" % (attr,repr(self)))
         elif isinstance(value,Caller):
-            key = "%s-%s" % (attr,id(self))
-            value.instance._callbacks_[key]=value.callback
-            newvalue=value.instance.bind.__on__(key,*value.args,**value.kargs)
+            value.assignEventOnTag( self, attr )
             logger.info("Assign event '%s' (handled) on %s" % (attr,repr(value.instance)))
         else:
             newvalue = value
-        TagBase.__setitem__(self,attr,newvalue)
+        TagBase.__setitem__(self,attr,value)
     #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 
