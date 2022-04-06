@@ -144,19 +144,24 @@ class TagCreator(type):
 
 class Caller:
     def __init__(self,instance, callback, args, kargs):
+        if not callable(callback): raise HTagException("The caller must be callable !")
         self.instance = instance
         self.callback = callback
         self.args = args
         self.kargs = kargs
-        
+
         self._others=[]
         self._assigned = None
-    
+
     def bind(self,callback,*args,**kargs): # -> Caller
-        if any( [isinstance(i,bytes) for i in args] ) or any( [isinstance(i,bytes) for k,i in kargs.items()] ):
-            raise HTagException("Can't bind (bytes)'js_arg' in next binders !")
-        self._others.append( (callback,args,kargs) )
-        return self
+        if callback is None : # do nothing
+            return self
+        else:
+            if not callable(callback): raise HTagException("The caller must be callable !")
+            if any( [isinstance(i,bytes) for i in args] ) or any( [isinstance(i,bytes) for k,i in kargs.items()] ):
+                raise HTagException("Can't bind (bytes)'js_arg' in next binders !")
+            self._others.append( (callback,args,kargs) )
+            return self
 
     def assignEventOnTag(self, object, event):
         self._assigned = "%s-%s" % (event,id(object)) # unique identifier for the event 'event' of the tag 'object'
@@ -164,9 +169,11 @@ class Caller:
         return self
 
     def __str__(self) -> str:
-        if not self._assigned: 
+        if not self._assigned:
             raise HTagException("Caller can't be serizalized, it's not _assign'ed to an event !")
-        return self.instance.bind.__on__(self._assigned,*self.args,**self.kargs)
+        # return self.instance.bind.__on__(self._assigned,*self.args,**self.kargs)
+        newargs = tuple([self._assigned]+list(self.args))
+        return genJsInteraction(id(self.instance),"__on__",newargs,self.kargs)
 
 class Binder:
     def __init__(self,btag_instance):

@@ -20,7 +20,22 @@ def test_simple_callback():
     assert caller.args == ()
     assert caller.kargs == {}
     assert f"onclick-{id(s)}" == caller._assigned
-    print(caller._assigned, s._callbacks_)
+    assert caller._assigned in s._callbacks_
+    assert s._callbacks_[ caller._assigned ] == caller
+
+    # try to rebind
+    def action2():
+        pass
+
+    s["onclick"] = action2
+    assert len(s._callbacks_)==1
+
+    caller=s["onclick"]
+    assert caller.instance == s
+    assert caller.callback == action2
+    assert caller.args == ()
+    assert caller.kargs == {}
+    assert f"onclick-{id(s)}" == caller._assigned
     assert caller._assigned in s._callbacks_
     assert s._callbacks_[ caller._assigned ] == caller
 
@@ -85,6 +100,33 @@ def test_binded_parent_callback(): # args/kargs
     print(p)
     print(s)
     print(caller)
+
+def test_ko():
+    a=Tag.H.a("link")
+    a["onclick"]=test_ko                            # /!\ non sens /!\
+    assert not isinstance( a["onclick"], Caller )
+    assert a["onclick"] == test_ko
+
+    a=Tag.a("link")
+    with pytest.raises(TypeError):
+        a["onclick"]=a.bind()
+    with pytest.raises(HTagException):
+        a["onclick"]=a.bind(None)
+    with pytest.raises(HTagException):
+        a["onclick"]=a.bind(a.bind(None)) # not double bind
+    with pytest.raises(HTagException):
+        a["onclick"]=a.bind("")
+    with pytest.raises(HTagException):
+        a["onclick"]=a.bind(test_ko).bind("")
+    with pytest.raises(HTagException):
+        a["onclick"]=a.bind(test_ko).bind(b"this.value")    # not possible to bind a js in a second binder (just the first)
+
+    with pytest.raises(TypeError):
+        a["onclick"]=a.bind(test_ko).bind() # non sens
+
+    a["onclick"]=a.bind(test_ko).bind(None).bind(None) # possible
+
+
 
 if __name__=="__main__":
     import logging

@@ -1,4 +1,10 @@
-### 0.1.6 "multi bind" 2022/04/05
+### 0.1.7 2022/04/06
+
+ * permit to add a 2nd (and so on) binder 'None' (does nothing)
+ * Caller doesn't use self.bind.<method>() anymore ;-)
+ * More tu
+
+### 0.1.6 "multi bind" 2022/04/06
 
  * Multi bind : ability to chain (ex: self.bind(..).bind(..) ). Only the first bind may contains b"js_code" !
  * first TU on new callback system (oufffff)
