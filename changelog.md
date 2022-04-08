@@ -1,3 +1,8 @@
+### 0.1.8 2022/04/08
+
+ * add a "caller.prior()" which is same concept as bind, but "insert" (instead of append)
+   (should be only useful for complex objects which want to make multiple bind, with keeping the same instance)
+
 ### 0.1.7 2022/04/06
 
  * permit to add a 2nd (and so on) binder 'None' (does nothing)

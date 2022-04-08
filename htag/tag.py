@@ -153,6 +153,16 @@ class Caller:
         self._others=[]
         self._assigned = None
 
+    def prior(self,callback,*args,**kargs):
+        """ make the current (those params) first, and move the previous in _others
+            (only the instance keep the same !)
+        """
+        self._others.append( (self.callback,self.args,self.kargs) )
+        self.callback = callback
+        self.args = args
+        self.kargs = kargs
+        return self
+
     def bind(self,callback,*args,**kargs): # -> Caller
         if callback is None : # do nothing
             return self
