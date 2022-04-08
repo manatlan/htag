@@ -102,8 +102,13 @@ def test_binded_parent_callback(): # args/kargs
     print(caller)
 
 def test_ko():
+
+    rt=Tag.div()
     a=Tag.H.a("link")
-    a["onclick"]=test_ko                            # /!\ non sens /!\
+    a["onclick"]=rt.bind( test_ko )                            # possible
+
+    a=Tag.H.a("link")
+    a["onclick"]=test_ko                                       # possible but non sens
     assert not isinstance( a["onclick"], Caller )
     assert a["onclick"] == test_ko
 
@@ -171,77 +176,128 @@ def test_prior():
 
 
 def test_on_event():
-    def action1(obj):
-        print("*****************************")
-    async def action2(obj):
-        print("*****************************")
-    def action3(obj):
-        print("*****************************")
-        yield
-        print("*****************************")
-    async def action4(obj):
-        print("*****************************")
-        yield
-        print("*****************************")
+    def action1(obj):   # classic
+        assert isinstance(obj,Tag) and obj.tag=="button"
+    async def action2(obj): # async method
+        assert isinstance(obj,Tag) and obj.tag=="button"
+    def action3(obj):   # classic generator
+        assert isinstance(obj,Tag) and obj.tag=="button"
+        yield "hello"
+    async def action4(obj): # async generator
+        assert isinstance(obj,Tag) and obj.tag=="button"
+        yield "hello"
 
 
     async def test():
         evt = s["onclick"]._assigned
         return [i async for i in s.__on__( evt )]
 
-    #----------------------------------------------------
-    s=Tag.button("hello", _onclick = action1)
+    ############################################################
+    # test btn handling simple callback
+    ############################################################
 
-    r=asyncio.run( test() )
-    assert r==[]
+    s=Tag.button("hello", _onclick = action1)
+    assert asyncio.run( test() ) == []
     #----------------------------------------------------
     s=Tag.button("hello", _onclick = action2)
-
-    r=asyncio.run( test() )
-    assert r==[]
+    assert asyncio.run( test() ) == []
     #----------------------------------------------------
     s=Tag.button("hello", _onclick = action3)
-
-    r=asyncio.run( test() )
-    assert r == [ None ]
-    asyncio.run( test() )
+    assert asyncio.run( test() ) == [ "hello" ]
     #----------------------------------------------------
     s=Tag.button("hello", _onclick = action4)
-
-    r=asyncio.run( test() )
-    assert r == [ None ]
+    assert asyncio.run( test() ) == [ "hello" ]
 
 
 
 
+    ############################################################
+    # test btn handling binded callback
+    ############################################################
 
-    #----------------------------------------------------
     s=Tag.button("hello")
     s["onclick"]= s.bind( action1)
-
-    r=asyncio.run( test() )
-    assert r==[]
+    assert asyncio.run( test() ) == []
     #----------------------------------------------------
     s=Tag.button("hello")
     s["onclick"]= s.bind( action2)
-
-    r=asyncio.run( test() )
-    assert r==[]
+    assert asyncio.run( test() ) == []
     #----------------------------------------------------
     s=Tag.button("hello")
     s["onclick"]= s.bind( action3)
-
-    r=asyncio.run( test() )
-    assert r == [ None ]
-    asyncio.run( test() )
+    assert asyncio.run( test() ) == [ "hello" ]
     #----------------------------------------------------
     s=Tag.button("hello")
     s["onclick"]= s.bind( action4)
+    assert asyncio.run( test() ) == [ "hello" ]
 
-    r=asyncio.run( test() )
-    assert r == [ None ]
+    ############################################################
+    # test btn handling theirs events
+    ############################################################
+    class App(Tag.div):
+        def __init__(self):
+            super().__init__()
+            self <= Tag.button("hello", _onclick = self.action1)
+            self <= Tag.button("hello", _onclick = self.action2)
+            self <= Tag.button("hello", _onclick = self.action3)
+            self <= Tag.button("hello", _onclick = self.action4)
 
-    #TODO: continue !!!!
+        def action1(self, o):   # classic
+            assert isinstance(o,Tag) and o.tag=="button"
+        async def action2(self, o): # async method
+            assert isinstance(o,Tag) and o.tag=="button"
+        def action3(self, o):   # classic generator
+            assert isinstance(o,Tag) and o.tag=="button"
+            yield "hello"
+        async def action4(self, o): # async generator
+            assert isinstance(o,Tag) and o.tag=="button"
+            yield "hello"
+
+
+    async def test(nb):
+        app=App()
+        o=app._contents[nb]
+        evt = o["onclick"]._assigned
+        return [i async for i in o.__on__( evt )]   # execute on button
+
+    assert asyncio.run( test(0) ) ==[]
+    assert asyncio.run( test(1) ) ==[]
+    assert asyncio.run( test(2) ) ==["hello"]
+    assert asyncio.run( test(3) ) ==["hello"]
+
+
+    ############################################################
+    # test app handling btn events
+    ############################################################
+
+    class App(Tag.div):
+        def __init__(self):
+            super().__init__()
+            self <= Tag.button("hello", _onclick = self.bind( self.action1 ))
+            self <= Tag.button("hello", _onclick = self.bind( self.action2 ))
+            self <= Tag.button("hello", _onclick = self.bind( self.action3 ))
+            self <= Tag.button("hello", _onclick = self.bind( self.action4 ))
+
+        def action1(self):   # classic
+            pass
+        async def action2(self): # async method
+            pass
+        def action3(self):   # classic generator
+            yield "hello"
+        async def action4(self): # async generator
+            yield "hello"
+
+
+    async def test(nb):
+        app=App()
+        o=app._contents[nb]
+        evt = o["onclick"]._assigned
+        return [i async for i in app.__on__( evt )]   # execute on app
+
+    assert asyncio.run( test(0) ) ==[]
+    assert asyncio.run( test(1) ) ==[]
+    assert asyncio.run( test(2) ) ==["hello"]
+    assert asyncio.run( test(3) ) ==["hello"]
 
 
 if __name__=="__main__":
@@ -251,9 +307,10 @@ if __name__=="__main__":
     logger = logging.getLogger("htag.tag")
     logger.setLevel(logging.INFO)
 
-    test_simple_callback()
-    test_simple_binded_himself_callback()
-    test_binded_parent_callback()
-    test_multiple_binded_himself_callback()
+    # test_simple_callback()
+    # test_simple_binded_himself_callback()
+    # test_binded_parent_callback()
+    # test_multiple_binded_himself_callback()
 
-    print( test_on_event() )
+    test_on_event()
+    # test_ko()

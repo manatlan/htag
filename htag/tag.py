@@ -67,6 +67,10 @@ class TagBase:
             self._contents.append(elt)
 
     def __setitem__(self,attr,value):
+
+        # if not isinstance(self,Tag):  #TODO: in the future ;-)
+        #     raise HTagException("Can't assign a callback on a tagbase")
+
         self._attrs[attr]=value
     def __getitem__(self,attr):
         return self._attrs.get(attr,None)
@@ -181,6 +185,8 @@ class Caller:
     def __str__(self) -> str:
         if not self._assigned:
             raise HTagException("Caller can't be serizalized, it's not _assign'ed to an event !")
+        if not isinstance(self.instance,Tag):
+            raise HTagException(f"This object {repr(self.instance)} can't handle a callback")
         # return self.instance.bind.__on__(self._assigned,*self.args,**self.kargs)
         newargs = tuple([self._assigned]+list(self.args))
         return genJsInteraction(id(self.instance),"__on__",newargs,self.kargs)

@@ -1,3 +1,7 @@
+
+ * add more unit tests (tag is at 99% cov)
+ * add an htexception when trying to render a caller on something other than a Tag.
+
 ### 0.1.8 2022/04/08
 
  * add a "caller.prior()" which is same concept as bind, but "insert" (instead of append)
