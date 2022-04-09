@@ -21,11 +21,6 @@ def stringify(obj):
             return "<:<:%s:>:>" % obj.decode()
     return json.dumps(obj, default=my).replace('"<:<:',"").replace(':>:>"',"")
 
-def genJsInteraction(id,method=None,args=None,kargs=None):
-    interact=dict(id=id,method=method,args=args,kargs=kargs)
-    return f"""interact( {stringify(interact)} );"""
-
-
 class TagBase:
     """ This is a class helper to produce a "HTML TAG" """
     tag: str="div" # default one
@@ -189,7 +184,19 @@ class Caller:
             raise HTagException(f"This object {repr(self.instance)} can't handle a callback")
         # return self.instance.bind.__on__(self._assigned,*self.args,**self.kargs)
         newargs = tuple([self._assigned]+list(self.args))
-        return genJsInteraction(id(self.instance),"__on__",newargs,self.kargs)
+        return str(BaseCaller(self.instance,"__on__", newargs, self.kargs))
+
+class BaseCaller:
+    def __init__(self,instance, mname=None, args=None, kargs=None):
+        self.instance = instance
+        self.mname = mname
+        self.args = args
+        self.kargs = kargs
+
+    def __str__(self) -> str:
+        interact=dict(id=0,method=self.mname,args=self.args,kargs=self.kargs)
+        if self.instance is not None: interact["id"]=id(self.instance)
+        return f"""interact( {stringify(interact)} );"""
 
 class Binder:
     def __init__(self,btag_instance):
@@ -197,8 +204,8 @@ class Binder:
     def __getattr__(self,method:str):
         m=hasattr(self.__instance,method) and getattr(self.__instance,method)
         if m and callable( m ):
-            def _(*args,**kargs) -> str:
-                return genJsInteraction(id(self.__instance),method,args,kargs)
+            def _(*args,**kargs) -> BaseCaller:
+                return BaseCaller(self.__instance,method,args,kargs)
             return _
         else:
             raise HTagException("Unknown method '%s' in '%s'"%(method,self.__instance.__class__.__name__))

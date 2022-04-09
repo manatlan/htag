@@ -510,4 +510,4 @@ if __name__=="__main__":
 
     # test_intelligent_rendering()
     # test_statics_in_real_statics()
-    test_fmtcaller()
+    test_render_yield_with_scripts()

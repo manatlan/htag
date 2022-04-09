@@ -191,6 +191,63 @@ async def test_simplest_async():
     await hr.doNext( r)
     assert "update" not in r
 
+
+@pytest.mark.asyncio
+async def test_yield():
+
+    class Object(Tag):
+        def __init__(self):
+            super().__init__()
+
+        def inc(self):
+            yield
+            yield list("abc")
+            yield "d"
+
+    o=Object()
+
+    hr=Simu(o)
+
+    r=await hr.init()
+
+    assert o._contents==[]
+
+    r=await hr.interact(o).inc()
+
+    # first yield, yield nothing
+    assert o._contents==[]
+
+    assert r["next"]
+    assert "stream" not in r
+
+    r=await hr.doNext( r)
+
+    # seconf yield, yield list("abc")
+    assert o._contents==['a', 'b', 'c']
+    assert "stream" in r
+    assert r["stream"][id(o)]=="abc"
+    assert r["next"]
+    assert ">abc<" in str(o)
+
+    r=await hr.doNext( r)
+
+    assert o._contents==['a', 'b', 'c', 'd']
+    assert "stream" in r
+    assert r["stream"][id(o)]=="d"
+    assert r["next"]
+    assert ">abcd<" in str(o)
+
+    r=await hr.doNext( r)
+    assert r=={}
+
+@pytest.mark.asyncio
+async def test_bug():
+    S=Simu( Tag.div() )
+    r=await S.hr.interact(15654654654546,"m",(),{})
+    assert r["err"] # 15654654654546 is not an existing Tag or generator (dead objects ?)?!"
+
+
+
 if __name__=="__main__":
 
     import logging
@@ -198,4 +255,6 @@ if __name__=="__main__":
 
     # asyncio.run( test1() )
     # asyncio.run( test2() )
-    asyncio.run( test_simplest_async() )
+    # asyncio.run( test_simplest_async() )
+    asyncio.run( test_yield() )
+    # asyncio.run( test_bug() )

@@ -102,6 +102,9 @@ def test_binded_parent_callback(): # args/kargs
     print(caller)
 
 def test_ko():
+    x=Tag.a("link",_onclick="alert(42)")
+    x["onclick"] = "alert(42)"
+
 
     rt=Tag.div()
     a=Tag.H.a("link")

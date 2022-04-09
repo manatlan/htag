@@ -42,7 +42,7 @@ window.addEventListener('DOMContentLoaded', start );
         return HTMLResponse( str(self.renderer) )
 
     async def POST(self,request) -> JSONResponse:
-        data=await request.json()
+        data = await request.json()
         dico = await self.renderer.interact(data["id"],data["method"],data["args"],data["kargs"])
         return JSONResponse(dico)
 

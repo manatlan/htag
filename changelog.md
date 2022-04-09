@@ -1,11 +1,14 @@
+### 0.1.9 2022/04/09
 
- * add more unit tests (tag is at 99% cov)
- * add an htexception when trying to render a caller on something other than a Tag.
+ * add more unit tests (tag/render is at 99% cov)
+ * add an htagexception when trying to render a caller on something other than a Tag.
+ * the "self.bind.<method>()" doesn't return a string anymore, but a BaseCaller object, str'able
 
 ### 0.1.8 2022/04/08
 
  * add a "caller.prior()" which is same concept as bind, but "insert" (instead of append)
-   (should be only useful for complex objects which want to make multiple bind, with keeping the same instance)
+   (should be only useful for complex objects which want to make multiple bind, with keeping the same instance
+    to ba able to pass its own js needs, see "htbulma.inputs" )
 
 ### 0.1.7 2022/04/06
 

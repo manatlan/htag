@@ -196,8 +196,12 @@ def test_generate_js_interact():
     with pytest.raises(HTagException):
         c.bind.onclick_unknown(12)
 
-    js=c.bind.onclick(12)
-    print(js)
+    bc=c.bind.onclick(12)
+    assert bc.instance == c
+    assert bc.mname == "onclick"
+    assert bc.args == (12,)
+    assert bc.kargs == {}
+    js=str(bc)
     assert js.replace( str(id(c)),"<id>" ) == 'interact( {"id": <id>, "method": "onclick", "args": [12], "kargs": {}} );'
 
 

@@ -9,7 +9,7 @@
 import json,asyncio,types,traceback
 
 from . import __version__
-from .tag import HTagException,H, Tag, TagBase, genJsInteraction
+from .tag import HTagException,H, Tag, TagBase, BaseCaller
 
 import logging
 logger = logging.getLogger(__name__)
@@ -126,7 +126,7 @@ function action( o ) {
 }
 
 %s
-""" % (genJsInteraction(0), js)
+""" % (BaseCaller( None ), js)
 
         self._statics.append( H.script( js_base ))
 
@@ -183,14 +183,14 @@ function action( o ) {
                         # it's a "async def yield"
                         try:
                             ret = await r.__anext__()
-                            next_js_call = genJsInteraction(id(r))
+                            next_js_call = BaseCaller(r)
                         except StopAsyncIteration:
                             del self._loop[ id(r) ]
                     elif isinstance(r, types.GeneratorType):
                         # it's a "def yield"
                         try:
                             ret = r.__next__()
-                            next_js_call = genJsInteraction(id(r))
+                            next_js_call = BaseCaller(r)
                         except StopIteration:
                             del self._loop[ id(r) ]
                     else:
@@ -227,7 +227,7 @@ function action( o ) {
 
             if next_js_call:
                 # if there was generator, set the next js call !
-                rep["next"]=next_js_call
+                rep["next"]= str(next_js_call)
 
         except Exception as e:
             print("ERROR",e)
