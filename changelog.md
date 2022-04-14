@@ -8,7 +8,7 @@
 
  * add a "caller.prior()" which is same concept as bind, but "insert" (instead of append)
    (should be only useful for complex objects which want to make multiple bind, with keeping the same instance
-    to ba able to pass its own js needs, see "htbulma.inputs" )
+   to ba able to pass its own js needs, see "htbulma.inputs" )
 
 ### 0.1.7 2022/04/06
 

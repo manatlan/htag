@@ -1,7 +1,11 @@
-from ctypes.wintypes import HACCEL
 import os,sys; sys.path.insert(0,os.path.dirname(os.path.dirname(__file__)))
 from htag import Tag
 H=Tag.H
+
+"""
+example, mainly for my visual tests
+
+"""
 
 # "https://cdn.jsdelivr.net/npm/bulma@0.8.2/css/bulma.min.css"
 # css=Tag.style("""/*! bulma.io v0.8.2 | MIT License | github.com/jgthms/bulma *""")
