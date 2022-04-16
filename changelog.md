@@ -1,3 +1,7 @@
+
+- tagbase/tag "self._contents" -> "self.childs" : can now access to children, officially !
+- effort on typings
+
 ### 0.1.9 2022/04/09
 
  * add more unit tests (tag/render is at 99% cov)

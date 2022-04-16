@@ -5,4 +5,10 @@
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
     "editor.wordWrap": "off",
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true,
+
+	"python.analysis.diagnosticSeverityOverrides": {
+		"reportUnusedExpression": "none",
+	},
 }

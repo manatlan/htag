@@ -11,10 +11,15 @@ import json,asyncio,types,traceback
 from . import __version__
 from .tag import HTagException,H, Tag, TagBase, BaseCaller
 
+from typing import Callable, Optional
+
+StrNonable = Optional[str]
+
+
 import logging
 logger = logging.getLogger(__name__)
 
-def fmtcaller(method,a,k) -> str:
+def fmtcaller(method:str,a,k) -> str:
     """ pretty format caller method( a:tuple, k:dict) -> str"""
     MAX=15
     def show(x):
@@ -49,7 +54,7 @@ class Stater:
         rec( [self.tag._getTree()])
         logger.debug("Stater.__init__(), save %s states", len(self._states))
 
-    def guess(self,dontRedraw=None): # -> list<Tag>
+    def guess(self,dontRedraw=Optional[Tag]): # -> list<Tag>
         """ to be runned after interactions to guess whose are modifieds
             return modifieds tags
         """
@@ -80,7 +85,7 @@ class Stater:
 
 
 class HRenderer:
-    def __init__(self, tag: Tag, js:str, exit_callback=None):
+    def __init__(self, tag: Tag, js:str, exit_callback:Optional[Callable]=None):
         """ tag object will be setted as a 'body' tag ! """
         """ js should containt an interact method, and an initializer to call the start()"""
         if not isinstance(tag, Tag): raise HTagException("Can only render a Tag !")
@@ -132,7 +137,7 @@ function action( o ) {
 
         self._loop={}   # for savng generator, to keep them during GC
 
-    async def interact(self,oid,method_name,args,kargs) -> dict:
+    async def interact(self,oid,method_name:str,args,kargs) -> dict:
         """ call the 'method_name' of pyobj 'id' with (args,kargs), return the pyobj/tag"""
         try:
             interaction_scripts=[] # interact js scripts
@@ -144,7 +149,7 @@ function action( o ) {
                 rep = self._mkReponse( [self.tag] )
                 rep["update"]={0: list(rep["update"].values())[0]}  #INPERSONNATE (for first interact on id#0)
             else:
-                def hookInteractScripts(obj,js):
+                def hookInteractScripts(obj,js:str):
                     interaction_scripts.append( obj._genIIFEScript(js) ) #IIFE !
 
                 state = Stater(self.tag)
@@ -273,7 +278,7 @@ function action( o ) {
         return "<!DOCTYPE html>"+str(H.html( [head,body] ))
 
     @property
-    def title(self):
+    def title(self) -> str:
         return self.tag.__class__.__name__
 
 

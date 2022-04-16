@@ -9,6 +9,11 @@
 import html,json,hashlib
 import logging,types,asyncio
 import weakref
+from typing import Sequence,Union,Optional,Any,Callable,Type
+
+AnyTags = Union[ Optional[Any], Sequence[Any]]
+StrNonable = Optional[str]
+
 logger = logging.getLogger(__name__)
 
 class HTagException(Exception): pass
@@ -21,11 +26,14 @@ def stringify(obj):
             return "<:<:%s:>:>" % obj.decode()
     return json.dumps(obj, default=my).replace('"<:<:',"").replace(':>:>"',"")
 
+
+
+
 class TagBase:
     """ This is a class helper to produce a "HTML TAG" """
     tag: str="div" # default one
 
-    def __init__(self, content=None,**_attrs):
+    def __init__(self, content:AnyTags=None,**_attrs):
         self.set(content)
 
         self._attrs={}
@@ -37,37 +45,37 @@ class TagBase:
 
         # compute a md5 (to indentify state for statics only now)
         # WARN : attrs or content change -> doesn't affect md5 !
-        self.md5 = md5( str(self._attrs) + str(self._contents))
+        self.md5 = md5( str(self._attrs) + str(self.childs))
 
-    def __le__(self, o):
+    def __le__(self, o: AnyTags ):
         self.add(o)
         return o
 
     def clear(self):
-        self._contents=[]
+        self.childs=[]
 
-    def set(self,elt):
+    def set(self,elt:AnyTags):
         """ a bit like .innerHTML setting (avoid clear+add)"""
         self.clear()
         self.add( elt)
 
-    def add(self,elt):
+    def add(self,elt:AnyTags):
         """ add an object or a list/tuple of objects """
         if elt is None:
             pass
         elif not isinstance(elt,str) and hasattr(elt,"__iter__"):
             for i in elt:
-                self._contents.append(i)
+                self.childs.append(i)
         else:
-            self._contents.append(elt)
+            self.childs.append(elt)
 
-    def __setitem__(self,attr,value):
+    def __setitem__(self,attr:str,value):
 
         # if not isinstance(self,Tag):  #TODO: in the future ;-)
         #     raise HTagException("Can't assign a callback on a tagbase")
 
         self._attrs[attr]=value
-    def __getitem__(self,attr):
+    def __getitem__(self,attr:str) -> Any:
         return self._attrs.get(attr,None)
 
     def __str__(self):
@@ -91,7 +99,7 @@ class TagBase:
         return """<%(tag)s%(attrs)s>%(content)s</%(tag)s>""" % dict(
             tag=self.tag.replace("_","-"),
             attrs=" ".join([""]+rattrs) if rattrs else "",
-            content="".join([mystr(i) for i in self._contents if i is not None]),
+            content="".join([mystr(i) for i in self.childs if i is not None]),
         )
 
 
@@ -106,27 +114,27 @@ class TagBase:
         return """%s%s:%s""" % (
             self.tag,
             self._attrs,
-            [image(i) for i in self._contents],
+            [image(i) for i in self.childs],
         )
 
     def _getTree(self) -> dict:
         """ return a tree of TagBase childs """
         ll=[]
 
-        for i in self._contents:
+        for i in self.childs:
             if isinstance(i,TagBase):
                 ll.append( i._getTree() )
 
         return {self:ll}
 
     def __repr__(self):
-        return f"<{self.__class__.__name__}'{self.tag} {self._attrs.get('id')} (childs:{len(self._contents)})>"
+        return f"<{self.__class__.__name__}'{self.tag} {self._attrs.get('id')} (childs:{len(self.childs)})>"
 
 
 
 
 class TagBaseCreator(type):
-    def __getattr__(self,name:str):
+    def __getattr__(self,name:str) -> Type:
         return type('TagBase%s' % name.capitalize(), (TagBase,), {**TagBase.__dict__,"tag":name})
 
 class H(metaclass=TagBaseCreator): # Html
@@ -134,15 +142,16 @@ class H(metaclass=TagBaseCreator): # Html
         raise HTagException("no!")
 
 
+
 class TagCreator(type):
-    def __getattr__(self,name:str):
+    def __getattr__(self,name:str) -> Type:
         if name == "H":
             return H
         else:
             return type('Tag%s' % name.capitalize(), (Tag,), {**Tag.__dict__,"tag":name})
 
 class Caller:
-    def __init__(self,instance, callback, args, kargs):
+    def __init__(self,instance, callback:Callable, args, kargs):
         if not callable(callback): raise HTagException("The caller must be callable !")
         self.instance = instance
         self.callback = callback
@@ -152,7 +161,7 @@ class Caller:
         self._others=[]
         self._assigned = None
 
-    def prior(self,callback,*args,**kargs):
+    def prior(self,callback:Callable,*args,**kargs):
         """ make the current (those params) first, and move the previous in _others
             (only the instance keep the same !)
         """
@@ -162,7 +171,7 @@ class Caller:
         self.kargs = kargs
         return self
 
-    def bind(self,callback,*args,**kargs): # -> Caller
+    def bind(self,callback:Callable,*args,**kargs): # -> Caller
         if callback is None : # do nothing
             return self
         else:
@@ -172,7 +181,7 @@ class Caller:
             self._others.append( (callback,args,kargs) )
             return self
 
-    def assignEventOnTag(self, object, event):
+    def assignEventOnTag(self, object, event:str):
         self._assigned = "%s-%s" % (event,id(object)) # unique identifier for the event 'event' of the tag 'object'
         self.instance._callbacks_[self._assigned]=self   # save the Caller in _callbacks_ of self.instance
         return self
@@ -187,7 +196,7 @@ class Caller:
         return str(BaseCaller(self.instance,"__on__", newargs, self.kargs))
 
 class BaseCaller:
-    def __init__(self,instance, mname=None, args=None, kargs=None):
+    def __init__(self,instance, mname:StrNonable=None, args=None, kargs=None):
         self.instance = instance
         self.mname = mname
         self.args = args
@@ -210,7 +219,7 @@ class Binder:
         else:
             raise HTagException("Unknown method '%s' in '%s'"%(method,self.__instance.__class__.__name__))
 
-    def __call__(self,callback,*args,**kargs) -> Caller:
+    def __call__(self,callback:Callable,*args,**kargs) -> Caller:
         return Caller(self.__instance,callback,args,kargs)
 
 
@@ -219,18 +228,18 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
 
     __instances__ = weakref.WeakValueDictionary()
 
-    js: str = None  # post script, useful for js/init when tag is rendered
+    js: StrNonable = None  # post script, useful for js/init when tag is rendered
 
     @classmethod
-    def NoRender(cls,f):
+    def NoRender(cls,f:Callable):
         f._norender = True
         return f
 
     @classmethod
-    def find_tag(cls, obj_id):
+    def find_tag(cls, obj_id:int):
         return cls.__instances__.get(obj_id, None)
 
-    def __init__(self, content=None,**_attrs):
+    def __init__(self, content:AnyTags=None,**_attrs):
         self._callbacks_={}
         attrs={}
         auto={}
@@ -253,7 +262,7 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
     # new mechanism (could replace self.bind.<m>()) ... one day
     #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-    async def __on__(self,eventjs,*a,**ka):
+    async def __on__(self,eventjs:str,*a,**ka):
         logger.info(f"callback __on__ {eventjs} {a} {ka}")
         caller = self._callbacks_[eventjs]
 
@@ -278,7 +287,7 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
             else:
                 assert r is None
 
-    def __setitem__(self,attr,value):
+    def __setitem__(self,attr:str,value):
         if type(value) in [types.FunctionType,types.MethodType]:
             value = Caller( self, value, (), {})
             value.assignEventOnTag( self, attr )
@@ -286,8 +295,7 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
         elif isinstance(value,Caller):
             value.assignEventOnTag( self, attr )
             logger.info("Assign event '%s' (handled) on %s" % (attr,repr(value.instance)))
-        else:
-            newvalue = value
+
         TagBase.__setitem__(self,attr,value)
     #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -299,7 +307,7 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
 
     #to override
     def exit(self):
-        print("exit() DOES NOTHING (should be overrided)")
+        print("exit() DOES NOTHING (should be overriden)")
 
     def _getAllJs(self) -> list:
         """ get a list of IIFE js declared script of this tag and its children"""
@@ -308,14 +316,14 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
             logger.debug("Init Script (.js) found in %s --> '%s'",repr(self),self.js)
             ll.append( self._genIIFEScript( self.js ) ) #IIFE !
 
-        def rec(childs):
+        def rec(childs:Sequence):
             for i in childs:
                 if isinstance(i,Tag):
                     ll.extend( i._getAllJs() )
                 elif isinstance(i,TagBase):
-                    rec(i._contents)
+                    rec(i.childs)
 
-        rec(self._contents)
+        rec(self.childs)
 
         return ll
 

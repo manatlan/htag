@@ -104,6 +104,31 @@ def test_attrs():
     div["id"] = "mydiv"
     div.add(H.h1("world"))
 
+def test_childs():
+    t = Tag.ul()
+    t <= Tag.li()
+    assert len(t.childs)==1
+    assert t.childs[0].tag == "li"
+
+    t.childs.append( Tag.li() )
+    assert len(t.childs)==2
+    assert t.childs[-1].tag == "li"
+
+    t.clear()
+    assert len(t.childs)==0
+
+    t <= [Tag.li(),Tag.li()]
+    assert len(t.childs)==2
+
+    t <= (Tag.li(),Tag.li())
+    assert len(t.childs)==4
+
+    del t.childs[2]
+    assert len(t.childs)==3
+
+    t.set( Tag.li() )
+    assert len(t.childs)==1
+
 
 
 

@@ -259,7 +259,7 @@ def test_on_event():
 
     async def test(nb):
         app=App()
-        o=app._contents[nb]
+        o=app.childs[nb]
         evt = o["onclick"]._assigned
         return [i async for i in o.__on__( evt )]   # execute on button
 
@@ -293,7 +293,7 @@ def test_on_event():
 
     async def test(nb):
         app=App()
-        o=app._contents[nb]
+        o=app.childs[nb]
         evt = o["onclick"]._assigned
         return [i async for i in app.__on__( evt )]   # execute on app
 
