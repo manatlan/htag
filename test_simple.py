@@ -75,15 +75,18 @@ def test_H():
 def test_attrs():
     d=H.div(_data_text=12)
     assert d["data-text"]==12
+    assert d.attrs == {"data-text":12}
     d["data-text"]+=1
     assert str(d) == '<div data-text="13"></div>'
 
     d=H.div(_checked=True)
     assert d["checked"]
+    assert d.attrs == {"checked":True}
     assert str(d) == '<div checked></div>'
 
     d=H.div(_checked=False)
     assert not d["checked"]
+    assert d.attrs == {"checked":False}
     assert str(d) == '<div></div>'
 
     d=H.my_div( "hello")

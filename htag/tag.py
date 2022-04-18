@@ -45,14 +45,14 @@ class TagBase:
 
         # compute a md5 (to indentify state for statics only now)
         # WARN : attrs or content change -> doesn't affect md5 !
-        self.md5 = md5( str(self._attrs) + str(self.childs))
+        self.md5 = md5( str(self._attrs) + str(self._childs))
 
     def __le__(self, o: AnyTags ):
         self.add(o)
         return o
 
     def clear(self):
-        self.childs=[]
+        self._childs=[]
 
     def set(self,elt:AnyTags):
         """ a bit like .innerHTML setting (avoid clear+add)"""
@@ -65,9 +65,17 @@ class TagBase:
             pass
         elif not isinstance(elt,str) and hasattr(elt,"__iter__"):
             for i in elt:
-                self.childs.append(i)
+                self._childs.append(i)
         else:
-            self.childs.append(elt)
+            self._childs.append(elt)
+
+    @property
+    def childs(self) -> list:
+        return self._childs
+
+    @property
+    def attrs(self) -> dict:
+        return self._attrs
 
     def __setitem__(self,attr:str,value):
 
@@ -79,15 +87,15 @@ class TagBase:
         return self._attrs.get(attr,None)
 
     def __str__(self):
-        return self.__render__( self._attrs.items() , str )
+        return self.__render__( list(self._attrs.items()) , str )
 
-    def _renderStatic(self):
+    def _renderStatic(self) -> str:
         """ IT REMOVES @ID on tagbase too ;-( """
         mystr = lambda x: x._renderStatic() if isinstance(x,TagBase) else str(x)
         attrs = [(k,v) for k,v in self._attrs.items() if k != "id" ]
         return self.__render__(attrs,mystr)
 
-    def __render__(self, attrs, mystr ):
+    def __render__(self, attrs:list, mystr:Callable ) -> str:
         rattrs=[]
         for k,v in attrs:
             if v is not None:
@@ -99,7 +107,7 @@ class TagBase:
         return """<%(tag)s%(attrs)s>%(content)s</%(tag)s>""" % dict(
             tag=self.tag.replace("_","-"),
             attrs=" ".join([""]+rattrs) if rattrs else "",
-            content="".join([mystr(i) for i in self.childs if i is not None]),
+            content="".join([mystr(i) for i in self._childs if i is not None]),
         )
 
 
@@ -114,21 +122,21 @@ class TagBase:
         return """%s%s:%s""" % (
             self.tag,
             self._attrs,
-            [image(i) for i in self.childs],
+            [image(i) for i in self._childs],
         )
 
     def _getTree(self) -> dict:
         """ return a tree of TagBase childs """
         ll=[]
 
-        for i in self.childs:
+        for i in self._childs:
             if isinstance(i,TagBase):
                 ll.append( i._getTree() )
 
         return {self:ll}
 
     def __repr__(self):
-        return f"<{self.__class__.__name__}'{self.tag} {self._attrs.get('id')} (childs:{len(self.childs)})>"
+        return f"<{self.__class__.__name__}'{self.tag} {self._attrs.get('id')} (childs:{len(self._childs)})>"
 
 
 
@@ -321,9 +329,9 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
                 if isinstance(i,Tag):
                     ll.extend( i._getAllJs() )
                 elif isinstance(i,TagBase):
-                    rec(i.childs)
+                    rec(i._childs)
 
-        rec(self.childs)
+        rec(self._childs)
 
         return ll
 

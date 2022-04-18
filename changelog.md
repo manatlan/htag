@@ -1,5 +1,6 @@
 
 - tagbase/tag "self._contents" -> "self.childs" : can now access to children, officially !
+- tagbase/tag "self._attrs" -> "self.attrs" : can now access to attributes, officially !
 - effort on typings
 
 ### 0.1.9 2022/04/09
@@ -12,7 +13,7 @@
 
  * add a "caller.prior()" which is same concept as bind, but "insert" (instead of append)
    (should be only useful for complex objects which want to make multiple bind, with keeping the same instance
-   to ba able to pass its own js needs, see "htbulma.inputs" )
+   to be able to pass its own js needs, see "htbulma.inputs" )
 
 ### 0.1.7 2022/04/06
 
