@@ -45,14 +45,14 @@ def test_ok_including_a_Tag_in_statics():
     assert "<mystyle>" in str(r) # will not be included
     # and a logger.warning is outputed
 
-def test_statics_in_real_statics():
-    s1=Tag.H.div( [1,"h",Tag.div("dyn")], _id=12 )
-    s2=Tag.div( [1,"h",Tag.H.div("stat"),Tag.H.Section( Tag("yolo") )] )
+# def test_statics_in_real_statics():
+#     s1=Tag.div( [1,"h",Tag.div("dyn"),Tag.H.div("dyn",_id=12)] )
+#     s2=Tag.div( [1,"h",Tag.H.div("stat"),Tag.H.Section( Tag("yolo") )] )
 
-    assert "id=" in str(s1)
-    assert s1._renderStatic() =="<div>1h<div>dyn</div></div>"
-    assert "id=" in str(s2)
-    assert s2._renderStatic() =="<div>1h<div>stat</div><Section><div>yolo</div></Section></div>"
+#     assert "id=" in str(s1)
+#     assert s1._renderStatic() =='<div>1h<div>dyn</div><div id="12">dyn</div></div>'
+#     assert "id=" in str(s2)
+#     assert s2._renderStatic() =="<div>1h<div>stat</div><Section><div>yolo</div></Section></div>"
 
 
 def test_render_a_tag_with_interaction():

@@ -96,18 +96,43 @@ class HRenderer:
             self.tag.exit = exit_callback
 
         self._statics=[]
-        ensureList=lambda x: x if isinstance(x,list) else [x]
-        def rec( subclasses ):
-            for c in subclasses:
-                for i in ensureList(c.statics):
-                    if isinstance(i,TagBase):
-                        if isinstance(i,Tag):
-                            logger.warning("Avoid to include dynamic Tag in statics! (it's converted)")
-                        if i.md5 not in [j.md5 for j in self._statics]:
-                            self._statics.append( i )
-                rec(c.__subclasses__())
 
-        rec(Tag.__subclasses__())
+        ensureList=lambda x: list(x) if type(x) in [list,tuple] else [x]
+
+        def feedStatics(tag):
+            for i in ensureList(tag.statics):
+                if isinstance(i,TagBase):
+                    if isinstance(i,Tag):
+                        logger.warning("Avoid to include dynamic Tag in statics! (it will be converted)")
+                    if i.md5 not in [j.md5 for j in self._statics]:
+                        self._statics.append( i )
+
+
+        if hasattr(self.tag, "imports") and self.tag.imports is not None:
+            # there is an "imports" attribut
+            # so, try to import statics according "imports" attrs on tags
+            logger.info("Include statics from Tag's imports attibut")
+            feedStatics(tag)
+            def rec( tag ):
+                if hasattr(tag, "imports") and tag.imports is not None:
+                    imports = ensureList(tag.imports)
+                    if not all([isinstance(c,type) and issubclass(c,TagBase) for c in imports]):
+                        raise HTagException("imports can contains only Tag classes")
+                    for c in imports:
+                        feedStatics(c)
+                        rec(c)
+
+            rec( self.tag )
+        else:
+            # there is no "imports" attribut
+            # so try to imports statics using Tag subclasses
+            logger.info("Include statics from Tag's subclasses")
+            def rec( tag ):
+                for c in tag.__subclasses__():
+                    feedStatics(c)
+                    rec(c)
+
+            rec(Tag)
 
         logger.debug("HRenderer(), statics found : %s", [repr(i) for i in self._statics])
 
@@ -272,14 +297,16 @@ function action( o ) {
         head <= H.meta(_name="version",_content=f"HTag {__version__}")
         head <= H.title( self.title )
         for i in self._statics:
-            head <= i._renderStatic()
+            if isinstance(i,Tag):
+                head <= i._renderStatic()
+            else:
+                head <= i
 
-        body=H.body( "Loading...", _id=0 ) # #INPERSONNATE (first interact on id #0)
+        body=H.body( "Loading...", _id=0 ) # IMPERSONATE (first interact on id #0)
         return "<!DOCTYPE html>"+str(H.html( [head,body] ))
 
     @property
     def title(self) -> str:
         return self.tag.__class__.__name__
-
 
 

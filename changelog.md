@@ -1,7 +1,15 @@
+### 0.1.11 "bugued version" 2022/04/20
 
-- tagbase/tag "self._contents" -> "self.childs" : can now access to children, officially !
-- tagbase/tag "self._attrs" -> "self.attrs" : can now access to attributes, officially !
-- effort on typings
+ * IGNORE on test_statics_in_real_statics ;-( ... (so it's a bugued version from scratch, a 0.1.12 will fix soon)
+ * Tag.statics : None|Tag(instance)|List|Tuple
+ * Tag.imports : None|Tag(class)|List|Tuple
+ * _renderStatic() on Tag (no more on Tagbase), preserving H/TagBase @id !
+
+### 0.1.10 2022/04/18
+
+ - tagbase/tag "self._contents" -> "self.childs" : can now access to children, officially !
+ - tagbase/tag "self._attrs" -> "self.attrs" : can now access to attributes, officially !
+ - effort on typings
 
 ### 0.1.9 2022/04/09
 

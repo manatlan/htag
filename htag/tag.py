@@ -89,12 +89,6 @@ class TagBase:
     def __str__(self):
         return self.__render__( list(self._attrs.items()) , str )
 
-    def _renderStatic(self) -> str:
-        """ IT REMOVES @ID on tagbase too ;-( """
-        mystr = lambda x: x._renderStatic() if isinstance(x,TagBase) else str(x)
-        attrs = [(k,v) for k,v in self._attrs.items() if k != "id" ]
-        return self.__render__(attrs,mystr)
-
     def __render__(self, attrs:list, mystr:Callable ) -> str:
         rattrs=[]
         for k,v in attrs:
@@ -232,7 +226,8 @@ class Binder:
 
 
 class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
-    statics: list = [] # list of "Tag", imported at start
+    statics: list = [] # list of "Tag", imported at start in html>head
+    imports = None
 
     __instances__ = weakref.WeakValueDictionary()
 
@@ -342,4 +337,9 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
         logger.debug("Tag.__str__() : render str for %s", repr(self))
         return TagBase.__str__(self)
 
+    def _renderStatic(self) -> str:
+        """ IT REMOVES @ID !!! """
+        mystr = lambda x: x._renderStatic() if isinstance(x,Tag) else str(x)
+        attrs = [(k,v) for k,v in self._attrs.items() if k != "id" ]
+        return self.__render__(attrs,mystr)
 
