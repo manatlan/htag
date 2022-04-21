@@ -1,5 +1,7 @@
+### 0.1.13 2022/04/21
 
  * add unitests for ".imports"
+ * better statics resolver
 
 ### 0.1.12 "fixed version" 2022/04/20
 

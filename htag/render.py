@@ -95,7 +95,7 @@ class HRenderer:
             # add an .exit() method on the tag !!!!!!!!!!!!!!!!!!!!!!
             self.tag.exit = exit_callback
 
-        self._statics=[]
+        self._statics: list = []
 
         ensureList=lambda x: list(x) if type(x) in [list,tuple] else [x]
 
@@ -104,8 +104,12 @@ class HRenderer:
                 if isinstance(i,TagBase):
                     if isinstance(i,Tag):
                         logger.warning("Avoid to include dynamic Tag in statics! (it will be converted)")
+                        i = i._ensureTagBase()
+
                     if i.md5 not in [j.md5 for j in self._statics]:
                         self._statics.append( i )
+                # else:
+                #     raise HTagException("Statics must be a TagBase/H")
 
 
         if hasattr(self.tag, "imports") and self.tag.imports is not None:
@@ -296,11 +300,7 @@ function action( o ) {
         head <= H.meta(_name="viewport",_content="width=device-width, initial-scale=1")
         head <= H.meta(_name="version",_content=f"HTag {__version__}")
         head <= H.title( self.title )
-        for i in self._statics:
-            if isinstance(i,TagBase): # possibly a Tag (convert static !)
-                head <= i._ensureTagBase()
-            else:
-                head <= i
+        head <= self._statics
 
         body=H.body( "Loading...", _id=0 ) # IMPERSONATE (first interact on id #0)
         return "<!DOCTYPE html>"+str(H.html( [head,body] ))
