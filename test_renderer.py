@@ -31,7 +31,7 @@ def test_ko_try_render_a_tagbase():
     t=H.div("hello")
     print(isinstance(t,Tag))
 
-    with pytest.raises(Exception):
+    with pytest.raises(HTagException):
         HRenderer(t,"function interact() {}; start(); // the starter")
 
 def test_ok_including_a_Tag_in_statics():
@@ -537,6 +537,21 @@ def test_imports():
     assert len(styles)>2
 
 
+    class AppWithBrokenImport(Tag.body):
+        statics = Tag.H.style("""body {color: #080}""", _id="main")
+        imports = "nimpnawak"
+
+        def __init__(self):
+            super().__init__()
+
+            self <= Yo()
+
+    # this works ...
+    str(AppWithBrokenImport())
+
+    # this not !
+    with pytest.raises(HTagException):
+        HRenderer(AppWithBrokenImport(),"//js")
 
 
 if __name__=="__main__":
