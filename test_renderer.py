@@ -538,8 +538,7 @@ def test_imports():
 
 
     class AppWithBrokenImport(Tag.body):
-        statics = Tag.H.style("""body {color: #080}""", _id="main")
-        imports = "nimpnawak"
+        imports = "nimpnawak"               # not a Tag class !? -> error
 
         def __init__(self):
             super().__init__()
