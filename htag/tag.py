@@ -132,6 +132,16 @@ class TagBase:
     def __repr__(self):
         return f"<{self.__class__.__name__}'{self.tag} {self._attrs.get('id')} (childs:{len(self._childs)})>"
 
+    def _ensureTagBase(self): # TODO: can do a lot better here !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        """ ensure that the tag/tagbase will be rendered as a real tagbase (and childs too) """
+        if isinstance(self,Tag): # it REMOVES @ID !!!
+            attrs = {"_"+k:v for k,v in self.attrs.items() if k != "id" }
+        else:
+            attrs = {"_"+k:v for k,v in self.attrs.items()}
+        contents = [(i._ensureTagBase() if isinstance(i,TagBase) else i) for i in self.childs]
+        t=TagBase( contents, **attrs )
+        t.tag = self.tag
+        return t
 
 
 
@@ -337,9 +347,4 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
         logger.debug("Tag.__str__() : render str for %s", repr(self))
         return TagBase.__str__(self)
 
-    def _renderStatic(self) -> str:
-        """ IT REMOVES @ID !!! """
-        mystr = lambda x: x._renderStatic() if isinstance(x,Tag) else str(x)
-        attrs = [(k,v) for k,v in self._attrs.items() if k != "id" ]
-        return self.__render__(attrs,mystr)
 

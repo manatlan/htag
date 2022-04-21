@@ -297,8 +297,8 @@ function action( o ) {
         head <= H.meta(_name="version",_content=f"HTag {__version__}")
         head <= H.title( self.title )
         for i in self._statics:
-            if isinstance(i,Tag):
-                head <= i._renderStatic()
+            if isinstance(i,TagBase): # possibly a Tag (convert static !)
+                head <= i._ensureTagBase()
             else:
                 head <= i
 

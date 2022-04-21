@@ -1,3 +1,11 @@
+
+ * add unitests for ".imports"
+
+### 0.1.12 "fixed version" 2022/04/20
+
+ * _renderStatic() -> _ensureTagBase(), returns a TagBase (preserving H/TagBase @id)
+ * all unittests are back
+
 ### 0.1.11 "bugued version" 2022/04/20
 
  * IGNORE on test_statics_in_real_statics ;-( ... (so it's a bugued version from scratch, a 0.1.12 will fix soon)
