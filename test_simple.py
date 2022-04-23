@@ -360,27 +360,27 @@ def test_iadd():
     a1 <= B
     a1 <= C
 
-    # a2=Tag.H.A()
-    # a2 += B
-    # a2 += C
+    a2=Tag.H.A()
+    a2 += B
+    a2 += C
 
     a3=Tag.H.A()
     a3.add( B )
     a3.add( C )
 
-    assert str(a1)==str(a3)
+    assert str(a1)==str(a3)==str(a2)
 
 
     # but not with "tuple"
     a1=Tag.H.A()
     a1 <= B, C  # it's not a tuple (it's 2 statements)
 
-    # a2=Tag.H.A()
-    # a2 += B, C  # it's a tuple
+    a2=Tag.H.A()
+    a2 += B, C  # it's a tuple
 
-    # assert str(a1) != str(a2)
+    assert str(a1) != str(a2)
     assert str(a1) == "<A><B></B></A>"
-    # assert str(a2) == "<A><B></B><C></C></A>"
+    assert str(a2) == "<A><B></B><C></C></A>"
 
 
     # btw, This is possible ... '<=' is chain'able
@@ -392,21 +392,44 @@ def test_iadd():
     ## a1 += B += C
 
 
-    # # AVOID TO DO SOMETHING LIKE THAT
-    # # AVOID TO DO SOMETHING LIKE THAT
-    # # AVOID TO DO SOMETHING LIKE THAT
-    # # and it could be weird to mix them like that
-    # a=Tag.H.A()
-    # B=Tag.H.B()
-    # C=Tag.H.C()
-    # a += B <= C # '<=' is first, and return C ... so A will contain just C
-    # assert str(a) == "<A><C></C></A>"
-    # # AVOID TO DO SOMETHING LIKE THAT
-    # # AVOID TO DO SOMETHING LIKE THAT
-    # # AVOID TO DO SOMETHING LIKE THAT
+    # AVOID TO DO SOMETHING LIKE THAT
+    # AVOID TO DO SOMETHING LIKE THAT
+    # AVOID TO DO SOMETHING LIKE THAT
+    # and it could be weird to mix them like that
+    a=Tag.H.A()
+    B=Tag.H.B()
+    C=Tag.H.C()
+    a += B <= C # '<=' is first, and return C ... so A will contain just C ... B is lost in the deep ;-(
+    assert str(a) == "<A><C></C></A>"
+    # AVOID TO DO SOMETHING LIKE THAT
+    # AVOID TO DO SOMETHING LIKE THAT
+    # AVOID TO DO SOMETHING LIKE THAT
 
     # "<=" return the added, so it could be chained (a<=b<=c)
-    ### "+=" can add mass object using a tuple form (without braces) ( a += b,c,d,e  ===  a <= (b,c,d,e) )
+    # "+=" can add mass object using a tuple form (without braces) ( a += b,c,d,e  ===  a <= (b,c,d,e) )
+    a1=Tag.H.A()
+    b=Tag.H.B()
+    c=Tag.H.C()
+    a1+= b,c
+
+    a2=Tag.H.A()
+    b=Tag.H.B()
+    c=Tag.H.C()
+    a2<= (b,c)
+
+    a3=Tag.H.A()
+    b=Tag.H.B()
+    c=Tag.H.C()
+    a3<= b+c
+
+    a4=Tag.H.A()
+    b=Tag.H.B()
+    c=Tag.H.C()
+    a4+= b+c
+
+    assert str(a1)==str(a2)==str(a3)==str(a4)
+
+
 
 def test_add():
     a=Tag.H.A()
@@ -470,8 +493,7 @@ def test_add():
     a=Tag.H.A()
     c=Tag.H.C()
     a+=c
-    assert isinstance(a,list)
-    assert len(a) == 2
+    assert str(a) == "<A><C></C></A>"
 
 if __name__=="__main__":
 
@@ -490,4 +512,4 @@ if __name__=="__main__":
     # test_its_the_same_tagbase_exactly()
 
     # test_base_concepts()
-    test_add()
+    test_iadd()

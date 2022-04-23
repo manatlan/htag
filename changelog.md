@@ -1,3 +1,9 @@
+### 0.2.1 "killing the braces 2" 2022/04/22
+
+ * new operator on tag/tagbase : "+=" -> same as "<=" ... but "a += b,c"  ===  "a <= (b,c)"
+   (but avoid to mix "+=" and "<=" in a same line)
+
+
 ### 0.2.0 "killing the braces" 2022/04/22
 
  * new operator on tag/tagbase : "+" -> create a list of tags

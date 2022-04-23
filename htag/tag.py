@@ -63,15 +63,14 @@ class TagBase:
         # WARN : attrs or content change -> doesn't affect md5 !
         self.md5 = md5( str(self._attrs) + str(self._childs))
 
-    def __le__(self, o: AnyTags ):
-        self.add(o)
-        return o
+    def __le__(self, elt: AnyTags ):
+        self.add(elt)
+        return elt
 
-    # the world is not ready for this ;-)
-    # def __iadd__(self,  o: AnyTags):
-    #     ''' use "+=" instead of "<=" '''
-    #     self.add(o)
-    #     return self
+    def __iadd__(self,  elt: AnyTags):
+        ''' use "+=" instead of "<=" '''
+        self.add(elt)
+        return self
 
     def __add__(self,  elt):
         return Elements([self]) + elt
@@ -287,10 +286,10 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
         if "_id" in attrs:
             raise HTagException("can't set the html attribut '_id'")
         else:
-            attrs["_id"]=id(self)   # force an @id !
-        TagBase.__init__(self,None, **attrs)
-        self.set(content)
-        Tag.__instances__[id(self)]=self
+            the_id = id(self)
+            attrs["_id"]=the_id   # force an @id !
+            TagBase.__init__(self, content, **attrs)
+            Tag.__instances__[the_id]=self
 
     # new mechanism (could replace self.bind.<m>()) ... one day
     #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
