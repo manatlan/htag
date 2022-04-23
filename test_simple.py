@@ -350,7 +350,128 @@ def test_auto_instanciate_attributs():
     assert t.value == 42
 
 
+def test_iadd():
+    B=Tag.H.B()
+    C=Tag.H.C()
 
+
+    # same concept "<=" & "+="
+    a1=Tag.H.A()
+    a1 <= B
+    a1 <= C
+
+    # a2=Tag.H.A()
+    # a2 += B
+    # a2 += C
+
+    a3=Tag.H.A()
+    a3.add( B )
+    a3.add( C )
+
+    assert str(a1)==str(a3)
+
+
+    # but not with "tuple"
+    a1=Tag.H.A()
+    a1 <= B, C  # it's not a tuple (it's 2 statements)
+
+    # a2=Tag.H.A()
+    # a2 += B, C  # it's a tuple
+
+    # assert str(a1) != str(a2)
+    assert str(a1) == "<A><B></B></A>"
+    # assert str(a2) == "<A><B></B><C></C></A>"
+
+
+    # btw, This is possible ... '<=' is chain'able
+    a1=Tag.H.A()
+    a1 <= B <= C <= 12
+    assert str(a1) == "<A><B><C>12</C></B></A>"
+
+    # but syntax error, for that
+    ## a1 += B += C
+
+
+    # # AVOID TO DO SOMETHING LIKE THAT
+    # # AVOID TO DO SOMETHING LIKE THAT
+    # # AVOID TO DO SOMETHING LIKE THAT
+    # # and it could be weird to mix them like that
+    # a=Tag.H.A()
+    # B=Tag.H.B()
+    # C=Tag.H.C()
+    # a += B <= C # '<=' is first, and return C ... so A will contain just C
+    # assert str(a) == "<A><C></C></A>"
+    # # AVOID TO DO SOMETHING LIKE THAT
+    # # AVOID TO DO SOMETHING LIKE THAT
+    # # AVOID TO DO SOMETHING LIKE THAT
+
+    # "<=" return the added, so it could be chained (a<=b<=c)
+    ### "+=" can add mass object using a tuple form (without braces) ( a += b,c,d,e  ===  a <= (b,c,d,e) )
+
+def test_add():
+    a=Tag.H.A()
+    b=Tag.H.B()
+    c=Tag.H.C()
+
+    assert 42+a == [42,a]
+    assert a+None == None+a == [a]
+
+    x=a+b+c
+    assert x==[a,b,c]
+
+    x=a+42
+    assert x==[a,42]
+
+    x=42+a
+    assert x==[42,a]
+
+    a=Tag.H.A()
+    b=Tag.H.B()
+    c=Tag.H.C()
+
+    a.clear()
+    a <= b+c+c+c
+    assert str(a) == "<A><B></B><C></C><C></C><C></C></A>"
+
+    a.clear()
+    a<= b+"kkk"+42+None+78
+    assert str(a) == "<A><B></B>kkk4278</A>"
+
+    # a.clear()
+    # a+= b+"kkk"+42+None+78
+    # print(a)
+
+    a.clear()
+    a.add( b+"kkk"+42+None+78 )
+    assert str(a) == "<A><B></B>kkk4278</A>"
+
+    a.childs.append( c )
+    assert str(a) == "<A><B></B>kkk4278<C></C></A>"
+
+    x=12+(a+c)+(b+c)
+    assert x == [12,a,c,b,c]
+
+    xx=12+a+(c+b)+c
+    assert xx == [12,a,c,b,c]
+
+    x1=xx[:]
+    x1+=13+c
+    assert x1 == [12,a,c,b,c,13,c]
+
+    x1=xx[:]
+    x1+=[13,c]
+    assert x1 == [12,a,c,b,c,13,c]
+
+    x1=xx[:]
+    x1+=(13,c)
+    assert x1 == [12,a,c,b,c,13,c]
+
+
+    a=Tag.H.A()
+    c=Tag.H.C()
+    a+=c
+    assert isinstance(a,list)
+    assert len(a) == 2
 
 if __name__=="__main__":
 
@@ -369,3 +490,4 @@ if __name__=="__main__":
     # test_its_the_same_tagbase_exactly()
 
     # test_base_concepts()
+    test_add()

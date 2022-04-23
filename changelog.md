@@ -1,3 +1,11 @@
+### 0.2.0 "killing the braces" 2022/04/22
+
+ * new operator on tag/tagbase : "+" -> create a list of tags
+   (now, it's easier to add multiple childs in one line :
+
+    - "a <= b+c", instead of "a <= (b,c)"
+    - "Tag.div( a+b )" instead of "Tag.div( (a,b) )"
+
 ### 0.1.13 2022/04/21
 
  * add unitests for ".imports"

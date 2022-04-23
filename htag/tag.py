@@ -27,7 +27,23 @@ def stringify(obj):
     return json.dumps(obj, default=my).replace('"<:<:',"").replace(':>:>"',"")
 
 
-
+class Elements(list):
+    def __add__(self,  elt: AnyTags):
+        if elt is None:
+            pass
+        elif not isinstance(elt,str) and hasattr(elt,"__iter__"):
+            self.extend( list(elt) )
+        else:
+            self.append(elt)
+        return self
+    def __radd__(self,  elt: AnyTags):
+        if elt is None:
+            pass
+        elif not isinstance(elt,str) and hasattr(elt,"__iter__"):
+            self[:0] = list(elt)
+        else:
+            self.insert(0,elt)
+        return self
 
 class TagBase:
     """ This is a class helper to produce a "HTML TAG" """
@@ -51,8 +67,19 @@ class TagBase:
         self.add(o)
         return o
 
+    # the world is not ready for this ;-)
+    # def __iadd__(self,  o: AnyTags):
+    #     ''' use "+=" instead of "<=" '''
+    #     self.add(o)
+    #     return self
+
+    def __add__(self,  elt):
+        return Elements([self]) + elt
+    def __radd__(self,  elt):
+        return elt + Elements([self])
+
     def clear(self):
-        self._childs=[]
+        self._childs=Elements()
 
     def set(self,elt:AnyTags):
         """ a bit like .innerHTML setting (avoid clear+add)"""
@@ -61,13 +88,7 @@ class TagBase:
 
     def add(self,elt:AnyTags):
         """ add an object or a list/tuple of objects """
-        if elt is None:
-            pass
-        elif not isinstance(elt,str) and hasattr(elt,"__iter__"):
-            for i in elt:
-                self._childs.append(i)
-        else:
-            self._childs.append(elt)
+        self._childs.__add__(elt)
 
     @property
     def childs(self) -> list:
@@ -78,11 +99,10 @@ class TagBase:
         return self._attrs
 
     def __setitem__(self,attr:str,value):
-
         # if not isinstance(self,Tag):  #TODO: in the future ;-)
         #     raise HTagException("Can't assign a callback on a tagbase")
-
         self._attrs[attr]=value
+
     def __getitem__(self,attr:str) -> Any:
         return self._attrs.get(attr,None)
 
