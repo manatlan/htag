@@ -17,12 +17,7 @@ LIMITATION : But multi client doesn't work using guy.serve().
 (because HRenderer can manage only one instance at once)
 (to handle multiple, you should modify this class to handle multiple HRenderer)
 """
-try:
-    import guy
-except ImportError:
-    import sys
-    print("You should install 'guy' for this htag runner")
-    sys.exit(-1)
+import guy
 
 class GuyApp(guy.Guy):
     """ Open the rendering in a GUY instance

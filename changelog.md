@@ -1,3 +1,8 @@
+### 0.2.2 "the 1st good one" 2022/04/22
+
+ * MAJOR VERSION : the lib for runners are not mandatory !!!
+   (til now, it didn't worked when no starlette, uvicorn, guy)
+
 ### 0.2.1 "killing the braces 2" 2022/04/22
 
  * new operator on tag/tagbase : "+=" -> same as "<=" ... but "a += b,c"  ===  "a <= (b,c)"

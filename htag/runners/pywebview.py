@@ -12,12 +12,7 @@ from ..render import HRenderer
 
 
 import asyncio,os
-try:
-    import webview
-except ImportError:
-    import sys
-    print("You should install 'pywebview' for this htag runner")
-    sys.exit(-1)
+import webview
 
 
 """

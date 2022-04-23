@@ -8,13 +8,29 @@
 # #############################################################################
 
 # mono instance
-from .browserstarlettehttp import BrowserStarletteHTTP
-from .browserstarlettews import BrowserStarletteWS
 from .browserhttp import BrowserHTTP
-from .pywebview import PyWebWiew
-from .guyapp import GuyApp
 
-# multi instance
-from .webhttp import WebHTTP
+try:
+    # mono instance
+    from .browserstarlettehttp import BrowserStarletteHTTP
+    from .browserstarlettews import BrowserStarletteWS
 
-__all__ = ["BrowserHTTP","PyWebWiew","GuyApp","BrowserStarletteHTTP","BrowserStarletteWS","WebHTTP"]
+    # multi instance
+    from .webhttp import WebHTTP
+
+except ImportError:
+    print("You should install 'starlette' & 'uvicorn' for this htag runner")
+
+try:
+    # mono instance (juste one pywebview ;-)
+    from .pywebview import PyWebWiew
+except ImportError:
+    print("You should install 'pywebview' for this htag runner")
+
+try:
+    # mono instance (only ! htag limitation)
+    from .guyapp import GuyApp
+except ImportError:
+    print("You should install 'guy' for this htag runner")
+
+

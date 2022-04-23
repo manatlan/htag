@@ -12,14 +12,9 @@ from ..render import HRenderer
 
 
 import webbrowser,os,json
-try:
-    import uvicorn
-    from starlette.applications import Starlette
-    from starlette.responses import HTMLResponse
-except ImportError:
-    import sys
-    print("You should install 'starlette' & 'uvicorn' for this htag runner")
-    sys.exit(-1)
+import uvicorn
+from starlette.applications import Starlette
+from starlette.responses import HTMLResponse
 
 
 class BrowserStarletteWS:
