@@ -374,16 +374,20 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
     def _genIIFEScript(self,js:str) -> str:
         return f"(function(tag){{ {js}\n }})(document.getElementById('{id(self)}'));"
 
-    def __str__(self):
+    def _hasRender(self):
         if hasattr(self,"render"):
             render = getattr(self,"render")
             if callable(render):
-                logger.debug("Tag.__str__() : %s rendering itself with its render() method", repr(self))
-                self.clear()
-                render()
-                return TagBase.__str__(self)
-
-        logger.debug("Tag.__str__() : render str for %s", repr(self))
+                return render
+                
+    def __str__(self):
+        render = self._hasRender()
+        if render:
+            logger.debug("Tag.__str__() : %s rendering itself with its render() method", repr(self))
+            self.clear()
+            render()
+        else:
+            logger.debug("Tag.__str__() : render str for %s", repr(self))
         return TagBase.__str__(self)
 
 

@@ -304,10 +304,13 @@ def test_intelligent_rendering2():
         def inc(self):
             self.nb += 1
 
-        def __str__(self):
-            self.clear()
+        # def __str__(self):
+        #     self.clear()
+        #     self <= self.nb
+        #     return Tag.__str__(self)
+
+        def render(self):
             self <= self.nb
-            return Tag.__str__(self)
 
     # test that the base feature works ;-)
     o=Obj()
@@ -359,13 +362,19 @@ def test_build_immediatly_vs_lately():
         def inc(self):
             self.nb+=1
 
-        def __str__(self):
+        # def __str__(self):
+        #     self["name"]=self.name
+        #     self["nb"]=self.nb
+        #     self.clear()
+        #     for i in range(self.nb):
+        #         self <= H.span("*")
+        #     return Tag.__str__(self)
+
+        def render(self):
             self["name"]=self.name
             self["nb"]=self.nb
-            self.clear()
             for i in range(self.nb):
                 self <= H.span("*")
-            return Tag.__str__(self)
 
 
     o1=Obj("toto")
