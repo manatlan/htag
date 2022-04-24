@@ -1,9 +1,9 @@
-### 0.3.0 "back to future" 2022/../..
+### 0.3.0 "back to future" 2022/04/22
 
  * Remove "Tag.NoRender" trick (too brain fucked) ... kiss ! (can be simulated easily)
  * if Tag.init() is defined : it will use as a simplified init method (don't mix __init__() & init() ;-) )
    (it's the old ".init(...)" behaviour of gtag)
- * if Tag.render() is defined : Rendering (str) will call it before rendering -> useful for lately rendering (dynamic ones)
+ * if Tag.render() is defined : Rendering (str) will call it before rendering -> useful for lately rendering (simple dynamic ones)
    (it's the old ".build()" behaviour of gtag)
 
 ### 0.2.2 "the 1st good one" 2022/04/22
