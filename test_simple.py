@@ -139,7 +139,6 @@ def test_tag_generation_with_opt_params():
     class NewTag(Tag.h1):
 
         def __init__(self,nb,txt="torchon", **a):
-            print("===",self.tag)
             Tag.__init__(self, **a)
             self.nb=nb
             self.txt=txt

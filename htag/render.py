@@ -298,7 +298,7 @@ function action( o ) {
         head=H.head()
         head <= H.meta(_charset="utf-8")
         head <= H.meta(_name="viewport",_content="width=device-width, initial-scale=1")
-        head <= H.meta(_name="version",_content=f"HTag {__version__}")
+        head <= H.meta(_name="version",_content=f"htag {__version__}")
         head <= H.title( self.title )
         head <= self._statics
 
