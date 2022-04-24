@@ -271,24 +271,39 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
     def find_tag(cls, obj_id:int):
         return cls.__instances__.get(obj_id, None)
 
-    def __init__(self, content:AnyTags=None,**_attrs):
+    def __init__(self, *args,**kargs):
         self._callbacks_={}
         attrs={}
         auto={}
-        for k,v in _attrs.items():
+        for k,v in kargs.items():
             if k.startswith("_"):
                 attrs[k]=v
             else:
                 auto[k]=v
 
-        self.__dict__.update(auto)
+        # own a simplified init() ?
+        init=None
+        if hasattr(self,"init"):
+            init = getattr(self,"init")
+            init = init if callable(init) else None
+
+        if not init:
+            # if no own 'init' method, declare def args as attributs instance
+            self.__dict__.update(auto)
 
         if "_id" in attrs:
             raise HTagException("can't set the html attribut '_id'")
         else:
             the_id = id(self)
             attrs["_id"]=the_id   # force an @id !
-            TagBase.__init__(self, content, **attrs)
+            if init:
+                TagBase.__init__(self, None, **attrs)
+                logger.debug("Tag.__init__() : %s use its own simplified init()", repr(self))
+                init(*args,**auto)
+            else:
+                if len(args)>1: raise HTagException("Bad constructor")
+                content = args[0] if args else None
+                TagBase.__init__(self, content, **attrs)
             Tag.__instances__[the_id]=self
 
     # new mechanism (could replace self.bind.<m>()) ... one day
@@ -363,6 +378,14 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
         return f"(function(tag){{ {js}\n }})(document.getElementById('{id(self)}'));"
 
     def __str__(self):
+        if hasattr(self,"render"):
+            render = getattr(self,"render")
+            if callable(render):
+                logger.debug("Tag.__str__() : %s rendering itself with a its render() method", repr(self))
+                self.clear()
+                render()
+                return TagBase.__str__(self)
+
         logger.debug("Tag.__str__() : render str for %s", repr(self))
         return TagBase.__str__(self)
 

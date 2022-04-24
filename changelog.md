@@ -1,3 +1,10 @@
+### 0.3.0 "back to future" 2022/../..
+
+ * if Tag.init() is defined : it will use as a simplified init method (don't mix __init__() & init() ;-) )
+   (it's the old ".init(...)" behaviour of gtag)
+ * if Tag.render() is defined : Rendering (str) will call it before rendering -> useful for lately rendering (dynamic ones)
+   (it's the old ".build()" behaviour of gtag)
+
 ### 0.2.2 "the 1st good one" 2022/04/22
 
  * MAJOR VERSION : the lib for runners are not mandatory !!!
