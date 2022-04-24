@@ -60,13 +60,13 @@ class Object(Tag):
     def incNormal(self):
         self["nb"]+=1
 
-    @Tag.NoRender
+    # @Tag.NoRender
     def incNoRedraw(self):
         self["nb"]+=1
 
 
 @pytest.mark.asyncio
-async def test_simplest():
+async def test_simplest():  #TODO: redefine coz norender is gone, so this test is perhaps non sense
     o=Object()
 
     hr=Simu(o)
@@ -76,11 +76,11 @@ async def test_simplest():
     r=await hr.interact(o).incNormal()
     assert list(r["update"].keys()) == [ id(o) ]
 
-    r=await hr.interact(o).incNoRedraw()
-    assert r=={}
+    # r=await hr.interact(o).incNoRedraw()
+    # assert r=={}
 
 @pytest.mark.asyncio
-async def test_rendering():
+async def test_rendering(): #TODO: redefine coz norender is gone, so this test is perhaps non sense
 
     class P(Tag):
         def __init__(self):
@@ -107,10 +107,10 @@ async def test_rendering():
             self["my"]+=1
             self.o1.incNormal()     # has no efect
 
-        @Tag.NoRender
-        def testModMe_2(self):
-            self["my"]+=1
-            self.o1.incNormal()     # has no efect
+        # @Tag.NoRender
+        # def testModMe_2(self):
+        #     self["my"]+=1
+        #     self.o1.incNormal()     # has no efect
 
 
         # use incNoRedraw from o1
@@ -122,10 +122,10 @@ async def test_rendering():
             self["my"]+=1
             self.o1.incNoRedraw()   # has no efect
 
-        @Tag.NoRender
-        def testModMe_12(self):
-            self["my"]+=1
-            self.o1.incNoRedraw()   # has no efect
+        # @Tag.NoRender
+        # def testModMe_12(self):
+        #     self["my"]+=1
+        #     self.o1.incNoRedraw()   # has no efect
 
     #====================================================================
     o=P()
@@ -138,8 +138,8 @@ async def test_rendering():
     r=await hr.interact( o ).testModO1_1()
     assert id(o.o1) in r["update"]  # just o1 has changed
 
-    r=await hr.interact( o ).testModO1_2()
-    assert id(o.o1) in r["update"]  # just o1 has changed
+    # r=await hr.interact( o ).testModO1_2()
+    # assert id(o.o1) in r["update"]  # just o1 has changed
 
     #========================
 
@@ -149,8 +149,8 @@ async def test_rendering():
     r=await hr.interact( o ).testModMe_1()
     assert id(o) in r["update"] # in fact, redraw main
 
-    r=await hr.interact( o ).testModMe_2()
-    assert id(o.o1) in r["update"]  # redraw just the child # not the main, coz main return 0
+    # r=await hr.interact( o ).testModMe_2()
+    # assert id(o.o1) in r["update"]  # redraw just the child # not the main, coz main return 0
 
     # #========================
 
@@ -160,21 +160,21 @@ async def test_rendering():
     r=await hr.interact( o ).testModMe_11()
     assert id(o) in r["update"] # in fact, redraw main
 
-    r=await hr.interact( o ).testModMe_12()
-    assert id(o.o1) in r["update"]  # redraw just the child # not the main, coz main return 0
+    # r=await hr.interact( o ).testModMe_12()
+    # assert id(o.o1) in r["update"]  # redraw just the child # not the main, coz main return 0
 
 
 
 
 @pytest.mark.asyncio
-async def test_simplest_async():
+async def test_simplest_async(): #TODO: redefine coz norender is gone, so this test is perhaps non sense
 
     class Object(Tag):
         def __init__(self):
             Tag.__init__(self)
             self["nb"]=0
 
-        @Tag.NoRender
+        # @Tag.NoRender
         def inc(self):
             self["nb"]+=1
             yield
@@ -186,10 +186,10 @@ async def test_simplest_async():
     r=await hr.init()
 
     r=await hr.interact(o).inc()
-    assert "update" not in r
+    assert "update" in r
 
     await hr.doNext( r)
-    assert "update" not in r
+    assert "update" in r
 
 
 @pytest.mark.asyncio
@@ -256,5 +256,6 @@ if __name__=="__main__":
     # asyncio.run( test1() )
     # asyncio.run( test2() )
     # asyncio.run( test_simplest_async() )
-    asyncio.run( test_yield() )
+    # asyncio.run( test_yield() )
+    asyncio.run( test_rendering() )
     # asyncio.run( test_bug() )

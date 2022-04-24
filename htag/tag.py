@@ -263,11 +263,6 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
     js: StrNonable = None  # post script, useful for js/init when tag is rendered
 
     @classmethod
-    def NoRender(cls,f:Callable):
-        f._norender = True
-        return f
-
-    @classmethod
     def find_tag(cls, obj_id:int):
         return cls.__instances__.get(obj_id, None)
 
@@ -379,7 +374,7 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
             render = getattr(self,"render")
             if callable(render):
                 return render
-                
+
     def __str__(self):
         render = self._hasRender()
         if render:

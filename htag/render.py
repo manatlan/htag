@@ -58,6 +58,8 @@ class Stater:
         """ to be runned after interactions to guess whose are modifieds
             return modifieds tags
         """
+        #TODO: the 'dontRedraw' shouldn't be set since htag>=0.3.0, so this code could be redsigned
+
         logger.debug("Stater.guess(), start guessing ....")
         modifieds=[]
 
@@ -184,16 +186,12 @@ function action( o ) {
                 state = Stater(self.tag)
                 setattr(Tag,"__call__", hookInteractScripts) # not great (with concurrencies)
                 try:
-                    norender=False
-
                     obj = Tag.find_tag(oid)
                     if obj:
                         # call the method
                         method=getattr(obj,method_name)
 
-                        norender = hasattr(method,"_norender")
-
-                        logger.info(f"INTERACT with METHOD {fmtcaller(method_name,args,kargs)} %s, of %s", "**NoRender**" if norender else "", repr(obj) )
+                        logger.info(f"INTERACT with METHOD {fmtcaller(method_name,args,kargs)}, of %s", repr(obj) )
 
                         if asyncio.iscoroutinefunction( method ):
                             r=await method(*args,**kargs)
@@ -201,14 +199,14 @@ function action( o ) {
                             r=method(*args,**kargs)
 
                         if isinstance(r, types.AsyncGeneratorType) or isinstance(r, types.GeneratorType):
-                            # save it, to avoid GC (and save the Tag/norender)
-                            self._loop[id(r)] = dict(gen=r,tag=obj,norender= norender)
+                            # save it, to avoid GC
+                            self._loop[id(r)] = dict(gen=r,tag=obj)
 
                     else:
                         obj = self._loop.get(oid,None)
                         if obj: # it's a existing generator
-                            r, obj, norender = obj["gen"], obj["tag"], obj["norender"]
-                            logger.info("INTERACT with GENERATOR %s(...) %s, of %s",r.__name__, "**NoRender**" if norender else "", repr(obj) )
+                            r, obj = obj["gen"], obj["tag"]
+                            logger.info("INTERACT with GENERATOR %s(...), of %s",r.__name__, repr(obj) )
                         else:
                             raise Exception(f"{oid} is not an existing Tag or generator (dead objects ?)?!")
 
@@ -232,10 +230,7 @@ function action( o ) {
                         assert r is None
                         ret=None
 
-                    if norender:
-                        rep= self._mkReponse(state.guess(obj) ) # avoid redraw obj
-                    else:
-                        rep= self._mkReponse(state.guess() )
+                    rep= self._mkReponse(state.guess() )
 
                     if ret:
                         obj.add(ret) # add content in object

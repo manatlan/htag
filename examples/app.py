@@ -82,7 +82,6 @@ class Page(Tag.body):
 
         self.js="console.log(42)"
 
-    @Tag.NoRender
     def press(self,v):
         self.t["value"]=v
         print(v)
