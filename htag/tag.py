@@ -378,7 +378,7 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
         if hasattr(self,"render"):
             render = getattr(self,"render")
             if callable(render):
-                logger.debug("Tag.__str__() : %s rendering itself with a its render() method", repr(self))
+                logger.debug("Tag.__str__() : %s rendering itself with its render() method", repr(self))
                 self.clear()
                 render()
                 return TagBase.__str__(self)
