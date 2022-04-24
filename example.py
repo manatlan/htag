@@ -2,7 +2,10 @@ from htag import Tag
 import htbulma as b
 
 class Star1(Tag.div): # it's a component ;-)
-    """ rendering lately """
+    """ rendering lately (using render (called before __str__))
+
+        it's simpler ... but event/action shouldn't try to draw something, coz render will rebuild all at each time
+    """
 
     def init(self,value=0):
         self.value=value
@@ -12,23 +15,24 @@ class Star1(Tag.div): # it's a component ;-)
 
     def render(self): # <- ensure dynamic rendering
         self <= b.Button( "-", _onclick = lambda o: self.inc(-1), _class="is-small" )
-        self <= b.Button( "+", _onclick = lambda o: self.inc(1) , _class="is-small" )
+        self <= b.Button( "+", _onclick = lambda o: self.inc(+1), _class="is-small" )
         self <= "⭐"*self.value
 
 class Star2(Tag.div): # it's a component ;-)
-    """ rendering immediatly """
+    """ rendering immediatly (each event does the rendering)
+
+        it's less simple ... but event/action should redraw something !
+
+    """
 
     def init(self,value=0):
         self.value=value
-        self <= b.Button( "-", _onclick = self.bind.inc(-1), _class="is-small" )
-        self <= b.Button( "+", _onclick = self.bind.inc(1) , _class="is-small" )
-        # self <= b.Button( "-", _onclick = lambda o: self.inc(-1), _class="is-small" )
-        # self <= b.Button( "+", _onclick = lambda o: self.inc(1) , _class="is-small" )
+        self <= b.Button( "-", _onclick = lambda o: self.inc(-1), _class="is-small" )
+        self <= b.Button( "+", _onclick = lambda o: self.inc(+1), _class="is-small" )
 
         self.content = Tag.span( "⭐"*self.value )
         self <= self.content
 
-    @Tag.NoRender
     def inc(self,v):
         self.value+=v
         self.content.set( "⭐"*self.value )
@@ -36,11 +40,6 @@ class Star2(Tag.div): # it's a component ;-)
 
 
 class App(Tag.body):
-  statics = Tag.style("""html {
-    user-select: none;
-    -ms-touch-action: manipulation;
-    touch-action: manipulation;
-}""")
 
   def init(self):
     self._mbox = b.MBox(self)
@@ -57,8 +56,8 @@ class App(Tag.body):
 
 
 if __name__=="__main__":
-    import logging
-    logging.basicConfig(format='[%(levelname)-5s] %(name)s: %(message)s',level=logging.DEBUG)
+    # import logging
+    # logging.basicConfig(format='[%(levelname)-5s] %(name)s: %(message)s',level=logging.DEBUG)
 
     app=App()
 
