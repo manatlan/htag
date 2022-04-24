@@ -67,7 +67,7 @@ def test_weird_with_real_constructor():
         def __init__(self):
             super().__init__(1,2)
 
-    with pytest.raises(HTagException): # Bad constructor
+    with pytest.raises(TypeError):
         Toto()
 
     class Toto(Tag.div):

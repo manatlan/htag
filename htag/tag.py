@@ -287,10 +287,6 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
             init = getattr(self,"init")
             init = init if callable(init) else None
 
-        if not init:
-            # if no own 'init' method, declare def args as attributs instance
-            self.__dict__.update(auto)
-
         if "_id" in attrs:
             raise HTagException("can't set the html attribut '_id'")
         else:
@@ -301,9 +297,10 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
                 logger.debug("Tag.__init__() : %s use its own simplified init()", repr(self))
                 init(*args,**auto)
             else:
-                if len(args)>1: raise HTagException("Bad constructor")
-                content = args[0] if args else None
-                TagBase.__init__(self, content, **attrs)
+                # if no own 'init' method, declare default args (auto) as attributs instance
+                self.__dict__.update(auto)
+
+                TagBase.__init__(self, *args, **attrs)
             Tag.__instances__[the_id]=self
 
     # new mechanism (could replace self.bind.<m>()) ... one day
