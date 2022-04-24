@@ -6,23 +6,21 @@ class Star(Tag.div): # it's a component ;-)
     def init(self,value=0):
         self.value=value
 
-    def render(self): # <- ensure dynamic rendering
-        def inc(v):
-            self.value+=v
+    def more(self,o): self.value+=1
+    def less(self,o): self.value-=1
 
-        self <= b.Button( "-", _onclick = lambda o: inc(-1), _class="is-small" )
-        self <= b.Button( "+", _onclick = lambda o: inc(1) , _class="is-small" )
+    def render(self): # <- ensure dynamic rendering
+        self <= b.Button( "-", _onclick = self.less, _class="is-small" )
+        self <= b.Button( "+", _onclick = self.more, _class="is-small" )
         self <= "⭐"*self.value
 
 
 class App(Tag.body):
-  statics = Tag.style("""
-  html {
-user-select: none;
--ms-touch-action: manipulation;
-touch-action: manipulation;
-}
-  """)
+  statics = Tag.style("""html {
+    user-select: none;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+}""")
 
   def init(self):
     self._mbox = b.MBox(self)
