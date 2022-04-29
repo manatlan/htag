@@ -22,6 +22,7 @@ class BrowserStarletteWS:
         Open the rendering in a browser tab.
     """
     def __init__(self,tag:Tag):
+        assert isinstance(tag,Tag)
         js = """
 async function interact( o ) {
     ws.send( JSON.stringify(o) );
@@ -36,8 +37,7 @@ ws.onmessage = function(e) {
 
         self.renderer=HRenderer(tag, js, lambda: os._exit(0))
 
-
-    def run(self):
+    def run(self, host="127.0.0.1", port=8000, openBrowser=True ):   # localhost, by default !!
         app = Starlette()
 
         @app.route('/')
@@ -54,5 +54,6 @@ ws.onmessage = function(e) {
                 await websocket.send_text( json.dumps(actions) )
             await websocket.close()
 
-        webbrowser.open_new_tab("http://127.0.0.1:8000")
-        uvicorn.run(app)
+        if openBrowser:
+            webbrowser.open_new_tab(f"http://{host}:{port}")
+        uvicorn.run(app, host=host, port=port)

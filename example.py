@@ -61,5 +61,5 @@ if __name__=="__main__":
 
     app=App()
 
-    from htag.runners import BrowserHTTP
-    BrowserHTTP( app ).run()
+    from htag.runners import *
+    BrowserStarletteWS( app ).run()

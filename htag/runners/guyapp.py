@@ -25,6 +25,8 @@ class GuyApp(guy.Guy):
     """
 
     def __init__(self,tag: Tag):
+        assert isinstance(tag,Tag)
+
         js = """
 async function interact( o ) {
     action( await self.interact(o["id"], o["method"], o["args"], o["kargs"]) );

@@ -23,6 +23,8 @@ class BrowserHTTP:
     """
 
     def __init__(self,tag:Tag):
+        assert isinstance(tag,Tag)
+
         js = """
 async function interact( o ) {
     action( await (await window.fetch("/",{method:"POST", body:JSON.stringify(o)})).json() )
@@ -33,7 +35,7 @@ window.addEventListener('DOMContentLoaded', start );
 
         self.renderer=HRenderer(tag, js, lambda: os._exit(0))
 
-    def run(self):
+    def run(self, host="127.0.0.1", port=8000, openBrowser=True ):   # localhost, by default !!
         """
         ASyncio http server with stdlib ;-)
         Inspired from https://www.pythonsheets.com/notes/python-asyncio.html
@@ -46,7 +48,7 @@ window.addEventListener('DOMContentLoaded', start );
             return header
 
         async def handler(conn):
-            
+
             CHUNK_LIMIT=256 # must be minimal
             req = b''
             while True:
@@ -54,11 +56,11 @@ window.addEventListener('DOMContentLoaded', start );
                 if chunk:
                     req += chunk
                     if len(chunk) < CHUNK_LIMIT:
-                        break                    
+                        break
                 else:
                     break
-            
-            
+
+
             try:
                 if req.startswith(b"GET / HTTP"):
                     resp = make_header()
@@ -83,8 +85,6 @@ window.addEventListener('DOMContentLoaded', start );
                 conn, addr = await loop.sock_accept(sock)
                 loop.create_task(handler(conn))
 
-        host = '127.0.0.1'
-        port = 8000
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             s.setblocking(False)
@@ -93,7 +93,8 @@ window.addEventListener('DOMContentLoaded', start );
 
             loop = asyncio.get_event_loop()
             try:
-                webbrowser.open_new_tab(f"http://{host}:{port}")
+                if openBrowser:
+                    webbrowser.open_new_tab(f"http://{host}:{port}")
                 loop.run_until_complete(server(s, loop))
             except KeyboardInterrupt:
                 pass

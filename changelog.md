@@ -1,3 +1,10 @@
+### 0.3.1 "runners version" 2022/04/29
+
+ * all runners are upgraded (taking host,port,openBrowser,debug options, and assert) : compatibiliy keeped
+ * WebHTTP can takes multiples class now
+ * WebHTTP can handle multiple client, multiple Tags ... and give "query_params" to tag constructor (if needed)
+ * WebHTTP can take a param "timeout" (by default 5min)
+
 ### 0.3.0 "back to future" 2022/04/22
 
  * Remove "Tag.NoRender" trick (too brain fucked) ... kiss ! (can be simulated easily)
@@ -17,7 +24,7 @@
    (but avoid to mix "+=" and "<=" in a same line)
 
 
-### 0.2.0 "killing the braces" 2022/04/22
+### 0.2.0 "killing the braces" 2022 /04/22
 
  * new operator on tag/tagbase : "+" -> create a list of tags
    (now, it's easier to add multiple childs in one line :

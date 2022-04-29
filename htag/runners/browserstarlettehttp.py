@@ -23,6 +23,8 @@ class BrowserStarletteHTTP:
         Open the rendering in a browser tab.
     """
     def __init__(self,tag:Tag):
+        assert isinstance(tag,Tag)
+
         js = """
 async function interact( o ) {
     action( await (await window.fetch("/",{method:"POST", body:JSON.stringify(o)})).json() )
@@ -41,10 +43,21 @@ window.addEventListener('DOMContentLoaded', start );
         dico = await self.renderer.interact(data["id"],data["method"],data["args"],data["kargs"])
         return JSONResponse(dico)
 
-    def run(self):
-        app = Starlette(debug=True, routes=[
+
+    def __call__(self):
+        """ create a uvicorn factory/asgi, to make it compatible with uvicorn
+            from scratch.
+        """
+        return Starlette(debug=True, routes=[
             Route('/', self.GET, methods=["GET"]),
             Route('/', self.POST, methods=["POST"]),
         ])
-        webbrowser.open_new_tab("http://127.0.0.1:8000")
-        uvicorn.run(app)
+        return app
+
+    def run(self, host="127.0.0.1", port=8000, openBrowser=True, debug=True):   # localhost, by default !!
+        import uvicorn
+        if openBrowser:
+            webbrowser.open_new_tab(f"http://{host}:{port}")
+
+        uvicorn.run(self(), host=host, port=port)
+

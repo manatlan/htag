@@ -29,6 +29,8 @@ class PyWebWiew:
         Interactions with builtin pywebview.api ;-)
     """
     def __init__(self,tag:Tag):
+        assert isinstance(tag,Tag)
+
         js = """
 async function interact( o ) {
     action( await pywebview.api.interact( o["id"], o["method"], o["args"], o["kargs"] ) );

@@ -12,61 +12,34 @@ from ..render import HRenderer
 
 """ REAL WEB http,
 - .exit() has no effect ;-)
-- can handle multiple client (see SESID below)
-- each client -> an instance is created (at post)
-- session are destroyed after 5m of inactivity
+- can handle multiple client (with htuid cookie)
+- can handle multiple "tag class", and brings query_params as "query_params:dict" when instanciate tag
+- the session is destroyed after timeout/5m of inactivity
 """
 
 import os
+import uuid
 import time
 import asyncio
+import logging
 
-TIMEOUT = 5*60 # in seconds
-
-import uvicorn
 from starlette.applications import Starlette
 from starlette.responses import HTMLResponse,JSONResponse
 from starlette.routing import Route
-
+logger = logging.getLogger(__name__)
 
 class WebHTTP:
     """ Simple ASync Web Server (with starlette) with HTTP interactions with htag.
-        can handle multiple instances !!!
+        can handle multiple instances & multiples Tag
     """
-    def __init__(self,callback_tag_creator):
+    def __init__(self,*classes, timeout=5*60):
+        assert len(classes)>0
+        assert all( [issubclass(i,Tag) for i in classes] )
         self.sessions={}
-        self.callback_tag_creator = callback_tag_creator
+        self.classes={i.__name__:i for i in classes}
+        self.timeout=timeout
 
-    def _createRenderer(self):
-        js = """
-async function interact( o ) {
-    action( await (await window.fetch("/"+SESID,{method:"POST", body:JSON.stringify(o)})).json() )
-}
 
-//======================================================= create a unique SESSION ID
-var SESID = window.sessionStorage.getItem('SESID');
-if(!SESID) {
-    SESID = Math.random().toString(36).substring(2);
-    window.sessionStorage.setItem('SESID',SESID);
-}
-console.log("SESSION ID:",SESID)
-//=======================================================
-
-window.addEventListener('DOMContentLoaded', start );
-"""
-        tag = self.callback_tag_creator()
-        return HRenderer(tag, js ) # NO EXIT !!
-
-    def _getRendererSession(self,ses_id):
-
-        if ses_id in self.sessions: # reuse
-            ses_renderer = self.sessions[ses_id]["renderer"]
-        else: # create a new one
-            ses_renderer = self._createRenderer()
-            self.sessions[ses_id] = dict( lastaccess=None, renderer=ses_renderer )
-
-        self.sessions[ses_id]["lastaccess"] = time.time()
-        return self.sessions[ses_id]["renderer"]
 
     async def _purgeSessions(self):
 
@@ -74,31 +47,110 @@ window.addEventListener('DOMContentLoaded', start );
             while True:
                 now=time.time()
                 for ses_id,ses_info in list(self.sessions.items()):
-                    if now - ses_info["lastaccess"] > TIMEOUT:
+                    if now - ses_info["lastaccess"] > self.timeout:
+                        logger.info("PURGE SESSION: %s (sessions:%s)", ses_id, len(self.sessions))
                         del self.sessions[ses_id]
 
-                await asyncio.sleep(60) # every 60s
+                await asyncio.sleep(60) # check every 60s
 
         asyncio.ensure_future( purge() )
 
 
+    def createHRenderer(self,tag):
+        js = """
+async function interact( o ) {
+    action( await (await window.fetch("/%s/",{method:"POST", body:JSON.stringify(o)})).json() )
+}
+
+window.addEventListener('DOMContentLoaded', start );
+""" % (tag.__class__.__name__)
+
+        return HRenderer(tag, js ) # NO EXIT !!
+
+    def getsession(self,request,sessionid,klass):
+        qp = dict(request.query_params)
+        hr=None
+
+        if sessionid in self.sessions:
+            ses = self.sessions[ sessionid ]
+            if request.method == "GET" and ses["qp"] != qp:
+                # if we are at "CREATE TIME", we control query_params
+                # not same construction -> destroy it (for recreate later)
+                hr=None
+                logger.info("FORGET SESSION %s (sessions:%s)",sessionid,len(self.sessions))
+            else:
+                ses["lastaccess"] = time.time()
+                hr = ses["renderer"]
+                logger.info("REUSE SESSION %s (sessions:%s)",sessionid,len(self.sessions))
+
+        if hr is None:
+            # need a new session
+            try:
+                tag = klass( query_params = qp )
+            except TypeError:
+                logger.warning("Can't instanciate tag '%s' with 'query_params' argument, so instanciate it without argument !", klass.__name__)
+                tag = klass()
+
+            hr=self.createHRenderer(tag)
+            self.sessions[ sessionid ] = dict( lastaccess=time.time(), renderer=hr, qp=qp )
+            logger.info("CREATE SESSION %s for %s with qp=%s (sessions:%s)",sessionid,repr(hr.tag),qp,len(self.sessions))
+        return hr
+
+
     async def GET(self,request) -> HTMLResponse:
-        # create a "empty shelf" (the renderer is destroyed after use)
-        r=self._createRenderer()
-        return HTMLResponse( str(r) )
+        tagClass=request.path_params.get('tagClass',None)
+        if tagClass is None:
+            # by default, take the first one
+            klass=list(self.classes.values())[0]
+        else:
+            # take the named one
+            klass=self.classes.get(tagClass,None)
+
+        if klass:
+            htuid = request.cookies.get("htuid")
+
+            if htuid:
+                sessionid = klass.__name__+":"+htuid
+            else:
+                htuid = str(uuid.uuid4())
+                sessionid = klass.__name__+":"+htuid
+
+            hr = self.getsession(request,sessionid,klass)
+
+            r=HTMLResponse( str(hr) )
+            r.set_cookie("htuid",htuid,path="/")
+            return r
+        else:
+            return HTMLResponse( "404 Not Found" , status_code=404 )
 
     async def POST(self,request) -> JSONResponse:
-        data=await request.json()
+        tagClass=request.path_params.get('tagClass',None)
+        klass=self.classes.get(tagClass,None)
 
-        # get renderer from session id
-        ses_renderer = self._getRendererSession(request.path_params['sesid'])
+        if klass:
+            htuid = request.cookies.get('htuid')
+            sessionid = klass.__name__+":"+htuid
+            hr = self.getsession(request,sessionid,klass)
 
-        actions = await ses_renderer.interact(data["id"],data["method"],data["args"],data["kargs"])
-        return JSONResponse(actions)
+            logger.info("INTERACT WITH SESSION %s (sessions:%s)",sessionid,len(self.sessions))
+            data=await request.json()
+            actions = await hr.interact(data["id"],data["method"],data["args"],data["kargs"])
+            return JSONResponse(actions)
+        else:
+            return HTMLResponse( "404 Not Found" , status_code=404 )
+
+
+    def __call__(self):
+        """ create a uvicorn factory/asgi, to make it compatible with uvicorn
+            from scratch.
+        """
+        app = Starlette(debug=True, routes=[
+            Route('/',              self.GET,   methods=["GET"]),
+            Route('/{tagClass}',    self.GET,   methods=["GET"]),
+            Route('/{tagClass}/',   self.POST,  methods=["POST"]),
+        ], on_startup=[self._purgeSessions])
+        return app
 
     def run(self, host="0.0.0.0", port=8000):   # wide, by default !!
-        app = Starlette(debug=True, routes=[
-            Route('/', self.GET, methods=["GET"]),
-            Route('/{sesid}', self.POST, methods=["POST"]),
-        ], on_startup=[self._purgeSessions])
-        uvicorn.run(app, host=host, port=port)
+        import uvicorn
+        uvicorn.run(self(), host=host, port=port)
