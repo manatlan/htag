@@ -4,6 +4,12 @@
  * WebHTTP can takes multiples class now
  * WebHTTP can handle multiple client, multiple Tags ... and give "query_params" to tag constructor (if needed)
  * WebHTTP can take a param "timeout" (by default 5min)
+ * runners http with starlette are now compatible with unicorn/reloader !!! exemple:
+
+      app = WebHTTP( MyTag )
+      if __name__=="__main__":
+          uvicorn.run("main:app",reload=True)
+
 
 ### 0.3.0 "back to future" 2022/04/22
 
