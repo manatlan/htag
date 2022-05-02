@@ -494,6 +494,15 @@ def test_add():
     a+=c
     assert str(a) == "<A><C></C></A>"
 
+
+def test_js_call_at_init():
+    class TEST(Tag.div):
+        def init(self):
+            self("/*JS1*/") # <= only in interaction, for now
+
+    with pytest.raises(TypeError): # TypeError: 'TEST' object is not callable
+        TEST()
+
 if __name__=="__main__":
 
     import logging
@@ -511,4 +520,5 @@ if __name__=="__main__":
     # test_its_the_same_tagbase_exactly()
 
     # test_base_concepts()
-    test_iadd()
+    # test_iadd()
+    test_js_call_at_init()

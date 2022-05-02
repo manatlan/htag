@@ -105,7 +105,6 @@ class HRenderer:
             for i in ensureList(tag.statics):
                 if isinstance(i,TagBase):
                     if isinstance(i,Tag):
-                        logger.warning("Avoid to include dynamic Tag in statics! (it will be converted)")
                         i = i._ensureTagBase()
 
                     if i.md5 not in [j.md5 for j in self._statics]:
@@ -294,11 +293,11 @@ function action( o ) {
         head <= H.meta(_charset="utf-8")
         head <= H.meta(_name="viewport",_content="width=device-width, initial-scale=1")
         head <= H.meta(_name="version",_content=f"htag {__version__}")
-        head <= H.title( self.title )
         head <= self._statics
+        head <= H.title( self.title )   # set a default title
 
         body=H.body( "Loading...", _id=0 ) # IMPERSONATE (first interact on id #0)
-        return "<!DOCTYPE html>"+str(H.html( [head,body] ))
+        return "<!DOCTYPE html>"+str(H.html( head+body ))
 
     @property
     def title(self) -> str:

@@ -54,6 +54,21 @@ def test_statics_in_real_statics():
     assert "id=" in str(s2)
     assert str(s2._ensureTagBase()) =="<div>1h<div>stat</div><Section><div>yolo</div></Section></div>"
 
+def test_render_title():
+
+    class MyDiv(Tag.div):
+        pass
+
+    r=HRenderer(MyDiv(),"function interact() {}; start(); // the starter")
+    assert str(r).find("<title>MyDiv</title>") > 0
+
+    class MyDiv(Tag.div):
+        statics = Tag.title("hello")
+
+    r=HRenderer(MyDiv(),"function interact() {}; start(); // the starter")
+    p1= str(r).find("<title>hello</title>")
+    p2 = str(r).find("<title>MyDiv</title>")
+    assert p1 < p2
 
 def test_render_a_tag_with_interaction():
 
@@ -580,4 +595,5 @@ if __name__=="__main__":
     # test_intelligent_rendering()
     # test_statics_in_real_statics()
     # test_render_yield_with_scripts()
-    test_statics_in_real_statics()
+    # test_statics_in_real_statics()
+    test_render_title()

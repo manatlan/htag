@@ -1,3 +1,8 @@
+### 0.3.2  2022/05/02
+
+ * if app set a statics Tag.title is prefered over default one (based on tag name)
+ * don't throw a log warning when dynamic tag are included in statics (they are converted to static silently)
+
 ### 0.3.1 "runners version" 2022/04/29
 
  * all runners are upgraded (taking host,port,openBrowser,debug options, and assert) : compatibiliy keeped
