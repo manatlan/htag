@@ -127,7 +127,7 @@ window.addEventListener('DOMContentLoaded', start );
         tagClass=request.path_params.get('tagClass',None)
         klass=self.classes.get(tagClass,None)
 
-        if klass:
+        if klass and request.cookies.get('htuid'):
             htuid = request.cookies.get('htuid')
             sessionid = klass.__name__+":"+htuid
             hr = self.getsession(request,sessionid,klass)
