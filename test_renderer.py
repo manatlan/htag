@@ -576,6 +576,79 @@ def test_imports():
         HRenderer(AppWithBrokenImport,"//js")
 
 
+def test_new():
+    class APP(Tag.div):
+        def init(self,val=42):
+            self <= f"=={val}=="
+
+    # syntax of versions < 0.4 is not supported anymore
+    with pytest.raises(TypeError):
+        HRenderer( APP(),"//" )
+
+    # new syntax
+    hr=HRenderer( APP,"//" )
+    assert str(hr).startswith("<!DOCTYPE html>")
+
+    async def assertion(txt):
+        actions = await hr.interact( 0, None, None, None)
+        assert txt in actions["update"][0]
+
+    # ensure first interaction produce the right thing
+    asyncio.run( assertion(">==42==</body>") )
+
+
+    #-----------------
+    # new syntax (with init first arg) : OK
+    hr=HRenderer( APP,"//", init=((43,),{}) )
+    assert str(hr).startswith("<!DOCTYPE html>")
+
+    async def assertion(txt):
+        actions = await hr.interact( 0, None, None, None)
+        assert txt in actions["update"][0]
+
+    # ensure first interaction produce the right thing
+    asyncio.run( assertion(">==43==</body>") )
+
+
+    #-----------------
+    # new syntax (with init as keyword arg) : ok
+    hr=HRenderer( APP,"//", init=((),dict(val=44)) )
+    assert str(hr).startswith("<!DOCTYPE html>")
+
+    async def assertion(txt):
+        actions = await hr.interact( 0, None, None, None)
+        assert txt in actions["update"][0]
+
+    # ensure first interaction produce the right thing
+    asyncio.run( assertion(">==44==</body>") )
+
+
+    #-----------------
+    # new syntax (with init first arg) : KO (coz too many args)
+    hr=HRenderer( APP,"//", init=((45,49),{}) )
+    assert str(hr).startswith("<!DOCTYPE html>")
+
+    async def assertion(txt):
+        actions = await hr.interact( 0, None, None, None)
+        assert txt in actions["update"][0]
+
+    # ensure first interaction produce the right thing
+    asyncio.run( assertion(">==42==</body>") )
+
+
+    #-----------------
+    # new syntax (with init as bad keyword arg) : KO (bad args)
+    hr=HRenderer( APP,"//", init=((),dict(myval=50)) )
+    assert str(hr).startswith("<!DOCTYPE html>")
+
+    async def assertion(txt):
+        actions = await hr.interact( 0, None, None, None)
+        assert txt in actions["update"][0]
+
+    # ensure first interaction produce the right thing
+    asyncio.run( assertion(">==42==</body>") )
+
+
 if __name__=="__main__":
     # test_ko_try_render_a_tagbase()
     # test_render_a_tag_with_interaction()
@@ -595,4 +668,5 @@ if __name__=="__main__":
     # test_statics_in_real_statics()
     # test_render_yield_with_scripts()
     # test_statics_in_real_statics()
-    test_render_title()
+    # test_render_title()
+    test_new()
