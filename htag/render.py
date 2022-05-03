@@ -99,6 +99,9 @@ class HRenderer:
             logger.warning(f"Can't instanciate tag '{tagClass.__name__}' with {init} arguments, so instanciate it without argument !")
             tag = tagClass()
 
+        tag._hr = self # new 0.4 (bind the hr to the main class)
+                       # which will bind it to all children too
+
         self.tag=tag
         self.tag.tag="body" # force first tag as body !!
         if exit_callback:

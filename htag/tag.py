@@ -258,6 +258,8 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
     statics: list = [] # list of "Tag", imported at start in html>head
     imports = None
 
+    _hr = None      # the hrenderer whose manage this tag instance !
+
     __instances__ = weakref.WeakValueDictionary()
 
     js: StrNonable = None  # post script, useful for js/init when tag is rendered
@@ -365,6 +367,18 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
         rec(self._childs)
 
         return ll
+
+
+    def add(self,elt:AnyTags):
+        """ override tagbase.add to feed 'tag._hr' with the hrenderer """
+        if isinstance(elt,Tag):
+            elt._hr = self._hr
+        elif not isinstance(elt,str) and hasattr(elt,"__iter__"):
+            for i in elt:
+                if isinstance(i,Tag):
+                    i._hr = self._hr
+
+        TagBase.add(self,elt)
 
     def _genIIFEScript(self,js:str) -> str:
         return f"(function(tag){{ {js}\n }})(document.getElementById('{id(self)}'));"
