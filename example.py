@@ -59,7 +59,5 @@ if __name__=="__main__":
     # import logging
     # logging.basicConfig(format='[%(levelname)-5s] %(name)s: %(message)s',level=logging.DEBUG)
 
-    app=App()
-
     from htag.runners import *
-    BrowserStarletteWS( app ).run()
+    BrowserStarletteWS( App ).run()

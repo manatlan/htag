@@ -92,12 +92,10 @@ class Page(Tag.body): # define a <body>, but the renderer will force it to <body
 
         return super().__str__()
 
-# instanciate the main component
-obj=Page()
 
 # and execute it in a pywebview instance
 from htag.runners import *
-PyWebWiew( obj ).run()
+PyWebWiew( Page ).run()
 
 # here is another runner, in a simple browser (thru ajax calls)
-# BrowserHTTP( obj ).run()
+# BrowserHTTP( Page ).run()

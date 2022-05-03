@@ -1,3 +1,7 @@
+### 0.4.0 "breaking changes"
+ * BIG/BREAKING CHANGES : all runners/Hrenderer takes tag subclass, and create the instance at construction
+ * fix webhttp when post with no htuid
+
 ### 0.3.2  2022/05/02
 
  * if app set a statics Tag.title is prefered over default one (based on tag name)

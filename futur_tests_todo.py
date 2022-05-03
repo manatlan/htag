@@ -80,12 +80,9 @@ import logging
 logging.basicConfig(format='[%(levelname)-5s] %(name)s: %(message)s',level=logging.DEBUG)
 logging.getLogger("htag.tag").setLevel( logging.INFO )
 
-# instanciate the main component
-obj=Page()
-
 # and execute it in a pywebview instance
 from htag.runners import *
-# PyWebWiew( obj ).run()
+# PyWebWiew( Page ).run()
 
 # here is another runner, in a simple browser (thru ajax calls)
-BrowserHTTP( obj ).run()
+BrowserHTTP( Page ).run()

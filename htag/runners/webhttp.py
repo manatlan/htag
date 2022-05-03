@@ -56,16 +56,16 @@ class WebHTTP:
         asyncio.ensure_future( purge() )
 
 
-    def createHRenderer(self,tag):
+    def createHRenderer(self,tagClass,params):
         js = """
 async function interact( o ) {
     action( await (await window.fetch("/%s/",{method:"POST", body:JSON.stringify(o)})).json() )
 }
 
 window.addEventListener('DOMContentLoaded', start );
-""" % (tag.__class__.__name__)
+""" % (tagClass.__name__)
 
-        return HRenderer(tag, js ) # NO EXIT !!
+        return HRenderer(tagClass, js , init = params) # NO EXIT !!
 
     def getsession(self,request,sessionid,klass):
         qp = dict(request.query_params)
@@ -85,13 +85,9 @@ window.addEventListener('DOMContentLoaded', start );
 
         if hr is None:
             # need a new session
-            try:
-                tag = klass( query_params = qp )
-            except TypeError:
-                logger.warning("Can't instanciate tag '%s' with 'query_params' argument, so instanciate it without argument !", klass.__name__)
-                tag = klass()
+            params = ( (), dict(query_params = qp) )
 
-            hr=self.createHRenderer(tag)
+            hr=self.createHRenderer(klass, params)
             self.sessions[ sessionid ] = dict( lastaccess=time.time(), renderer=hr, qp=qp )
             logger.info("CREATE SESSION %s for %s with qp=%s (sessions:%s)",sessionid,repr(hr.tag),qp,len(self.sessions))
         return hr

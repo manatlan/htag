@@ -124,14 +124,12 @@ if __name__=="__main__":
 
     logging.getLogger("htag.tag").setLevel( logging.WARNING )
 
-    app=Page()
-
     from htag.runners import *
-    # r=GuyApp( app )
-    # r=PyWebWiew( app )
-    # r=BrowserStarletteHTTP( app )
-    # r=BrowserStarletteWS( app )
-    r=BrowserHTTP( app )
-    # r=WebHTTP( lambda: Page() )
+    # r=GuyApp( Page )
+    # r=PyWebWiew( Page )
+    # r=BrowserStarletteHTTP( Page )
+    # r=BrowserStarletteWS( Page )
+    # r=BrowserHTTP( Page )
+    r=WebHTTP( Page )
     r.run()
 

@@ -20,8 +20,9 @@ class Simu:
     """
 
 
-    def __init__(self,tag:Tag):
-        self.hr = HRenderer(tag,"//")
+    def __init__(self,tagClass:type):
+        self.hr = HRenderer(tagClass,"//")
+        self.tag = self.hr.tag
 
     async def init(self):
         logger.debug("first interaction/init phase")
@@ -67,10 +68,8 @@ class Object(Tag):
 
 @pytest.mark.asyncio
 async def test_simplest():  #TODO: redefine coz norender is gone, so this test is perhaps non sense
-    o=Object()
-
-    hr=Simu(o)
-
+    hr=Simu( Object )
+    o = hr.tag
     r=await hr.init()
 
     r=await hr.interact(o).incNormal()
@@ -128,9 +127,9 @@ async def test_rendering(): #TODO: redefine coz norender is gone, so this test i
         #     self.o1.incNoRedraw()   # has no efect
 
     #====================================================================
-    o=P()
 
-    hr=Simu(o)
+    hr=Simu( P )
+    o=hr.tag
 
     r=await hr.init()
 
@@ -179,9 +178,8 @@ async def test_simplest_async(): #TODO: redefine coz norender is gone, so this t
             self["nb"]+=1
             yield
 
-    o=Object()
-
-    hr=Simu(o)
+    hr=Simu(Object)
+    o=hr.tag
 
     r=await hr.init()
 
@@ -204,9 +202,9 @@ async def test_yield():
             yield list("abc")
             yield "d"
 
-    o=Object()
 
-    hr=Simu(o)
+    hr=Simu(Object)
+    o=hr.tag
 
     r=await hr.init()
 
@@ -242,7 +240,7 @@ async def test_yield():
 
 @pytest.mark.asyncio
 async def test_bug():
-    S=Simu( Tag.div() )
+    S=Simu( Tag.div )
     r=await S.hr.interact(15654654654546,"m",(),{})
     assert r["err"] # 15654654654546 is not an existing Tag or generator (dead objects ?)?!"
 

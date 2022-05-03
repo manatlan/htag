@@ -87,10 +87,18 @@ class Stater:
 
 
 class HRenderer:
-    def __init__(self, tag: Tag, js:str, exit_callback:Optional[Callable]=None):
+    def __init__(self, tagClass: type, js:str, exit_callback:Optional[Callable]=None, init= ((),{}) ):
         """ tag object will be setted as a 'body' tag ! """
         """ js should containt an interact method, and an initializer to call the start()"""
-        if not isinstance(tag, Tag): raise HTagException("Can only render a Tag !")
+        if not issubclass(tagClass, Tag): raise HTagException("HRendered can only handle tag subclasses !")
+
+        try:
+            args,kargs = init
+            tag = tagClass( *args,**kargs )
+        except TypeError:
+            logger.warning(f"Can't instanciate tag '{tagClass.__name__}' with {init} arguments, so instanciate it without argument !")
+            tag = tagClass()
+
         self.tag=tag
         self.tag.tag="body" # force first tag as body !!
         if exit_callback:
@@ -117,7 +125,7 @@ class HRenderer:
             # there is an "imports" attribut
             # so, try to import statics according "imports" attrs on tags
             logger.info("Include statics from Tag's imports attibut")
-            feedStatics(tag)
+            feedStatics(self.tag)
             def rec( tag ):
                 if hasattr(tag, "imports") and tag.imports is not None:
                     imports = ensureList(tag.imports)

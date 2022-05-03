@@ -8,7 +8,7 @@ def test_statics_only_tagbase():
 
     str(AEFF())
 
-    assert "**no that!**" not in str(HRenderer(AEFF(),"//js"))
+    assert "**no that!**" not in str(HRenderer(AEFF,"//js"))
 
     del AEFF
 
@@ -20,7 +20,7 @@ def test_built_immediatly():
     class O(Tag.div):
         statics=H.style("/*S1*/")
 
-    assert "/*S1*/" in str(HRenderer( O(), "//"))
+    assert "/*S1*/" in str(HRenderer( O, "//"))
     ################################################################
     class OO1(Tag.div):
         imports = O
@@ -28,7 +28,7 @@ def test_built_immediatly():
             Tag.div.__init__(self)
             self <= O() # "O" is a direct child
 
-    assert "/*S1*/" in str(HRenderer( OO1(), "//"))
+    assert "/*S1*/" in str(HRenderer( OO1, "//"))
     ################################################################
     class OO2(Tag.div):
         imports = O
@@ -36,7 +36,7 @@ def test_built_immediatly():
             Tag.div.__init__(self)
             self <= Tag.div( O() ) # "O" is a non-direct child
 
-    assert "/*S1*/" in str(HRenderer( OO2(), "//"))
+    assert "/*S1*/" in str(HRenderer( OO2, "//"))
     ################################################################
 
 def test_build_lately():
@@ -46,7 +46,7 @@ def test_build_lately():
     class O(Tag.div):
         statics=H.style("/*S1*/")
 
-    assert "/*S1*/" in str(HRenderer( O(), "//"))
+    assert "/*S1*/" in str(HRenderer( O, "//"))
     ################################################################
     class OO1(Tag.div):
         imports = O
@@ -54,7 +54,7 @@ def test_build_lately():
             self <= O() # "O" is a direct child
             return str(super())
 
-    assert "/*S1*/" in str(HRenderer( OO1(), "//"))
+    assert "/*S1*/" in str(HRenderer( OO1, "//"))
     ################################################################
     class OO2(Tag.div):
         imports = O
@@ -62,7 +62,7 @@ def test_build_lately():
             self <= Tag.div( O() ) # "O" is a non-direct child
             return str(super())
 
-    assert "/*S1*/" in str(HRenderer( OO2(), "//"))
+    assert "/*S1*/" in str(HRenderer( OO2, "//"))
     ################################################################
 
 def test_TagBase_md5():

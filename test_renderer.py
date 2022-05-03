@@ -28,11 +28,9 @@ def getGeneratorId(resp):
     return int(re.findall( r"(\d+)", resp["next"])[0])
 
 def test_ko_try_render_a_tagbase():
-    t=H.div("hello")
-    print(isinstance(t,Tag))
 
     with pytest.raises(HTagException):
-        HRenderer(t,"function interact() {}; start(); // the starter")
+        HRenderer(H.div,"function interact() {}; start(); // the starter")
 
 def test_ok_including_a_Tag_in_statics():
     class Style(Tag):
@@ -41,7 +39,7 @@ def test_ok_including_a_Tag_in_statics():
     class O(Tag):
         statics= [Style()]  # <= avoid that (does nothing!!!)
 
-    r=HRenderer(O(),"function interact() {}; start(); // the starter")
+    r=HRenderer(O,"function interact() {}; start(); // the starter")
     assert "<mystyle>" in str(r) # will not be included
     # and a logger.warning is outputed
 
@@ -59,13 +57,13 @@ def test_render_title():
     class MyDiv(Tag.div):
         pass
 
-    r=HRenderer(MyDiv(),"function interact() {}; start(); // the starter")
+    r=HRenderer(MyDiv,"function interact() {}; start(); // the starter")
     assert str(r).find("<title>MyDiv</title>") > 0
 
     class MyDiv(Tag.div):
         statics = Tag.title("hello")
 
-    r=HRenderer(MyDiv(),"function interact() {}; start(); // the starter")
+    r=HRenderer(MyDiv,"function interact() {}; start(); // the starter")
     p1= str(r).find("<title>hello</title>")
     p2 = str(r).find("<title>MyDiv</title>")
     assert p1 < p2
@@ -95,7 +93,8 @@ def test_render_a_tag_with_interaction():
     assert str(id(t)) in js(t) # and referenced to this tag
     assert "SCRIPT2" not in js(t)
 
-    r=HRenderer(t,"function interact() {}; start(); // the starter")
+    r=HRenderer(MyDiv,"function interact() {}; start(); // the starter")
+    t=r.tag
     assert t.tag == "body" # tag is now a body tag (coz main tag of renderer)
 
     assert ">Loading...<" in str(r) # first rendering is the loader
@@ -145,8 +144,8 @@ def test_render_a_tag_with_child_interactions():
             self.a.action()
             self.b.action()
 
-    t=MyDiv()
-    r=HRenderer(t,"function interact() {}; start(); // the starter")
+    r=HRenderer(MyDiv,"function interact() {}; start(); // the starter")
+    t=r.tag
     assert str(r).count("<script>my</script>") == 1 # it's the same static, ensure just one !
 
     # START
@@ -186,8 +185,8 @@ def test_render_yield_with_scripts():
             yield
             self("SCRIPT3")
 
-    t=MyDiv()
-    r=HRenderer(t,"function interact() {}; start(); // the starter", lambda: "ok")
+    r=HRenderer(MyDiv,"function interact() {}; start(); // the starter", lambda: "ok")
+    t=r.tag
 
     assert t.exit() == "ok", "tag.exit() doesn't work !?"
 
@@ -230,8 +229,8 @@ def test_interact_error():
         async def as_action(self):
             return 12/0
 
-    t=MyDiv()
-    r=HRenderer(t,"function interact() {}; start(); // the starter", lambda: "ok")
+    r=HRenderer(MyDiv,"function interact() {}; start(); // the starter", lambda: "ok")
+    t=r.tag
 
     assert t.exit() == "ok", "tag.exit() doesn't work !?"
 
@@ -413,20 +412,20 @@ def test_build_immediatly_vs_lately():
     assert anon(o1) == anon(o2)
 
 
-def test_renderer_same_str():
-    class Nimp(Tag):
-        def __init__(self,name,**a):
-            Tag.__init__(self,**a)
-            self["name"] = name
-            self <= Tag.div(name)
+# def test_renderer_same_str():
+#     class Nimp(Tag):
+#         def __init__(self,name,**a):
+#             Tag.__init__(self,**a)
+#             self["name"] = name
+#             self <= Tag.div(name)
 
-    o1=Nimp("hello1",_class="kiki")
-    o2=Nimp(name="hello2")
+#     o1=Nimp("hello1",_class="kiki")
+#     o2=Nimp(name="hello2")
 
-    h1=HRenderer(o1,"//js")
-    h2=HRenderer(o2,"//js")
+#     h1=HRenderer(o1,"//js")
+#     h2=HRenderer(o2,"//js")
 
-    assert str(h1) == str(h2)
+#     assert str(h1) == str(h2)
 
 
 def test_discovering_js():
@@ -434,7 +433,7 @@ def test_discovering_js():
         js="/*JS1*/"
 
     # dynamic js init not present (normal!)
-    assert "/*JS1*/" not in str(HRenderer( O(), "//"))
+    assert "/*JS1*/" not in str(HRenderer( O, "//"))
 
     class OOI(Tag): # immediate rendering
         def __init__(self):
@@ -461,16 +460,16 @@ def test_discovering_js():
         assert 0 in resp["update"]
         assert "/*JS1*/" in resp["post"]
 
-    r=HRenderer(OOI(),"//js interact")
+    r=HRenderer(OOI,"//js interact")
     asyncio.run(test(r))
 
-    r=HRenderer(OOOI(),"//js interact")
+    r=HRenderer(OOOI,"//js interact")
     asyncio.run(test(r))
 
-    r=HRenderer(OOL(),"//js interact")
+    r=HRenderer(OOL,"//js interact")
     asyncio.run(test(r))
 
-    r=HRenderer(OOOL(),"//js interact")
+    r=HRenderer(OOOL,"//js interact")
     asyncio.run(test(r))
 
 
@@ -505,16 +504,16 @@ def test_discovering_css():
         assert "/*CSS1*/" in str(r)
 
 
-    r=HRenderer(OOI(),"//js interact")
+    r=HRenderer(OOI,"//js interact")
     test(r)
 
-    r=HRenderer(OOOI(),"//js interact")
+    r=HRenderer(OOOI,"//js interact")
     test(r)
 
-    r=HRenderer(OOL(),"//js interact")
+    r=HRenderer(OOL,"//js interact")
     test(r)
 
-    r=HRenderer(OOOL(),"//js interact")
+    r=HRenderer(OOOL,"//js interact")
     test(r)
 
 def test_imports():
@@ -552,11 +551,11 @@ def test_imports():
 
             self <= Yo()
 
-    html=str(HRenderer( AppWithImport(), ""))
+    html=str(HRenderer( AppWithImport, ""))
     styles = re.findall("(<style[^<]+</style>)",html)
     assert len(styles)==2
 
-    html=str(HRenderer( AppWithoutImport(), ""))
+    html=str(HRenderer( AppWithoutImport, ""))
     styles = re.findall("(<style[^<]+</style>)",html)
     assert len(styles)>2
 
@@ -574,7 +573,7 @@ def test_imports():
 
     # this not !
     with pytest.raises(HTagException):
-        HRenderer(AppWithBrokenImport(),"//js")
+        HRenderer(AppWithBrokenImport,"//js")
 
 
 if __name__=="__main__":

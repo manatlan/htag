@@ -22,8 +22,8 @@ class BrowserHTTP:
         But it's the perfect runner, to test/debug, coz interactions are easier !
     """
 
-    def __init__(self,tag:Tag):
-        assert isinstance(tag,Tag)
+    def __init__(self,tagClass:type):
+        assert issubclass(tagClass,Tag)
 
         js = """
 async function interact( o ) {
@@ -33,7 +33,7 @@ async function interact( o ) {
 window.addEventListener('DOMContentLoaded', start );
 """
 
-        self.renderer=HRenderer(tag, js, lambda: os._exit(0))
+        self.renderer=HRenderer(tagClass, js, lambda: os._exit(0))
 
     def run(self, host="127.0.0.1", port=8000, openBrowser=True ):   # localhost, by default !!
         """

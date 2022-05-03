@@ -28,8 +28,8 @@ class PyWebWiew:
     """ Open the rendering in a pywebview instance
         Interactions with builtin pywebview.api ;-)
     """
-    def __init__(self,tag:Tag):
-        assert isinstance(tag,Tag)
+    def __init__(self,tagClass:type):
+        assert issubclass(tagClass,Tag)
 
         js = """
 async function interact( o ) {
@@ -39,7 +39,7 @@ async function interact( o ) {
 window.addEventListener('pywebviewready', start );
 """
 
-        self.renderer=HRenderer(tag, js, lambda: os._exit(0))
+        self.renderer=HRenderer(tagClass, js, lambda: os._exit(0))
 
     def run(self):
         class Api:
