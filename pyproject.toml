@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "htag"
-version = "0.3.2"
+version = "0.4.0"
 description = "GUI toolkit for building GUI toolkits (and create beautiful applications for mobile, web, and desktop from a single python3 codebase)"
 authors = ["manatlan <manatlan@gmail.com>"]
 readme = 'README.md'
