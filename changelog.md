@@ -1,6 +1,10 @@
-### 0.4.0 "breaking changes"
- * BIG/BREAKING CHANGES : all runners/Hrenderer takes tag subclass, and create the instance at construction
+### 0.4.0 "big breaking changes"
+
+ * BIG/BREAKING CHANGES : The Tag.__init__(...) shouldn't be used anymore : use init() only !!!!!!!
+ * BIG/BREAKING CHANGES : all runners/Hrenderer takes tag subclass (no more an instance!), and create the tag instance at construction
+ * tag.parent refer to the parent Tag (except the root one, where its parent is None)
  * fix webhttp when post with no htuid
+ * nearly 100% tested (tag+render statements)
 
 ### 0.3.2  2022/05/02
 

@@ -54,14 +54,12 @@ class Simu:
 
 
 class Object(Tag):
-    def __init__(self):
-        Tag.__init__(self)
+    def init(self):
         self["nb"]=0
 
     def incNormal(self):
         self["nb"]+=1
 
-    # @Tag.NoRender
     def incNoRedraw(self):
         self["nb"]+=1
 
@@ -82,8 +80,7 @@ async def test_simplest():  #TODO: redefine coz norender is gone, so this test i
 async def test_rendering(): #TODO: redefine coz norender is gone, so this test is perhaps non sense
 
     class P(Tag):
-        def __init__(self):
-            Tag.__init__(self)
+        def init(self):
 
             self.o1 = Object()
             self <= self.o1
@@ -169,11 +166,9 @@ async def test_rendering(): #TODO: redefine coz norender is gone, so this test i
 async def test_simplest_async(): #TODO: redefine coz norender is gone, so this test is perhaps non sense
 
     class Object(Tag):
-        def __init__(self):
-            Tag.__init__(self)
+        def init(self):
             self["nb"]=0
 
-        # @Tag.NoRender
         def inc(self):
             self["nb"]+=1
             yield
@@ -194,8 +189,6 @@ async def test_simplest_async(): #TODO: redefine coz norender is gone, so this t
 async def test_yield():
 
     class Object(Tag):
-        def __init__(self):
-            super().__init__()
 
         def inc(self):
             yield

@@ -303,6 +303,24 @@ def test_on_event():
     assert asyncio.run( test(3) ) ==["hello"]
 
 
+def test_try_to_bind_on_tagbase():
+    class Jo(Tag.div):
+        def init(self):
+            self <= Tag.H.button("hello",_onclick=self.bind( self.action ) )
+        def action(self,o):
+            pass
+
+    with pytest.raises(HTagException): # htag.tag.HTagException: Caller can't be serizalized, it's not _assign'ed to an event !
+        str(Jo())
+
+    class Jo(Tag.div):
+        def init(self):
+            self <= Tag.H.button("hello",_onclick=self.action )
+        def action(self,o):
+            pass
+
+    assert 'button onclick="&lt;bound method' in str(Jo())
+
 if __name__=="__main__":
     import logging
     logging.basicConfig(format='[%(levelname)-5s] %(name)s: %(message)s',level=logging.DEBUG)
@@ -315,5 +333,6 @@ if __name__=="__main__":
     # test_binded_parent_callback()
     # test_multiple_binded_himself_callback()
 
-    test_on_event()
+    # test_on_event()
     # test_ko()
+    test_try_to_bind_on_tagbase()

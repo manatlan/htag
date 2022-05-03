@@ -45,12 +45,9 @@ class Star(Tag.div): # it's a div tag
     def inc(self,v):
         self.nb+=v
 
-    def __str__(self):
+    def render(self):
         # here, the representation is built lately
         # (during the __str__ rendering)
-
-        # we clear all the contents of the tag
-        self.clear()
 
         # we add our buttons, binded to its py method
         self <= Button( "-", lambda: self.inc(-1) )
@@ -58,8 +55,6 @@ class Star(Tag.div): # it's a div tag
 
         # we draw the stars
         self <= "⭐"*self.nb
-
-        return super().__str__()
 
 
 class Page(Tag.body): # define a <body>, but the renderer will force it to <body> in all cases
@@ -75,12 +70,9 @@ class Page(Tag.body): # define a <body>, but the renderer will force it to <body
             ("Superman", Star(7)),
         ]
 
-    def __str__(self):
+    def render(self):
         # here, the representation is built lately
         # (during the __str__ rendering)
-
-        # we clear the content
-        self.clear()
 
         # we put a title
         self <= Tag.H.h1("Best movies ;-)")   # here is shortcut to create "<h1>Best movies ;-)</h1>"
@@ -90,7 +82,6 @@ class Page(Tag.body): # define a <body>, but the renderer will force it to <body
         for name,star in sorted( self.movies, key=lambda x: -x[1].nb ):
             self <= Tag.H.div( [name,star] )
 
-        return super().__str__()
 
 
 # and execute it in a pywebview instance

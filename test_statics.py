@@ -24,16 +24,14 @@ def test_built_immediatly():
     ################################################################
     class OO1(Tag.div):
         imports = O
-        def __init__(self):
-            Tag.div.__init__(self)
+        def init(self):
             self <= O() # "O" is a direct child
 
     assert "/*S1*/" in str(HRenderer( OO1, "//"))
     ################################################################
     class OO2(Tag.div):
         imports = O
-        def __init__(self):
-            Tag.div.__init__(self)
+        def init(self):
             self <= Tag.div( O() ) # "O" is a non-direct child
 
     assert "/*S1*/" in str(HRenderer( OO2, "//"))
@@ -50,17 +48,15 @@ def test_build_lately():
     ################################################################
     class OO1(Tag.div):
         imports = O
-        def __str__(self):
+        def render(self):
             self <= O() # "O" is a direct child
-            return str(super())
 
     assert "/*S1*/" in str(HRenderer( OO1, "//"))
     ################################################################
     class OO2(Tag.div):
         imports = O
-        def __str__(self):
+        def render(self):
             self <= Tag.div( O() ) # "O" is a non-direct child
-            return str(super())
 
     assert "/*S1*/" in str(HRenderer( OO2, "//"))
     ################################################################

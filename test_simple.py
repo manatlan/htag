@@ -500,8 +500,28 @@ def test_js_call_at_init():
         def init(self):
             self("/*JS1*/") # <= only in interaction, for now
 
-    with pytest.raises(TypeError): # TypeError: 'TEST' object is not callable
-        TEST()
+    # NOW WORKS !!!!
+    x=TEST()
+    assert x._getAllJs() == []  # normal, coz it's an interaction script, not a static js
+
+
+def test_init_hr():
+    class A(Tag.div):
+        pass
+    class TEST(Tag.div):
+        def init(self):
+            self <= A()
+            self <= A()+A()+"hello"
+
+    t=TEST( hr="FAKE_HR" ) # simulate the hr which is setted by HRenderer IRL
+    assert t.hr=="FAKE_HR"
+    assert t.parent==None
+    assert len(t.childs) == 4
+    assert len([i for i in t.childs if isinstance(i,Tag)]) == 3
+    assert all( [i.hr=="FAKE_HR" for i in t.childs if isinstance(i,Tag)] )
+    assert all( [i.parent==t for i in t.childs if isinstance(i,Tag)] )
+
+
 
 if __name__=="__main__":
 
@@ -521,4 +541,5 @@ if __name__=="__main__":
 
     # test_base_concepts()
     # test_iadd()
-    test_js_call_at_init()
+    # test_js_call_at_init()
+    test_init_hr()

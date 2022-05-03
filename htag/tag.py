@@ -220,9 +220,6 @@ class Caller:
     def __str__(self) -> str:
         if not self._assigned:
             raise HTagException("Caller can't be serizalized, it's not _assign'ed to an event !")
-        if not isinstance(self.instance,Tag):
-            raise HTagException(f"This object {repr(self.instance)} can't handle a callback")
-        # return self.instance.bind.__on__(self._assigned,*self.args,**self.kargs)
         newargs = tuple([self._assigned]+list(self.args))
         return str(BaseCaller(self.instance,"__on__", newargs, self.kargs))
 
@@ -257,8 +254,8 @@ class Binder:
 class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
     statics: list = [] # list of "Tag", imported at start in html>head
     imports = None
-
-    _hr = None      # the hrenderer whose manage this tag instance !
+    hr = None
+    parent = None
 
     __instances__ = weakref.WeakValueDictionary()
 
@@ -271,12 +268,14 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
     def __init__(self, *args,**kargs):
         self._callbacks_={}
         attrs={}
-        auto={}
+        selfs={}
         for k,v in kargs.items():
             if k.startswith("_"):
                 attrs[k]=v
+            elif k=="hr":       # provided by the HRenderer when instanciating the Tag !
+                self.hr = v
             else:
-                auto[k]=v
+                selfs[k]=v
 
         # own a simplified init() ?
         init=None
@@ -291,11 +290,10 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
             attrs["_id"]=the_id   # force an @id !
             if init:
                 TagBase.__init__(self, None, **attrs)
-                logger.debug("Tag.__init__() : %s use its own simplified init()", repr(self))
-                init(*args,**auto)
+                init(*args,**selfs)
             else:
-                # if no own 'init' method, declare default args (auto) as attributs instance
-                self.__dict__.update(auto)
+                # if no own 'init' method, declare default args (selfs) as attributs instance
+                self.__dict__.update(selfs)
 
                 TagBase.__init__(self, *args, **attrs)
             Tag.__instances__[the_id]=self
@@ -368,16 +366,22 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
 
         return ll
 
+    def __call__(self, js:str):
+        if self.hr is None:
+            logger.error(f"call js is not possible, {repr(self)} is not tied to HRenderer !")
+        else:
+            self.hr._addInteractionScript( self._genIIFEScript(js) )
 
     def add(self,elt:AnyTags):
-        """ override tagbase.add to feed 'tag._hr' with the hrenderer """
+        """ override tagbase.add to feed 'tag._hr' with the hrenderer of the parent/self """
         if isinstance(elt,Tag):
-            elt._hr = self._hr
+            elt.hr = self.hr
+            elt.parent = self
         elif not isinstance(elt,str) and hasattr(elt,"__iter__"):
             for i in elt:
                 if isinstance(i,Tag):
-                    i._hr = self._hr
-
+                    i.hr = self.hr
+                    i.parent = self
         TagBase.add(self,elt)
 
     def _genIIFEScript(self,js:str) -> str:
