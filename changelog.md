@@ -1,4 +1,8 @@
-### 0.4.0 "big breaking changes"
+### 0.4.1 "big breaking changes" 2022/05/03
+
+ * FIX the way add interaction script (post js) with `__call__` : now it works like expected
+
+### 0.4.0 "big breaking changes" 2022/05/03
 
  * BIG/BREAKING CHANGES : The Tag.__init__(...) shouldn't be used anymore : use init() only !!!!!!!
  * BIG/BREAKING CHANGES : all runners/Hrenderer takes tag subclass (no more an instance!), and create the tag instance at construction

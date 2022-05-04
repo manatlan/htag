@@ -254,7 +254,7 @@ class Binder:
 class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
     statics: list = [] # list of "Tag", imported at start in html>head
     imports = None
-    hr = None
+    _hr = None
     parent = None
 
     __instances__ = weakref.WeakValueDictionary()
@@ -273,7 +273,7 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
             if k.startswith("_"):
                 attrs[k]=v
             elif k=="hr":       # provided by the HRenderer when instanciating the Tag !
-                self.hr = v
+                self._hr = v
             else:
                 selfs[k]=v
 
@@ -367,20 +367,28 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
         return ll
 
     def __call__(self, js:str):
-        if self.hr is None:
-            logger.error(f"call js is not possible, {repr(self)} is not tied to HRenderer !")
+        """ Send "js to execute" (post js) now """
+        if self._hr:
+            current = self
         else:
-            self.hr._addInteractionScript( self._genIIFEScript(js) )
+            current = self.parent
+            while current is not None and current.parent is not None:
+                current = current.parent
+
+        if current is None or current._hr is None:
+            logger.error(f"call js is not possible, {repr(self)} is not tied to a parent/HRenderer !")
+        else:
+            current._hr._addInteractionScript( self._genIIFEScript(js) )
 
     def add(self,elt:AnyTags):
-        """ override tagbase.add to feed 'tag._hr' with the hrenderer of the parent/self """
+        """ override tagbase.add to feed 'tag.parent' with the parent
+            TODO: make it a lot better !
+        """
         if isinstance(elt,Tag):
-            elt.hr = self.hr
             elt.parent = self
         elif not isinstance(elt,str) and hasattr(elt,"__iter__"):
             for i in elt:
                 if isinstance(i,Tag):
-                    i.hr = self.hr
                     i.parent = self
         TagBase.add(self,elt)
 
