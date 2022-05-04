@@ -1,4 +1,9 @@
-### 0.4.1 "big breaking changes" 2022/05/03
+### 0.4.2 "fix big breaking changes" 2022/05/03
+
+ * FIX the way add interaction script (post js) with `__call__` : now it works in the init of the main tag too !
+ * + tu (new) simu
+
+### 0.4.1 "fix big breaking changes" 2022/05/03
 
  * FIX the way add interaction script (post js) with `__call__` : now it works like expected
 
@@ -20,7 +25,7 @@
  * all runners are upgraded (taking host,port,openBrowser,debug options, and assert) : compatibiliy keeped
  * WebHTTP can takes multiples class now
  * WebHTTP can handle multiple client, multiple Tags ... and give "query_params" to tag constructor (if needed)
- * WebHTTP can take a param "timeout" (by default 5min)
+ * WebHTTP can take a param "timeout" (by default 5min) 
  * runners http with starlette are now compatible with unicorn/reloader !!! exemple:
 
       app = WebHTTP( MyTag )

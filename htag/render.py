@@ -87,6 +87,8 @@ class HRenderer:
         """ js should containt an interact method, and an initializer to call the start()"""
         if not issubclass(tagClass, Tag): raise HTagException("HRendered can only handle tag subclasses !")
 
+        self._interaction_scripts=[]
+
         try:
             args,kargs = init
             kargs["hr"] = self
@@ -171,14 +173,13 @@ function action( o ) {
         self._loop={}   # for savng generator, to keep them during GC
 
 
-    _interaction_scripts=[]
     def _addInteractionScript(self, js:str):
         self._interaction_scripts.append(js)
 
     async def interact(self,oid,method_name:str,args,kargs) -> dict:
         """ call the 'method_name' of pyobj 'id' with (args,kargs), return the pyobj/tag"""
         try:
-            self._interaction_scripts=[] # reset the list
+            ## self._interaction_scripts=[] # reset the list
             next_js_call=None
 
             if oid==0:
@@ -250,6 +251,8 @@ function action( o ) {
                     rep["post"]=""
                 # add them
                 rep["post"] += "\n".join(self._interaction_scripts)
+
+                self._interaction_scripts=[]    # reset the list !
 
             if next_js_call:
                 # if there was generator, set the next js call !
