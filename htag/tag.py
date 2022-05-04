@@ -254,8 +254,6 @@ class Binder:
 class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
     statics: list = [] # list of "Tag", imported at start in html>head
     imports = None
-    _hr = None
-    parent = None
 
     __instances__ = weakref.WeakValueDictionary()
 
@@ -266,6 +264,8 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
         return cls.__instances__.get(obj_id, None)
 
     def __init__(self, *args,**kargs):
+        self._hr=None
+        self.parent=None
         self._callbacks_={}
         attrs={}
         selfs={}
