@@ -11,7 +11,7 @@ from .. import Tag
 from ..render import HRenderer
 
 
-import webbrowser,os,json
+import os,json
 from starlette.applications import Starlette
 from starlette.responses import HTMLResponse
 from starlette.routing import Route,WebSocketRoute
@@ -37,7 +37,6 @@ ws.onmessage = function(e) {
 
         self.renderer=HRenderer(tagClass, js, lambda: os._exit(0))
 
-
     async def GET(self,request):
         return HTMLResponse( str(self.renderer) )
 
@@ -45,7 +44,7 @@ ws.onmessage = function(e) {
         """ create a uvicorn factory/asgi, to make it compatible with uvicorn
             from scratch.
         """
-        class Interact(WebSocketEndpoint):
+        class WsInteract(WebSocketEndpoint):
             encoding = "json"
 
             async def on_receive(this, websocket, data):
@@ -54,11 +53,11 @@ ws.onmessage = function(e) {
 
         return Starlette(debug=True, routes=[
             Route('/', self.GET, methods=["GET"]),
-            WebSocketRoute("/ws", Interact),
+            WebSocketRoute("/ws", WsInteract),
         ])
 
     def run(self, host="127.0.0.1", port=8000, openBrowser=True):   # localhost, by default !!
-        import uvicorn
+        import uvicorn,webbrowser
         if openBrowser:
             webbrowser.open_new_tab(f"http://{host}:{port}")
 

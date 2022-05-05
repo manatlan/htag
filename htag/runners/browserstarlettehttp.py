@@ -10,7 +10,7 @@
 from .. import Tag
 from ..render import HRenderer
 
-import webbrowser,os
+import os
 
 from starlette.applications import Starlette
 from starlette.responses import HTMLResponse,JSONResponse
@@ -53,7 +53,7 @@ window.addEventListener('DOMContentLoaded', start );
         ])
 
     def run(self, host="127.0.0.1", port=8000, openBrowser=True):   # localhost, by default !!
-        import uvicorn
+        import uvicorn,webbrowser
         if openBrowser:
             webbrowser.open_new_tab(f"http://{host}:{port}")
 
