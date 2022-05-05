@@ -51,8 +51,7 @@ class Viewer(Tag.ul):
 
 class Page(Tag.body):
 
-    def __init__(self):
-        super().__init__()
+    def init(self):
 
         self.view = Viewer()
         self <= self.view

@@ -1,8 +1,11 @@
+### 0.4.3 "going nice" 2022/05/05
 
  * Tag: better declaration/init of _hr/parent on the instance !
  * better tu test_interactions
+ * fix examples
+ * add an example, on how to use uvicorn/autoreload
 
-### 0.4.2 "fix fix big breaking changes" 2022/05/03
+### 0.4.2 "fix fix big breaking changes" 2022/05/04
 
  * FIX the way add interaction script (post js) with `__call__` : now it works in the init of the main tag too !
  * + tu (new) simu

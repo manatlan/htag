@@ -615,8 +615,7 @@ if __name__=="__main__":
 
     class Page(Tag):
         js = "console.log('started')"
-        def __init__(self):
-            super().__init__()
+        def init(self):
             self.select=2
             self.disabled=False
             self.ll = [(i + 1, i + 1, i + 1, i + 1, i + 1) for i in range(33)]

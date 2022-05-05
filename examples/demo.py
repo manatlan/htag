@@ -60,8 +60,7 @@ class Star(Tag.div): # it's a div tag
 class Page(Tag.body): # define a <body>, but the renderer will force it to <body> in all cases
     """ This is the main Tag, it will be rendered as <body> by the htag/renderer """
 
-    def __init__(self):
-        super().__init__()
+    def init(self):
 
         # here is a list of movies ;-)
         self.movies=[

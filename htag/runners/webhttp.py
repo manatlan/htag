@@ -17,7 +17,6 @@ from ..render import HRenderer
 - the session is destroyed after timeout/5m of inactivity
 """
 
-import os
 import uuid
 import time
 import asyncio

@@ -17,10 +17,12 @@ class Calc(Tag.div):
 .mycalc *,button {font-size:2em;font-family: monospace}
 """)]
 
-    def __init__(self):
+    def init(self):
         self.txt=""
         self.aff = Tag.Div("&nbsp;",_style="border:1px solid black")
-        super().__init__(self.aff,_class="mycalc")
+
+        self["class"]="mycalc"
+        self <= self.aff
         self <= Tag.button("C", _onclick=self.bind( self.clean) )
         self <= [Tag.button(i,  _onclick=self.bind( self.press, i) ) for i in "0123456789+-x/."]
         self <= Tag.button("=", _onclick=self.bind( self.compute ) )

@@ -57,8 +57,7 @@ import time,asyncio
 class Page(Tag.body):
     statics=css
 
-    def __init__(self,**a):
-        super().__init__(**a)
+    def init(self):
         self.c1=CptWithStars(0)
         self.c2=Cpt(0)
 
@@ -129,7 +128,7 @@ if __name__=="__main__":
     # r=PyWebWiew( Page )
     # r=BrowserStarletteHTTP( Page )
     # r=BrowserStarletteWS( Page )
-    # r=BrowserHTTP( Page )
-    r=WebHTTP( Page )
+    r=BrowserHTTP( Page )
+    # r=WebHTTP( Page )
     r.run()
 

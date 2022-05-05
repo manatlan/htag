@@ -12,7 +12,6 @@ from ..render import HRenderer
 
 import webbrowser,os
 
-import uvicorn
 from starlette.applications import Starlette
 from starlette.responses import HTMLResponse,JSONResponse
 from starlette.routing import Route
@@ -52,9 +51,8 @@ window.addEventListener('DOMContentLoaded', start );
             Route('/', self.GET, methods=["GET"]),
             Route('/', self.POST, methods=["POST"]),
         ])
-        return app
 
-    def run(self, host="127.0.0.1", port=8000, openBrowser=True, debug=True):   # localhost, by default !!
+    def run(self, host="127.0.0.1", port=8000, openBrowser=True):   # localhost, by default !!
         import uvicorn
         if openBrowser:
             webbrowser.open_new_tab(f"http://{host}:{port}")
