@@ -12,10 +12,10 @@ from ..render import HRenderer
 
 
 import webbrowser,os,json
-import uvicorn
 from starlette.applications import Starlette
 from starlette.responses import HTMLResponse
-
+from starlette.routing import Route,WebSocketRoute
+from starlette.endpoints import WebSocketEndpoint
 
 class BrowserStarletteWS:
     """ Simple ASync Web Server (with starlette) with WebSocket interactions with HTag.
@@ -37,23 +37,29 @@ ws.onmessage = function(e) {
 
         self.renderer=HRenderer(tagClass, js, lambda: os._exit(0))
 
-    def run(self, host="127.0.0.1", port=8000, openBrowser=True ):   # localhost, by default !!
-        app = Starlette()
 
-        @app.route('/')
-        async def homepage(request):
-            return HTMLResponse( str(self.renderer) )
+    async def GET(self,request):
+        return HTMLResponse( str(self.renderer) )
 
-        @app.websocket_route('/ws')
-        async def websocket(websocket):
-            await websocket.accept()
-            while True:
-                mesg = await websocket.receive_text()
-                data = json.loads(mesg)
+    def __call__(self,*a,**k):
+        """ create a uvicorn factory/asgi, to make it compatible with uvicorn
+            from scratch.
+        """
+        class Interact(WebSocketEndpoint):
+            encoding = "json"
+
+            async def on_receive(this, websocket, data):
                 actions = await self.renderer.interact(data["id"],data["method"],data["args"],data["kargs"])
                 await websocket.send_text( json.dumps(actions) )
-            await websocket.close()
 
+        return Starlette(debug=True, routes=[
+            Route('/', self.GET, methods=["GET"]),
+            WebSocketRoute("/ws", Interact),
+        ])
+
+    def run(self, host="127.0.0.1", port=8000, openBrowser=True):   # localhost, by default !!
+        import uvicorn
         if openBrowser:
             webbrowser.open_new_tab(f"http://{host}:{port}")
-        uvicorn.run(app, host=host, port=port)
+
+        uvicorn.run(self(), host=host, port=port)

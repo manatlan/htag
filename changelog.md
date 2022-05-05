@@ -1,3 +1,6 @@
+
+ * the runner 'BrowserStarletteWS' can be autoreloaded too, with uvicorn/reload'er ... it's now asgi compliant (factory)
+
 ### 0.4.3 "going nice" 2022/05/05
 
  * Tag: better declaration/init of _hr/parent on the instance !

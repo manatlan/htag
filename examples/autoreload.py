@@ -4,7 +4,7 @@ import os,sys; sys.path.insert(0,os.path.dirname(os.path.dirname(__file__)))
 from htag import Tag
 
 """
-AUTORELOAD is possible with this two runners : WebHTTP & BrowserStarletteHTTP
+AUTORELOAD is possible with this two runners : WebHTTP, BrowserStarletteHTTP & BrowserStarletteWS
 (could be very handy in development phase)
 
 See this example, on how to instanciate the runner and use uvicorn/autoreload
@@ -22,8 +22,12 @@ class Demo(Tag.div):
 from htag.runners import *
 
 app = BrowserStarletteHTTP( Demo )
+# app = BrowserStarletteWS( Demo )
 # app = WebHTTP( Demo )
 
 if __name__=="__main__":
     import uvicorn
     uvicorn.run("autoreload:app",host="127.0.0.1",port=8000,reload=True,factory=True)
+
+    # or the classic :
+    # app.run()
