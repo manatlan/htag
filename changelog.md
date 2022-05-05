@@ -1,3 +1,4 @@
+### 0.4.4 "nice" 2022/05/05
 
  * the runner 'BrowserStarletteWS' can be autoreloaded too, with uvicorn/reload'er ... it's now asgi compliant (factory)
 
