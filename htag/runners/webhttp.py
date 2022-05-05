@@ -14,7 +14,8 @@ from ..render import HRenderer
 - .exit() has no effect ;-)
 - can handle multiple client (with htuid cookie)
 - can handle multiple "tag class", and brings query_params as "query_params:dict" when instanciate tag
-- the session is destroyed after timeout/5m of inactivity
+- the session are purged automatically after timeout/5m of inactivity
+- "http get query_params" are passed at Tag'init, if it accepts a query_params:dict param. (needed for https://htag.glitch.me)
 """
 
 import uuid
@@ -23,7 +24,7 @@ import asyncio
 import logging
 
 from starlette.applications import Starlette
-from starlette.responses import HTMLResponse,JSONResponse
+from starlette.responses import HTMLResponse,JSONResponse,Response
 from starlette.routing import Route
 logger = logging.getLogger(__name__)
 
@@ -37,8 +38,6 @@ class WebHTTP:
         self.sessions={}
         self.classes={i.__name__:i for i in classes}
         self.timeout=timeout
-
-
 
     async def _purgeSessions(self):
 
@@ -118,7 +117,7 @@ window.addEventListener('DOMContentLoaded', start );
         else:
             return HTMLResponse( "404 Not Found" , status_code=404 )
 
-    async def POST(self,request) -> JSONResponse:
+    async def POST(self,request) -> Response:
         tagClass=request.path_params.get('tagClass',None)
         klass=self.classes.get(tagClass,None)
 
