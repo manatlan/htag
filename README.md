@@ -6,7 +6,7 @@ The descendant of [gtag](https://github.com/manatlan/gtag) ... but :
  * Able to be used in anything which can display html/js/css (pywebview, cefpython3, a browser, in [pyscript](https://pyscript.net/).... or [guy](https://github.com/manatlan/guy))
  * A **lot lot lot better and simpler** (better abstractions/code/concepts)
  * "intelligent rendering" (redraw only component on state changes)
- * and it runs in pyscript](https://pyscript.net/) too ;-)
+ * and it runs in [pyscript](https://pyscript.net/) too ;-)
 
 It's a GUI toolkit for building GUI toolkits ;-)
 
