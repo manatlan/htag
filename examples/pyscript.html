@@ -22,11 +22,11 @@ class Main(Tag.body):
         self._mbox = b.MBox(self)
 
         self <= b.Box("hello")
-        self <= b.Button("hello",_onclick="alert(42)")
-        self <= b.Button("hello2",_onclick=self.bind.test())
-        self <= b.Button("msg",_onclick=lambda o: self._mbox.show("hello"))
+        self <= b.Button("js alert box",_onclick="alert(42)")
+        self <= b.Button("add content",_onclick= self.test )
+        self <= b.Button("htbulma mbox",_onclick=lambda o: self._mbox.show("hello"))
 
-    def test(self):
+    def test(self,object):
         self <= "(hello from pyscript)"
 
 ###############################################################################
