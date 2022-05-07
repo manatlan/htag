@@ -9,6 +9,7 @@
 
 # mono instance
 from .browserhttp import BrowserHTTP
+from .pyscript import PyScript
 
 try:
     # mono instance

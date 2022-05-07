@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>py-script,py-env {display: none}</style>
+    <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+    <py-env>
+        - htag
+        - htbulma
+    </py-env>
+</head>
+
+<body> loadind pyscript ;-)
+
+<py-script>
+from htag import Tag
+import htbulma as b         # a library of htag's components
+
+class Main(Tag.body):
+    statics = Tag.title("MON TITRE")
+
+    def init(self):
+        self._mbox = b.MBox(self)
+
+        self <= b.Box("hello")
+        self <= b.Button("hello",_onclick="alert(42)")
+        self <= b.Button("hello2",_onclick=self.bind.test())
+        self <= b.Button("msg",_onclick=lambda o: self._mbox.show("hello"))
+
+    def test(self):
+        self <= "(hello from pyscript)"
+
+###############################################################################
+from htag.runners.pyscript import PyScript
+from js import window
+
+PyScript( Main  ).run( window )
+
+</py-script>
+</body>
+</html>

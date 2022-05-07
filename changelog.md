@@ -1,3 +1,7 @@
+### 0.4.6 "pyscript" 2022/05/07
+
+ * FIX: declare PyScript as runner ;-)
+
 ### 0.4.5 "pyscript" 2022/05/07
 
  * new runner "PyScript" (alpha), so htag can be runned in client side ;-)
