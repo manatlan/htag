@@ -1,11 +1,11 @@
 [tool.poetry]
 name = "htag"
-version = "0.4.4"
+version = "0.4.5"
 description = "GUI toolkit for building GUI toolkits (and create beautiful applications for mobile, web, and desktop from a single python3 codebase)"
 authors = ["manatlan <manatlan@gmail.com>"]
 readme = 'README.md'
 license="MIT"
-keywords=['gui', 'electron', "cef", "pywebview", "starlette", "asyncio", "guy", "desktop", "web", "mobile", "http", "websocket", "html"]
+keywords=['gui', 'electron', "cef", "pywebview", "starlette", "asyncio", "guy", "desktop", "web", "mobile", "http", "websocket", "html", "pyscript"]
 homepage = "https://github.com/manatlan/htag"
 repository = "https://github.com/manatlan/htag"
 documentation = "https://manatlan.github.io/htag/"

@@ -1,3 +1,7 @@
+### 0.4.5 "pyscript" 2022/05/07
+
+ * new runner "PyScript" (alpha), so htag can be runned in client side ;-)
+
 ### 0.4.4 "nice" 2022/05/05
 
  * the runner 'BrowserStarletteWS' can be autoreloaded too, with uvicorn/reload'er ... it's now asgi compliant (factory)
