@@ -5,7 +5,7 @@
     <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <py-env>
-        - htag
+        - htag==0.4.7
     </py-env>
 </head>
 
@@ -41,7 +41,7 @@ class PageHome(Tag.body):
     def test(self,object):
         self <= Tag.li("content")
 
-        
+
 class PageTest(Tag.body):
     imports=[] # force to imports its statics only
 
