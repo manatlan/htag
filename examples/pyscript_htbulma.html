@@ -15,6 +15,7 @@
 <py-script>
 from htag import Tag
 import htbulma as b         # a library of htag's components
+import html
 
 class App(Tag.body):
     """Build and use your own UI components"""
@@ -45,7 +46,7 @@ class App(Tag.body):
         fields.addField("range",      b.Range(42,_min=0,_max=100, onchange=self.showvalue) )
 
         filer = b.HSplit(
-            b.FileSelect("./", self.load, pattern="*.py"),
+            b.FileSelect("/", self.load, pattern="*.py"),
             self.code ,
             sizes=[30,70],
           )
