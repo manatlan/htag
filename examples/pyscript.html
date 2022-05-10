@@ -30,7 +30,7 @@ class Main(Tag.body):
         self <= Tag.li("hello from pyscript")
 
 ###############################################################################
-from htag.runners.pyscript import PyScript
+from htag.runners import PyScript
 from js import window
 
 PyScript( Main  ).run( window )

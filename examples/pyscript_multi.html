@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>py-script,py-env {display: none}</style>
+    <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <py-env>
+        - htag
+    </py-env>
+</head>
+
+<body> loading pyscript ;-)
+
+<py-script>
+from htag import Tag
+
+class Header(Tag.div):
+    def init(self,title):
+        self.js='document.title="MyApp %s"'%title;
+        self <= Tag.h3("MyApp > "+title)
+        self <= Tag.div(
+            Tag.a("home",_href="#PageHome") + " " + Tag.a("test",_href="#PageTest")
+        )
+        self <= Tag.hr()
+
+
+class PageHome(Tag.body):
+    statics = [
+        Tag.style("body {background:yellow}"),
+        Tag.script("function testLocal() {alert(42)}"),
+        Tag.script(_src="https://my.netlib.re/test.js"),
+    ]
+    imports=[] # force to imports its statics only
+
+    def init(self):
+        self <= Header("Main")
+        self <= Tag.button("add content",_onclick= self.test )
+        self <= Tag.button("js distant",_onclick="test()")
+        self <= Tag.button("js local",_onclick="testLocal()")
+
+    def test(self,object):
+        self <= Tag.li("content")
+
+        
+class PageTest(Tag.body):
+    imports=[] # force to imports its statics only
+
+    def init(self):
+        self <= Header("Test")
+        self <= Tag.button("add content",_onclick= self.test )
+
+    def test(self,object):
+        self <= Tag.li("content")
+
+###############################################################################
+from htag.runners import PyScript
+from js import window
+
+PyScript( PageHome, PageTest  ).run( window )
+
+</py-script>
+</body>
+</html>

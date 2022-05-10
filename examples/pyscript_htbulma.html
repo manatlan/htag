@@ -71,7 +71,7 @@ class App(Tag.body):
         self.code.set( html.escape(open(filename).read()) )
 
 ###############################################################################
-from htag.runners.pyscript import PyScript
+from htag.runners import PyScript
 from js import window
 
 PyScript( App  ).run( window )
