@@ -27,16 +27,14 @@ class Header(Tag.div):
 class PageHome(Tag.body):
     statics = [
         Tag.style("body {background:yellow}"),
-        Tag.script("function testLocal() {alert(42)}"),
-        Tag.script(_src="https://my.netlib.re/test.js"),
+        Tag.script("function test() {alert(42)}"),
     ]
     imports=[] # force to imports its statics only
 
     def init(self):
         self <= Header("Main")
         self <= Tag.button("add content",_onclick= self.test )
-        self <= Tag.button("js distant",_onclick="test()")
-        self <= Tag.button("js local",_onclick="testLocal()")
+        self <= Tag.button("js local",_onclick="test()")
 
     def test(self,object):
         self <= Tag.li("content")
