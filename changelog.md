@@ -1,3 +1,8 @@
+### 0.4.7 "pyscript++" 2022/05/10
+
+ * The runner "pyscript" declare statics in the right way in head (fix trouble with script/js)
+ * The runner "pyscript" can handle multiple Tag class, and serve the right with #hash (hash == class name, if no, serve the 1st one)
+
 ### 0.4.6 "pyscript" 2022/05/07
 
  * FIX: declare PyScript as runner ;-)

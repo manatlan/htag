@@ -13,52 +13,69 @@ from ..render import HRenderer
 import json
 
 class PyScript:
-    def __init__(self,tagClass:type):
-        assert issubclass(tagClass,Tag)
 
-        self.renderer=HRenderer(tagClass, "//")
+    def __init__(self,*classes):
+        assert len(classes)>0
+        assert all( [issubclass(i,Tag) for i in classes] )
 
-    def run(self,window):
+        self.classes={}
+        for i in classes:
+            tagClass = i.__name__
+            js = """
+interact=async function(o) {
+     let actions = await window.interactions( "%s", JSON.stringify(o) );
+     action( JSON.parse(actions) )
+}
+
+""" % tagClass
+            self.classes[tagClass] = HRenderer(i, js)
+
+        self._window = None
+
+
+    def run(self,window): # window: "pyscript js.window"
         window.interactions = self.interactions
+        assert window.document.head, "No <head> in <html>"
+        assert window.document.body, "No <body> in <html>"
 
-        # put javascript in
-        window.eval("""
-window.interact=async function(o) {
-     let actions = await window.interactions( JSON.stringify(o) );
-     window.action( JSON.parse(actions) )
-}
+        hash = window.document.location.hash
+        if hash in ["#","",None]:
+            current = list(self.classes.values())[0]
+        else:
+            current = self.classes.get(hash[1:],None)
+            assert current, "Unknown htag tag '%s'" % hash[1:]
 
-window.action = function( o ) {
-    if(o.hasOwnProperty("update"))
-        Object.keys(o["update"]).forEach(key => {
-            document.getElementById( key ).outerHTML = o["update"][key];
-        });
-    if(o.hasOwnProperty("stream"))
-        Object.keys(o["stream"]).forEach(key => {
-            document.getElementById( key ).innerHTML += o["stream"][key];
-        });
 
-    if(o.hasOwnProperty("post")) eval( o["post"] );
-    if(o.hasOwnProperty("next")) eval( o["next"] );
-    if(o.hasOwnProperty("err"))  console.log( "ERROR", o["err"] );
-}
+        # install statics in headers
+        window.document.head.innerHTML=""
+        for s in current._statics:
+            tag=window.document.createElement(s.tag)
+            tag.innerHTML = "".join([str(i) for i in s.childs if i is not None])
+            for key,value in s.attrs.items():
+                setattr(tag, key, value)
+            window.document.head.appendChild(tag)
 
-window.start=function() {
-    window.interact( {"id":0, "method":null, "args":null, "kargs":null} )
-}
-""")
-        # install statics
-        head = window.document.getElementsByTagName("head")[0]
-        for s in self.renderer._statics:
-            head.innerHTML+=str(s);
-
-        # install the first object
-        window.document.getElementsByTagName("body")[0].outerHTML=str(Tag.H.body( "Loading...", _id=0 ))
+        # install the first object in body
+        window.document.body.outerHTML=str(Tag.H.body( _id=0 ))
 
         # and start the process
         window.start()
 
-    async def interactions(self, o):
+        # save it, for hashchange
+        if self._window is None :
+            # install the hashchange event
+            # (which can only work, after the run())
+            import pyodide
+            def _rerun_(event):
+                if self._window: self.run( self._window )
+            window.addEventListener("hashchange", pyodide.create_proxy(_rerun_) )
+
+        self._window = window
+
+
+    async def interactions(self, tagClass, o):
+        current = self.classes[tagClass]
+
         data=json.loads(o)
-        actions = await self.renderer.interact( data["id"], data["method"], data["args"], data["kargs"] )
+        actions = await current.interact( data["id"], data["method"], data["args"], data["kargs"] )
         return json.dumps(actions)
