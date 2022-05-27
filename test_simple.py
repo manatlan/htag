@@ -533,7 +533,26 @@ def test_init_hr():
     assert len([i for i in t.childs if isinstance(i,Tag)]) == 3
     assert all( [i.parent==t for i in t.childs if isinstance(i,Tag)] )
 
+def test_remove():
+    t=Tag.div()
+    o=Tag.b("hello")
+    t<=o
+    assert len(t.childs)==1
+    assert o in t.childs
+    assert t.remove(o)
+    assert len(t.childs)==0
+    assert o not in t.childs
+    assert not t.remove(o)
 
+    t.add("a")
+    t.add("a")
+    assert len(t.childs)==2
+    assert "a" in t.childs
+    assert t.remove("a")
+    assert len(t.childs)==1
+    assert "a" in t.childs
+    assert t.remove("a")
+    assert len(t.childs)==0
 
 if __name__=="__main__":
 
@@ -553,5 +572,6 @@ if __name__=="__main__":
 
     # test_base_concepts()
     # test_iadd()
-    test_js_call_at_init()
+    # test_js_call_at_init()
     # test_init_hr()
+    test_remove()

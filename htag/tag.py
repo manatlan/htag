@@ -89,6 +89,13 @@ class TagBase:
         """ add an object or a list/tuple of objects """
         self._childs.__add__(elt)
 
+    def remove(self, elt):
+        """Remove an object from its childs"""
+        if elt in self._childs:
+            self._childs.remove(elt)
+            return True
+
+
     @property
     def childs(self) -> list:
         return self._childs

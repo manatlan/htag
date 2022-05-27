@@ -1,3 +1,7 @@
+### 0.4.8 "remove is here" 2022/05/10
+
+ * now you can remove a child from a tag with .remove(item) ;-)
+
 ### 0.4.7 "pyscript++" 2022/05/10
 
  * The runner "pyscript" declare statics in the right way in head (fix trouble with script/js)
