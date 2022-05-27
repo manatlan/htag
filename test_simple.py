@@ -554,6 +554,14 @@ def test_remove():
     assert t.remove("a")
     assert len(t.childs)==0
 
+    o=Tag.b("hello")
+    assert not o.remove()
+    t<=o
+    assert len(t.childs)==1
+    assert o in t.childs
+    assert o.remove()
+    assert len(t.childs)==0
+
 if __name__=="__main__":
 
     import logging

@@ -1,3 +1,7 @@
+### 0.4.9 "remove is here" 2022/05/10
+
+ * Tag.remove() to remove itself, (if attached (has parent))
+
 ### 0.4.8 "remove is here" 2022/05/10
 
  * now you can remove a child from a tag with .remove(item) ;-)
