@@ -4,11 +4,12 @@ import pytest
 
 def test_statics_only_tagbase():
     class AEFF(Tag):
-        statics="**no that!**"
+        statics="body {background:red}", b"alert(42);"
 
-    str(AEFF())
+    h=str(HRenderer(AEFF,"//js"))
 
-    assert "**no that!**" not in str(HRenderer(AEFF,"//js"))
+    assert "<style>body {background:red}</style>" in h
+    assert "<script>alert(42);</script>" in h
 
     del AEFF
 
@@ -92,3 +93,4 @@ if __name__=="__main__":
     logging.basicConfig(format='[%(levelname)-5s] %(name)s: %(message)s',level=logging.DEBUG)
     # logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.DEBUG)
     # test_Tag_md5()
+    test_statics_only_tagbase()

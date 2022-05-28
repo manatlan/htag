@@ -116,6 +116,12 @@ class HRenderer:
 
                     if i.md5 not in [j.md5 for j in self._statics]:
                         self._statics.append( i )
+                elif isinstance(i,str): # auto add as Tag.style // CSS
+                    self._statics.append( Tag.H.style(i))
+                elif isinstance(i,bytes): # auto add as Tag.script // JS
+                    self._statics.append( Tag.H.script(i.decode()))
+                else:
+                    raise HTagException("Included static is bad")
 
 
         if hasattr(self.tag, "imports") and self.tag.imports is not None:

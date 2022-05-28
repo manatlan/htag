@@ -1,4 +1,10 @@
-### 0.4.9 "remove is here" 2022/05/10
+### 0.5.0 "simplest" 2022/05/28
+
+ * add shortcut to create simple basics (as js or css)
+ * if a static is str -> add a style / CSS
+ * if a static is bytes -> add a script / JS
+
+### 0.4.9 "remove is here" 2022/05/27
 
  * Tag.remove() to remove itself, (if attached (has parent))
 
