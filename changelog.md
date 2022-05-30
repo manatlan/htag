@@ -1,3 +1,7 @@
+### 0.5.1 "simplest" 2022/05/30
+
+ - create a js "window.error(msg)" method to manage your own errors
+
 ### 0.5.0 "simplest" 2022/05/28
 
  * add shortcut to create simple basics (as js or css)

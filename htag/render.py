@@ -168,7 +168,7 @@ function action( o ) {
 
     if(o.hasOwnProperty("post")) eval( o["post"] );
     if(o.hasOwnProperty("next")) eval( o["next"] );
-    if(o.hasOwnProperty("err"))  console.log( "ERROR", o["err"] );
+    if(o.hasOwnProperty("err")) { if(window.error) error( o["err"] ); else console.log( "ERROR", msg ); }
 }
 
 %s
