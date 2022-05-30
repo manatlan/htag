@@ -10,7 +10,7 @@ example, mainly for my visual tests
 # "https://cdn.jsdelivr.net/npm/bulma@0.8.2/css/bulma.min.css"
 # css=Tag.style("""/*! bulma.io v0.8.2 | MIT License | github.com/jgthms/bulma *""")
 
-css=[Tag.link( _href="https://cdn.jsdelivr.net/npm/bulma@0.8.2/css/bulma.min.css",_rel="stylesheet"),]
+css=Tag.link( _href="https://cdn.jsdelivr.net/npm/bulma@0.8.2/css/bulma.min.css",_rel="stylesheet")
 
 class CptWithStars(Tag.div):
     statics=css
@@ -55,7 +55,7 @@ class Cpt(Tag.div):
 import time,asyncio
 
 class Page(Tag.body):
-    statics=css
+    statics=css,b"window.error=function(txt) {document.body.innerHTML = txt}"
 
     def init(self):
         self.c1=CptWithStars(0)

@@ -1,6 +1,11 @@
-### 0.5.1 "simplest" 2022/05/30
+### 0.5.2 "better errors" 2022/05/30
 
- - create a js "window.error(msg)" method to manage your own errors
+ - the "window.error(msg)" handle js post/next interactions too !
+ - !!! PRE js error are not handle yet !!! (things with ex: b"this.value" when calling bindings)
+
+### 0.5.1 "the real 5" 2022/05/30
+
+ - create a js "window.error(msg)" method to manage your own (python) errors
 
 ### 0.5.0 "simplest" 2022/05/28
 

@@ -155,6 +155,13 @@ class HRenderer:
         js_base="""
 function start() { %s }
 
+function _error(txt,env) {
+    if(window.error)
+        error( env+" ERROR: "+txt );
+    else
+        console.log( env+" ERROR:", txt );
+}
+
 function action( o ) {
 
     if(o.hasOwnProperty("update"))
@@ -166,9 +173,9 @@ function action( o ) {
             document.getElementById( key ).innerHTML += o["stream"][key];
         });
 
-    if(o.hasOwnProperty("post")) eval( o["post"] );
-    if(o.hasOwnProperty("next")) eval( o["next"] );
-    if(o.hasOwnProperty("err")) { if(window.error) error( o["err"] ); else console.log( "ERROR", msg ); }
+    if(o.hasOwnProperty("post")) {try{ eval( o["post"] )} catch(e) {_error(e, "JS");throw e}};
+    if(o.hasOwnProperty("next")) {try{ eval( o["next"] )} catch(e) {_error(e, "JS");throw e}};
+    if(o.hasOwnProperty("err")) _error( o["err"], "PYTHON")
 }
 
 %s
