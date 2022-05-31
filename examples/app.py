@@ -55,7 +55,7 @@ class Cpt(Tag.div):
 import time,asyncio
 
 class Page(Tag.body):
-    statics=css,b"window.error=function(txt) {document.body.innerHTML = txt}"
+    statics=css,b"window.error=function(txt) {document.body.innerHTML += txt}"
 
     def init(self):
         self.c1=CptWithStars(0)

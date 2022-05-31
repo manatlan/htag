@@ -244,7 +244,7 @@ class BaseCaller:
     def __str__(self) -> str:
         interact=dict(id=0,method=self.mname,args=self.args,kargs=self.kargs)
         if self.instance is not None: interact["id"]=id(self.instance)
-        return f"""interact( {stringify(interact)} );"""
+        return f"""try{{interact( {stringify(interact)} )}} catch(e) {{_error(e,"JS")}}"""
 
 class Binder:
     def __init__(self,btag_instance):

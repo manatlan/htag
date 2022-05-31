@@ -229,7 +229,7 @@ def test_generate_js_interact():
     assert bc.args == (12,)
     assert bc.kargs == {}
     js=str(bc)
-    assert js.replace( str(id(c)),"<id>" ) == 'interact( {"id": <id>, "method": "onclick", "args": [12], "kargs": {}} );'
+    assert 'interact( {"id": <id>, "method": "onclick", "args": [12], "kargs": {}} )' in js.replace( str(id(c)),"<id>" )
 
 
 def test_generate_real_js():
@@ -574,7 +574,7 @@ if __name__=="__main__":
     # test_bad_tag_instanciation()
     # test_tag_generation_with_opt_params()
     # test_tag_generation_override_attr_at_construct()
-    # test_generate_js_interact()
+    test_generate_js_interact()
     # test_generate_real_js()
     # test_its_the_same_tagbase_exactly()
 
@@ -582,4 +582,4 @@ if __name__=="__main__":
     # test_iadd()
     # test_js_call_at_init()
     # test_init_hr()
-    test_remove()
+    # test_remove()

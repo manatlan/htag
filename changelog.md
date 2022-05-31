@@ -1,3 +1,7 @@
+### 0.5.3 "better js errors" 2022/05/31
+
+ - the "window.error(msg)" can handle all js interactions !
+
 ### 0.5.2 "better errors" 2022/05/30
 
  - the "window.error(msg)" handle js post/next interactions too !
