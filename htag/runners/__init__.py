@@ -23,7 +23,7 @@ except ImportError:
     print("**WARNING** Runners 'BrowserStarletteHTTP','BrowserStarletteWS' & 'WebHTTP' not availables, you should install 'starlette' & 'uvicorn' for theses htag runners")
 
 try:
-    # mono instance (juste one pywebview ;-)
+    # mono instance (just one pywebview ;-)
     from .pywebview import PyWebWiew
 except ImportError:
     print("**WARNING** Runner 'PyWebWiew' not available, you should install 'pywebview' for this htag runner")
@@ -34,4 +34,9 @@ try:
 except ImportError:
     print("**WARNING** Runner 'GuyApp' not available, you should install 'guy' for this htag runner")
 
+try:
+    # mono instance (just one chrome app instance)
+    from .chromeapp import ChromeApp
+except ImportError:
+    print("**WARNING** Runner 'ChromeApp' not available, you should install 'starlette' & 'uvicorn' for this htag runner")
 

@@ -1,3 +1,7 @@
+### 0.5.4 "ChromeApp is here" 2022/05/31
+
+ - Add a new runner "ChromeApp", to run in a chrome app mode (without *guy* !)
+
 ### 0.5.3 "better js errors" 2022/05/31
 
  - the "window.error(msg)" can handle all js interactions !
