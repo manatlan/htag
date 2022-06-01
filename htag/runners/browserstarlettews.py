@@ -28,7 +28,7 @@ async function interact( o ) {
     ws.send( JSON.stringify(o) );
 }
 
-var ws = new WebSocket("ws://localhost:8000/ws");
+var ws = new WebSocket("ws://"+document.location.host+"/ws");
 ws.onopen = start;
 ws.onmessage = function(e) {
     action( JSON.parse(e.data) );

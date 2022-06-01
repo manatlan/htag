@@ -1,3 +1,7 @@
+### 0.5.5 2022/06/01
+
+ - FIX: the runner BrowserStarletteWS can now change its listening port ;-)
+
 ### 0.5.4 "ChromeApp is here" 2022/05/31
 
  - Add a new runner "ChromeApp", to run in a chrome app mode (without *guy* !)

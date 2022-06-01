@@ -128,7 +128,8 @@ if __name__=="__main__":
     # r=PyWebWiew( Page )
     # r=BrowserStarletteHTTP( Page )
     # r=BrowserStarletteWS( Page )
-    r=BrowserHTTP( Page )
+    # r=BrowserHTTP( Page )
+    r=ChromeApp( Page )
     # r=WebHTTP( Page )
     r.run()
 
