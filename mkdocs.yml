@@ -13,6 +13,7 @@ edit_uri: ""
 
 nav:
     - Introduction: 'index.md'
+    - Tutorial: 'tutorial.md'
     - Runners: 'runners.md'
 
 markdown_extensions:

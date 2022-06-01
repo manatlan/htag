@@ -92,7 +92,7 @@ It should run OOTB, everywhere where pyscript runs.
  - you only need a browser ;-)
  - Interactions are INPROC.
  - no need of external libs
- - can handle [multiple htag objects](https://github.com/manatlan/htag/blob/main/examples/pyscript_multi.html)
+ - can handle [multiple htag objects](https://github.com/manatlan/htag/blob/main/examples/pyscript_multi.html) (with url anchors)
 
 **Cons**
 
