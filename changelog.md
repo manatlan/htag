@@ -1,3 +1,7 @@
+### 0.5.6 2022/06/01
+
+ - Tag.innerHTML is here ;-) readonly (and without @id/Tag, but keeps @ig/TagBase(H)!
+
 ### 0.5.5 2022/06/01
 
  - FIX: the runner BrowserStarletteWS can now change its listening port ;-)

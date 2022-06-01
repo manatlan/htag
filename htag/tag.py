@@ -117,9 +117,9 @@ class TagBase:
         return self._attrs.get(attr,None)
 
     def __str__(self):
-        return self.__render__( list(self._attrs.items()) , str )
+        return self.__render__( list(self._attrs.items()) )
 
-    def __render__(self, attrs:list, mystr:Callable ) -> str:
+    def __render__(self, attrs:list ) -> str:
         rattrs=[]
         for k,v in attrs:
             if v is not None:
@@ -131,9 +131,19 @@ class TagBase:
         return """<%(tag)s%(attrs)s>%(content)s</%(tag)s>""" % dict(
             tag=self.tag.replace("_","-"),
             attrs=" ".join([""]+rattrs) if rattrs else "",
-            content="".join([mystr(i) for i in self._childs if i is not None]),
+            content="".join([str(i) for i in self._childs if i is not None]),   # keeps @id
         )
 
+    @property
+    def innerHTML(self) -> str:
+        """ return innerHTML of the tagbase, but without @id !!!"""
+        def noid(v):
+            if isinstance(v,TagBase):
+                return str(v._ensureTagBase())
+            else:
+                return str(v)
+
+        return "".join([noid(i) for i in self._childs if i is not None])        # remove @id
 
 
     def _getStateImage(self) -> str: #TODO: could disapear (can make something more inteligent here!)

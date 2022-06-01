@@ -562,6 +562,26 @@ def test_remove():
     assert o.remove()
     assert len(t.childs)==0
 
+
+def test_innerHTML():
+    # normal case
+    t=Tag.div()
+    assert t.innerHTML==""
+    o=Tag.b("hello")
+    t.add(o)
+    assert "<b id=" in str(t)
+    assert "<b>" in t.innerHTML
+
+    # But ensure that with tagbase(H), it keeps the @id
+    t=Tag.div()
+    assert t.innerHTML==""
+    o=Tag.H.b("hello",_id="myb")
+    t.add(o)
+    assert "<b id=" in str(t)
+    assert "<b id=" in t.innerHTML
+
+
+
 if __name__=="__main__":
 
     import logging
@@ -574,7 +594,7 @@ if __name__=="__main__":
     # test_bad_tag_instanciation()
     # test_tag_generation_with_opt_params()
     # test_tag_generation_override_attr_at_construct()
-    test_generate_js_interact()
+    # test_generate_js_interact()
     # test_generate_real_js()
     # test_its_the_same_tagbase_exactly()
 
@@ -583,3 +603,4 @@ if __name__=="__main__":
     # test_js_call_at_init()
     # test_init_hr()
     # test_remove()
+    test_innerHTML()
