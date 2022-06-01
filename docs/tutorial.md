@@ -138,4 +138,35 @@ When you will click the button, the instance of the object will add "some conten
 
 From here, you have seen 95% of the features of **htag**.
 
+## Include ressources
+
+**htag** provide a way to include some external ressources (think: css, js, favicon, ...). All theses ressources will be included in `<head>` tag, at construction time.
+**htag** will scan the python Tag'classes and collect all of them to produce the heading parts of the html rendering.
+
+The trick is to define a class attribut `statics`, to add your ressource ... a simple example :
+
+```python
+from htag import Tag
+
+class App(Tag.body):
+    statics = Tag.style("""body {background:yellow}""")
+
+    def init(self):
+        self <= "hello world"
+
+if __name__=="__main__":
+    from htag.runners import BrowserHTTP
+    BrowserHTTP( App ).run(port=9999)    # <= this is the runner
+```
+
+`statics` can be a Tag'instance or a list of Tag'instance.
+
+!!! note "Discovering statics"
+    By default, **htag** will discover all Tag'subclasses to include their statics, from the current process. But sometimes, it can be useful to include only thoses which we really need ; it's possible thru the class attribut `imports`, which should contain a list of Tag'class.
+
+
+## Execute JS statements on client side
+
+Sometimes, it can be useful to start a js statement ...
+
 **`** NEXT SOON **`**
