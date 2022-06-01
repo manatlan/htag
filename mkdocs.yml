@@ -20,3 +20,4 @@ markdown_extensions:
   - markdown.extensions.codehilite:
       guess_lang: false
   - admonition
+  - fenced_code
