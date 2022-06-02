@@ -40,3 +40,11 @@ try:
 except ImportError:
     print("**WARNING** Runner 'ChromeApp' not available, you should install 'starlette' & 'uvicorn' for this htag runner")
 
+
+try:
+    # mono instance (just one android app instance)
+    from .androidapp import AndroidApp
+    from .browsertornadohttp import BrowserTornadoHTTP
+except ImportError:
+    print("**WARNING** Runner 'AndroidApp' & 'BrowserTornadoHTTP' not available, you should install 'tornado' for this htag runner")
+

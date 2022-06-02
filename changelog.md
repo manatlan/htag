@@ -1,3 +1,9 @@
+## 0.5.7 "htag works on android/apk !!!" 2022/06/02
+
+ - 2 new runners !!!
+ - AndroidApp : and it works with buildozer with `android:usesCleartextTraffic="true"` in application of `AndroidManifest.tmpl.xml` !!!
+ - BrowserTornadoHTTP : use tornado !
+
 ### 0.5.6 2022/06/01
 
  - Tag.innerHTML is here ;-) readonly (and without @id/Tag, but keeps @ig/TagBase(H)!
