@@ -12,6 +12,13 @@ For example :
 
 But, in all cases, your **htag app** will run in all theses runners, in the same way !
 
+## AndroidApp
+Run a tornado webserver, and open the kivy webview, in an android context, to render the HTag app.
+
+[source](https://github.com/manatlan/htag/blob/main/htag/runners/androidapp.py)
+
+[tutorial](https://github.com/manatlan/htagapk)
+
 ## BrowserHTTP
 Run a http server, and open the default browser to render the HTag app.
 
