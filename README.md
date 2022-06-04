@@ -10,11 +10,11 @@ Thoses can be a browser, a pywebview, or anything based on cef, depending on an 
 
 But yes … the promise is here : it's a GUI toolkit for building "beautiful" applications for mobile, web, and desktop from a single codebase.
 
-(`*`) **HTag** provides somes [`runners`](htag/runners) ootb. But they are just here for the show. IRL: you should build your own, for your needs.
+(`*`) **HTag** provides somes [`runners`](https://manatlan.github.io/htag/runners/) ootb. But they are just here for the show. IRL: you should build your own, for your needs.
 
 [DEMO/TUTORIAL](https://htag.glitch.me/)
 
-[Changelog](changelog.md)
+[Changelog](https://github.com/manatlan/htag/blob/main/changelog.md)
 
 [Available on pypi.org](https://pypi.org/project/htag/)
 
