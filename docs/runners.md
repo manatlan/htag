@@ -126,7 +126,7 @@ Run your `App` (htag.Tag class) like this :
 ```python
 from js import window
 from htag.runners import PyScript
-PyScript( Main  ).run( window )
+PyScript( App ).run( window )
 ```
 
 [source](https://github.com/manatlan/htag/blob/main/htag/runners/pyscript.py)
@@ -149,7 +149,7 @@ Run your `App` (htag.Tag class) like this :
 
 ```python
 from htag.runners import PyWebWiew
-PyWebWiew( Main ).run()
+PyWebWiew( App ).run()
 ```
 
 
@@ -172,7 +172,7 @@ Run your `App` (htag.Tag class) like this :
 
 ```python
 from htag.runners import BrowserTornadoHTTP
-BrowserTornadoHTTP( Main ).run()
+BrowserTornadoHTTP( App ).run()
 ```
 
 [source](https://github.com/manatlan/htag/blob/main/htag/runners/browsertornadohttp.py)
@@ -193,7 +193,7 @@ Run your `App` (htag.Tag class) like this :
 
 ```python
 from htag.runners import WebHTTP
-WebHTTP( Main ).run()
+WebHTTP( App ).run()
 ```
 
 [source](https://github.com/manatlan/htag/blob/main/htag/runners/webhttp.py)
