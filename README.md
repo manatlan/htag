@@ -5,15 +5,12 @@ Thoses can be a browser, a pywebview, or anything based on cef, depending on an 
 
  * For a **desktop app** : You can use the "PyWebView runner", which will run the UI in a pywebview container (or "ChromeApp runner", in a local chrome app mode). 
  * For a **web app** : You can use the "WebHTTP runner", which will run the UI in a web server, and serve the UI on client side, in a browser. 
- * For a **android app** : You can use the "Guy runner", which will run the UI in a kiwi webview, and can be embedded in an apk (`**`)
+ * For a **android app** : You can use the "AndroidApp runner", which will run the UI in a kiwi webview thru tornado webserver, and can be embedded in an apk ([example](https://github.com/manatlan/htagapk))
  * For a **pyscript app** : you can use the "PyScript runner", which will run completly in client side
 
 But yes … the promise is here : it's a GUI toolkit for building "beautiful" applications for mobile, web, and desktop from a single codebase.
 
 (`*`) **HTag** provides somes [`runners`](htag/runners) ootb. But they are just here for the show. IRL: you should build your own, for your needs.
-
-(`**`) **HTag** is not tied to [guy](https://github.com/manatlan/guy), but can use it as is. So, a **HTag app** could be packaged in an apk/android, using [a guy method](https://manatlan.github.io/guy/howto_build_apk_android/). But in the future, **HTag** will come with its own "android runner" (without *guy* !)
-
 
 [DEMO/TUTORIAL](https://htag.glitch.me/)
 
