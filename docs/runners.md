@@ -165,7 +165,7 @@ PyWebWiew( App ).run()
  - need external libs
 
 ## BrowserTornadoHTTP
-Run a http server (using tornado), and serve the htag app to any browser.
+Run a http server (using tornado), and open the default browser to render the HTag app.
 (if you want to use another webserver ;-))
 
 Run your `App` (htag.Tag class) like this :
