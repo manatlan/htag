@@ -1,3 +1,8 @@
+## 0.5.8 "minor changes" 2022/06/04
+
+ - fix typo in AndroidApp
+ - Add an example : examples/camShot.py
+
 ## 0.5.7 "htag works on android/apk !!!" 2022/06/02
 
  - 2 new runners !!!

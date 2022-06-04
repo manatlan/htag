@@ -95,7 +95,7 @@ window.addEventListener('DOMContentLoaded', start );
         else:
             print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
             print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-            print("SHOULD BE RUN ON ANDROIT (you are on '%s') fallback to browser !!!" % platform)
+            print("SHOULD BE RUN ON ANDROID (you are on '%s') fallback to browser !!!" % platform)
             print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
             print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
             import webbrowser
@@ -103,6 +103,7 @@ window.addEventListener('DOMContentLoaded', start );
             self.server.start()
             return
 
+        # better: https://karobben.github.io/2021/04/30/Python/kivy_android_webviewer/ ?
 
         class Wv(Widget):
             def __init__(self, runner ):
