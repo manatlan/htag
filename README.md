@@ -3,10 +3,10 @@
 A new python library to create UI (or UI toolkit), which can be rendered in anything which can render **html/js/css**.
 Thoses can be a browser, a pywebview, or anything based on cef, depending on an "htag runner" (`*`) !
 
- * For a **desktop app** : You can use the "PyWebView runner", which will run the UI in a pywebview container (or "ChromeApp runner", in a local chrome app mode). 
- * For a **web app** : You can use the "WebHTTP runner", which will run the UI in a web server, and serve the UI on client side, in a browser. 
- * For a **android app** : You can use the "AndroidApp runner", which will run the UI in a kiwi webview thru tornado webserver, and can be embedded in an apk ([example](https://github.com/manatlan/htagapk))
- * For a **pyscript app** : you can use the "PyScript runner", which will run completly in client side
+ * For a **desktop app** : You can use the [PyWebView runner](https://manatlan.github.io/htag/runners/#pywebwiew), which will run the UI in a pywebview container (or "ChromeApp runner", in a local chrome app mode). 
+ * For a **web app** : You can use the [WebHTTP runner](https://manatlan.github.io/htag/runners/#webhttp), which will run the UI in a web server, and serve the UI on client side, in a browser. 
+ * For a **android app** : You can use the [AndroidApp runner](https://manatlan.github.io/htag/runners/#androidapp), which will run the UI in a kiwi webview thru tornado webserver, and can be embedded in an apk ([example](https://github.com/manatlan/htagapk))
+ * For a **pyscript app** : you can use the [PyScript runner](https://manatlan.github.io/htag/runners/#pyscript), which will run completly in client side
 
 But yes … the promise is here : it's a GUI toolkit for building "beautiful" applications for mobile, web, and desktop from a single codebase.
 
