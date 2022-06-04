@@ -81,13 +81,6 @@ Run a http server (using starlette/uvicorn), and open the default chrome, in [Ap
  - need external libs
  - need an installed chrome
 
-
-## GuyApp
-[Guy](https://github.com/manatlan/guy) is special. And this runner is deprecated, and will be replaced by a future
-"android runner". Currently, it's only here, to [provide a way to release an apk/android app]((https://manatlan.github.io/guy/howto_build_apk_android/)).
-
-[source](https://github.com/manatlan/htag/blob/main/htag/runners/guyapp.py)
-
 ## PyScript
 Run everything in client side, thanks to the marvellous [pyscript](https://pyscript.net/). Don't know if there is an utility, but it's possible ;-).
 It should run OOTB, everywhere where pyscript runs.
