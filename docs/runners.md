@@ -217,4 +217,4 @@ Like said before ... Htag provides somes [`runners`](https://github.com/manatlan
 
 Example :
 
-In my case, I've build my own, as a "htag application web server" : a process which can spawn/manage htag process, and communicate with a front http/ws server, thru unix socket. The "htag web app" communicate with the front http/ws server using websocket if available, or fallback to http. It's pretty solid, and works like a charm. If I reach to make it more generic, I will add another runner for this concept later.
+In my case, I've build my own, as a "htag application web server" : a process which can spawn/manage htag process, and communicate with a front https/wss server, thru unix socket. The "htag web app" communicate with the front https/wss server using websocket if available, or fallback to http. It's pretty solid, and works like a charm. If I reach to make it more generic, I will add another runner for this concept later.
