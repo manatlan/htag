@@ -15,12 +15,26 @@ But, in all cases, your **htag app** will run in all theses runners, in the same
 ## AndroidApp
 Run a tornado webserver, and open the kivy webview, in an android context, to render the HTag app.
 
+Run your `App` (htag.Tag class) like this :
+
+```python
+from htag.runners import AndroidApp
+AndroidApp( App ).run()
+```
+
 [source](https://github.com/manatlan/htag/blob/main/htag/runners/androidapp.py)
 
 [tutorial](https://github.com/manatlan/htagapk)
 
 ## BrowserHTTP
 Run a http server, and open the default browser to render the HTag app.
+
+Run your `App` (htag.Tag class) like this :
+
+```python
+from htag.runners import BrowserHTTP
+BrowserHTTP( App ).run()
+```
 
 [source](https://github.com/manatlan/htag/blob/main/htag/runners/browserhttp.py)
 
@@ -35,6 +49,14 @@ Run a http server, and open the default browser to render the HTag app.
 
 ## BrowserStarletteHTTP
 Run a http server (using starlette/uvicorn), and open the default browser to render the HTag app.
+
+Run your `App` (htag.Tag class) like this :
+
+```python
+from htag.runners import BrowserStarletteHTTP
+BrowserStarletteHTTP( App ).run()
+```
+
 
 [source](https://github.com/manatlan/htag/blob/main/htag/runners/browserstarlettehttp.py)
 
@@ -52,6 +74,13 @@ Run a http server (using starlette/uvicorn), and open the default browser to ren
 ## BrowserStarletteWS
 Run a WS server (using starlette/uvicorn), and open the default browser to render the HTag app.
 
+Run your `App` (htag.Tag class) like this :
+
+```python
+from htag.runners import BrowserStarletteWS
+BrowserStarletteWS( App ).run()
+```
+
 [source](https://github.com/manatlan/htag/blob/main/htag/runners/browserstarlettews.py)
 
 **Pros**
@@ -67,6 +96,13 @@ Run a WS server (using starlette/uvicorn), and open the default browser to rende
 
 ## ChromeApp
 Run a http server (using starlette/uvicorn), and open the default chrome, in [App Mode](https://technastic.com/open-websites-in-application-mode-google-chrome/), to render the HTag app.
+
+Run your `App` (htag.Tag class) like this :
+
+```python
+from htag.runners import ChromeApp
+ChromeApp( App ).run()
+```
 
 [source](https://github.com/manatlan/htag/blob/main/htag/runners/chromeapp.py)
 
@@ -85,6 +121,14 @@ Run a http server (using starlette/uvicorn), and open the default chrome, in [Ap
 Run everything in client side, thanks to the marvellous [pyscript](https://pyscript.net/). Don't know if there is an utility, but it's possible ;-).
 It should run OOTB, everywhere where pyscript runs.
 
+Run your `App` (htag.Tag class) like this :
+
+```python
+from js import window
+from htag.runners import PyScript
+PyScript( Main  ).run( window )
+```
+
 [source](https://github.com/manatlan/htag/blob/main/htag/runners/pyscript.py)
 
 **Pros**
@@ -101,6 +145,14 @@ It should run OOTB, everywhere where pyscript runs.
 ## PyWebWiew
 Run everything in a [pywebview](https://pywebview.flowrl.com/) instance. The ideal solution to provide a "python GUI app".
 
+Run your `App` (htag.Tag class) like this :
+
+```python
+from htag.runners import PyWebWiew
+PyWebWiew( Main ).run()
+```
+
+
 [source](https://github.com/manatlan/htag/blob/main/htag/runners/pywebview.py)
 
 **Pros**
@@ -116,6 +168,13 @@ Run everything in a [pywebview](https://pywebview.flowrl.com/) instance. The ide
 Run a http server (using tornado), and serve the htag app to any browser.
 (if you want to use another webserver ;-))
 
+Run your `App` (htag.Tag class) like this :
+
+```python
+from htag.runners import BrowserTornadoHTTP
+BrowserTornadoHTTP( Main ).run()
+```
+
 [source](https://github.com/manatlan/htag/blob/main/htag/runners/browsertornadohttp.py)
 
 **Pros**
@@ -129,6 +188,13 @@ Run a http server (using tornado), and serve the htag app to any browser.
 
 ## WebHTTP
 Run a http server (using starlette/uvicorn), and serve the htag app to any browser.
+
+Run your `App` (htag.Tag class) like this :
+
+```python
+from htag.runners import WebHTTP
+WebHTTP( Main ).run()
+```
 
 [source](https://github.com/manatlan/htag/blob/main/htag/runners/webhttp.py)
 
