@@ -1,6 +1,6 @@
 # HTag : "[H]TML Tag"
 
-[![Test](https://github.com/manatlan/htag/actions/workflows/unittests.yml/badge.svg)](https://github.com/manatlan/htag/actions/workflows/python-unittests.yml)
+[![Test](https://github.com/manatlan/htag/actions/workflows/unittests.yml/badge.svg)](https://github.com/manatlan/htag/actions/workflows/unittests.yml)
 
 A new python library to create UI (or UI toolkit), which can be rendered in anything which can render **html/js/css**.
 Thoses can be a browser, a pywebview, or anything based on cef, depending on an "htag runner" (`*`) !
