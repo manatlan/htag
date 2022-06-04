@@ -119,6 +119,20 @@ Run everything in a [pywebview](https://pywebview.flowrl.com/) instance. The ide
  - til pywebview [doesn't support async calls](https://github.com/r0x0r/pywebview/issues/867), full htag features (async) will not be available ;-(
  - need external libs
 
+## BrowserTornadoHTTP
+Run a http server (using tornado), and serve the htag app to any browser.
+(if you want to use another webserver ;-))
+
+[source](https://github.com/manatlan/htag/blob/main/htag/runners/browsertornadohttp.py)
+
+**Pros**
+
+ - the http server is robust
+ - debugging is simple (can see http exchanges in the browser dev tools)
+
+**Cons**
+
+ - need external libs
 
 ## WebHTTP
 Run a http server (using starlette/uvicorn), and serve the htag app to any browser.
