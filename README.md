@@ -3,7 +3,7 @@
 [![Test](https://github.com/manatlan/htag/actions/workflows/unittests.yml/badge.svg)](https://github.com/manatlan/htag/actions/workflows/unittests.yml)
 
 A new python library to create UI (or UI toolkit), which can be rendered in anything which can render **html/js/css**.
-Thoses can be a browser, a pywebview, an android/apk, or anything based on cef, depending on an "htag runner" (`*`) !
+Thoses can be a browser, a pywebview, an android/apk, or anything based on cef, depending on an [htag runner](https://manatlan.github.io/htag/runners/) !
 
  * For a **desktop app** : You can use the [PyWebView runner](https://manatlan.github.io/htag/runners/#pywebwiew), which will run the UI in a pywebview container (or "ChromeApp runner", in a local chrome app mode). 
  * For a **web app** : You can use the [WebHTTP runner](https://manatlan.github.io/htag/runners/#webhttp), which will run the UI in a web server, and serve the UI on client side, in a browser. 
@@ -11,8 +11,6 @@ Thoses can be a browser, a pywebview, an android/apk, or anything based on cef, 
  * For a **pyscript app** : you can use the [PyScript runner](https://manatlan.github.io/htag/runners/#pyscript), which will run completly in client side
 
 But yes … the promise is here : **it's a GUI toolkit for building "beautiful" applications for mobile, web, and desktop from a single codebase**.
-
-(`*`) **HTag** provides somes [`runners`](https://manatlan.github.io/htag/runners/) ootb. But they are just here for the show. IRL: you should build your own, for your needs.
 
 [DOCUMENTATION](https://manatlan.github.io/htag/)
 
@@ -34,11 +32,11 @@ To try it :
     $ wget https://raw.githubusercontent.com/manatlan/htag/main/examples/demo.py
     $ python3 demo.py
 
-There will be docs in the future ;-)
 
 ## ROADMAP to 1.0.0
 
  * rock solid (need more tests)
+ * setup minimal docs ;-)
  * ~~top level api could change (Tag() -> create a Tag, Tag.mytag() -> create a TagBase ... can be a little bit ambiguous)~~
  * add a runner with WS with stdlib ? (not starlette!)
  * ~~I don't really like the current way to generate js in interaction : need to found something more solid.~~
