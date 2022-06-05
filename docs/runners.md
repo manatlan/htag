@@ -213,8 +213,8 @@ WebHTTP( App ).run()
 
 ## Summary
 
-Like said before ... Htag provides somes [`runners`](https://github.com/manatlan/htag/runners) ootb. But they are just here for the show. IRL: you should build your own, for your needs.
+Htag provides somes [`runners`](https://github.com/manatlan/htag/runners) ootb. But they are just here for the show. IRL: you should build your own, for your needs.
 
-Example :
+**Example:**
 
 In my case, I've build my own, as a "htag application web server" : a process which can spawn/manage htag process, and communicate with a front https/wss server, thru unix socket. The "htag web app" communicate with the front https/wss server using websocket if available, or fallback to http. It's pretty solid, and works like a charm. If I reach to make it more generic, I will add another runner for this concept later.
