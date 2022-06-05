@@ -4,16 +4,16 @@ The 'Runners' is the htag denomination, for some classes provided with htag, to 
 
 For example :
 
- * "BrowserHTTP" is really adapted to run your htag app with just pure python.
- * "BrowserStarletteHTTP" is the perfect runner during developpement process, because it can autoreload on file changes, and it's easier to follow http interactions.
- * "PyWebView" is the perfect solution, to deliver a gui python app, as a freezed exe (embbeding the pywebview/cef).
- * "ChromeApp" is the perfect solution to deliver a gui python app, with minimal footprints, because it will reuse the installed chrome of the computer.
- * "PyScript" is fun, if you only have a browser (no need of python ;-))
+ * [BrowserHTTP](#BrowserHTTP) is really adapted to run your htag app with just pure python.
+ * [BrowserStarletteHTTP](#BrowserStarletteHTTP) is the perfect runner during developpement process, because it can autoreload on file changes, and it's easier to follow http interactions.
+ * [PyWebView](#PyWebView) is the perfect solution, to deliver a gui python app, as a freezed exe (embbeding the pywebview/cef).
+ * [ChromeApp](#ChromeApp) is the perfect solution to deliver a gui python app, with minimal footprints, because it will reuse the installed chrome of the computer.
+ * [PyScript](#PyScript)" is fun, if you only have a browser (no need of python ;-), just html !
 
 But, in all cases, your **htag app** will run in all theses runners, in the same way !
 
 ## AndroidApp
-Run a tornado webserver, and open the kivy webview, in an android context, to render the HTag app.
+Run a tornado webserver, and open the kivy webview, in an android context, to render the HTag app ([Here you will find recipes](https://github.com/manatlan/htagapk)) ! And it's simple !
 
 Run your `App` (htag.Tag class) like this :
 
@@ -24,7 +24,7 @@ AndroidApp( App ).run()
 
 [source](https://github.com/manatlan/htag/blob/main/htag/runners/androidapp.py)
 
-[tutorial](https://github.com/manatlan/htagapk)
+
 
 ## BrowserHTTP
 Run a http server, and open the default browser to render the HTag app.
