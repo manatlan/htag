@@ -580,6 +580,8 @@ def test_innerHTML():
     assert "<b id=" in str(t)
     assert "<b id=" in t.innerHTML
 
+    t=Tag.div(42)
+    assert t.innerHTML=="42"
 
 
 if __name__=="__main__":
