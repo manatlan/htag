@@ -2,6 +2,7 @@ site_name: HTag's Docs
 site_description: GUI toolkit for building GUI toolikit (for building applications for desktop, web, and mobile from a single python3 codebase)
 
 theme:
+    logo: htag.png
     name: 'material'
     palette:
         primary: 'black'
