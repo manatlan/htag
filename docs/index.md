@@ -1,5 +1,7 @@
 # HTag
 
+<img src="htag.png" width="100" height="100" style="float:right">
+
 docs are coming ....
 
 meanwhile, you can learn a lot on [htag's demo](https://htag.glitch.me/) ;-)
