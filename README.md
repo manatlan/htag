@@ -1,4 +1,5 @@
-# HTag : "[H]TML Tag"
+# HTag : "H(tml)Tag"
+![logo](docs/htag.png)
 
 [![Test](https://github.com/manatlan/htag/actions/workflows/unittests.yml/badge.svg)](https://github.com/manatlan/htag/actions/workflows/unittests.yml)
 
