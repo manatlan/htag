@@ -1,5 +1,6 @@
 # HTag : "H(tml)Tag"
-![logo](docs/htag.png)
+
+<img src="docs/htag.png" width="100" height="100">
 
 [![Test](https://github.com/manatlan/htag/actions/workflows/unittests.yml/badge.svg)](https://github.com/manatlan/htag/actions/workflows/unittests.yml)
 
