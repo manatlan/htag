@@ -28,9 +28,11 @@ from starlette.responses import HTMLResponse,JSONResponse,Response
 from starlette.routing import Route
 logger = logging.getLogger(__name__)
 
-class WebHTTP:
+class WebHTTP(Starlette):
     """ Simple ASync Web Server (with starlette) with HTTP interactions with htag.
         can handle multiple instances & multiples Tag
+
+        The instance is an ASGI htag app
     """
     def __init__(self,*classes, timeout=5*60):
         assert len(classes)>0
@@ -38,6 +40,12 @@ class WebHTTP:
         self.sessions={}
         self.classes={i.__name__:i for i in classes}
         self.timeout=timeout
+
+        Starlette.__init__(self,debug=True, routes=[
+            Route('/',              self.GET,   methods=["GET"]),
+            Route('/{tagClass}',    self.GET,   methods=["GET"]),
+            Route('/{tagClass}/',   self.POST,  methods=["POST"]),
+        ], on_startup=[self._purgeSessions])
 
     async def _purgeSessions(self):
 
@@ -134,17 +142,7 @@ window.addEventListener('DOMContentLoaded', start );
             return HTMLResponse( "404 Not Found" , status_code=404 )
 
 
-    def __call__(self):
-        """ create a uvicorn factory/asgi, to make it compatible with uvicorn
-            from scratch.
-        """
-        app = Starlette(debug=True, routes=[
-            Route('/',              self.GET,   methods=["GET"]),
-            Route('/{tagClass}',    self.GET,   methods=["GET"]),
-            Route('/{tagClass}/',   self.POST,  methods=["POST"]),
-        ], on_startup=[self._purgeSessions])
-        return app
 
     def run(self, host="0.0.0.0", port=8000):   # wide, by default !!
         import uvicorn
-        uvicorn.run(self(), host=host, port=port)
+        uvicorn.run(self, host=host, port=port)

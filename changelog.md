@@ -1,3 +1,8 @@
+## 0.6.0 "asgi with starlette"
+
+ - MINOR BREAKING CHANGES : runners based on starlette (WebHTTP, BrowserStarletteHTTP & BrowserStarletteWS) create an "ASGI HTag Instance"
+ - camshot example is better
+
 ## 0.5.8 "minor changes" 2022/06/04
 
  - fix typo in AndroidApp

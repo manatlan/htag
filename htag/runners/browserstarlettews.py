@@ -17,9 +17,11 @@ from starlette.responses import HTMLResponse
 from starlette.routing import Route,WebSocketRoute
 from starlette.endpoints import WebSocketEndpoint
 
-class BrowserStarletteWS:
+class BrowserStarletteWS(Starlette):
     """ Simple ASync Web Server (with starlette) with WebSocket interactions with HTag.
         Open the rendering in a browser tab.
+
+        The instance is an ASGI htag app
     """
     def __init__(self,tagClass:type):
         assert issubclass(tagClass,Tag)
@@ -37,13 +39,6 @@ ws.onmessage = function(e) {
 
         self.renderer=HRenderer(tagClass, js, lambda: os._exit(0))
 
-    async def GET(self,request):
-        return HTMLResponse( str(self.renderer) )
-
-    def __call__(self,*a,**k):
-        """ create a uvicorn factory/asgi, to make it compatible with uvicorn
-            from scratch.
-        """
         class WsInteract(WebSocketEndpoint):
             encoding = "json"
 
@@ -51,14 +46,18 @@ ws.onmessage = function(e) {
                 actions = await self.renderer.interact(data["id"],data["method"],data["args"],data["kargs"])
                 await websocket.send_text( json.dumps(actions) )
 
-        return Starlette(debug=True, routes=[
+        Starlette.__init__(self,debug=True, routes=[
             Route('/', self.GET, methods=["GET"]),
             WebSocketRoute("/ws", WsInteract),
         ])
+
+
+    async def GET(self,request):
+        return HTMLResponse( str(self.renderer) )
 
     def run(self, host="127.0.0.1", port=8000, openBrowser=True):   # localhost, by default !!
         import uvicorn,webbrowser
         if openBrowser:
             webbrowser.open_new_tab(f"http://{host}:{port}")
 
-        uvicorn.run(self(), host=host, port=port)
+        uvicorn.run(self, host=host, port=port)
