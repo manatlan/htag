@@ -4,11 +4,11 @@ The 'Runners' is the htag denomination, for some classes provided with htag, to 
 
 For example :
 
- * [BrowserHTTP](#BrowserHTTP) is really adapted to run your htag app with just pure python.
- * [BrowserStarletteHTTP](#BrowserStarletteHTTP) is the perfect runner during developpement process, because it can autoreload on file changes, and it's easier to follow http interactions.
- * [PyWebView](#PyWebView) is the perfect solution, to deliver a gui python app, as a freezed exe (embbeding the pywebview/cef).
- * [ChromeApp](#ChromeApp) is the perfect solution to deliver a gui python app, with minimal footprints, because it will reuse the installed chrome of the computer.
- * [PyScript](#PyScript)" is fun, if you only have a browser (no need of python ;-), just html !
+ * [BrowserHTTP](#browserhttp) is really adapted to run your htag app with just pure python.
+ * [BrowserStarletteHTTP](#browserstarlettehttp) is the perfect runner during developpement process, because it can autoreload on file changes, and it's easier to follow http interactions.
+ * [PyWebView](#pywebview) is the perfect solution, to deliver a gui python app, as a freezed exe (embbeding the pywebview/cef).
+ * [ChromeApp](#chromeapp) is the perfect solution to deliver a gui python app, with minimal footprints, because it will reuse the installed chrome of the computer.
+ * [PyScript](#pyscript)" is fun, if you only have a browser (no need of python ;-), just html !
 
 But, in all cases, your **htag app** will run in all theses runners, in the same way !
 
@@ -48,7 +48,7 @@ BrowserHTTP( App ).run()
  - the http server is not robust at all
 
 ## BrowserStarletteHTTP
-Run a http server (using starlette/uvicorn), and open the default browser to render the HTag app.
+Run a http server (using starlette/uvicorn), and open the default browser to render the HTag app. Because it's based on **Starlette**, this runner is an **ASGI HTag App**, which provide [a lot of features](asgi)
 
 Run your `App` (htag.Tag class) like this :
 
@@ -72,7 +72,7 @@ BrowserStarletteHTTP( App ).run()
 
 
 ## BrowserStarletteWS
-Run a WS server (using starlette/uvicorn), and open the default browser to render the HTag app.
+Run a WS server (using starlette/uvicorn), and open the default browser to render the HTag app. Because it's based on **Starlette**, this runner is an **ASGI HTag App**, which provide [a lot of features](asgi)
 
 Run your `App` (htag.Tag class) like this :
 
@@ -187,7 +187,7 @@ BrowserTornadoHTTP( App ).run()
  - need external libs
 
 ## WebHTTP
-Run a http server (using starlette/uvicorn), and serve the htag app to any browser.
+Run a http server (using starlette/uvicorn), and serve the htag app to any browser. Because it's based on **Starlette**, this runner is an **ASGI HTag App**, which provide [a lot of features](asgi)
 
 Run your `App` (htag.Tag class) like this :
 
