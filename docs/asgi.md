@@ -9,7 +9,9 @@ all asgi/starlette features OOTB.
 Admit that you have this python file `myapp.py`
 
 ```python
-class App(Htag.div):
+from htag import Tag
+
+class App(Tag.div):
     ...
 
 app = BrowserStarletteHTTP(App)
@@ -27,7 +29,9 @@ Uvicorn can restart the server on file changes.
 ### Programmaticaly
 
 ```python
-class App(Htag.div):
+from htag import Tag
+
+class App(Tag.div):
     ...
 
 app = BrowserStarletteHTTP(App)
@@ -47,9 +51,11 @@ You can start the server part, in autoreload mode, from command line, with :
 ## You can setup new routes
 
 ```python
-class App(Htag.div):
+from htag import Tag
+
+class App(Tag.div):
     ...
 
 app = BrowserStarletteHTTP(App)
-app.add_route("/style.css", mymethod, methods=["GET",])
+app.add_route("/style.css", mymethod_to_return_style_css )
 ```
