@@ -13,6 +13,7 @@ def test_default():
 
 def data_source():
     for i in  [
+        "DevApp",
         "BrowserStarletteHTTP",
         "BrowserStarletteWS",
         "WebHTTP",

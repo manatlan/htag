@@ -1,4 +1,8 @@
-## 0.6.0 "asgi with starlette"
+## 0.6.1 "DevApp runner" 2022/06/08
+
+ - "DevApp runner" specialized for dev (autoreload/autorefresh/log)
+
+## 0.6.0 "asgi with starlette" 2022/06/07
 
  - MINOR BREAKING CHANGES : runners based on starlette (WebHTTP, BrowserStarletteHTTP & BrowserStarletteWS) create an "ASGI HTag Instance"
  - camshot example is better

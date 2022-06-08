@@ -15,12 +15,13 @@ try:
     # mono instance
     from .browserstarlettehttp import BrowserStarletteHTTP
     from .browserstarlettews import BrowserStarletteWS
+    from .devapp import DevApp                                      # special dev
 
     # multi instance
     from .webhttp import WebHTTP
 
 except ImportError:
-    print("**WARNING** Runners 'BrowserStarletteHTTP','BrowserStarletteWS' & 'WebHTTP' not availables, you should install 'starlette' & 'uvicorn' for theses htag runners")
+    print("**WARNING** Runners 'BrowserStarletteHTTP','BrowserStarletteWS' & 'WebHTTP' (and DevApp) not availables, you should install 'starlette' & 'uvicorn' for theses htag runners")
 
 try:
     # mono instance (just one pywebview ;-)
