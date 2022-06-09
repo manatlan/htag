@@ -30,7 +30,7 @@ class DevApp(Starlette):
             * refresh UI/HTML/client part, after server autoreloaded
             * console.log/info in devtools, for all exchanges
             * uvicorn debug
-            * js error() method auto implemented
+            * js error() method auto implemented (popup with skip/refresh)
 
         Simple ASync Web Server (with starlette) with WebSocket interactions with HTag.
         Open the rendering in a browser tab.
@@ -39,27 +39,44 @@ class DevApp(Starlette):
     """
     def __init__(self,tagClass:type):
         assert issubclass(tagClass,Tag)
+
+        #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+        # add a Static Template, for displaying beautiful full error on UI ;-)
+        #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ #TODO: perhaps something integrated in hrenderer
+        t=Tag.H.div( _style="z-index:10000000000;position:fixed;top:10px;left:10px;background:#F00;padding:8px;border:1px solid yellow" )
+        t <= Tag.H.a("X",_href="#",_onclick="this.parentNode.remove()",_style="color:yellow;text-decoration:none",_title="Forget error (skip)")
+        t <= " "
+        t <= Tag.H.a("REFRESH",_href="#",_onclick="window.location.reload()",_style="color:yellow;text-decoration:none",_title="Restart the UI part by refreshing it")
+        t <= Tag.H.pre()
+        template = Tag.H.template(t,_id="DevAppError")
+        #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+
+
         js = """
 
-window.error=function(txt) {document.body.innerHTML = txt+" <a href='#' onclick='window.location.reload()'>Restart</a>"}
+window.error=function(txt) {
+    var clone = document.importNode(document.querySelector("#DevAppError").content, true);
+    clone.querySelector("pre").innerHTML = txt
+    document.body.appendChild(clone)
+}
 
 async function interact( o ) {
-    console.info("[htag interact]",o)
-    ws.send( JSON.stringify(o) );
+    let packet = JSON.stringify(o)
+    console.info("[htag interact]",packet.length,o)
+    ws.send( packet );
 }
 
 var ws = new WebSocket("ws://"+document.location.host+"/ws");
 ws.onopen = function() {console.info("[htag start]");start()};
-ws.onclose = function() {window.location.reload()}
+ws.onclose = function() {document.body.innerHTML="Refreshing";window.location.reload()}
 
 ws.onmessage = function(e) {
     let data = JSON.parse(e.data);
-    console.info("[htag action]",data)
+    console.info("[htag action]",e.data.length,data)
     action( data );
 };
 """
-
-        self.renderer=HRenderer(tagClass, js, lambda: os._exit(0))
+        self.renderer=HRenderer(tagClass, js, lambda: os._exit(0), fullerror=True, statics=[template,])
 
         class WsInteract(WebSocketEndpoint):
             encoding = "json"
@@ -100,4 +117,3 @@ ws.onmessage = function(e) {
         if openBrowser:
             webbrowser.open_new_tab(url)
         uvicorn.run(fileapp,host=host,port=port,reload=True,debug=True)
-

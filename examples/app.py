@@ -115,21 +115,23 @@ class Page(Tag.body):
         self("fgdsgfd()")
 
 
+# exemple for instanciating the logging before ...
+import logging
+logging.basicConfig(format='[%(levelname)-5s] %(name)s: %(message)s',level=logging.DEBUG)
+# logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.DEBUG)
+
+logging.getLogger("htag.tag").setLevel( logging.WARNING )
+
+from htag.runners import *
+# r=GuyApp( Page )
+# r=PyWebWiew( Page )
+# r=BrowserStarletteHTTP( Page )
+# r=BrowserStarletteWS( Page )
+# r=BrowserHTTP( Page )
+r=BrowserTornadoHTTP( Page )
+# r=DevApp( Page )
+# r=WebHTTP( Page )
+
 if __name__=="__main__":
-    # exemple for instanciating the logging before ...
-    import logging
-    logging.basicConfig(format='[%(levelname)-5s] %(name)s: %(message)s',level=logging.DEBUG)
-    # logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.DEBUG)
-
-    logging.getLogger("htag.tag").setLevel( logging.WARNING )
-
-    from htag.runners import *
-    # r=GuyApp( Page )
-    # r=PyWebWiew( Page )
-    # r=BrowserStarletteHTTP( Page )
-    # r=BrowserStarletteWS( Page )
-    # r=BrowserHTTP( Page )
-    r=BrowserTornadoHTTP( Page )
-    # r=WebHTTP( Page )
     r.run()
 

@@ -82,11 +82,12 @@ class Stater:
 
 
 class HRenderer:
-    def __init__(self, tagClass: type, js:str, exit_callback:Optional[Callable]=None, init= ((),{}) ):
+    def __init__(self, tagClass: type, js:str, exit_callback:Optional[Callable]=None, init= ((),{}), fullerror=False, statics=[] ):
         """ tag object will be setted as a 'body' tag ! """
         """ js should containt an interact method, and an initializer to call the start()"""
-        if not issubclass(tagClass, Tag): raise HTagException("HRendered can only handle tag subclasses !")
-
+        if not issubclass(tagClass, Tag): raise HTagException("HRenderer can only handle tag subclasses !")
+        if not isinstance(statics, list): raise HTagException("HRenderer statics should be a list !")
+        self.fullerror = fullerror
         self._interaction_scripts=[]
 
         try:
@@ -104,7 +105,7 @@ class HRenderer:
             # add an .exit() method on the tag !!!!!!!!!!!!!!!!!!!!!!
             self.tag.exit = exit_callback
 
-        self._statics: list = []
+        self._statics: list = list(statics)
 
         ensureList=lambda x: list(x) if type(x) in [list,tuple] else [x]
 
@@ -273,8 +274,9 @@ function action( o ) {
 
         except Exception as e:
             print("ERROR",e)
-            logger.error("Exception %s:\n%s", e, traceback.format_exc())
-            rep={"err": str(e) }
+            fullerror=traceback.format_exc()
+            logger.error("Exception %s:\n%s", e, fullerror)
+            rep={"err": fullerror if self.fullerror else str(e) }
 
         logger.info("RETURN --> %s",json.dumps(rep,indent=4))
 

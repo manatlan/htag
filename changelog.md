@@ -1,3 +1,8 @@
+## 0.6.2 "DevApp runner++" 2022/06/09
+
+ - "DevApp runner" upgraded ! (popup with skip/refresh & full error traceback (py only))
+ - meanwhile HRenderer can set special statics list with param statics.
+
 ## 0.6.1 "DevApp runner" 2022/06/08
 
  - "DevApp runner" specialized for dev (autoreload/autorefresh/log)
