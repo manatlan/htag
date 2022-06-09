@@ -4,6 +4,11 @@
 
 [![Test](https://github.com/manatlan/htag/actions/workflows/unittests.yml/badge.svg)](https://github.com/manatlan/htag/actions/workflows/unittests.yml)
 
+<a href="https://pypi.org/project/htag/">
+    <img src="https://badge.fury.io/py/htag.svg" alt="Package version">
+</a>
+
+
 A new python library to create UI (or UI toolkit), which can be rendered in anything which can render **html/js/css**.
 Thoses can be a browser, a pywebview, an android/apk, or anything based on cef, depending on an [htag runner](https://manatlan.github.io/htag/runners/) !
 
