@@ -48,7 +48,7 @@ BrowserHTTP( App ).run()
  - the http server is not robust at all
 
 ## BrowserStarletteHTTP
-Run a http server (using starlette/uvicorn), and open the default browser to render the HTag app. Because it's based on **Starlette**, this runner is an **ASGI HTag App**, which provide [a lot of features](/asgi/)
+Run a http server (using starlette/uvicorn), and open the default browser to render the HTag app. Because it's based on **Starlette**, this runner is an **ASGI HTag App**, which provide [a lot of features](/htag/asgi/)
 
 Run your `App` (htag.Tag class) like this :
 
@@ -72,7 +72,7 @@ BrowserStarletteHTTP( App ).run()
 
 
 ## BrowserStarletteWS
-Run a WS server (using starlette/uvicorn), and open the default browser to render the HTag app. Because it's based on **Starlette**, this runner is an **ASGI HTag App**, which provide [a lot of features](/asgi/)
+Run a WS server (using starlette/uvicorn), and open the default browser to render the HTag app. Because it's based on **Starlette**, this runner is an **ASGI HTag App**, which provide [a lot of features](/htag/asgi/)
 
 Run your `App` (htag.Tag class) like this :
 
@@ -187,7 +187,7 @@ BrowserTornadoHTTP( App ).run()
  - need external libs
 
 ## WebHTTP
-Run a http server (using starlette/uvicorn), and serve the htag app to any browser. Because it's based on **Starlette**, this runner is an **ASGI HTag App**, which provide [a lot of features](/asgi/)
+Run a http server (using starlette/uvicorn), and serve the htag app to any browser. Because it's based on **Starlette**, this runner is an **ASGI HTag App**, which provide [a lot of features](/htag/asgi/)
 
 Run your `App` (htag.Tag class) like this :
 
