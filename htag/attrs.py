@@ -45,6 +45,8 @@ class StrClass:
 
     def __str__(self):
         return " ".join(self._ll)
+    def __repr__(self):
+        return " ".join(self._ll)
 
 #---------------------------------------------------------------
 
@@ -106,5 +108,7 @@ class StrStyle:
         return str(self)==str(x)
 
     def __str__(self):
+        return "".join(["%s:%s;" %(k,v) for k,v in self._ll])
+    def __repr__(self):
         return "".join(["%s:%s;" %(k,v) for k,v in self._ll])
 

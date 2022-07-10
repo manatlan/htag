@@ -1,3 +1,7 @@
+## 0.7.1 "fix style & class" 2022/07/10
+
+ - it works better now ;-)
+
 ## 0.7.0 "style & class" 2022/07/10
 
  - The "DevApp runner" is able to print in stdout (no more python buffering !!!!!) <- really needed for me ;-)

@@ -62,7 +62,7 @@ class TagBase:
 
         # compute a md5 (to indentify state for statics only now)
         # WARN : attrs or content change -> doesn't affect md5 !
-        self.md5 = md5( str([str(k)+str(v) for k,v in self._attrs.items()]) + str(self._childs))
+        self.md5 = md5( str(self._attrs) + str(self._childs))
 
     def __le__(self, elt: AnyTags ):
         self.add(elt)
