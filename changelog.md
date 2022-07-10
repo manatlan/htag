@@ -1,3 +1,11 @@
+## 0.7.0 "style & class" 2022/07/10
+
+ - The "DevApp runner" is able to print in stdout (no more python buffering !!!!!) <- really needed for me ;-)
+   (it's now the perfect runner for dev process !!!)
+ - "style" and "class" are now specials attributs (htag.attrs.StrStyle & htag.attrs.StrClass) on a Tag.
+   which provides methods to manage contents (respectivly "dict" & list) !
+   But works in the old/classic way, with str !
+
 ## 0.6.2 "DevApp runner++" 2022/06/09
 
  - "DevApp runner" upgraded ! (popup with skip/refresh & full error traceback (py only))

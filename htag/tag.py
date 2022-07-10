@@ -10,6 +10,7 @@ import html,json,hashlib
 import logging,types,asyncio
 import weakref
 from typing import Sequence,Union,Optional,Any,Callable,Type
+from .attrs import StrClass,StrStyle
 
 AnyTags = Union[ Optional[Any], Sequence[Any]]
 StrNonable = Optional[str]
@@ -61,7 +62,7 @@ class TagBase:
 
         # compute a md5 (to indentify state for statics only now)
         # WARN : attrs or content change -> doesn't affect md5 !
-        self.md5 = md5( str(self._attrs) + str(self._childs))
+        self.md5 = md5( str([str(k)+str(v) for k,v in self._attrs.items()]) + str(self._childs))
 
     def __le__(self, elt: AnyTags ):
         self.add(elt)
@@ -111,10 +112,28 @@ class TagBase:
     def __setitem__(self,attr:str,value):
         # if not isinstance(self,Tag):  #TODO: in the future ;-)
         #     raise HTagException("Can't assign a callback on a tagbase")
-        self._attrs[attr]=value
+        attr=attr.strip().lower()
+        if attr == "style":
+            self._attrs["style"]=StrStyle(value)
+        elif attr.strip().lower() == "class":
+            self._attrs["class"]=StrClass(value)
+        else:
+            self._attrs[attr]=value
 
     def __getitem__(self,attr:str) -> Any:
-        return self._attrs.get(attr,None)
+        attr=attr.strip().lower()
+        r=self._attrs.get(attr,None)
+        if r is None:
+            if attr == "style":
+                self._attrs["style"]=StrStyle()
+                return self._attrs["style"]
+            elif attr == "class":
+                self._attrs["class"]=StrClass()
+                return self._attrs["class"]
+            else:
+                return r
+        else:
+            return r
 
     def __str__(self):
         return self.__render__( list(self._attrs.items()) )
@@ -127,7 +146,8 @@ class TagBase:
                     if v == True:
                         rattrs.append(k)
                 else:
-                    rattrs.append( '%s="%s"' % (k,html.escape( str(v) )) )
+                    if v!="":
+                        rattrs.append( '%s="%s"' % (k,html.escape( str(v) )) )
         return """<%(tag)s%(attrs)s>%(content)s</%(tag)s>""" % dict(
             tag=self.tag.replace("_","-"),
             attrs=" ".join([""]+rattrs) if rattrs else "",

@@ -170,11 +170,11 @@ def test_tag_generation_with_opt_params():
     assert g["id"] == id(g)
 
     assert anon(g) == \
-         '''<h1 class="jo" style="border:1px solid red" id="<id>"><li id="1">1 torchon</li><li id="2">2 torchon</li><li id="3">3 torchon</li></h1>'''
+         '''<h1 class="jo" style="border:1px solid red;" id="<id>"><li id="1">1 torchon</li><li id="2">2 torchon</li><li id="3">3 torchon</li></h1>'''
 
     g=NewTag(3,txt="serviette",_class="jo",_style="border:1px solid red")
     assert anon(g) == \
-        '''<h1 class="jo" style="border:1px solid red" id="<id>"><li id="1">1 serviette</li><li id="2">2 serviette</li><li id="3">3 serviette</li></h1>'''
+        '''<h1 class="jo" style="border:1px solid red;" id="<id>"><li id="1">1 serviette</li><li id="2">2 serviette</li><li id="3">3 serviette</li></h1>'''
 
 
 def test_tag_generation_override_attr_at_construct():

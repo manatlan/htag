@@ -95,7 +95,6 @@ ws.onmessage = function(e) {
         return HTMLResponse( str(self.renderer) )
 
     def run(self, host="127.0.0.1", port=8000, openBrowser=True):   # localhost, by default !!
-        """ example `app.run(__name__)` """
         import uvicorn,webbrowser
         import inspect,sys
         from pathlib import Path
@@ -113,6 +112,8 @@ ws.onmessage = function(e) {
         print("="*79)
         print(f"Start Uvicorn Reloader for '{fileapp}' ({url})")
         print("="*79)
+
+        os.environ["PYTHONUNBUFFERED"]="FALSE"
 
         if openBrowser:
             webbrowser.open_new_tab(url)
