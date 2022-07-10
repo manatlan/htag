@@ -64,9 +64,13 @@ class DictStyle(dict):
     def clear(self) -> None:
         self._parent._ll=[]
 
+    def update(self, d:dict):
+        for k,v in d.items():
+            self[k]=v
+
 class StrStyle:
     """ expose basic methods set/get/contains/remove """
-    def __init__(self,txt=""):
+    def __init__(self,txt=None):
         self._ll=[]
         if txt is not None:
             if isinstance(txt,dict):

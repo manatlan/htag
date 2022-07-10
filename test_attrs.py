@@ -88,6 +88,9 @@ def test_StrStyle_multiple():
     assert style.get("bAckground") == []
     assert style==""
 
+    style.dict.update( dict(kiki="koko"))
+    assert style.dict == {"kiki":"koko"}
+
 def test_tag_class():
     # test a constructor with a _class
     d=Tag.div( "toto", _class="myclass")

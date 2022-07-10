@@ -1,3 +1,7 @@
+## 0.7.2 2022/07/10
+
+ - add `tag["style"].dict.update( dict )`
+
 ## 0.7.1 "fix style & class" 2022/07/10
 
  - it works better now ;-)
