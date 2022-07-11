@@ -5,7 +5,7 @@ The 'Runners' is the htag denomination, for some classes provided with htag, to 
 For example :
 
  * [BrowserHTTP](#browserhttp) is really adapted to run your htag app with just pure python.
- * [BrowserStarletteHTTP](#browserstarlettehttp) is the perfect runner during developpement process, because it can autoreload on file changes, and it's easier to follow http interactions.
+ * [DevApp](#devapp) is the perfect runner during developpement process, because it autoreloads (and autorefreshs UI) on file changes, and it's easy to follow http interactions in devtools/console of your browser.
  * [PyWebView](#pywebview) is the perfect solution, to deliver a gui python app, as a freezed exe (embbeding the pywebview/cef).
  * [ChromeApp](#chromeapp) is the perfect solution to deliver a gui python app, with minimal footprints, because it will reuse the installed chrome of the computer.
  * [PyScript](#pyscript)" is fun, if you only have a browser (no need of python ;-), just html !
@@ -27,7 +27,7 @@ AndroidApp( App ).run()
 
 
 ## BrowserHTTP
-Run a http server, and open the default browser to render the HTag app.
+Run a http server, and open the default browser to render the HTag app. It's the only one in pure python3, and works without any dependancies (except htag ;-)
 
 Run your `App` (htag.Tag class) like this :
 
@@ -116,6 +116,28 @@ ChromeApp( App ).run()
 
  - need external libs
  - need an installed chrome
+
+## DevApp
+This is the perfect runner for development process (internally, it runs a WS server (using starlette/uvicorn), and open the default browser to render the HTag app. Because it's based on **Starlette**, this runner is an **ASGI HTag App**, which provide [a lot of features](../asgi/))
+
+But it provides features like :
+
+ - Hot reloading (reload the code, and the UI automatically)
+ - js log (in devtools/console)
+ - Display full python error (tracebacks)
+
+Run your `App` (htag.Tag class) like this :
+
+```python
+from htag.runners import DevApp
+app=DevApp( App )
+if __name__ == "__main__":
+    app.run()
+```
+
+[source](https://github.com/manatlan/htag/blob/main/htag/runners/devapp.py)
+
+It should'nt be used in production env. But it's perfect to develop your htag app easily !
 
 ## PyScript
 Run everything in client side, thanks to the marvellous [pyscript](https://pyscript.net/). Don't know if there is an utility, but it's possible ;-).
