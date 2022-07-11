@@ -37,7 +37,9 @@ def test_StrStyle():
 
     assert style.get("BackGround ") == ['yellow !important']
     assert style.contains(" bACKground ")
+    assert "BackgRound" in style
     assert not style.contains("nimp")
+    assert "nimp" not in style
 
     # old classic way, still works
     style= style+"titi:tata"
@@ -56,6 +58,9 @@ def test_StrStyle():
 def test_StrStyle_multiple():
     style= StrStyle("background: red;backGround: black")
     assert style.contains("BackGround") == 2
+    assert len(style)==2
+    assert len(style.dict)==1
+    assert "bACKground" in style
     assert style.get("background") == ["red","black"]
     style.set("background","yellow") # in fact, it "add"ing ;-)
     assert style.get("background") == ["red","black","yellow"]
@@ -95,9 +100,12 @@ def test_tag_class():
     # test a constructor with a _class
     d=Tag.div( "toto", _class="myclass")
     assert d["class"].contains("myclass")
+    assert "myclass" in d["class"]
+    assert len(d["class"])==1
     assert d["class"] == "myclass"
     d["class"].add("kiki")
     assert d["class"] == "myclass kiki"
+    assert len(d["class"])==2
 
     # test a constructor with a _class (python's list)
     d=Tag.div( "toto", _class=["myclass"])
@@ -113,6 +121,7 @@ def test_tag_class():
     d["class"].list.clear()
     assert d["class"] == ""
     assert "class" not in str(d)
+    assert len(d["class"])==0
 
     # test a constructor without a _class
     d=Tag.div( "toto" )

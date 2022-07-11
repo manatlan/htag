@@ -14,6 +14,9 @@ class StrClass:
     def contains(self,c) -> int:
         return self._ll.count(c)
 
+    def __contains__(self,kk):
+        return self.contains(kk)>0
+
     def add(self,*cc):
         for c in cc:
             if not self.contains(c):
@@ -42,6 +45,9 @@ class StrClass:
 
     def __eq__(self,x):
         return str(self)==str(x)
+
+    def __len__(self):
+        return len(self._ll)
 
     def __str__(self):
         return " ".join(self._ll)
@@ -95,6 +101,9 @@ class StrStyle:
     def contains(self,kk) -> int:
         return len(self.get(kk))
 
+    def __contains__(self,kk):
+        return self.contains(kk)>0
+
     def remove(self,kk) -> bool:
         ll=[(k,v) for k,v in self._ll if keyize(kk)==k]
         for i in ll:
@@ -110,6 +119,9 @@ class StrStyle:
 
     def __eq__(self,x):
         return str(self)==str(x)
+
+    def __len__(self):
+        return len(self._ll)
 
     def __str__(self):
         return "".join(["%s:%s;" %(k,v) for k,v in self._ll])

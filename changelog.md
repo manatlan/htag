@@ -1,3 +1,8 @@
+## 0.7.3 2022/07/11
+
+ - add `tag["style"].__contains__ & __len__`
+ - add `tag["class"].__contains__ & __len__`
+
 ## 0.7.2 2022/07/10
 
  - add `tag["style"].dict.update( dict )`

@@ -43,11 +43,12 @@ class DevApp(Starlette):
         #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
         # add a Static Template, for displaying beautiful full error on UI ;-)
         #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ #TODO: perhaps something integrated in hrenderer
+        styles={"color":"yellow","text-decoration":"none"}
         t=Tag.H.div( _style="z-index:10000000000;position:fixed;top:10px;left:10px;background:#F00;padding:8px;border:1px solid yellow" )
-        t <= Tag.H.a("X",_href="#",_onclick="this.parentNode.remove()",_style="color:yellow;text-decoration:none",_title="Forget error (skip)")
+        t <= Tag.H.a("X",_href="#",_onclick="this.parentNode.remove()",_style=styles,_title="Forget error (skip)")
         t <= " "
-        t <= Tag.H.a("REFRESH",_href="#",_onclick="window.location.reload()",_style="color:yellow;text-decoration:none",_title="Restart the UI part by refreshing it")
-        t <= Tag.H.pre()
+        t <= Tag.H.a("REFRESH",_href="#",_onclick="window.location.reload()",_style=styles,_title="Restart the UI part by refreshing it")
+        t <= Tag.H.pre(_style="overflow:auto")
         template = Tag.H.template(t,_id="DevAppError")
         #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 
