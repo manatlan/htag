@@ -8,7 +8,7 @@ class LeafLet(Tag.div):
     ]
 
     def init(self,lat:float,long:float,zoom:int=13):
-        self["style"]="height:300px;width:300px;border:1px solid red;display:inline-block"
+        self["style"]="height:300px;width:300px;border:2px solid black;display:inline-block;margin:2px;"
         self.js = f"""
 var map = L.map('{id(self)}').setView([{lat}, {long}], {zoom});
 
@@ -25,7 +25,14 @@ class App(Tag.body):
     def init(self):
         self <= LeafLet(51.505, -0.09)          #london, uk
         self <= LeafLet(42.35,-71.08)           #Boston, usa
-        self <= LeafLet(48.5734053,7.7521113)   #strasbourg, france
+
+        self(   """navigator.geolocation.getCurrentPosition((position)=>{%s});"""
+                % self.bind.add_me(b"position.coords.latitude",b"position.coords.longitude")
+        )
+
+    def add_me(self,lat,long):
+        self <= Tag.div(f"And you could be near here: ({lat},{long}):")
+        self <= LeafLet(lat,long)
 
 
 from htag.runners import DevApp
