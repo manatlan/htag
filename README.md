@@ -27,7 +27,7 @@ But yes … the promise is here : **it's a GUI toolkit for building "beautiful" 
 
 [Available on pypi.org](https://pypi.org/project/htag/)
 
-
+[Announcement on reddit (22/07/14)](https://www.reddit.com/r/Python/comments/vysnci/htag_a_new_gui_tookit_for_webdesktopandroid_from/)
 
 ## To have a look
 
