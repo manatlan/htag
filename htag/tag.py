@@ -233,6 +233,10 @@ class Caller:
         self._others=[]
         self._assigned = None
 
+        self._befores=[]
+        self._afters=[]
+
+
     def prior(self,callback:Callable,*args,**kargs):
         """ make the current (those params) first, and move the previous in _others
             (only the instance keep the same !)
@@ -258,11 +262,26 @@ class Caller:
         self.instance._callbacks_[self._assigned]=self   # save the Caller in _callbacks_ of self.instance
         return self
 
+    def __add__(self,js:str): # -> Caller
+        if not isinstance(js,str):
+            raise HTagException("Can't add non string to a Caller")
+        self._afters.append(js)
+        return self
+    def __radd__(self,js:str): # -> Caller
+        if not isinstance(js,str):
+            raise HTagException("Can't radd non string to a Caller")
+        self._befores.append(js)
+        return self
+
+
     def __str__(self) -> str:
         if not self._assigned:
             raise HTagException("Caller can't be serizalized, it's not _assign'ed to an event !")
         newargs = tuple([self._assigned]+list(self.args))
-        return str(BaseCaller(self.instance,"__on__", newargs, self.kargs))
+        bc=BaseCaller(self.instance,"__on__", newargs, self.kargs)
+        bc._befores = self._befores
+        bc._afters = self._afters
+        return str(bc)
 
 class BaseCaller:
     def __init__(self,instance, mname:StrNonable=None, args=None, kargs=None):
@@ -271,10 +290,25 @@ class BaseCaller:
         self.args = args
         self.kargs = kargs
 
+        self._befores=[]
+        self._afters=[]
+
+    def __add__(self,js:str): # -> BaseCaller
+        if not isinstance(js,str):
+            raise HTagException("Can't add non string to a BaseCaller")
+        self._afters.append(js)
+        return self
+    def __radd__(self,js:str): # -> BaseCaller
+        if not isinstance(js,str):
+            raise HTagException("Can't radd non string to a BaseCaller")
+        self._befores.append(js)
+        return self
+
     def __str__(self) -> str:
         interact=dict(id=0,method=self.mname,args=self.args,kargs=self.kargs)
         if self.instance is not None: interact["id"]=id(self.instance)
-        return f"""try{{interact( {stringify(interact)} )}} catch(e) {{_error(e,"JS")}}"""
+        gen = lambda ll: (";".join(ll))+";" if ll else ""
+        return f"""try{{{gen(self._befores)}interact( {stringify(interact)} );{gen(self._afters)}}} catch(e) {{_error(e,"JS")}}"""
 
 class Binder:
     def __init__(self,btag_instance):

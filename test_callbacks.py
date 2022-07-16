@@ -79,6 +79,39 @@ def test_multiple_binded_himself_callback():
     assert caller._others==[ (action2,(),{})]
 
 
+def test_binded_concatenate_strings(): #TODO: need more tests
+    def action1():
+        pass
+
+    s=Tag.button("hello")
+
+    s["onclick"]=s.bind( action1 )+"let x=42"
+    assert ";let x=42;}" in str(s)
+
+    s["onclick"]="let x=41"+s.bind( action1 )
+    assert "try{let x=41;" in str(s)
+
+    # can't add str to a callback not binded (logical!)
+    with pytest.raises(TypeError):
+        s["onclick"]=action1+"let x=42;"
+
+    # cant add non-str to a Caller
+    with pytest.raises(HTagException):
+        s["onclick"]=s.bind(action1)+42
+    with pytest.raises(HTagException):
+        s["onclick"]=42+s.bind(action1)
+
+    # and it works too for old binders (self.bind.<method>())
+    class A(Tag.div):
+        def init(self):
+            self <= Tag.button("1",_onclick=self.bind.action()+"let x=42")
+            self <= Tag.button("2",_onclick="let x=41"+self.bind.action())
+        def action(self):
+            pass
+    s=str(A()) # TODO: not terrible
+    assert ";let x=42;}" in s
+    assert "try{let x=41;" in s
+
 def test_binded_parent_callback(): # args/kargs
     def action():
         pass
@@ -335,4 +368,5 @@ if __name__=="__main__":
 
     # test_on_event()
     # test_ko()
-    test_try_to_bind_on_tagbase()
+    # test_try_to_bind_on_tagbase()
+    test_binded_concatenate_strings()

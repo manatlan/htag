@@ -1,3 +1,7 @@
+## 0.7.4 2022/07/16
+
+ - can add str to Caller/BaseCaller (new `self.bind(action)` and old `self.bind.<action>()` ) with `+` operator
+
 ## 0.7.3 2022/07/11
 
  - add `tag["style"].__contains__ & __len__`
