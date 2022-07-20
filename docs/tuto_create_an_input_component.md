@@ -133,7 +133,7 @@ class Test(Tag.body):
 
 You will notice that when you input bad credentials, the form is resetted to its initial values ! It's normal, because the `authent` method will modify the `Test` component's content (adding a `Tag.li` to `self`), which had the effect to force the redraw of the `Test` component on UI side !
 
-If you want to avoid this behaviour, simply add the `Tag.li` in another part of the UI, like that :
+If you want to avoid this behaviour, simply add the `Tag.li` in another part of the UI (or simply remove the last 2 lines), like that :
 
 ```python
 class Test(Tag.body):
