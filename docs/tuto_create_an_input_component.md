@@ -1,6 +1,6 @@
 # How to create your first "input" component
 
-I assume that you have the minimal bases (see tutorial). And I will show you how to create an "reactive" input field .... it's, by far, the most complex thing ;-). But it's a component which cover well all the feature of htag concepts.
+I assume that you have the minimal bases (html's crafting and events bindings). And I will show you how to create an "reactive" input field .... it's, by far, the most complex thing ;-). But it's a component which cover well all the feature of htag concepts. If you understand that : you can start to craft your own/complex components easily.
 
 Let's create a minimal htag app, which is runn'able as is (if you got the dependencies for the DevApp runner):
 
@@ -17,12 +17,9 @@ class Test(Tag.body):
 ###############################################################################    
 # the runner side
 ###############################################################################    
-from htag.runners import DevApp
-
-app=DevApp(Test)
-
 if __name__=="__main__":
-    app.run(port=10202)
+    from htag.runners import BrowserHTTP
+    BrowserHTTP(Test).run()
 
 ```
 
@@ -70,7 +67,7 @@ Assigning ` _onchange = self.myonchange` is strictly the same as `_onchange = se
 But the form `self.bind( <method>, ....)` is better when you need to send arguments. In this case, it will send the client value
 to the `myonchange` callback (using the `b"trick"` to get data from client/js side).
 
-It's better, but it will be a lot better to make it a "htag component", to be reusable in another app.
+It's better, but it will be a lot better to make it a **"htag component", to be re-usable in another htag apps**.
 
 Let's create a `MyInput component`, and reuse it from the main class `Test` like that:
 
@@ -132,8 +129,9 @@ class Test(Tag.body):
             self <= Tag.li("not the rights credentials ;-)")
         
 ```    
+**To go further**
 
-You will notice that when you input bad credentials, the form is resetted to its initial values ! It's normal, because the `authent` method will modify the `Test` component's content (adding a `Tag.li` to `self`), which had the effect to force the redraw of all the `Test` component on UI side !
+You will notice that when you input bad credentials, the form is resetted to its initial values ! It's normal, because the `authent` method will modify the `Test` component's content (adding a `Tag.li` to `self`), which had the effect to force the redraw of the `Test` component on UI side !
 
 If you want to avoid this behaviour, simply add the `Tag.li` in another part of the UI, like that :
 
