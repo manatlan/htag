@@ -1,6 +1,6 @@
 # How to create your first "input" component
 
-I assume that you have the minimal bases (html's crafting and events bindings). And I will show you how to create an "reactive" input field .... it's, by far, the most complex thing ;-). But it's a component which cover well all the feature of htag concepts. If you understand that : you can start to craft your own/complex components easily.
+I assume that you have the minimal bases (html's crafting and events bindings). And I will show you how to create an "reactive" input field .... it's, by far, the most complex thing ;-). But it's a component which cover well all the core features of htag concepts. If you understand that : you can start to craft your own/complex components easily.
 
 Let's create a minimal htag app, which is runn'able as is (if you got the dependencies for the DevApp runner):
 
