@@ -88,7 +88,7 @@ if __name__=="__main__":
 
 It will produce the same html rendering.
 
-[The tutorial to create an "input" component](tuto_create_an_input_component)
+[The tutorial to create an "input" component](/tuto_create_an_input_component/)
 
 
 ## Interactions
