@@ -4,14 +4,21 @@ from htag import Tag
 import io,base64,random
 import matplotlib.pyplot as plt
 
+class TagPlot(Tag.span):
+    def init(self,plt):
+        self["style"]="display:inline-block"
+        with io.StringIO() as fid:
+            plt.savefig(fid,format='svg',bbox_inches='tight')
+            self <= fid.getvalue()
+
 class App(Tag):
     def init(self):
-        self.img = Tag.svg(_viewBox="0 0 1000 1500")
+        self.main = Tag.div()
         self.liste=[1, 2, 5, 4]
         
         # create the layout
         self <= Tag.h3("Matplotlib test" + Tag.button("Add",_onclick=self.add_random))
-        self <= self.img
+        self <= self.main
         
         self.redraw_svg()
 
@@ -20,13 +27,12 @@ class App(Tag):
         self.redraw_svg()
 
     def redraw_svg(self):
-        plt.plot(self.liste)
         plt.ylabel('some numbers')
         plt.xlabel('size of the liste')
+        plt.plot(self.liste)
         
-        with io.StringIO() as fid:
-            plt.savefig(fid,format='svg')
-            self.img.set( fid.getvalue() )
+        self.main.clear()
+        self.main <= TagPlot(plt)
 
 if __name__=="__main__":
     from htag.runners import BrowserHTTP
