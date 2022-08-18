@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <py-env>
         - htag
+        - matplotlib
     </py-env>
 </head>
 
@@ -13,27 +14,42 @@
 
 <py-script>
 from htag import Tag
+import io,base64,random
+import matplotlib.pyplot as plt
 
-class AComponent(Tag.div):
-    def init(self,txt):
-        self <= txt
+class TagPlot(Tag.span):
+    def init(self,plt):
+        self["style"]="display:inline-block"
+        with io.StringIO() as fid:
+            plt.savefig(fid,format='svg',bbox_inches='tight')
+            self <= fid.getvalue()
 
-class Main(Tag.body):
-    statics = Tag.title("My Title")
-
+class App(Tag.body):
     def init(self):
-        self <= AComponent("htag demo in pyscript")
-        self <= Tag.button("add content",_onclick= self.test )
-        self <= Tag.button("js alert box",_onclick="alert(42)")
+        self.content = Tag.div()
+        
+        # create the layout
+        self += Tag.h2("MatPlotLib " + Tag.button("Random",_onclick=self.redraw_plt))
+        self += self.content
+        
+        self.redraw_plt()
 
-    def test(self,object):
-        self <= Tag.li("hello from pyscript")
+    def redraw_plt(self,obj=None):
+        plt.clf()
+        plt.ylabel('Some numbers')
+        plt.xlabel('Size of my list')
+        my_list=[random.randint(1,10) for i in range(random.randint(20,50))]
+        plt.plot( my_list )
+        
+        self.content.clear()
+        self.content += Tag.div(f"My list: {my_list}")
+        self.content += TagPlot(plt)
 
 ###############################################################################
 from htag.runners import PyScript
 from js import window
 
-PyScript( Main  ).run( window )
+PyScript( App ).run( window )
 
 </py-script>
 </body>
