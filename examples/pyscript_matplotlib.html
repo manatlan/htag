@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>py-script,py-env {display: none}</style>
+    <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <py-env>
+        - htag
+    </py-env>
+</head>
+
+<body> loading pyscript ;-)
+
+<py-script>
+from htag import Tag
+
+class AComponent(Tag.div):
+    def init(self,txt):
+        self <= txt
+
+class Main(Tag.body):
+    statics = Tag.title("My Title")
+
+    def init(self):
+        self <= AComponent("htag demo in pyscript")
+        self <= Tag.button("add content",_onclick= self.test )
+        self <= Tag.button("js alert box",_onclick="alert(42)")
+
+    def test(self,object):
+        self <= Tag.li("hello from pyscript")
+
+###############################################################################
+from htag.runners import PyScript
+from js import window
+
+PyScript( Main  ).run( window )
+
+</py-script>
+</body>
+</html>
