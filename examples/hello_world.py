@@ -5,8 +5,8 @@ class App(Tag.body):
     def init(self):
         self += "Hello World"
 
-from htag.runners import DevApp as Runner           # need htag+starlette+uvicorn
-#from htag.runners import BrowserHTTP as Runner     # need htag ONLY !
+from htag.runners import DevApp as Runner           # need starlette+uvicorn !!!
+#from htag.runners import BrowserHTTP as Runner
 app=Runner(App)
 if __name__=="__main__":
     app.run()
