@@ -9,8 +9,9 @@
 </a>
 
 
-A new python library to create UI (or UI toolkit), which can be rendered in anything which can render **html/js/css**.
+A new python library to create UI (or UI toolkit), which render nativly in anything which can render **html/js/css**.
 Thoses can be a browser, a pywebview, an android/apk, or anything based on cef, depending on an [htag runner](https://manatlan.github.io/htag/runners/) !
+As it's based on html/js rendering: you can easily mix powerful JS libs with powerful PY3 libs : and make powerful python apps !
 
  * For a **desktop app** : You can use the [PyWebView runner](https://manatlan.github.io/htag/runners/#pywebwiew), which will run the UI in a pywebview container (or "ChromeApp runner", in a local chrome app mode). 
  * For a **web app** : You can use the [WebHTTP runner](https://manatlan.github.io/htag/runners/#webhttp), which will run the UI in a web server, and serve the UI on client side, in a browser. 
