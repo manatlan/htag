@@ -11,29 +11,28 @@ class TagPlot(Tag.span):
             plt.savefig(fid,format='svg',bbox_inches='tight')
             self <= fid.getvalue()
 
-class App(Tag):
+class App(Tag.body):
     def init(self):
-        self.main = Tag.div()
-        self.liste=[1, 2, 5, 4]
+        self.content = Tag.div()
         
         # create the layout
-        self <= Tag.h3("Matplotlib test" + Tag.button("Add",_onclick=self.add_random))
-        self <= self.main
+        self += Tag.h2("MatPlotLib " + Tag.button("Random",_onclick=self.redraw_plt))
+        self += self.content
         
-        self.redraw_svg()
+        self.redraw_plt()
 
-    def add_random(self,o):
-        self.liste.append( random.randint(1,6))
-        self.redraw_svg()
-
-    def redraw_svg(self):
-        plt.ylabel('some numbers')
-        plt.xlabel('size of the liste')
-        plt.plot(self.liste)
+    def redraw_plt(self,obj=None):
+        plt.clf()
+        plt.ylabel('Some numbers')
+        plt.xlabel('Size of my list')
+        my_list=[random.randint(1,10) for i in range(random.randint(20,50))]
+        plt.plot( my_list )
         
-        self.main.clear()
-        self.main <= TagPlot(plt)
+        self.content.clear()
+        self.content += Tag.div(f"My list: {my_list}")
+        self.content += TagPlot(plt)
 
+from htag.runners import BrowserHTTP as Runner
+app=Runner(App)
 if __name__=="__main__":
-    from htag.runners import BrowserHTTP
-    BrowserHTTP(App).run()
+    app.run()
