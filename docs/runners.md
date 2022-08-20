@@ -8,7 +8,7 @@ For example :
  * [DevApp](#devapp) is the perfect runner during developpement process, because it autoreloads (and autorefreshs UI) on file changes, and it's easy to follow http interactions in devtools/console of your browser.
  * [PyWebView](#pywebview) is the perfect solution, to deliver a gui python app, as a freezed exe (embbeding the pywebview/cef).
  * [ChromeApp](#chromeapp) is the perfect solution to deliver a gui python app, with minimal footprints, because it will reuse the installed chrome of the computer.
- * [PyScript](#pyscript)" is fun, if you only have a browser (no need of python ;-), just html !
+ * [PyScript](#pyscript) is fun, if you only have a browser (no need of python ;-), just html !
 
 But, in all cases, your **htag app** will run in all theses runners, in the same way !
 
@@ -143,7 +143,7 @@ It should'nt be used in production env. But it's perfect to develop your htag ap
 Run everything in client side, thanks to the marvellous [pyscript](https://pyscript.net/). Don't know if there is an utility, but it's possible ;-).
 It should run OOTB, everywhere where pyscript runs.
 
-Run your `App` (htag.Tag class) like this :
+Run your `App` (htag.Tag class), in a HTML file, like this :
 
 ```python
 <!DOCTYPE html>
@@ -184,7 +184,7 @@ PyScript( App ).run( window )
 
 **Cons**
 
- - Setuping the pyscript environnement can be long.
+ - Launching the pyscript environnement can be long.
 
 ## PyWebView
 Run everything in a [pywebview](https://pywebview.flowrl.com/) instance. The ideal solution to provide a "python GUI app".
