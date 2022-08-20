@@ -120,9 +120,9 @@ class _ChromeApp:
     def __del__(self): # really important !
         try:
             self._p.kill()
+            if self.cacheFolderToRemove: shutil.rmtree(self.cacheFolderToRemove, ignore_errors=True)
         except:
             print("**ERROR**, can't kill chrome") # when chrone not installed during unittests on github
-        if self.cacheFolderToRemove: shutil.rmtree(self.cacheFolderToRemove, ignore_errors=True)
 
     #~ def _com(self, payload: dict):
         #~ """ https://chromedevtools.github.io/devtools-protocol/tot/Browser/#method-close """
