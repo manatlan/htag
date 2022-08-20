@@ -146,9 +146,31 @@ It should run OOTB, everywhere where pyscript runs.
 Run your `App` (htag.Tag class) like this :
 
 ```python
-from js import window
+<!DOCTYPE html>
+<html>
+<head>
+    <style>py-script,py-env {display: none}</style>
+    <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <py-env>
+        - htag
+    </py-env>
+</head>
+<body> loading pyscript ;-)
+<py-script>
+from htag import Tag
+
+class App(Tag.body):
+    ...
+
+###############################################################################
 from htag.runners import PyScript
+from js import window
+
 PyScript( App ).run( window )
+</py-script>
+</body>
+</html>
 ```
 
 [source](https://github.com/manatlan/htag/blob/main/htag/runners/pyscript.py)
@@ -164,7 +186,7 @@ PyScript( App ).run( window )
 
  - Setuping the pyscript environnement can be long.
 
-## PyWebWiew
+## PyWebView
 Run everything in a [pywebview](https://pywebview.flowrl.com/) instance. The ideal solution to provide a "python GUI app".
 
 Run your `App` (htag.Tag class) like this :
