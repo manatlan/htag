@@ -7,7 +7,9 @@
             "label": "build dist for pypi",
             "type": "shell",
             "command": [
-                    "python3 -m pytest . && python3 -c 'from htag import _majVersion; _majVersion()' && poetry build",
+                    "python3 -m pytest .",
+                    "&& python3 .vscode/update_version_from_toml.py",
+                    "&& poetry build"
             ],
             "group": {
                 "kind": "build",

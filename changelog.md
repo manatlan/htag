@@ -1,3 +1,6 @@
+
+ - remove the old "def _majVersion()", and put it in task/build !
+
 ## 0.7.5 "Bye bye guy !" 2022/08/20
 
   - bye bye GuyApp ... htag is free from guy !
