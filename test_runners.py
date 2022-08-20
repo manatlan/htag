@@ -18,7 +18,7 @@ def data_source():
         "BrowserStarletteWS",
         "WebHTTP",
         "PyWebWiew",
-        "ChromeApp",
+        #"ChromeApp", # need Chrome installed ;-(
         "AndroidApp",
         "BrowserTornadoHTTP",
         "PyScript",
@@ -32,7 +32,7 @@ def test_a_runner( my_runner ):
     if hasattr(mrunners,my_runner):
         runner=getattr(mrunners,my_runner)
         r=runner( MyApp )
-        # assert hasattr(r,"run")
+        assert hasattr(r,"run")
     else:
         print("can't test %s" % my_runner)
 
