@@ -166,8 +166,8 @@ class App(Tag.body):
 ###############################################################################
 from htag.runners import PyScript
 from js import window
-
 PyScript( App ).run( window )
+
 </py-script>
 </body>
 </html>
