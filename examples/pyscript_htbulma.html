@@ -36,14 +36,14 @@ class App(Tag.body):
         self.select=1
         fields=b.Fields()
         options=[1,2,3]
-        fields.addField("radio",      b.Radio(self.select, options, onchange=self.showvalue))
-        fields.addField("sb",         b.SelectButtons(self.select, options, onchange=self.showvalue) )
-        fields.addField("select",     b.Select(self.select, options, onchange=self.showvalue) )
-        fields.addField("cb",         b.Checkbox( False, "Just do it", onchange=self.showvalue))
-        fields.addField("input",      b.Input("hello", onchange=self.showvalue))
-        fields.addField("input date", b.Input(None,_type="date", onchange=self.showvalue) )
-        fields.addField("text area",  b.Textarea("world",_rows=2, onchange=self.showvalue) )
-        fields.addField("range",      b.Range(42,_min=0,_max=100, onchange=self.showvalue) )
+        fields.addField("radio",      b.Radio(self.select, options, _onchange=self.showvalue))
+        fields.addField("sb",         b.SelectButtons(self.select, options, _onchange=self.showvalue) )
+        fields.addField("select",     b.Select(self.select, options, _onchange=self.showvalue) )
+        fields.addField("cb",         b.Checkbox( False, "Just do it", _onchange=self.showvalue))
+        fields.addField("input",      b.Input("hello", _onchange=self.showvalue))
+        fields.addField("input date", b.Input(None,_type="date", _onchange=self.showvalue) )
+        fields.addField("text area",  b.Textarea("world",_rows=2, _onchange=self.showvalue) )
+        fields.addField("range",      b.Range(42,_min=0,_max=100, _onchange=self.showvalue) )
 
         filer = b.HSplit(
             b.FileSelect("/", self.load, pattern="*.py"),

@@ -1,7 +1,9 @@
 import pytest
 
+
 from htag import Tag,HTagException
 from htag.attrs import StrClass,StrStyle
+from htag.tag import NotBindedCaller
 
 def test_StrClass():
     classe = StrClass("  click  main  kik34 ")
@@ -152,9 +154,37 @@ def test_tag_style():
     assert d["style"].dict=={}
 
 
+def test_non_null_attrs():
+    t=Tag.div()
+    assert t["class"] is not None
+    assert t["style"] is not None
+
+    # all starts with "on" are not None
+    assert t["onclick"] is not None
+    assert t["on_nimp"] is not None
+
+    # all others are none
+    assert t["kiki"] is None
+
+    assert isinstance( t["class"] ,StrClass )
+    assert isinstance( t["style"] ,StrStyle )
+    assert isinstance( t["onclick"] ,NotBindedCaller )
+    assert isinstance( t["onUNKNOWN"] ,NotBindedCaller )
+
+def test_non_null_onevent():
+    def method(o):
+        pass
+    t=Tag.div()
+    assert "onunknown" not in str(t)    # stupid fact
+
+    t["onUNKNOWN"].bind( method )
+    assert "onunknown" in str(t)
+
 if __name__=="__main__":
     # test_StrClass()
-    test_StrStyle()
+    # test_StrStyle()
     # test_tag_class()
     # test_tag_style()
     # test_StrStyle_multiple()
+    #test_non_null_attrs()
+    test_non_null_onevent()

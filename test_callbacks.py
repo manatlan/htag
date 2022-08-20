@@ -173,42 +173,42 @@ def test_ko():
 
 
 
-def test_prior():
-    def action1():
-        pass
-    def action2():
-        pass
+# def test_prior():
+#     def action1():
+#         pass
+#     def action2():
+#         pass
 
-    s=Tag.button("hello")
-    callback = s.bind( action1 )
+#     s=Tag.button("hello")
+#     callback = s.bind( action1 )
 
-    #----------------------------------------
-    s["onclick"]=callback
+#     #----------------------------------------
+#     s["onclick"]=callback
 
-    assert isinstance( s["onclick"], Caller )
-    caller=s["onclick"]
-    assert caller.instance == s
-    assert caller.callback == action1   # action1 is first !
-    assert caller._others == []
-    assert caller.args == ()
-    assert caller.kargs == {}
-    assert f"onclick-{id(s)}" == caller._assigned
-    assert caller._assigned in s._callbacks_
-    assert s._callbacks_[ caller._assigned ] == caller
+#     assert isinstance( s["onclick"], Caller )
+#     caller=s["onclick"]
+#     assert caller.instance == s
+#     assert caller.callback == action1   # action1 is first !
+#     assert caller._others == []
+#     assert caller.args == ()
+#     assert caller.kargs == {}
+#     assert f"onclick-{id(s)}" == caller._assigned
+#     assert caller._assigned in s._callbacks_
+#     assert s._callbacks_[ caller._assigned ] == caller
 
-    #----------------------------------------
-    s["onclick"]=callback.prior( action2 )
+#     #----------------------------------------
+#     s["onclick"]=callback.prior( action2 )
 
-    assert isinstance( s["onclick"], Caller )
-    caller=s["onclick"]
-    assert caller.instance == s
-    assert caller.callback == action2   # action2 is now first !
-    assert caller._others[0][0] == action1 # action1 is next
-    assert caller.args == ()
-    assert caller.kargs == {}
-    assert f"onclick-{id(s)}" == caller._assigned
-    assert caller._assigned in s._callbacks_
-    assert s._callbacks_[ caller._assigned ] == caller
+#     assert isinstance( s["onclick"], Caller )
+#     caller=s["onclick"]
+#     assert caller.instance == s
+#     assert caller.callback == action2   # action2 is now first !
+#     assert caller._others[0][0] == action1 # action1 is next
+#     assert caller.args == ()
+#     assert caller.kargs == {}
+#     assert f"onclick-{id(s)}" == caller._assigned
+#     assert caller._assigned in s._callbacks_
+#     assert s._callbacks_[ caller._assigned ] == caller
 
 
 def test_on_event():

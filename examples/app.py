@@ -5,6 +5,8 @@ H=Tag.H
 """
 example, mainly for my visual tests
 
+(But NOT A GOOD EXAMPLE/PRACTICE (mainly tests with "Tag.H"! avoid that ;-))
+
 """
 
 # "https://cdn.jsdelivr.net/npm/bulma@0.8.2/css/bulma.min.css"
@@ -15,42 +17,35 @@ css=Tag.link( _href="https://cdn.jsdelivr.net/npm/bulma@0.8.2/css/bulma.min.css"
 class CptWithStars(Tag.div):
     statics=css
 
-    def __init__(self,value=0,**a):
-        super().__init__(self,**a)
-
+    def init(self,value=0):
         self.nb=value
-        self.build()
 
-    def build(self): # special method
-        self.clear()
-        self.add( H.button( "-",_onclick=self.bind.onclick(-1) ))
+    def render(self): # special method
+        self.add( Tag.button( "-",_onclick=self.bind.onclick(-1) ))
         self.add( self.nb )
-        self.add( H.button( "+",_onclick=self.bind.onclick(1) ))
+        self.add( Tag.button( "+",_onclick=self.bind.onclick(1) ))
         for i in range(self.nb):
             self.add("*")
 
     def onclick(self,v):
         self.nb+=v
-        self.build()
 
 
 class Cpt(Tag.div):
     statics=css
 
-    def __init__(self,value=0,**a):
-        super().__init__(**a)
+    def init(self,value=0):
         self.nb=value
 
-        self.ocpt = H.span( self.nb )
+        self.ocpt = Tag.span( value )
 
-        self <= H.button( "-",_onclick=self.bind.onclick(-1) )
-        self <= self.ocpt
-        self <= H.button( "+",_onclick=self.bind.onclick(1) )
+        self += Tag.button( "-",_onclick=self.bind.onclick(-1) )
+        self += self.ocpt
+        self += Tag.button( "+",_onclick=self.bind.onclick(1) )
 
     def onclick(self,v):
         self.nb+=v
-        self.ocpt.clear()
-        self.ocpt.add(self.nb)
+        self.ocpt.set(self.nb)
 
 import time,asyncio
 
@@ -59,7 +54,7 @@ class Page(Tag.body):
 
     def init(self):
         self.c1=CptWithStars(0)
-        self.c2=Cpt(0)
+        self.c2=Cpt()
 
         self.add( self.c1 )
         self.add( self.c2 )
@@ -122,16 +117,8 @@ logging.basicConfig(format='[%(levelname)-5s] %(name)s: %(message)s',level=loggi
 
 logging.getLogger("htag.tag").setLevel( logging.WARNING )
 
-from htag.runners import *
-# r=GuyApp( Page )
-# r=PyWebWiew( Page )
-# r=BrowserStarletteHTTP( Page )
-# r=BrowserStarletteWS( Page )
-# r=BrowserHTTP( Page )
-r=BrowserTornadoHTTP( Page )
-# r=DevApp( Page )
-# r=WebHTTP( Page )
-
+from htag.runners import DevApp as Runner
+r=Runner( Page )
 if __name__=="__main__":
     r.run()
 

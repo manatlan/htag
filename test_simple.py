@@ -584,6 +584,14 @@ def test_innerHTML():
     assert t.innerHTML=="42"
 
 
+def test_elements_to_str():
+    l=Tag.H.div("hello")+Tag.H.div("world")
+    assert str(l) == "<div>hello</div><div>world</div>"
+    l=Tag.H.div("hello")+42
+    assert str(l) == "<div>hello</div>42"
+    l=42+Tag.H.div("hello")
+    assert str(l) == "42<div>hello</div>"
+
 if __name__=="__main__":
 
     import logging
@@ -605,4 +613,5 @@ if __name__=="__main__":
     # test_js_call_at_init()
     # test_init_hr()
     # test_remove()
-    test_innerHTML()
+    # test_innerHTML()
+    test_elements_to_str()

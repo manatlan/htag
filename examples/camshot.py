@@ -59,7 +59,6 @@ class App(Tag.body):
 
 if __name__=="__main__":
     from htag.runners import *
-    # r=GuyApp( App )
     # r=PyWebWiew( App )
     # r=BrowserStarletteHTTP( App )
     # r=BrowserStarletteWS( App )

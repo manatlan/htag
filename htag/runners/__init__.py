@@ -7,45 +7,70 @@
 # https://github.com/manatlan/htag
 # #############################################################################
 
+class _RunnerNotFunctionnal:
+    def __init__(self,*tagClass:type):
+        raise ERROR
+
 # mono instance
 from .browserhttp import BrowserHTTP
+
+# multi instances
 from .pyscript import PyScript
+
 
 try:
     # mono instance
     from .browserstarlettehttp import BrowserStarletteHTTP
-    from .browserstarlettews import BrowserStarletteWS
-    from .devapp import DevApp                                      # special dev
+except Exception as err:
+    ERROR=err
+    class BrowserStarletteHTTP(_RunnerNotFunctionnal): pass
 
+try:
+    # mono instance
+    from .browserstarlettews import BrowserStarletteWS
+except Exception as err:
+    ERROR=err
+    class BrowserStarletteWS(_RunnerNotFunctionnal): pass
+
+try:
+    # mono instance
+    from .devapp import DevApp                                      # special dev
+except Exception as err:
+    ERROR=err
+    class DevApp(_RunnerNotFunctionnal): pass
+
+try:
     # multi instance
     from .webhttp import WebHTTP
-
-except ImportError:
-    print("**WARNING** Runners 'BrowserStarletteHTTP','BrowserStarletteWS' & 'WebHTTP' (and DevApp) not availables, you should install 'starlette' & 'uvicorn' for theses htag runners")
+except Exception as err:
+    ERROR=err
+    class WebHTTP(_RunnerNotFunctionnal): pass
 
 try:
     # mono instance (just one pywebview ;-)
     from .pywebview import PyWebWiew
-except ImportError:
-    print("**WARNING** Runner 'PyWebWiew' not available, you should install 'pywebview' for this htag runner")
-
-try:
-    # mono instance (only ! htag limitation)
-    from .guyapp import GuyApp
-except ImportError:
-    print("**WARNING** Runner 'GuyApp' not available, you should install 'guy' for this htag runner")
+except Exception as err:
+    ERROR=err
+    class PyWebWiew(_RunnerNotFunctionnal): pass
 
 try:
     # mono instance (just one chrome app instance)
     from .chromeapp import ChromeApp
-except ImportError:
-    print("**WARNING** Runner 'ChromeApp' not available, you should install 'starlette' & 'uvicorn' for this htag runner")
-
+except Exception as err:
+    ERROR=err
+    class ChromeApp(_RunnerNotFunctionnal): pass
 
 try:
     # mono instance (just one android app instance)
     from .androidapp import AndroidApp
+except Exception as err:
+    ERROR=err
+    class AndroidApp(_RunnerNotFunctionnal): pass
+
+try:
+    # mono instance
     from .browsertornadohttp import BrowserTornadoHTTP
-except ImportError:
-    print("**WARNING** Runner 'AndroidApp' & 'BrowserTornadoHTTP' not available, you should install 'tornado' for this htag runner")
+except Exception as err:
+    ERROR=err
+    class BrowserTornadoHTTP(_RunnerNotFunctionnal): pass
 

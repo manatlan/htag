@@ -45,6 +45,12 @@ class Elements(list):
         else:
             self.insert(0,elt)
         return self
+    def __str__(self):
+        return "".join([str(i) for i in self])
+
+    def __repr__(self):
+        return f"<Elements {list(self)}>"
+
 
 class TagBase:
     """ This is a class helper to produce a "HTML TAG" """
@@ -222,8 +228,42 @@ class TagCreator(type):
         else:
             return type('Tag%s' % name.capitalize(), (Tag,), {**Tag.__dict__,"tag":name})
 
-class Caller:
-    def __init__(self,instance, callback:Callable, args, kargs):
+class NotBindedCaller:
+    def __init__(self,instance,on_event):
+        self.__event = on_event
+        self.__instance=instance
+        self._befores=[]
+        self._afters=[]
+
+    def __add__(self,js:str): # -> X Caller
+        if not isinstance(js,str):
+            raise HTagException("Can't add non string to a Caller")
+        self._afters.append(js)
+        return self
+
+    def __radd__(self,js:str): # -> X Caller
+        if not isinstance(js,str):
+            raise HTagException("Can't radd non string to a Caller")
+        self._befores.append(js)
+        return self
+
+    # def add(self,js):
+    #     self.__add__(js)
+    #     return self
+
+    def bind(self,callback:Callable,*args,**kargs): #-> Caller
+        c = Caller(self.__instance,callback,args,kargs)
+        c.assignEventOnTag( self, self.__event  )
+        self.__instance[self.__event]=c
+        return c
+
+    def __str__(self):
+        return ";".join(self._befores+self._afters)
+
+
+class Caller(NotBindedCaller):
+    def __init__(self,instance, callback:Callable, args:tuple, kargs:dict):
+        super().__init__(instance,None)
         if not callable(callback): raise HTagException("The caller must be callable !")
         self.instance = instance
         self.callback = callback
@@ -233,19 +273,15 @@ class Caller:
         self._others=[]
         self._assigned = None
 
-        self._befores=[]
-        self._afters=[]
-
-
-    def prior(self,callback:Callable,*args,**kargs):
-        """ make the current (those params) first, and move the previous in _others
-            (only the instance keep the same !)
-        """
-        self._others.append( (self.callback,self.args,self.kargs) )
-        self.callback = callback
-        self.args = args
-        self.kargs = kargs
-        return self
+    # def prior(self,callback:Callable,*args,**kargs):
+    #     """ make the current (those params) first, and move the previous in _others
+    #         (only the instance keep the same !)
+    #     """
+    #     self._others.append( (self.callback,self.args,self.kargs) )
+    #     self.callback = callback
+    #     self.args = args
+    #     self.kargs = kargs
+    #     return self
 
     def bind(self,callback:Callable,*args,**kargs): # -> Caller
         if callback is None : # do nothing
@@ -262,18 +298,6 @@ class Caller:
         self.instance._callbacks_[self._assigned]=self   # save the Caller in _callbacks_ of self.instance
         return self
 
-    def __add__(self,js:str): # -> Caller
-        if not isinstance(js,str):
-            raise HTagException("Can't add non string to a Caller")
-        self._afters.append(js)
-        return self
-    def __radd__(self,js:str): # -> Caller
-        if not isinstance(js,str):
-            raise HTagException("Can't radd non string to a Caller")
-        self._befores.append(js)
-        return self
-
-
     def __str__(self) -> str:
         if not self._assigned:
             raise HTagException("Caller can't be serizalized, it's not _assign'ed to an event !")
@@ -283,26 +307,14 @@ class Caller:
         bc._afters = self._afters
         return str(bc)
 
-class BaseCaller:
+class BaseCaller(NotBindedCaller):
     def __init__(self,instance, mname:StrNonable=None, args=None, kargs=None):
+        super().__init__(instance, None)
+
         self.instance = instance
         self.mname = mname
         self.args = args
         self.kargs = kargs
-
-        self._befores=[]
-        self._afters=[]
-
-    def __add__(self,js:str): # -> BaseCaller
-        if not isinstance(js,str):
-            raise HTagException("Can't add non string to a BaseCaller")
-        self._afters.append(js)
-        return self
-    def __radd__(self,js:str): # -> BaseCaller
-        if not isinstance(js,str):
-            raise HTagException("Can't radd non string to a BaseCaller")
-        self._befores.append(js)
-        return self
 
     def __str__(self) -> str:
         interact=dict(id=0,method=self.mname,args=self.args,kargs=self.kargs)
@@ -400,6 +412,16 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
                     yield i
             else:
                 assert r is None
+
+    def __getitem__(self,attr:str) -> Any:
+        attr=attr.strip().lower()
+        r=TagBase.__getitem__(self,attr)
+        if r is None:
+            if attr.startswith("on"):
+                # self._attrs["class"]=StrClass()
+                return NotBindedCaller(self,attr)
+
+        return r
 
     def __setitem__(self,attr:str,value):
         if type(value) in [types.FunctionType,types.MethodType]:

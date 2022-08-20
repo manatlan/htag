@@ -1,3 +1,13 @@
+## 0.7.5 "Bye bye guy !" 2022/08/20
+
+  - bye bye GuyApp ... htag is free from guy !
+  - more intelligent htag.runners importing (the runner broke with the real exception, and does'nt
+    show a warning when external lib is not present)
+  - the "Elements" class (the list of tags, created using "+" operator) has now a __str__ method, and should render well ;-)
+  - the Caller.prior() method disappear (useless, and htbulma doesn't use it anymore)
+  - attrs "on[event]" are now, not None (like "style" & "class"), and can now be used/chained easier
+
+
 ## 0.7.4 2022/07/16
 
  - can add str to Caller/BaseCaller (new `self.bind(action)` and old `self.bind.<action>()` ) with `+` operator

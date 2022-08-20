@@ -8,13 +8,12 @@ def nimp(obj):
 class MyTag(Tag.span):
     def __init__(self,titre,callback):
         self.titre = titre
-        super().__init__( [titre,Tag.Button("x",_class="delete",_onclick=callback)], _class="tag",_style="margin:4px" )
+        super().__init__( titre + Tag.Button("x",_class="delete",_onclick=callback), _class="tag",_style="margin:4px" )
 
 
 class Page(Tag.body):
 
-    def __init__(self):
-        super().__init__()
+    def init(self):
 
         def ff(obj):
             self <= "ff"
@@ -76,13 +75,11 @@ class Page(Tag.body):
         yield ["c","d"]
         yield MyTag("kiki", nimp)
 
-import logging
-logging.basicConfig(format='[%(levelname)-5s] %(name)s: %(message)s',level=logging.DEBUG)
-logging.getLogger("htag.tag").setLevel( logging.INFO )
 
-# and execute it in a pywebview instance
-from htag.runners import *
-# PyWebWiew( Page ).run()
-
-# here is another runner, in a simple browser (thru ajax calls)
-BrowserHTTP( Page ).run()
+from htag.runners import DevApp as Runner
+app=Runner( Page )
+if __name__ == "__main__":
+    import logging
+    logging.basicConfig(format='[%(levelname)-5s] %(name)s: %(message)s',level=logging.DEBUG)
+    logging.getLogger("htag.tag").setLevel( logging.INFO )
+    app.run()
