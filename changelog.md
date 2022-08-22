@@ -1,5 +1,9 @@
+## 0.7.6 2022/08/22
 
+ - BIG CHANGES on how "inherited Tag" allows auto-init property & html_attribut : more consistent (need to have a "**kargs" in init/constructor)
+   (could break things on old htag app !!!)
  - remove the old "def _majVersion()", and put it in task/build !
+ - add a `__main__` on module, which just create a main.py with "hello world" app, with DevApp runner (and install uvicorn+starlette if needed)
 
 ## 0.7.5 "Bye bye guy !" 2022/08/20
 

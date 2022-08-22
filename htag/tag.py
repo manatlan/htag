@@ -377,7 +377,16 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
             attrs["_id"]=the_id   # force an @id !
             if init:
                 TagBase.__init__(self, None, **attrs)
-                init(*args,**selfs)
+                #=================================================== in v <= 0.7.5
+                # init(*args,**selfs)
+                #===================================================
+
+                #=================================================== in v > 0.7.5
+                if "hr" in kargs:
+                    del kargs["hr"]
+                init(*args,**kargs)
+                self.__dict__.update(selfs)
+                #===================================================
             else:
                 # if no own 'init' method, declare default args (selfs) as attributs instance
                 self.__dict__.update(selfs)

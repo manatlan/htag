@@ -15,7 +15,7 @@ def test_simplified_init():
     assert anon(Toto()) == '<div id="*"></div>'
 
     class Toto(Tag.div):
-        def init(self,v):
+        def init(self,v,**a):
             self.add(v)
     assert anon(Toto("hello")) == '<div id="*">hello</div>'
     assert anon(Toto("hello",_data_text='my')) == '<div data-text="my" id="*">hello</div>'
@@ -24,7 +24,7 @@ def test_simplified_init():
         Toto(js="tag.focus()")
 
     class Toto(Tag.div):
-        def init(self,v,vv=42):
+        def init(self,v,vv=42,**a):
             self.add(v)
             self.add(vv)
     assert anon(Toto("hello")) == '<div id="*">hello42</div>'
