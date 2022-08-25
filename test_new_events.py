@@ -76,8 +76,21 @@ def test_new_events(): # >0.7.4
     assert t["onclick"]._afters == ["var x=41"]
     assert len(t["onclick"]._others ) == 1
 
+def test_base():
+    def test():
+        print("kkk")
 
+    b=Tag.button("hello")
+    b["onclick"] = test
+    assert ' onclick="try{interact' in str(b)
 
+    b=Tag.button("hello")
+    b["onclick"] = b.bind( test )
+    assert ' onclick="try{interact' in str(b)
+
+    b=Tag.button("hello")
+    b["onclick"].bind( test )
+    assert ' onclick="try{interact' in str(b)
 
 if __name__=="__main__":
 
