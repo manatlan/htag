@@ -1,3 +1,9 @@
+## 0.7.7 "pyscript for one htag class only" 2022/08/27
+
+ - Runner `PyScript` don't accept multiple htag classes anymore ! Just one (like others !)
+   (the feature can be done with a simple htag.Tag component (see `examples/navigate_with_hashchange.py`, see Example2 (at top level))
+ - So `WebHTTP` runner is the last to accept multiple htag'classes ...
+
 ## 0.7.6 2022/08/22
 
  - BIG CHANGES on how "inherited Tag" allows auto-init property & html_attribut : more consistent (need to have a "**kargs" in init/constructor)

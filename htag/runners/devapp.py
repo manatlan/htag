@@ -10,8 +10,7 @@
 from .. import Tag
 from ..render import HRenderer
 
-import threading
-import os,json
+import os,json,sys,asyncio
 from starlette.applications import Starlette
 from starlette.responses import HTMLResponse
 from starlette.routing import Route,WebSocketRoute
@@ -77,7 +76,8 @@ ws.onmessage = function(e) {
     action( data );
 };
 """
-        self.renderer=HRenderer(tagClass, js, lambda: os._exit(0), fullerror=True, statics=[template,])
+
+        self.renderer=HRenderer(tagClass, js, self.killme, fullerror=True, statics=[template,])
 
         class WsInteract(WebSocketEndpoint):
             encoding = "json"
@@ -118,4 +118,22 @@ ws.onmessage = function(e) {
 
         if openBrowser:
             webbrowser.open_new_tab(url)
-        uvicorn.run(fileapp,host=host,port=port,reload=True,debug=True)
+
+        loop = asyncio.get_event_loop()
+
+        uvicorn.run(fileapp,host=host,port=port,reload=True,debug=True,loop=loop)
+        # config = uvicorn.Config(self,host=host,port=port,reload=True,debug=True)
+        # server = uvicorn.Server(config=config)
+        # loop = asyncio.get_event_loop()
+        # loop.run_until_complete(server.run())
+        # server.run()
+
+    def killme(self):
+        print("EXIT")
+        # try:
+        #     DevApp.server.should_exit = True
+        #     DevApp.server.force_exit = True
+        #     os._exit(0)
+        # except:
+        #     pass
+
