@@ -119,9 +119,8 @@ ws.onmessage = function(e) {
         if openBrowser:
             webbrowser.open_new_tab(url)
 
-        loop = asyncio.get_event_loop()
-
-        uvicorn.run(fileapp,host=host,port=port,reload=True,debug=True,loop=loop)
+        uvicorn.run(fileapp,host=host,port=port,reload=True,debug=True)
+        
         # config = uvicorn.Config(self,host=host,port=port,reload=True,debug=True)
         # server = uvicorn.Server(config=config)
         # loop = asyncio.get_event_loop()

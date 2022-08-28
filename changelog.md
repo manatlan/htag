@@ -1,3 +1,8 @@
+## 0.7.8 2022/08/28
+
+ - runner `DevApp` can work again on chromebook/penguin (no more weakref/loop/asyncio pickable trouble)
+
+
 ## 0.7.7 "pyscript for one htag class only" 2022/08/27
 
  - Runner `PyScript` don't accept multiple htag classes anymore ! Just one (like others !)
