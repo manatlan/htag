@@ -12,6 +12,11 @@ For example :
 
 But, in all cases, your **htag app** will run in all theses runners, in the same way !
 
+
+
+
+
+
 ## AndroidApp
 Run a tornado webserver, and open the kivy webview, in an android context, to render the HTag app ([Here you will find recipes](https://github.com/manatlan/htagapk)) ! And it's simple !
 
@@ -22,7 +27,18 @@ from htag.runners import AndroidApp
 AndroidApp( App ).run()
 ```
 
+**nb**
+
+ - the app should (TODO: test it !) `self.exit()`
+
+
 [source](https://github.com/manatlan/htag/blob/main/htag/runners/androidapp.py)
+
+
+
+
+
+
 
 
 
@@ -42,10 +58,18 @@ BrowserHTTP( App ).run()
 
  - Use only python included battery (no need of others libs)
  - debugging is simple (can see http exchanges in the browser dev tools)
+ - the app can `self.exit()`
+ - Understand [query params from url](../url/) to instanciate the main htag class
 
 **Cons**
 
  - the http server is not robust at all
+
+
+
+
+
+
 
 ## BrowserStarletteHTTP
 Run a http server (using starlette/uvicorn), and open the default browser to render the HTag app. Because it's based on **Starlette**, this runner is an **ASGI HTag App**, which provide [a lot of features](../asgi/)
@@ -65,10 +89,18 @@ BrowserStarletteHTTP( App ).run()
  - the http server is (ultra) robust
  - debugging is simple (can see http exchanges in the browser dev tools)
  - [can use uvicorn reloader](https://github.com/manatlan/htag/blob/main/examples/autoreload.py), useful during dev process !
+ - the app can `self.exit()`
+ - Understand [query params from url](../url/) to instanciate the main htag class
+
 
 **Cons**
 
  - need external libs
+
+
+
+
+
 
 
 ## BrowserStarletteWS
@@ -87,11 +119,21 @@ BrowserStarletteWS( App ).run()
 
  - the WS server is (ultra) robust
  - [can use uvicorn reloader](https://github.com/manatlan/htag/blob/main/examples/autoreload.py), useful during dev process !
+ - and [a lot of features](../asgi/), because it's astarlette/asgi.
+ - the app can `self.exit()`
+ - Understand [query params from url](../url/) to instanciate the main htag class
+
 
 **Cons**
 
  - need external libs
  - debugging is not simple (can see ws exchanges are not visible in the browser dev tools)
+
+
+
+
+
+
 
 
 ## ChromeApp
@@ -111,11 +153,20 @@ ChromeApp( App ).run()
  - the http server is (ultra) robust
  - debugging is simple (can see http exchanges in the browser dev tools)
  - looks like a cef/electron app, without cef (reuse installed chrome)
+ - the app can `self.exit()`
+ - and [a lot of features](../asgi/), because it's astarlette/asgi.
+ - Understand [query params from url](../url/) to instanciate the main htag class
 
 **Cons**
 
  - need external libs
  - need an installed chrome
+
+
+
+
+
+
 
 ## DevApp
 This is the perfect runner for development process (internally, it runs a WS server (using starlette/uvicorn), and open the default browser to render the HTag app. Because it's based on **Starlette**, this runner is an **ASGI HTag App**, which provide [a lot of features](../asgi/))
@@ -125,6 +176,9 @@ But it provides features like :
  - Hot reloading (reload the code, and the UI automatically)
  - js log (in devtools/console)
  - Display full python error (tracebacks)
+ - but CAN'T use `self.exit()` (coz uvicorn/reloader is hard to quit, but in the future : it should be possible)
+ - and [a lot of features](../asgi/), because it's astarlette/asgi.
+ - Understand [query params from url](../url/) to instanciate the main htag class
 
 Run your `App` (htag.Tag class) like this :
 
@@ -138,6 +192,14 @@ if __name__ == "__main__":
 [source](https://github.com/manatlan/htag/blob/main/htag/runners/devapp.py)
 
 It should'nt be used in production env. But it's perfect to develop your htag app easily !
+
+
+
+
+
+
+
+
 
 ## PyScript
 Run everything in client side, thanks to the marvellous [pyscript](https://pyscript.net/). Don't know if there is an utility, but it's possible ;-).
@@ -185,14 +247,26 @@ PyScript( App ).run( window )
 
  - Launching the pyscript environnement can be long.
 
+
+
+
+
+
+
+
+
+
+
+
+
 ## PyWebView
 Run everything in a [pywebview](https://pywebview.flowrl.com/) instance. The ideal solution to provide a "python GUI app".
 
 Run your `App` (htag.Tag class) like this :
 
 ```python
-from htag.runners import PyWebWiew
-PyWebWiew( App ).run()
+from htag.runners import PyWebView
+PyWebView( App ).run()
 ```
 
 
@@ -201,11 +275,23 @@ PyWebWiew( App ).run()
 **Pros**
 
  - Interactions are INPROC.
+ - the app can `self.exit()`
+
 
 **Cons**
 
  - til pywebview [doesn't support async calls](https://github.com/r0x0r/pywebview/issues/867), full htag features (async) will not be available ;-(
  - need external libs
+
+
+
+
+
+
+
+
+
+
 
 ## BrowserTornadoHTTP
 Run a http server (using tornado), and open the default browser to render the HTag app.
@@ -224,10 +310,25 @@ BrowserTornadoHTTP( App ).run()
 
  - the http server is robust
  - debugging is simple (can see http exchanges in the browser dev tools)
+ - the app can `self.exit()`
+ - and [a lot of features](../asgi/), because it's astarlette/asgi.
+ - Understand [query params from url](../url/) to instanciate the main htag class
 
 **Cons**
 
  - need external libs
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## WebHTTP
 Run a http server (using starlette/uvicorn), and serve the htag app to any browser.
@@ -244,18 +345,42 @@ WebHTTP( App ).run()
 
 **Pros**
 
- - can handle session (multi users)
- - can handle multiple htag objects (with url)
+ - can handle session (multiple users)
  - the http server is (ultra) robust
  - debugging is simple (can see http exchanges in the browser dev tools)
  - [can use uvicorn reloader](https://github.com/manatlan/htag/blob/main/examples/autoreload.py), useful during dev process !
+ - and [a lot of features](../asgi/), because it's astarlette/asgi.
+ - the app can't `self.exit()` (for secutiry reasons)
+ - Understand [query params from url](../url/) to instanciate the main htag class
+
 
 **Cons**
 
  - need external libs
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 ## Summary
+
+ | Features :                             | AndroidApp | BrowserHTTP | BrowserStarletteHTTP | BrowserStarletteWS | ChromeApp | DevApp | PyScript | PyWebView | BrowserTornadoHTTP | WebHTTP |
+ |:---------------------------------------|:----------:|:-----------:|:--------------------:|:------------------:|:---------:|:------:|:--------:|:---------:|:------------------:|:-------:|
+ | Work without external libs             |            | yes         |                      |                    |           |        | yes      |           |                    |         |
+ | Work on android                        | yes        |             |                      |                    |           |        | yes      |           |                    |         |
+ | Is ASGI/Starlette/uvicorn based        |            |             | yes                  | yes                | yes       | yes    |          |           |                    | yes     |
+ | Can `self.exit()`                      | (should)   | yes         | yes                  | yes                | yes       | no ;-( |          | yes       |  yes               | no      |
+ | Can use url query params               |            | yes         | yes                  | yes                | yes       | yes    |          |           |  yes               | yes     |
+
 
 Htag provides somes [`runners`](https://github.com/manatlan/htag/runners) ootb. But they are just here for the show. IRL: you should build your own, for your needs.
 
