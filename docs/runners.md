@@ -242,6 +242,8 @@ PyScript( App ).run( window )
  - you only need a browser ;-)
  - Interactions are INPROC.
  - no need of external libs
+ - Understand [query params from url](../url/) to instanciate the main htag class
+
 
 **Cons**
 
@@ -379,7 +381,7 @@ WebHTTP( App ).run()
  | Work on android                        | yes        |             |                      |                    |           |        | yes      |           |                    |         |
  | Is ASGI/Starlette/uvicorn based        |            |             | yes                  | yes                | yes       | yes    |          |           |                    | yes     |
  | Can `self.exit()`                      | (should)   | yes         | yes                  | yes                | yes       | no ;-( |          | yes       |  yes               | no      |
- | Can use url query params               |            | yes         | yes                  | yes                | yes       | yes    |          |           |  yes               | yes     |
+ | Can use url query params               |            | yes         | yes                  | yes                | yes       | yes    | yes      |           |  yes               | yes     |
 
 
 Htag provides somes [`runners`](https://github.com/manatlan/htag/runners) ootb. But they are just here for the show. IRL: you should build your own, for your needs.
