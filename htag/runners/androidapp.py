@@ -10,6 +10,7 @@
 
 from htag import Tag
 from htag.render import HRenderer
+from . import common
 
 import os,json,asyncio
 
@@ -32,6 +33,7 @@ class WebServer(Thread): # the webserver is ran on a separated thread
 
         class MainHandler(tornado.web.RequestHandler):
             async def get(this):
+                self.instance.instanciate( str(this.request.uri)  )
                 this.write( str(self.instance.renderer) )
             async def post(this):
                 data = json.loads( this.request.body.decode() )
@@ -54,6 +56,14 @@ class AndroidApp:
     def __init__(self,tagClass:type):
         assert issubclass(tagClass,Tag)
 
+        self.renderer=None
+        self.tagClass=tagClass
+
+    def instanciate(self,url:str):
+        init = common.url2ak(url)
+        if self.renderer and self.renderer.init == init:
+            return self.renderer
+
         js = """
 async function interact( o ) {
     action( await (await window.fetch("/",{method:"POST", body:JSON.stringify(o)})).json() )
@@ -61,10 +71,13 @@ async function interact( o ) {
 
 window.addEventListener('DOMContentLoaded', start );
 """
+        hr=HRenderer(self.tagClass, js, self.go_exit, init=init)
+        self.renderer=hr
+        return hr
 
-        self.renderer=HRenderer(tagClass, js, lambda: os._exit(0) )
 
-
+    def go_exit(self):
+        os._exit(0)
 
     def run(self): # basically, the same code as guy.runAndroid()
         host,port= "127.0.0.1", 12458
@@ -110,6 +123,13 @@ window.addEventListener('DOMContentLoaded', start );
                 self.f2 = self.create_webview               # ! important
                 super(Wv, self).__init__()
                 self.visible = False
+
+                def exit_app(*a,**k):
+                    activity.finish()
+                    App.get_running_app().stop()
+                    os._exit(0)
+
+                runner.go_exit = exit_app
 
                 runner.server.start()                       # ! important
 

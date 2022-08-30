@@ -30,7 +30,7 @@ AndroidApp( App ).run()
 **nb**
 
  - the app should (TODO: test it !) `self.exit()`
-
+ - Understand [query params from url](../url/) to instanciate the main htag class
 
 [source](https://github.com/manatlan/htag/blob/main/htag/runners/androidapp.py)
 
@@ -380,8 +380,8 @@ WebHTTP( App ).run()
  | Work without external libs             |            | yes         |                      |                    |           |        | yes      |           |                    |         |
  | Work on android                        | yes        |             |                      |                    |           |        | yes      |           |                    |         |
  | Is ASGI/Starlette/uvicorn based        |            |             | yes                  | yes                | yes       | yes    |          |           |                    | yes     |
- | Can `self.exit()`                      | (should)   | yes         | yes                  | yes                | yes       | no ;-( |          | yes       |  yes               | no      |
- | Can use url query params               |            | yes         | yes                  | yes                | yes       | yes    | yes      |           |  yes               | yes     |
+ | Can `self.exit()`                      | (should)   | yes         | yes                  | yes                | yes       | no ;-( |          | yes       |  yes               | no!     |
+ | Can use url query params               | yes        | yes         | yes                  | yes                | yes       | yes    | yes      |           |  yes               | yes     |
 
 
 Htag provides somes [`runners`](https://github.com/manatlan/htag/runners) ootb. But they are just here for the show. IRL: you should build your own, for your needs.

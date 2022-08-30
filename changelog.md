@@ -1,10 +1,11 @@
-## 0.8.0 ** IN PROGRESS **
+## 0.8.0 "Runners tour" ** IN PROGRESS **
 
  - All runners only accept only one Htag class by default : simpler !
+ - Runner `AndroidApp` could `self.exit()` (to test !)
  - Runner `ChromeApp` accept port (`app.run(port=9999)`)
  - Runner `WebHTTP` don't accept multiple htag classes anymore ! Just one (like others !), but got a `serve(...)` method  to allow to hook new http endpoints on others Htag Class (using starlette.add_route(...)): giving a lot more of possibilities ;-)
  - Runner `DevApp` (like WebHTTP) provide a `serve(...)` method, (so you can dev WebHTTP app with DevApp)
- - all runners (except `PyWebView` and `AndroidApp`) accept query params from url !!! (ex: "/?John%20Doey&p=1" -> (("John Doe",{p:1}) -> can call TagClass(self,name,p=None) )
+ - all runners (except `PyWebView`) accept query params from url !!! (ex: "/?John%20Doey&p=1" -> (("John Doe",{p:1}) -> can call TagClass(name,p=None) )
    (in the past, only WebHTTP could, but it was complicate). IT WAS MY MOST WANTED/NEEDED FEATURE ;-)
    (All runners manage only one "htag instance" (except WebHTTP, which can serve multiple clients))
  - the `__main__` on module, create an empty app, with DevApp (if it can pip) or BrowserHTTP (if not)
