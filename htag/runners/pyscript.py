@@ -9,6 +9,7 @@
 
 from .. import Tag
 from ..render import HRenderer
+from . import common
 
 import json
 
@@ -16,16 +17,17 @@ class PyScript:
 
     def __init__(self,tagClass:type):
         assert issubclass(tagClass,Tag)
+        self.tagClass=tagClass
+
+    def run(self,window): # window: "pyscript js.window"
 
         js = """
 interact=async function(o) {
  let actions = await window.interactions( JSON.stringify(o) );
  action( JSON.parse(actions) )
 }"""
-        self.hr = HRenderer(tagClass, js)
+        self.hr = HRenderer(self.tagClass, js, init=common.url2ak( window.document.location.href ))
 
-
-    def run(self,window): # window: "pyscript js.window"
         window.interactions = self.interactions
         assert window.document.head, "No <head> in <html>"
         assert window.document.body, "No <body> in <html>"
