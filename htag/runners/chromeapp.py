@@ -10,6 +10,7 @@
 
 from .. import Tag
 from ..render import HRenderer
+from . import common
 
 import os
 
@@ -149,17 +150,12 @@ class ChromeApp:
     def __init__(self,tagClass:type):
         assert issubclass(tagClass,Tag)
 
-        js = """
-async function interact( o ) {
-    action( await (await window.fetch("/",{method:"POST", body:JSON.stringify(o)})).json() )
-}
+        self.hrenderer = None
+        self.tagClass = tagClass
 
-window.addEventListener('DOMContentLoaded', start );
-"""
-
-        host,port= "127.0.0.1", 8707
+    def _run_the_base(self,port=8707):
+        host = "127.0.0.1"
         self._chromeapp = _ChromeApp(f"http://{host}:{port}",size=(800,600))
-        self.renderer=HRenderer(tagClass, js, self._chromeapp.exit )
 
         asgi=Starlette(debug=True, routes=[
             Route('/', self.GET, methods=["GET"]),
@@ -168,15 +164,33 @@ window.addEventListener('DOMContentLoaded', start );
 
         self._server = threading.Thread(name='ChromeAppServer', target=uvicorn.run,args=(asgi,),kwargs=dict(host=host, port=port))
 
+
+    def instanciate(self,url:str):
+        init = common.url2ak(url)
+        if self.hrenderer and self.hrenderer.init == init:
+            return self.hrenderer
+
+        js = """
+async function interact( o ) {
+    action( await (await window.fetch("/",{method:"POST", body:JSON.stringify(o)})).json() )
+}
+
+window.addEventListener('DOMContentLoaded', start );
+"""
+        return HRenderer(self.tagClass, js, self._chromeapp.exit, init=init )
+
+
     async def GET(self,request) -> HTMLResponse:
-        return HTMLResponse( str(self.renderer) )
+        self.hrenderer = self.instanciate( str(request.url) )
+        return HTMLResponse( str(self.hrenderer) )
 
     async def POST(self,request) -> JSONResponse:
         data = await request.json()
-        dico = await self.renderer.interact(data["id"],data["method"],data["args"],data["kargs"])
+        dico = await self.hrenderer.interact(data["id"],data["method"],data["args"],data["kargs"])
         return JSONResponse(dico)
 
-    def run(self):
+    def run(self,port=8707):
+        self._run_the_base(port)
         self._server.start()
         self._chromeapp.wait()
         os._exit(0) # to force quit the thread/uvicorn server

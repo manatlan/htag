@@ -9,6 +9,7 @@
 
 from .. import Tag
 from ..render import HRenderer
+from . import common
 
 import os
 
@@ -26,6 +27,19 @@ class BrowserStarletteHTTP(Starlette):
     def __init__(self,tagClass:type):
         assert issubclass(tagClass,Tag)
 
+        self.hrenderer = None
+        self.tagClass = tagClass
+
+        Starlette.__init__(self,debug=True, routes=[
+            Route('/', self.GET, methods=["GET"]),
+            Route('/', self.POST, methods=["POST"]),
+        ])
+
+    def instanciate(self,url:str):
+        init = common.url2ak(url)
+        if self.hrenderer and self.hrenderer.init == init:
+            return self.hrenderer
+
         js = """
 async function interact( o ) {
     action( await (await window.fetch("/",{method:"POST", body:JSON.stringify(o)})).json() )
@@ -34,19 +48,15 @@ async function interact( o ) {
 window.addEventListener('DOMContentLoaded', start );
 """
 
-        self.renderer=HRenderer(tagClass, js, lambda: os._exit(0))
-
-        Starlette.__init__(self,debug=True, routes=[
-            Route('/', self.GET, methods=["GET"]),
-            Route('/', self.POST, methods=["POST"]),
-        ])
+        return HRenderer(self.tagClass, js, lambda: os._exit(0), init=init)
 
     async def GET(self,request) -> HTMLResponse:
-        return HTMLResponse( str(self.renderer) )
+        self.hrenderer = self.instanciate( str(request.url) )
+        return HTMLResponse( str(self.hrenderer) )
 
     async def POST(self,request) -> JSONResponse:
         data = await request.json()
-        dico = await self.renderer.interact(data["id"],data["method"],data["args"],data["kargs"])
+        dico = await self.hrenderer.interact(data["id"],data["method"],data["args"],data["kargs"])
         return JSONResponse(dico)
 
     def run(self, host="127.0.0.1", port=8000, openBrowser=True):   # localhost, by default !!

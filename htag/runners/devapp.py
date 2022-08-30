@@ -9,6 +9,7 @@
 
 from .. import Tag
 from ..render import HRenderer
+from . import common
 
 import os,json,sys,asyncio
 from starlette.applications import Starlette
@@ -39,6 +40,31 @@ class DevApp(Starlette):
     def __init__(self,tagClass:type):
         assert issubclass(tagClass,Tag)
 
+        self.hrenderers={}
+        self.tagClass=tagClass
+
+        class WsInteract(WebSocketEndpoint):
+            encoding = "json"
+
+            async def on_receive(this, websocket, data):
+                className = data["class"]
+                actions = await self.hrenderers[className].interact(data["id"],data["method"],data["args"],data["kargs"])
+                await websocket.send_text( json.dumps(actions) )
+
+        Starlette.__init__(self,debug=True, routes=[
+            Route('/', self.GET, methods=["GET"]),
+            WebSocketRoute("/ws", WsInteract),
+        ])
+
+
+    def instanciate(self, tagClass, init):
+        """ intanciate or reuse """
+        className = tagClass.__name__
+
+        if className in self.hrenderers and self.hrenderers[className].init == init:
+            # the current version has already be initialized, we return the saved instance
+            return self.hrenderers[className]
+
         #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
         # add a Static Template, for displaying beautiful full error on UI ;-)
         #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ #TODO: perhaps something integrated in hrenderer
@@ -51,7 +77,6 @@ class DevApp(Starlette):
         template = Tag.H.template(t,_id="DevAppError")
         #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 
-
         js = """
 
 window.error=function(txt) {
@@ -61,6 +86,7 @@ window.error=function(txt) {
 }
 
 async function interact( o ) {
+    o["class"] = "%s";
     let packet = JSON.stringify(o)
     console.info("[htag interact]",packet.length,o)
     ws.send( packet );
@@ -75,25 +101,34 @@ ws.onmessage = function(e) {
     console.info("[htag action]",e.data.length,data)
     action( data );
 };
-"""
-
-        self.renderer=HRenderer(tagClass, js, self.killme, fullerror=True, statics=[template,])
-
-        class WsInteract(WebSocketEndpoint):
-            encoding = "json"
-
-            async def on_receive(this, websocket, data):
-                actions = await self.renderer.interact(data["id"],data["method"],data["args"],data["kargs"])
-                await websocket.send_text( json.dumps(actions) )
-
-        Starlette.__init__(self,debug=True, routes=[
-            Route('/', self.GET, methods=["GET"]),
-            WebSocketRoute("/ws", WsInteract),
-        ])
+""" % className
+        self.hrenderers[className]=HRenderer(tagClass, js, self.killme, fullerror=True, statics=[template,], init=init)
+        return self.hrenderers[className]
 
 
     async def GET(self,request):
-        return HTMLResponse( str(self.renderer) )
+        return self.serve(request, self.tagClass )
+
+    def serve(self,request, klass, init=None) -> HTMLResponse:
+        """ Serve for the `request`, an instance of the class 'klass'
+        initialized with `init` (tuple (*args,**kargs))
+        if init is None : takes them from request.url ;-)
+
+        return an htmlresponse (htag init page to start all)
+        """
+        if init is None:
+            # no init params
+            # so we take thoses from the url
+            init = common.url2ak( str(request.url) )
+        else:
+            assert type(init)==tuple
+            assert type(init[0])==tuple
+            assert type(init[1])==dict
+
+        hr = self.instanciate( klass, init )
+
+        return HTMLResponse( str(hr) )
+
 
     def run(self, host="127.0.0.1", port=8000, openBrowser=True):   # localhost, by default !!
         import uvicorn,webbrowser
@@ -120,7 +155,7 @@ ws.onmessage = function(e) {
             webbrowser.open_new_tab(url)
 
         uvicorn.run(fileapp,host=host,port=port,reload=True,debug=True)
-        
+
         # config = uvicorn.Config(self,host=host,port=port,reload=True,debug=True)
         # server = uvicorn.Server(config=config)
         # loop = asyncio.get_event_loop()
@@ -128,11 +163,6 @@ ws.onmessage = function(e) {
         # server.run()
 
     def killme(self):
-        print("EXIT")
-        # try:
-        #     DevApp.server.should_exit = True
-        #     DevApp.server.force_exit = True
-        #     os._exit(0)
-        # except:
-        #     pass
+        #TODO: exit() should work on devapp
+        os._exit(0) # but not, coz uvicorn restart the dead process in reloader mode
 

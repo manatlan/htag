@@ -89,6 +89,7 @@ class HRenderer:
         if not isinstance(statics, list): raise HTagException("HRenderer statics should be a list !")
         self.fullerror = fullerror
         self._interaction_scripts=[]
+        self.init = tuple( [tuple(init[0]),dict(init[1])] ) # save args/kargs whose initialized the instance
 
         try:
             args,kargs = init

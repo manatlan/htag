@@ -9,6 +9,7 @@
 
 from .. import Tag
 from ..render import HRenderer
+from . import common
 
 import asyncio
 import socket
@@ -25,6 +26,14 @@ class BrowserHTTP:
     def __init__(self,tagClass:type):
         assert issubclass(tagClass,Tag)
 
+        self.hrenderer=None
+        self.tagClass=tagClass
+
+    def instanciate(self,url:str):
+        init = common.url2ak(url)
+        if self.hrenderer and self.hrenderer.init == init:
+            return self.hrenderer
+
         js = """
 async function interact( o ) {
     action( await (await window.fetch("/",{method:"POST", body:JSON.stringify(o)})).json() )
@@ -32,8 +41,7 @@ async function interact( o ) {
 
 window.addEventListener('DOMContentLoaded', start );
 """
-
-        self.renderer=HRenderer(tagClass, js, lambda: os._exit(0))
+        return HRenderer(self.tagClass, js, lambda: os._exit(0), init=init)
 
     def run(self, host="127.0.0.1", port=8000, openBrowser=True ):   # localhost, by default !!
         """
@@ -62,13 +70,16 @@ window.addEventListener('DOMContentLoaded', start );
 
 
             try:
-                if req.startswith(b"GET / HTTP"):
+                # if req.startswith(b"GET / HTTP"):
+                if req.startswith(b"GET /"):
+                    url=req.decode()[4:].split(" HTTP")[0]
+                    self.hrenderer = self.instanciate(url)
                     resp = make_header()
-                    resp += str(self.renderer)
+                    resp += str(self.hrenderer)
                 elif req.startswith(b"POST / HTTP"):
                     _,content = req.split(b"\r\n\r\n")
                     data = json.loads(content.decode())
-                    dico = await self.renderer.interact(data["id"],data["method"],data["args"],data["kargs"] )
+                    dico = await self.hrenderer.interact(data["id"],data["method"],data["args"],data["kargs"] )
                     resp = make_header("application/json")
                     resp += json.dumps(dico)
                 else:
