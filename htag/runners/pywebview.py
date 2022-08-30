@@ -24,7 +24,7 @@ it can't work for "async generator" with the asyncio.run() trick (line 50)
 """
 #window.addEventListener('pywebviewready', async function() { await window.pywebview.api.start() });
 
-class PyWebWiew:
+class PyWebView:
     """ Open the rendering in a pywebview instance
         Interactions with builtin pywebview.api ;-)
     """

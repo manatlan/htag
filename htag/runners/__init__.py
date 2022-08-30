@@ -49,7 +49,8 @@ except Exception as err:
 
 try:
     # mono instance (just one pywebview ;-)
-    from .pywebview import PyWebWiew
+    from .pywebview import PyWebView
+    from .pywebview import PyWebView as PyWebWiew
 except Exception as err:
     ERROR=err
     class PyWebWiew(_RunnerNotFunctionnal): pass

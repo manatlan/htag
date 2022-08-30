@@ -17,7 +17,8 @@ def data_source():
         "BrowserStarletteHTTP",
         "BrowserStarletteWS",
         "WebHTTP",
-        "PyWebWiew",
+        "PyWebWiew",    # before 0.8.0 (mispelling)
+        "PyWebView",
         #"ChromeApp", # need Chrome installed ;-(
         "AndroidApp",
         "BrowserTornadoHTTP",
