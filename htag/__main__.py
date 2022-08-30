@@ -7,19 +7,27 @@
 # https://github.com/manatlan/htag
 # #############################################################################
 
-import pip,os,stat
+import os,stat
 
-# install uvicorn if not present (for DevApp mode)
 try:
-    import uvicorn
-except ImportError as e:
-    pip.main(['install', 'uvicorn'])
+    import pip
 
-# install starlette if not present (for DevApp mode)
-try:
-    import starlette
-except ImportError as e:
-    pip.main(['install', 'starlette'])
+    # install uvicorn if not present (for DevApp mode)
+    try:
+        import uvicorn
+    except ImportError as e:
+        pip.main(['install', 'uvicorn[standard]'])
+
+    # install starlette if not present (for DevApp mode)
+    try:
+        import starlette
+    except ImportError as e:
+        pip.main(['install', 'starlette'])
+
+    devappmode = True
+except:
+    devappmode = False
+
 
 code = """
 # -*- coding: utf-8 -*-
@@ -34,14 +42,14 @@ class App(Tag.body):
         self += "Hello World"
 
 #=================================================================================
-from htag.runners import DevApp as Runner
+%s
 # from htag.runners import BrowserHTTP as Runner
 # from htag.runners import ChromeApp as Runner
 
 app=Runner(App)
 if __name__=="__main__":
     app.run()
-"""
+""" % (devappmode and "from htag.runners import DevApp as Runner" or "from htag.runners import BrowserHTTP as Runner")
 
 newfile = "main.py"
 

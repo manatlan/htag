@@ -7,6 +7,7 @@
  - all runners (except `PyWebView`, `PyScript` and `AndroidApp`) accept query params from url !!! (ex: "/?John%20Doey&p=1" -> (("John Doe",{p:1}) -> can call TagClass(self,name,p=None) )
    (in the past, only WebHTTP could, but it was complicate). IT WAS MY MOST WANTED/NEEDED FEATURE ;-)
    (All runners manage only one "htag instance" (except WebHTTP, which can serve multiple clients))
+ - the `__main__` on module, create an empty app, with DevApp (if it can pip) or BrowserHTTP (if not)
 
 ## 0.7.8 2022/08/28
 
