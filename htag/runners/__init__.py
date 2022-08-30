@@ -11,6 +11,7 @@ class _RunnerNotFunctionnal:
     def __init__(self,*tagClass:type):
         raise ERROR
 
+
 # mono instance
 from .browserhttp import BrowserHTTP
 

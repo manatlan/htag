@@ -9,6 +9,9 @@
 
 from .. import Tag
 from ..render import HRenderer
+from . import common
+
+
 
 """ REAL WEB http,
 - .exit() has no effect ;-)
@@ -34,17 +37,15 @@ class WebHTTP(Starlette):
 
         The instance is an ASGI htag app
     """
-    def __init__(self,*classes, timeout=5*60):
-        assert len(classes)>0
-        assert all( [issubclass(i,Tag) for i in classes] )
-        self.sessions={}
-        self.classes={i.__name__:i for i in classes}
+    def __init__(self,tagClass:type, timeout=5*60):
+        assert issubclass(tagClass,Tag)
+        self.sessions={} # nb htag instances (htag x user)
+        self.tagClass=tagClass
         self.timeout=timeout
 
         Starlette.__init__(self,debug=True, routes=[
-            Route('/',              self.GET,   methods=["GET"]),
-            Route('/{tagClass}',    self.GET,   methods=["GET"]),
-            Route('/{tagClass}/',   self.POST,  methods=["POST"]),
+            Route('/',   self.GET,   methods=["GET"]),
+            Route('/{sesid}',   self.POST,  methods=["POST"]),
         ], on_startup=[self._purgeSessions])
 
     async def _purgeSessions(self):
@@ -61,85 +62,79 @@ class WebHTTP(Starlette):
 
         asyncio.ensure_future( purge() )
 
+    async def GET(self,request) -> HTMLResponse:
+        print( "NB SES=",len(self.sessions) )
+        return self.serve(request, self.tagClass )
 
-    def createHRenderer(self,tagClass,params):
-        js = """
-async function interact( o ) {
-    action( await (await window.fetch("/%s/",{method:"POST", body:JSON.stringify(o)})).json() )
-}
+    def serve(self,request, klass, init=None) -> HTMLResponse:
+        """ Serve for the `request`, an instance of the class 'klass'
+        initialized with `init` (tuple (*args,**kargs))
+        if init is None : takes them from request.url ;-)
 
-window.addEventListener('DOMContentLoaded', start );
-""" % (tagClass.__name__)
+        return an htmlresponse (htag init page to start all)
+        """
+        htuid = request.cookies.get('htuid') or str(uuid.uuid4())
 
-        return HRenderer(tagClass, js , init = params) # NO EXIT !!
+        if init is None:
+            # no init params
+            # so we take thoses from the url
+            init = common.url2ak( str(request.url) )
+        else:
+            assert type(init)==tuple
+            assert type(init[0])==tuple
+            assert type(init[1])==dict
 
-    def getsession(self,request,sessionid,klass):
-        qp = dict(request.query_params)
-        hr=None
+        hr = self.instanciate(htuid, klass, init )
 
-        if sessionid in self.sessions:
-            ses = self.sessions[ sessionid ]
-            if request.method == "GET" and ses["qp"] != qp:
-                # if we are at "CREATE TIME", we control query_params
-                # not same construction -> destroy it (for recreate later)
-                hr=None
-                logger.info("FORGET SESSION %s (sessions:%s)",sessionid,len(self.sessions))
-            else:
-                ses["lastaccess"] = time.time()
-                hr = ses["renderer"]
-                logger.info("REUSE SESSION %s (sessions:%s)",sessionid,len(self.sessions))
+        r = HTMLResponse( str(hr) )
+        r.set_cookie("htuid",htuid,path="/")
+        return r
 
-        if hr is None:
-            # need a new session
-            params = ( (), dict(query_params = qp) )
+    def instanciate(self, htuid, klass, init) -> HRenderer:
+        """ get|create an instance of `klass` for user session `htuid`
+        (get|save it into self.sessions)
+        """
+        sesid = f"{klass.__name__}|{htuid}"   # there can be only one instance of klass, at a time !
 
-            hr=self.createHRenderer(klass, params)
-            self.sessions[ sessionid ] = dict( lastaccess=time.time(), renderer=hr, qp=qp )
-            logger.info("CREATE SESSION %s for %s with qp=%s (sessions:%s)",sessionid,repr(hr.tag),qp,len(self.sessions))
+        if sesid in self.sessions and self.sessions[sesid]["renderer"].init == init:
+            # same url (same klass/params), same htuid -> same instance
+            hr=self.sessions[sesid]["renderer"]
+        else:
+            # url has changed ... recreate an instance
+            js = """
+                var SESID = "%s";
+                async function interact( o ) {
+                    action( await (await window.fetch("/"+SESID,{method:"POST", body:JSON.stringify(o)})).json() )
+                }
+
+                window.addEventListener('DOMContentLoaded', start );
+            """ % sesid
+
+            hr=HRenderer(klass, js, init=init ) # NO EXIT !!
+
+        # update session info
+        self.sessions[ sesid ] = dict(
+            lastaccess=time.time(),
+            renderer=hr,
+        )
+
         return hr
 
 
-    async def GET(self,request) -> HTMLResponse:
-        tagClass=request.path_params.get('tagClass',None)
-        if tagClass is None:
-            # by default, take the first one
-            klass=list(self.classes.values())[0]
-        else:
-            # take the named one
-            klass=self.classes.get(tagClass,None)
-
-        if klass:
-            htuid = request.cookies.get("htuid")
-
-            if htuid:
-                sessionid = klass.__name__+":"+htuid
-            else:
-                htuid = str(uuid.uuid4())
-                sessionid = klass.__name__+":"+htuid
-
-            hr = self.getsession(request,sessionid,klass)
-
-            r=HTMLResponse( str(hr) )
-            r.set_cookie("htuid",htuid,path="/")
-            return r
-        else:
-            return HTMLResponse( "404 Not Found" , status_code=404 )
-
     async def POST(self,request) -> Response:
-        tagClass=request.path_params.get('tagClass',None)
-        klass=self.classes.get(tagClass,None)
+        sesid=request.path_params.get('sesid',None)
 
-        if klass and request.cookies.get('htuid'):
-            htuid = request.cookies.get('htuid')
-            sessionid = klass.__name__+":"+htuid
-            hr = self.getsession(request,sessionid,klass)
+        if sesid in self.sessions:
+            hr = self.sessions[ sesid ]["renderer"]
 
-            logger.info("INTERACT WITH SESSION %s (sessions:%s)",sessionid,len(self.sessions))
+            logger.info("INTERACT WITH SESSION %s (sessions:%s)",sesid,len(self.sessions))
             data=await request.json()
             actions = await hr.interact(data["id"],data["method"],data["args"],data["kargs"])
             return JSONResponse(actions)
+
         else:
-            return HTMLResponse( "404 Not Found" , status_code=404 )
+            # session expired or bad call
+            return HTMLResponse( "400 BAD REQUEST" , status_code=400 )
 
 
 

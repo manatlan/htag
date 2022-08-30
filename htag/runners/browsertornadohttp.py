@@ -7,8 +7,9 @@
 # https://github.com/manatlan/htag
 # #############################################################################
 
-from htag import Tag
-from htag.render import HRenderer
+from .. import Tag
+from ..render import HRenderer
+from . import common
 
 import os,json,sys,asyncio
 
@@ -23,16 +24,8 @@ class BrowserTornadoHTTP:
     def __init__(self,tagClass:type):
         assert issubclass(tagClass,Tag)
 
-        js = """
-async function interact( o ) {
-    action( await (await window.fetch("/",{method:"POST", body:JSON.stringify(o)})).json() )
-}
-
-window.addEventListener('DOMContentLoaded', start );
-"""
-
-        self.renderer=HRenderer(tagClass, js, lambda: os._exit(0))
-
+        self.hrenderer=None
+        self.tagClass=tagClass
 
         try: # https://bugs.python.org/issue37373 FIX: tornado/py3.8 on windows
             if sys.platform == 'win32':
@@ -40,14 +33,30 @@ window.addEventListener('DOMContentLoaded', start );
         except:
             pass
 
+    def instanciate(self,url:str):
+        init = common.url2ak(url)
+        if self.hrenderer and self.hrenderer.init == init:
+            return self.hrenderer
+
+        js = """
+async function interact( o ) {
+    action( await (await window.fetch("/",{method:"POST", body:JSON.stringify(o)})).json() )
+}
+
+window.addEventListener('DOMContentLoaded', start );
+"""
+        return HRenderer(self.tagClass, js, lambda: os._exit(0), init=init)
+
+
     def run(self, host="127.0.0.1", port=8000, openBrowser=True):   # localhost, by default !!
 
         class MainHandler(tornado.web.RequestHandler):
             async def get(this):
-                this.write( str(self.renderer) )
+                self.hrenderer = self.instanciate( str(this.request.uri) )
+                this.write( str(self.hrenderer) )
             async def post(this):
                 data = json.loads( this.request.body.decode() )
-                dico = await self.renderer.interact(data["id"],data["method"],data["args"],data["kargs"])
+                dico = await self.hrenderer.interact(data["id"],data["method"],data["args"],data["kargs"])
                 this.write(json.dumps(dico))
 
         if openBrowser:

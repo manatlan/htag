@@ -9,6 +9,7 @@
 
 from .. import Tag
 from ..render import HRenderer
+from . import common
 
 
 import os,json
@@ -25,6 +26,27 @@ class BrowserStarletteWS(Starlette):
     """
     def __init__(self,tagClass:type):
         assert issubclass(tagClass,Tag)
+        self.hrenderer = None
+        self.tagClass = tagClass
+
+        class WsInteract(WebSocketEndpoint):
+            encoding = "json"
+
+            async def on_receive(this, websocket, data):
+                actions = await self.hrenderer.interact(data["id"],data["method"],data["args"],data["kargs"])
+                await websocket.send_text( json.dumps(actions) )
+
+        Starlette.__init__(self,debug=True, routes=[
+            Route('/', self.GET, methods=["GET"]),
+            WebSocketRoute("/ws", WsInteract),
+        ])
+
+
+    def instanciate(self,url:str):
+        init = common.url2ak(url)
+        if self.hrenderer and self.hrenderer.init == init:
+            return self.hrenderer
+
         js = """
 async function interact( o ) {
     ws.send( JSON.stringify(o) );
@@ -36,24 +58,13 @@ ws.onmessage = function(e) {
     action( JSON.parse(e.data) );
 };
 """
-
-        self.renderer=HRenderer(tagClass, js, lambda: os._exit(0))
-
-        class WsInteract(WebSocketEndpoint):
-            encoding = "json"
-
-            async def on_receive(this, websocket, data):
-                actions = await self.renderer.interact(data["id"],data["method"],data["args"],data["kargs"])
-                await websocket.send_text( json.dumps(actions) )
-
-        Starlette.__init__(self,debug=True, routes=[
-            Route('/', self.GET, methods=["GET"]),
-            WebSocketRoute("/ws", WsInteract),
-        ])
-
+        return HRenderer(self.tagClass, js, lambda: os._exit(0), init=init)
 
     async def GET(self,request):
-        return HTMLResponse( str(self.renderer) )
+
+        self.hrenderer=self.instanciate( str(request.url) )
+
+        return HTMLResponse( str(self.hrenderer) )
 
     def run(self, host="127.0.0.1", port=8000, openBrowser=True):   # localhost, by default !!
         import uvicorn,webbrowser
