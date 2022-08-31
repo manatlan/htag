@@ -1,4 +1,4 @@
-# Can instanciate with url/query params
+# Instanciating main htag class with url/query params
 
 In most runners, you can use "query parameters" (from the url) to instanciate your htag main class.
 
