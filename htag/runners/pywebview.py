@@ -21,6 +21,9 @@ LIMITATION :
 til pywebview doen't support async jsapi ...(https://github.com/r0x0r/pywebview/issues/867)
 it can't work for "async generator" with the asyncio.run() trick (line 50)
 
+pywebview doesn't support :
+ - document location change
+ - handling query_params from url
 """
 #window.addEventListener('pywebviewready', async function() { await window.pywebview.api.start() });
 

@@ -30,7 +30,7 @@ AndroidApp( App ).run()
 **nb**
 
  - the app should (TODO: test it !) `self.exit()`
- - Understand [query params from url](../url/) to instanciate the main htag class
+ - Understand [query params from url](../query_params/) to instanciate the main htag class
 
 [source](https://github.com/manatlan/htag/blob/main/htag/runners/androidapp.py)
 
@@ -59,7 +59,7 @@ BrowserHTTP( App ).run()
  - Use only python included battery (no need of others libs)
  - debugging is simple (can see http exchanges in the browser dev tools)
  - the app can `self.exit()`
- - Understand [query params from url](../url/) to instanciate the main htag class
+ - Understand [query params from url](../query_params/) to instanciate the main htag class
 
 **Cons**
 
@@ -90,7 +90,7 @@ BrowserStarletteHTTP( App ).run()
  - debugging is simple (can see http exchanges in the browser dev tools)
  - [can use uvicorn reloader](https://github.com/manatlan/htag/blob/main/examples/autoreload.py), useful during dev process !
  - the app can `self.exit()`
- - Understand [query params from url](../url/) to instanciate the main htag class
+ - Understand [query params from url](../query_params/) to instanciate the main htag class
 
 
 **Cons**
@@ -121,7 +121,7 @@ BrowserStarletteWS( App ).run()
  - [can use uvicorn reloader](https://github.com/manatlan/htag/blob/main/examples/autoreload.py), useful during dev process !
  - and [a lot of features](../asgi/), because it's astarlette/asgi.
  - the app can `self.exit()`
- - Understand [query params from url](../url/) to instanciate the main htag class
+ - Understand [query params from url](../query_params/) to instanciate the main htag class
 
 
 **Cons**
@@ -155,7 +155,7 @@ ChromeApp( App ).run()
  - looks like a cef/electron app, without cef (reuse installed chrome)
  - the app can `self.exit()`
  - and [a lot of features](../asgi/), because it's astarlette/asgi.
- - Understand [query params from url](../url/) to instanciate the main htag class
+ - Understand [query params from url](../query_params/) to instanciate the main htag class
 
 **Cons**
 
@@ -178,7 +178,7 @@ But it provides features like :
  - Display full python error (tracebacks)
  - but CAN'T use `self.exit()` (coz uvicorn/reloader is hard to quit, but in the future : it should be possible)
  - and [a lot of features](../asgi/), because it's astarlette/asgi.
- - Understand [query params from url](../url/) to instanciate the main htag class
+ - Understand [query params from url](../query_params/) to instanciate the main htag class
 
 Run your `App` (htag.Tag class) like this :
 
@@ -242,7 +242,7 @@ PyScript( App ).run( window )
  - you only need a browser ;-)
  - Interactions are INPROC.
  - no need of external libs
- - Understand [query params from url](../url/) to instanciate the main htag class
+ - Understand [query params from url](../query_params/) to instanciate the main htag class
 
 
 **Cons**
@@ -314,7 +314,7 @@ BrowserTornadoHTTP( App ).run()
  - debugging is simple (can see http exchanges in the browser dev tools)
  - the app can `self.exit()`
  - and [a lot of features](../asgi/), because it's astarlette/asgi.
- - Understand [query params from url](../url/) to instanciate the main htag class
+ - Understand [query params from url](../query_params/) to instanciate the main htag class
 
 **Cons**
 
@@ -347,13 +347,13 @@ WebHTTP( App ).run()
 
 **Pros**
 
- - can handle session (multiple users)
+ - can handle session (**multiple users**)
  - the http server is (ultra) robust
  - debugging is simple (can see http exchanges in the browser dev tools)
  - [can use uvicorn reloader](https://github.com/manatlan/htag/blob/main/examples/autoreload.py), useful during dev process !
  - and [a lot of features](../asgi/), because it's astarlette/asgi.
- - the app can't `self.exit()` (for secutiry reasons)
- - Understand [query params from url](../url/) to instanciate the main htag class
+ - the app can't `self.exit()` (for security reasons)
+ - Understand [query params from url](../query_params/) to instanciate the main htag class
 
 
 **Cons**

@@ -17,9 +17,9 @@ If can point your running App to urls like:
  * `/?name=john&age=12` -> will create the instance `MyTag("john",'12')`
  * `/?Jim&42` -> will create the instance `MyTag("Jim",'42')`
  * `/?Jo` -> will create the instance `MyTag("Jo",12)`
- * `/` -> will result in http/400 (because `name` is mandory)
+ * `/` -> will result in http/400 (because `name` is mandatory)
 
 **Remarks:**
 
- * TODO: complete here (http/400 when madatory ..)
+ * TODO: complete here (http/400 when mandatory ..)
  * all query params are string. It's up to you to cast to your needs.
