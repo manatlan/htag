@@ -102,9 +102,8 @@ class WebHTTP(Starlette):
         else:
             # url has changed ... recreate an instance
             js = """
-                var SESID = "%s";
                 async function interact( o ) {
-                    action( await (await window.fetch("/"+SESID,{method:"POST", body:JSON.stringify(o)})).json() )
+                    action( await (await window.fetch("/%s",{method:"POST", body:JSON.stringify(o)})).json() )
                 }
 
                 window.addEventListener('DOMContentLoaded', start );

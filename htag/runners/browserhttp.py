@@ -14,6 +14,7 @@ from . import common
 import asyncio
 import socket
 import webbrowser,os,json
+import urllib.parse
 
 class BrowserHTTP:
     """ Simple ASync Web Server with HTTP interactions with HTag. (only stdlib!)
@@ -73,9 +74,14 @@ window.addEventListener('DOMContentLoaded', start );
                 # if req.startswith(b"GET / HTTP"):
                 if req.startswith(b"GET /"):
                     url=req.decode()[4:].split(" HTTP")[0]
-                    self.hrenderer = self.instanciate(url)
-                    resp = make_header()
-                    resp += str(self.hrenderer)
+
+                    info = urllib.parse.urlsplit(url)
+                    if info.path=="/":
+                        self.hrenderer = self.instanciate(url)
+                        resp = make_header()
+                        resp += str(self.hrenderer)
+                    else:
+                        resp = "HTTP/1.1 404 NOT FOUND\r\n"
                 elif req.startswith(b"POST / HTTP"):
                     _,content = req.split(b"\r\n\r\n")
                     data = json.loads(content.decode())
