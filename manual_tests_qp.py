@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 
 from htag import Tag
@@ -35,7 +34,7 @@ class AnotherApp(Tag.body):
 
 #=================================================================================
 #---------------------------------------------------------------------------------
-# from htag.runners import DevApp as Runner     # with .serve() and no QUIT
+from htag.runners import DevApp as Runner     # with .serve() and no QUIT
 # from htag.runners import WebHTTP as Runner    # with .serve() and no QUIT
 
 # from htag.runners import BrowserHTTP as Runner
