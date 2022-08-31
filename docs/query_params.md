@@ -41,3 +41,4 @@ So, it's a **best practice**, to not have the `**a` trick in the constructor of 
 **Remarks:**
 
  * all query params are string. It's up to you to cast to your needs.
+ * this feature comes with htag >= 0.8.0
