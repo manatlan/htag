@@ -10,7 +10,7 @@ class App(Tag.body):
         self <= Tag.a("test '/' ?",_href="/",_style="display:block")
         self <= Tag.a("test '/?param=yo'",_href="/?param=yo",_style="display:block")
         self <= Tag.button("add content", _onclick=self.add_content)    # just to control interact
-        self <= Tag.button("quit app", _onclick=lambda o: self.exit())    # just to control interact
+        self <= Tag.button("quit app", _onclick=lambda o: self.exit())    # just to test QUIT/EXIT app
         self <= Tag.hr()
 
         self <= Tag.h3("Only if it handles tha '/other' route (WebHTTP/DevApp) :")
@@ -21,16 +21,6 @@ class App(Tag.body):
     def add_content(self,o):
         self <= "X "
 
-
-class AnotherApp(Tag.body):
-
-    def init(self, name="vide"):
-        self["style"]="background:#FFE;"
-        self <= "Hello "+name
-        self <= Tag.button("yo", _onclick=self.test)
-
-    def test(self,o):
-        self <= "X "
 
 #=================================================================================
 #---------------------------------------------------------------------------------
@@ -49,6 +39,16 @@ from htag.runners import DevApp as Runner     # with .serve() and no QUIT
 app=Runner(App)
 
 if hasattr(app,"serve"): # only DevApp & WebHTTP
+
+    class AnotherApp(Tag.body):
+
+        def init(self, name="vide"):
+            self["style"]="background:#FFE;"
+            self <= "Hello "+name
+            self <= Tag.button("add content", _onclick=self.add_content)
+
+        def add_content(self,o):
+            self <= "X "
 
     def another(request):
         return app.serve(request, AnotherApp )

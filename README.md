@@ -46,7 +46,7 @@ To try it :
  * rock solid (need more tests)
  * setup minimal docs ;-)
  * ~~top level api could change (Tag() -> create a Tag, Tag.mytag() -> create a TagBase ... can be a little bit ambiguous)~~
- * add a runner with WS with stdlib ? (not starlette!)
+ * ~~manage "query params" from url to initialize Tags/routes~~
  * ~~I don't really like the current way to generate js in interaction : need to found something more solid.~~
  * ~~the current way to initiate the statics is odd (only on real (embedded) Tag's) : should find a better way (static like gtag ?!)~~
 
