@@ -71,13 +71,16 @@ async function interact( o ) {
 
 window.addEventListener('DOMContentLoaded', start );
 """
+        self._exiter=None
         hr=HRenderer(self.tagClass, js, self.go_exit, init=init)
         self.renderer=hr
         return hr
 
-
     def go_exit(self):
-        os._exit(0)
+        if self._exiter is None:
+            os._exit(0)
+        else:
+            self._exiter()
 
     def run(self): # basically, the same code as guy.runAndroid()
         host,port= "127.0.0.1", 12458
@@ -129,7 +132,7 @@ window.addEventListener('DOMContentLoaded', start );
                     App.get_running_app().stop()
                     os._exit(0)
 
-                runner.go_exit = exit_app
+                runner._exiter=exit_app
 
                 runner.server.start()                       # ! important
 

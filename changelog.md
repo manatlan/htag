@@ -1,3 +1,7 @@
+## 0.8.1 2202/09/01
+
+ - Runner `AndroidApp` could `self.exit()` (to test !)
+ 
 ## 0.8.0 "Runners tour" 2022/08/31
 
  - All runners only accept only one Htag class by default : simpler !
