@@ -1,3 +1,8 @@
+## 0.8.2 "the perhaps last bug" 2202/09/07
+
+ - In somes circunstances, the renderer try'ed to update some TabBase (Tag.H) class, whose can't be
+   updated (did "js error outerHTML on null object"). Now it ensures, that it updates only Tag class !
+
 ## 0.8.1 2202/09/01
 
  - Runner `AndroidApp` could `self.exit()` (to test !)

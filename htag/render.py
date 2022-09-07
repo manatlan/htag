@@ -68,7 +68,7 @@ class Stater:
                 tag,childs= list(obj.items())[0]
                 state_after = tag._getStateImage()
                 state_before= self._states.get( id(tag) )
-                if state_after != state_before:
+                if state_after != state_before and isinstance(tag,Tag):
                     logger.debug("STATE BEFORE for %s = '%s'", repr(tag), state_before )
                     logger.debug("STATE AFTER  for %s = '%s'", repr(tag), state_after )
                     modifieds.append(tag)
