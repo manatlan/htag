@@ -1,12 +1,19 @@
-## 0.8.2 "the perhaps last bug" 2202/09/07
+## 0.8.3 "Event is coming" 2022/09/10
+
+ - js "event" is coming to Tag object, during "interaction" (property event is setted on the object). This property
+   is a mix of PointerEvent & KeyboarEvent.
+   ==> all runners should call hrenderer.interact(id,method,args,kargs,event), with the new js event !
+
+
+## 0.8.2 "the perhaps last bug" 2022/09/07
 
  - In somes circunstances, the renderer try'ed to update some TabBase (Tag.H) class, whose can't be
    updated (did "js error outerHTML on null object"). Now it ensures, that it updates only Tag class !
 
-## 0.8.1 2202/09/01
+## 0.8.1 2022/09/01
 
  - Runner `AndroidApp` could `self.exit()` (to test !)
- 
+
 ## 0.8.0 "Runners tour" 2022/08/31
 
  - All runners only accept only one Htag class by default : simpler !

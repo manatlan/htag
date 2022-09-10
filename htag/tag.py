@@ -317,7 +317,7 @@ class BaseCaller(NotBindedCaller):
         self.kargs = kargs
 
     def __str__(self) -> str:
-        interact=dict(id=0,method=self.mname,args=self.args,kargs=self.kargs)
+        interact=dict(id=0,method=self.mname,args=self.args,kargs=self.kargs,event=b"jevent(event)")
         if self.instance is not None: interact["id"]=id(self.instance)
         gen = lambda ll: (";".join(ll))+";" if ll else ""
         return f"""try{{{gen(self._befores)}interact( {stringify(interact)} );{gen(self._afters)}}} catch(e) {{_error(e,"JS")}}"""
@@ -352,7 +352,8 @@ class Tag(TagBase,metaclass=TagCreator): # custom tag (to inherit)
 
     def __init__(self, *args,**kargs):
         self._hr=None
-        self.parent=None
+        self.parent=None    #COULD DISAPPEAR SOON
+        self.event={}       # NEW !!!!
         self._callbacks_={}
         attrs={}
         selfs={}

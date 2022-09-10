@@ -56,7 +56,7 @@ window.addEventListener('DOMContentLoaded', start );
 
     async def POST(self,request) -> JSONResponse:
         data = await request.json()
-        dico = await self.hrenderer.interact(data["id"],data["method"],data["args"],data["kargs"])
+        dico = await self.hrenderer.interact(data["id"],data["method"],data["args"],data["kargs"],data.get("event"))
         return JSONResponse(dico)
 
     def run(self, host="127.0.0.1", port=8000, openBrowser=True):   # localhost, by default !!

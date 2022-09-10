@@ -33,7 +33,7 @@ class BrowserStarletteWS(Starlette):
             encoding = "json"
 
             async def on_receive(this, websocket, data):
-                actions = await self.hrenderer.interact(data["id"],data["method"],data["args"],data["kargs"])
+                actions = await self.hrenderer.interact(data["id"],data["method"],data["args"],data["kargs"],data.get("event"))
                 await websocket.send_text( json.dumps(actions) )
 
         Starlette.__init__(self,debug=True, routes=[

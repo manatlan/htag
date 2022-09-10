@@ -49,5 +49,5 @@ interact=async function(o) {
 
     async def interactions(self, o):
         data=json.loads(o)
-        actions = await self.hr.interact( data["id"], data["method"], data["args"], data["kargs"] )
+        actions = await self.hr.interact( data["id"], data["method"], data["args"], data["kargs"], data.get("event") )
         return json.dumps(actions)

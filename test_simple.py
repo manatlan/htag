@@ -229,7 +229,7 @@ def test_generate_js_interact():
     assert bc.args == (12,)
     assert bc.kargs == {}
     js=str(bc)
-    assert 'interact( {"id": <id>, "method": "onclick", "args": [12], "kargs": {}} )' in js.replace( str(id(c)),"<id>" )
+    assert 'interact( {"id": <id>, "method": "onclick", "args": [12], "kargs": {}, "event": jevent(event)} )' in js.replace( str(id(c)),"<id>" )
 
 
 def test_generate_real_js():

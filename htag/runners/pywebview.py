@@ -36,7 +36,7 @@ class PyWebView:
 
         js = """
 async function interact( o ) {
-    action( await pywebview.api.interact( o["id"], o["method"], o["args"], o["kargs"] ) );
+    action( await pywebview.api.interact( o["id"], o["method"], o["args"], o["kargs"], o["event"] ) );
 }
 
 window.addEventListener('pywebviewready', start );
@@ -46,8 +46,8 @@ window.addEventListener('pywebviewready', start );
 
     def run(self):
         class Api:
-            def interact(this,tagid,method,args,kargs):
-                return asyncio.run(self.renderer.interact(tagid,method,args,kargs))
+            def interact(this,tagid,method,args,kargs,event):
+                return asyncio.run(self.renderer.interact(tagid,method,args,kargs,event))
 
         window = webview.create_window(self.renderer.title, html=str(self.renderer), js_api=Api(),text_select=True)
         webview.start(debug=False)

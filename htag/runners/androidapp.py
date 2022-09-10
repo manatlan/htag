@@ -37,7 +37,7 @@ class WebServer(Thread): # the webserver is ran on a separated thread
                 this.write( str(self.instance.renderer) )
             async def post(this):
                 data = json.loads( this.request.body.decode() )
-                dico = await self.instance.renderer.interact(data["id"],data["method"],data["args"],data["kargs"])
+                dico = await self.instance.renderer.interact(data["id"],data["method"],data["args"],data["kargs"],data.get("event"))
                 this.write(json.dumps(dico))
 
         app = tornado.web.Application([(r"/", MainHandler),])

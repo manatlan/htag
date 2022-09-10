@@ -85,7 +85,7 @@ window.addEventListener('DOMContentLoaded', start );
                 elif req.startswith(b"POST / HTTP"):
                     _,content = req.split(b"\r\n\r\n")
                     data = json.loads(content.decode())
-                    dico = await self.hrenderer.interact(data["id"],data["method"],data["args"],data["kargs"] )
+                    dico = await self.hrenderer.interact(data["id"],data["method"],data["args"],data["kargs"],data.get("event") )
                     resp = make_header("application/json")
                     resp += json.dumps(dico)
                 else:

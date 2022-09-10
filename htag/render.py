@@ -58,8 +58,6 @@ class Stater:
         """ to be runned after interactions to guess whose are modifieds
             return modifieds tags
         """
-        #TODO: the 'dontRedraw' shouldn't be set since htag>=0.3.0, so this code could be redsigned
-
         logger.debug("Stater.guess(), start guessing ....")
         modifieds=[]
 
@@ -180,6 +178,67 @@ function action( o ) {
     if(o.hasOwnProperty("err")) _error( o["err"], "PYTHON")
 }
 
+function jevent (e) {
+    let n={};
+
+    // pointerevent
+    n.isTrusted=e.isTrusted;
+    n.altKey=e.altKey;
+    n.altitudeAngle=e.altitudeAngle;
+    n.azimuthAngle=e.azimuthAngle;
+    n.bubbles=e.bubbles;
+    n.button=e.button;
+    n.buttons=e.buttons;
+    n.cancelBubble=e.cancelBubble;
+    n.cancelable=e.cancelable;
+    n.clientX=e.clientX;
+    n.clientY=e.clientY;
+    n.composed=e.composed;
+    n.ctrlKey=e.ctrlKey;
+    n.defaultPrevented=e.defaultPrevented;
+    n.detail=e.detail;
+    n.eventPhase=e.eventPhase;
+    n.height=e.height;
+    n.isPrimary=e.isPrimary;
+    n.layerX=e.layerX;
+    n.layerY=e.layerY;
+    n.metaKey=e.metaKey;
+    n.movementX=e.movementX;
+    n.movementY=e.movementY;
+    n.offsetX=e.offsetX;
+    n.offsetY=e.offsetY;
+    n.pageX=e.pageX;
+    n.pageY=e.pageY;
+    n.pointerId=e.pointerId;
+    n.pointerType=e.pointerType;
+    n.pressure=e.pressure;
+    n.returnValue=e.returnValue;
+    n.screenX=e.screenX;
+    n.screenY=e.screenY;
+    n.shiftKey=e.shiftKey;
+    n.tangentialPressure=e.tangentialPressure;
+    n.tiltX=e.tiltX;
+    n.tiltY=e.tiltY;
+    n.timeStamp=e.timeStamp;
+    n.twist=e.twist;
+    n.type=e.type;
+    n.which=e.which;
+    n.width=e.width;
+    n.x=e.x;
+    n.y=e.y;
+
+    // keyboardevent specific
+    n.charCode=e.charCode;
+    n.code=e.code;
+    n.isComposing=e.isComposing;
+    n.key=e.key;
+    n.keyCode=e.keyCode;
+    n.location=e.location;
+    n.repeat=e.repeat;
+
+    return n;
+}
+
 %s
 """ % (BaseCaller( None ), js)
 
@@ -191,7 +250,7 @@ function action( o ) {
     def _addInteractionScript(self, js:str):
         self._interaction_scripts.append(js)
 
-    async def interact(self,oid,method_name:str,args,kargs) -> dict:
+    async def interact(self,oid,method_name:str,args,kargs,event=None) -> dict:
         """ call the 'method_name' of pyobj 'id' with (args,kargs), return the pyobj/tag"""
         try:
             ## self._interaction_scripts=[] # reset the list
@@ -207,6 +266,8 @@ function action( o ) {
                 state = Stater(self.tag)
                 obj = Tag.find_tag(oid)
                 if obj:
+                    obj.event=event or {}
+
                     # call the method
                     method=getattr(obj,method_name)
 

@@ -56,7 +56,7 @@ window.addEventListener('DOMContentLoaded', start );
                 this.write( str(self.hrenderer) )
             async def post(this):
                 data = json.loads( this.request.body.decode() )
-                dico = await self.hrenderer.interact(data["id"],data["method"],data["args"],data["kargs"])
+                dico = await self.hrenderer.interact(data["id"],data["method"],data["args"],data["kargs"],data.get("event"))
                 this.write(json.dumps(dico))
 
         if openBrowser:
