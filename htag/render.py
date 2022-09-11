@@ -180,6 +180,7 @@ function action( o ) {
 
 function jevent (e) {
     let n={};
+    if(e===undefined || e==null) return n;
 
     // pointerevent
     n.isTrusted=e.isTrusted;

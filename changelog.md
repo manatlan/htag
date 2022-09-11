@@ -1,3 +1,7 @@
+## 0.8.4 "Event ibetter 2022/09/11
+
+ - FIX: when event was null/undefined : it broke all ;-( ... now, it's ok!
+
 ## 0.8.3 "Event is coming" 2022/09/10
 
  - js "event" is coming to Tag object, during "interaction" (property event is setted on the object). This property
