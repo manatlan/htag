@@ -9,7 +9,7 @@
 import json,asyncio,types,traceback
 
 from . import __version__
-from .tag import HTagException,H, Tag, TagBase, BaseCaller
+from .tag import HTagException,H, Tag, BaseCaller
 
 from typing import Callable, Optional
 
@@ -110,12 +110,9 @@ class HRenderer:
 
         def feedStatics(tag):
             for i in ensureList(tag.statics):
-                if isinstance(i,TagBase):
-                    if isinstance(i,Tag):
-                        i = i._ensureTagBase()
-
+                if isinstance(i,Tag):
                     if i.md5 not in [j.md5 for j in self._statics]:
-                        self._statics.append( i )
+                        self._statics.append( str(i) )
                 elif isinstance(i,str): # auto add as Tag.style // CSS
                     self._statics.append( Tag.H.style(i))
                 elif isinstance(i,bytes): # auto add as Tag.script // JS
@@ -132,8 +129,8 @@ class HRenderer:
             def rec( tag ):
                 if hasattr(tag, "imports") and tag.imports is not None:
                     imports = ensureList(tag.imports)
-                    if not all([isinstance(c,type) and issubclass(c,TagBase) for c in imports]):
-                        raise HTagException("imports can contains only Tag classes")
+                    # if not all([isinstance(c,type) and issubclass(c,TagBase) for c in imports]):
+                    #     raise HTagException("imports can contains only Tag classes")
                     for c in imports:
                         feedStatics(c)
                         rec(c)

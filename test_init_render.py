@@ -4,7 +4,6 @@ from typing import Type
 import pytest
 
 from htag import H,Tag,HTagException
-from htag.tag import TagBase
 
 anon=lambda t: str(t).replace( str(id(t)),"*" )
 

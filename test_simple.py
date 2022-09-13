@@ -3,7 +3,6 @@
 import pytest
 
 from htag import H,Tag,HTagException
-from htag.tag import TagBase
 
 anon=lambda t: str(t).replace( str(id(t)),"<id>" )
 
@@ -51,26 +50,26 @@ def test_ko():
     with pytest.raises(HTagException):
         H.span(no="kk")
 
-def test_H():
-    # Tag.H is special, it's a shortcut to H
-    assert  Tag.H == H
-    assert  not issubclass(Tag.H, Tag)
+# def test_H():
+#     # Tag.H is special, it's a shortcut to H
+#     assert  Tag.H == H
+#     assert  not issubclass(Tag.H, Tag)
 
-    # ensure constructor, constructs well
-    assert  issubclass(Tag.H.div, TagBase)
-    assert  not issubclass(Tag.H.div, Tag)
+#     # ensure constructor, constructs well
+#     assert  issubclass(Tag.H.div, TagBase)
+#     assert  not issubclass(Tag.H.div, Tag)
 
-    #whereas Tag.<> is dynamic (with @id), and inherit boths
-    assert  issubclass(Tag.div, TagBase)
-    assert  issubclass(Tag.div, Tag)
+#     #whereas Tag.<> is dynamic (with @id), and inherit boths
+#     assert  issubclass(Tag.div, TagBase)
+#     assert  issubclass(Tag.div, Tag)
 
-    #the main diff ... Tag.H.<> has no @id
-    assert "id=" not in str(Tag.H.span("hello",_class="hello"))
-    #whereas ... Tag.<> has an @id
-    assert "id=" in str(Tag.span("hello",_class="hello"))
+#     #the main diff ... Tag.H.<> has no @id
+#     assert "id=" not in str(Tag.H.span("hello",_class="hello"))
+#     #whereas ... Tag.<> has an @id
+#     assert "id=" in str(Tag.span("hello",_class="hello"))
 
-    # it's the same construction
-    assert str(Tag.H.span("hello",_class="hello")) == str(H.span("hello",_class="hello"))
+#     # it's the same construction
+#     assert str(Tag.H.span("hello",_class="hello")) == str(H.span("hello",_class="hello"))
 
 def test_attrs():
     d=H.div(_data_text=12)
@@ -254,57 +253,57 @@ def test_generate_real_js():
     clone = Kiki()
     assert str(c).replace( str(id(c)), str(id(clone)) ) == str(clone)   # same, modulo id !
 
-def test_its_the_same_tagbase_exactly():
+# def test_its_the_same_tagbase_exactly():
 
-    class Test2(TagBase):
-        def __init__(self):
-            TagBase.__init__(self)
-            self.tag="h1"
-            self <= "hello"
-            self["id"] = 42
+#     class Test2(TagBase):
+#         def __init__(self):
+#             TagBase.__init__(self)
+#             self.tag="h1"
+#             self <= "hello"
+#             self["id"] = 42
 
-    class Test3(H.h1):
-        def __init__(self):
-            Tag.h1.__init__(self)
-            self <= "hello"
-            self["id"] = 42
+#     class Test3(H.h1):
+#         def __init__(self):
+#             Tag.h1.__init__(self)
+#             self <= "hello"
+#             self["id"] = 42
 
-    t1 = H.h1("hello",_id=42)
-    t2 = Test2()
-    t3 = Test3()
+#     t1 = H.h1("hello",_id=42)
+#     t2 = Test2()
+#     t3 = Test3()
 
-    assert str(t1) == str(t2) == str(t3)
-    assert t1._getStateImage() == t2._getStateImage() == t3._getStateImage()
-
-
-def test_base_concepts():
-    # Build a TagBase
-    o=H.h1("yo",_class="ya")
-    assert isinstance(o, TagBase)
-    assert not isinstance(o, Tag)
-    assert str(o) == '<h1 class="ya">yo</h1>'
-
-    # build a tag
-    o=Tag.h1( _class="ya")
-    o<= "yo"
-    assert isinstance(o, TagBase)
-    assert isinstance(o, Tag)
-    assert anon(o) == '<h1 class="ya" id="<id>">yo</h1>'
+#     assert str(t1) == str(t2) == str(t3)
+#     assert t1._getStateImage() == t2._getStateImage() == t3._getStateImage()
 
 
-    # INHERIT A REAL TAG
-    class Nimp2(Tag.h2):
+# def test_base_concepts():
+#     # Build a TagBase
+#     o=H.h1("yo",_class="ya")
+#     assert isinstance(o, TagBase)
+#     assert not isinstance(o, Tag)
+#     assert str(o) == '<h1 class="ya">yo</h1>'
 
-        def __init__(self,name,**attrs):
-            Tag.h2.__init__(self,**attrs)
-            self["name"] = name
-            self <= H.div(name)
+#     # build a tag
+#     o=Tag.h1( _class="ya")
+#     o<= "yo"
+#     assert isinstance(o, TagBase)
+#     assert isinstance(o, Tag)
+#     assert anon(o) == '<h1 class="ya" id="<id>">yo</h1>'
 
-    o=Nimp2("yo",_class="ya")
-    print( type(o),o.__class__,o )
-    assert isinstance(o, TagBase)
-    assert isinstance(o, Tag)
-    assert anon(o) == '<h2 class="ya" id="<id>" name="yo"><div>yo</div></h2>'
+
+#     # INHERIT A REAL TAG
+#     class Nimp2(Tag.h2):
+
+#         def __init__(self,name,**attrs):
+#             Tag.h2.__init__(self,**attrs)
+#             self["name"] = name
+#             self <= H.div(name)
+
+#     o=Nimp2("yo",_class="ya")
+#     print( type(o),o.__class__,o )
+#     assert isinstance(o, TagBase)
+#     assert isinstance(o, Tag)
+#     assert anon(o) == '<h2 class="ya" id="<id>" name="yo"><div>yo</div></h2>'
 
 
 def test_state_yield():
