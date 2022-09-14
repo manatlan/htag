@@ -499,32 +499,30 @@ def test_discovering_css():
 def test_imports():
 
     class Ya(Tag.div):
-        statics = Tag.H.style("""body {font-size:100px}""", _id="Ya")
+        statics = Tag.style("""body {font-size:100px}""", _id="Ya")
 
         def init(self):
             self <= "Ya"
 
 
     class Yo(Tag.div):
-        statics = Tag.H.style("""body {background:#CFC;}""", _id="Yo")
+        statics = Tag.style("""body {background:#CFC;}""", _id="Yo")
 
         def init(self):
             self <= "Yo"
 
 
     class AppWithImport(Tag.body):
-        statics = Tag.H.style("""body {color: #080}""", _id="main")
+        statics = Tag.style("""body {color: #080}""", _id="main")
         imports = Yo
 
         def init(self):
-
             self <= Yo()
 
     class AppWithoutImport(Tag.body):
-        statics = Tag.H.style("""body {color: #080}""", _id="main")
+        statics = Tag.style("""body {color: #080}""", _id="main")
 
         def init(self):
-
             self <= Yo()
 
     html=str(HRenderer( AppWithImport, ""))
@@ -644,4 +642,5 @@ if __name__=="__main__":
     # test_statics_in_real_statics()
     # test_render_title()
     # test_new()
-    test_render_a_tag_with_child_interactions()
+    # test_render_a_tag_with_child_interactions()
+    test_imports()

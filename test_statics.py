@@ -19,7 +19,7 @@ def test_built_immediatly():
     # test static discovering (in built immediatly)
     ################################################################
     class O(Tag.div):
-        statics=H.style("/*S1*/")
+        statics=Tag.style("/*S1*/")
 
     assert "/*S1*/" in str(HRenderer( O, "//"))
     ################################################################
@@ -29,7 +29,7 @@ def test_built_immediatly():
             self <= O() # "O" is a direct child
 
     assert "/*S1*/" in str(HRenderer( OO1, "//"))
-    ################################################################
+    # ################################################################
     class OO2(Tag.div):
         imports = O
         def init(self):
@@ -93,4 +93,5 @@ if __name__=="__main__":
     logging.basicConfig(format='[%(levelname)-5s] %(name)s: %(message)s',level=logging.DEBUG)
     # logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.DEBUG)
     # test_Tag_md5()
-    test_statics_only_tagbase()
+    # test_statics_only_tagbase()
+    test_built_immediatly()
