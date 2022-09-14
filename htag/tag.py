@@ -160,90 +160,31 @@ class Binder:
 
 class Tag(metaclass=TagCreator): # custom tag (to inherit)
 
+    #======================================================================
     # statics
+    #======================================================================
     statics: list = [] # list of "Tag", imported at start in html>head
     imports = None
+
+    __instances__ = weakref.WeakValueDictionary()
 
     @classmethod
     def find_tag(cls, obj_id:int):
         return cls.__instances__.get(obj_id, None)
 
 
+    #======================================================================
     # instance
+    #======================================================================
     tag: str="div" # default one
     js: StrNonable = None  # post script, useful for js/init when tag is rendered
 
-    __instances__ = weakref.WeakValueDictionary()
 
 
 
-    #===================================================================================================<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Tagbase
-    def clear(self):
-        self._childs=Elements()
-
-    def set(self,elt:AnyTags):
-        """ a bit like .innerHTML setting (avoid clear+add)"""
-        self.clear()
-        self.add( elt)
-
-
-    def remove(self, elt=None):
-        """Remove an object(elt) from its childs, or itself (if none), if attached (has parent)"""
-        if elt is None:
-            if self.parent:
-                return self.parent.remove(self)
-        else:
-            if elt in self._childs:
-                self._childs.remove(elt)
-                return True
-    @property
-    def bind(self):
-        """ to bind method ! and return its js repr"""
-        return Binder(self)
-
-    #to override
-    def exit(self):
-        print("exit() DOES NOTHING (should be overriden)")
-
-    def add(self,elt:AnyTags):
-        if isinstance(elt,Tag):
-            elt.parent = self
-        elif not isinstance(elt,str) and hasattr(elt,"__iter__"):
-            elt=list(elt)
-            for i in elt:
-                if isinstance(i,Tag):
-                    i.parent = self
-
-        self._childs.__add__(elt)
-
-
-
-    @property
-    def childs(self) -> list:
-        return self._childs
-
-    @property
-    def attrs(self) -> dict:
-        return self._attrs
-
-
-    @property
-    def innerHTML(self) -> str:
-        return "".join([str(i) for i in self._childs if i is not None])
-
-
-    #===================================================================================================<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-    def __simulateOldInit(self, content:AnyTags=None,**_attrs):  #TODO: integrate in the real __init__ ;-)
-        self.set(content)
-
-        self._attrs={}
-        for k,v in _attrs.items():
-            if not k.startswith("_"):
-                raise HTagException(f"Can't set attributs without underscore ('{k}' should be '_{k}')") # for convention only ;-(
-            else:
-                self[ k[1:].replace("_","-") ] = v
-
+    #======================================================================
+    # Constructor
+    #======================================================================
     def __init__(self, *args,**kargs):
         self._hr=None
         self.parent=None    #COULD DISAPPEAR SOON
@@ -281,10 +222,81 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         # save the weakref to the tag, for Tag.find_tag(id) method
         Tag.__instances__[id(self)]=self
 
-    # new mechanism (could replace self.bind.<m>()) ... one day
-    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
+    def __simulateOldInit(self, content:AnyTags=None,**_attrs):  #TODO: integrate in the real __init__ ;-)
+        self.set(content)
+
+        self._attrs={}
+        for k,v in _attrs.items():
+            if not k.startswith("_"):
+                raise HTagException(f"Can't set attributs without underscore ('{k}' should be '_{k}')") # for convention only ;-(
+            else:
+                self[ k[1:].replace("_","-") ] = v
+
+
+
+    #======================================================================
+    # public methods/properties
+    #======================================================================
+    def clear(self):
+        """ remove all childs """
+        self._childs=Elements()
+
+    def set(self,elt:AnyTags):
+        """ a bit like .innerHTML setting (avoid clear+add)"""
+        self.clear()
+        self.add( elt)
+
+
+    def remove(self, elt=None):
+        """Remove an object(elt) from its childs, or itself (if none), if attached (has parent)"""
+        if elt is None:
+            if self.parent:
+                return self.parent.remove(self)
+        else:
+            if elt in self._childs:
+                self._childs.remove(elt)
+                return True
+    def exit(self):
+        """ method to override, for your own exit"""
+        print("exit() DOES NOTHING (should be overriden)")
+
+    def add(self,elt:AnyTags):
+        """ add a element to this tag """
+        if isinstance(elt,Tag):
+            elt.parent = self
+        elif not isinstance(elt,str) and hasattr(elt,"__iter__"):
+            elt=list(elt)
+            for i in elt:
+                if isinstance(i,Tag):
+                    i.parent = self
+
+        self._childs.__add__(elt)
+
+
+    @property
+    def bind(self):
+        """ to bind method ! and return its js repr"""
+        return Binder(self)
+
+    @property
+    def childs(self) -> list:
+        return self._childs
+
+    @property
+    def attrs(self) -> dict:
+        return self._attrs
+
+    @property
+    def innerHTML(self) -> str:
+        return "".join([str(i) for i in self._childs if i is not None])
+
+
+    #===============================================================================
+    # Override methods
+    #===============================================================================
     async def __on__(self,eventjs:str,*a,**ka):
+        """ new mechanism (could replace self.bind.<m>()) ... one day"""
         logger.info(f"callback __on__ {eventjs} {a} {ka}")
         caller = self._callbacks_[eventjs]
 
@@ -351,7 +363,7 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         return elt
 
     def __iadd__(self,  elt: AnyTags):
-        ''' use "+=" instead of "<=" '''
+        ''' use "+=" instead of "<=" !!!! '''
         self.add(elt)
         return self
 
@@ -373,7 +385,7 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
                 current = current.parent
 
         if current is None or current._hr is None:
-            logger.error(f"call js is not possible, {repr(self)} is not tied to a parent/HRenderer !")
+            logger.error("call js is not possible, %s is not tied to a parent/HRenderer !", repr(self))
         else:
             current._hr._addInteractionScript( self._genIIFEScript(js) )
 
@@ -392,7 +404,7 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         attrs = dict(self._attrs) # make a copy
         if needIds:
             if attrs.get("id"):
-                logger.error(f"Tag {repr(self)} had an @id, it was replaced for HRenderer needs !!!!")
+                logger.warn("!!! **WARNING** Tag %s had an @id=%s, it was replaced for HRenderer needs !!!", repr(self),attrs["id"])
             attrs["id"]=id(self)
 
         # rewrite attrs(dict) -> nattrs(list)
