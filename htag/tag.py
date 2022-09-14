@@ -6,7 +6,8 @@
 #
 # https://github.com/manatlan/htag
 # #############################################################################
-import html,json,hashlib
+import html,json
+#import hashlib
 import logging,types,asyncio
 import weakref
 from typing import Sequence,Union,Optional,Any,Callable,Type
@@ -19,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 class HTagException(Exception): pass
 
-md5= lambda x: hashlib.md5(x.encode('utf-8')).hexdigest()
+#md5= lambda x: hashlib.md5(x.encode('utf-8')).hexdigest()
 
 def stringify(obj):
     def my(obj):
@@ -216,7 +217,7 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
 
     @property
     def innerHTML(self) -> str:
-        return self.__render(list(self._attrs.items()), False)
+        return "".join([str(i) for i in self._childs if i is not None])
 
 
     def _getStateImage(self) -> str: #TODO: could disapear (can make something more inteligent here!)
@@ -283,11 +284,12 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
             init = getattr(self,"init")
             init = init if callable(init) else None
 
-        if  "_id" in attrs: # TODO: currently it refuses settings @id !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        if  1==0: # TODO: currently it refuses settings @id !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        # if  "_id" in attrs: # TODO: currently it refuses settings @id !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             raise HTagException("can't set the html attribut '_id'")
         else:
             the_id = id(self)
-            attrs["_id"]=the_id   # force an @id !
+            #attrs["_id"]=the_id   # force an @id !
             if init:
                 self.fuckInit(None,**attrs)
                 #=================================================== in v <= 0.7.5
@@ -447,7 +449,7 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         else:
             logger.debug("Tag.__str__() : render str for %s", repr(self))
 
-        return self.__render(list(self._attrs.items()), self._isHrendered())
+        return self._render(list(self._attrs.items()), self._isHrendered())
 
     def _isHrendered(self):
         root= self
@@ -459,12 +461,17 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
                 root = parent
 
 
-    def __render(self,attrs,withId):
+    def _render(self,attrs,needIds):
         rattrs=[]
-        isRemoveIds=not withId
-        # isRemoveIds=False
+        if needIds:
+            d=dict(attrs)
+            #TODO: can overwrite a real id !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! do something !
+            d["id"]=id(self)
+            attrs = list(d.items())
+        # else:
+        #     attrs = [(k,v) for k,v in attrs if k!="id"]
+
         for k,v in attrs:
-            if isRemoveIds and k=="id": continue
             if v is not None:
                 if isinstance(v,bool):
                     if v == True:
@@ -475,7 +482,7 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         return """<%(tag)s%(attrs)s>%(content)s</%(tag)s>""" % dict(
             tag=self.tag.replace("_","-"),
             attrs=" ".join([""]+rattrs) if rattrs else "",
-            content="".join([str(i) for i in self._childs if i is not None]),   # keeps @id
+            content="".join([str(i) for i in self._childs if i is not None]),
         )
 
 

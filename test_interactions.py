@@ -146,7 +146,7 @@ async def test_simplest():
     assert s.tag["nb"]==1
     assert list(r["update"].keys()) == [ id(s.tag) ]
     assert r["update"][id(s.tag)]==str(s.tag)
-    assert ' nb="1"></body>' in r["update"][id(s.tag)]
+    assert ' nb="1" ' in r["update"][id(s.tag)]
 
     r=await s.interact().doNothing()
     assert "update" not in r
@@ -155,7 +155,7 @@ async def test_simplest():
     assert len(s.tag.childs)==1
     assert list(r["update"].keys()) == [ id(s.tag) ]
     assert r["update"][id(s.tag)]==str(s.tag)
-    assert ' nb="1">content</body>' in r["update"][id(s.tag)]
+    assert ' nb="1" ' in r["update"][id(s.tag)]
 
 
     r=await s.interact().all()
@@ -163,7 +163,8 @@ async def test_simplest():
     assert len(s.tag.childs)==2
     assert list(r["update"].keys()) == [ id(s.tag) ]
     assert r["update"][id(s.tag)]==str(s.tag)
-    assert ' nb="2">contentcontent</body>' in r["update"][id(s.tag)]
+    assert ' nb="2" ' in r["update"][id(s.tag)]
+    assert 'contentcontent' in r["update"][id(s.tag)]
 
 
 @pytest.mark.asyncio
@@ -345,8 +346,8 @@ if __name__=="__main__":
     import logging
     logging.basicConfig(format='[%(levelname)-5s] %(name)s: %(message)s',level=logging.DEBUG)
 
-    asyncio.run( test_empty() )
-    asyncio.run( test_js_at_init1() )
-    asyncio.run( test_js_at_init2() )
-    asyncio.run( test_js_at_init3() )
+    # asyncio.run( test_empty() )
+    # asyncio.run( test_js_at_init1() )
+    # asyncio.run( test_js_at_init2() )
+    # asyncio.run( test_js_at_init3() )
     asyncio.run( test_simplest() )

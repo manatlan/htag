@@ -19,7 +19,7 @@ from htag.runners import *
 # here is another runner, in a simple browser (thru ajax calls)
 # ChromeApp( Page ).run()
 # BrowserHTTP( Page ).run()
-app=BrowserHTTP( Page )
+app=DevApp( Page )
 if __name__ == "__main__":
     # BrowserTornadoHTTP( Page ).run()
 

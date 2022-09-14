@@ -1,7 +1,6 @@
 from htag import Tag
 from htag.render import HRenderer
 
-
 class App(Tag.div):
     def init(self,m="default"):
         self <= m
@@ -10,6 +9,6 @@ class App(Tag.div):
 s=App()
 print(s)
 
-
 hr=HRenderer(App,"")
 print(hr.tag)
+

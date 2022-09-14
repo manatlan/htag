@@ -16,7 +16,7 @@ def test_base():
     assert str(H.my_div("test")) == "<my-div>test</my-div>"
 
 def test_base2():
-    d=H.div("hello")
+    d=Tag.div("hello")
     assert str(d) == "<div>hello</div>"
     d.set("world")
     assert str(d) == "<div>world</div>"
@@ -30,7 +30,7 @@ def test_base2():
     def gen():
         for i in range(3):
             yield i
-    d=H.div()
+    d=Tag.div()
     d.add( gen() )
     assert str(d) == "<div>012</div>"
     d.set( gen() )
@@ -43,12 +43,12 @@ def test_base2():
     d=H.div( gen() )
     assert str(d) == "<div>012</div>"
 
-def test_ko():
-    with pytest.raises(HTagException):
-        H() #explicitly forbiddent
+# def test_ko():
+    # with pytest.raises(HTagException):
+    #     H() #explicitly forbiddent
 
-    with pytest.raises(HTagException):
-        H.span(no="kk")
+    # with pytest.raises(HTagException):
+    #     H.span(no="kk")
 
 # def test_H():
 #     # Tag.H is special, it's a shortcut to H
@@ -72,39 +72,40 @@ def test_ko():
 #     assert str(Tag.H.span("hello",_class="hello")) == str(H.span("hello",_class="hello"))
 
 def test_attrs():
-    d=H.div(_data_text=12)
+    d=Tag.div(_data_text=12)
     assert d["data-text"]==12
+
     assert d.attrs == {"data-text":12}
     d["data-text"]+=1
     assert str(d) == '<div data-text="13"></div>'
 
-    d=H.div(_checked=True)
+    d=Tag.div(_checked=True)
     assert d["checked"]
     assert d.attrs == {"checked":True}
     assert str(d) == '<div checked></div>'
 
-    d=H.div(_checked=False)
+    d=Tag.div(_checked=False)
     assert not d["checked"]
     assert d.attrs == {"checked":False}
     assert str(d) == '<div></div>'
 
-    d=H.my_div( "hello")
+    d=Tag.my_div( "hello")
     assert str(d) == "<my-div>hello</my-div>"
 
-    d=H.div(_id="d1",_class="click")
+    d=Tag.div(_id="d1",_class="click")
     assert d["id"]=="d1"
     assert d["class"]=="click"
     assert str(d) == '<div id="d1" class="click"></div>'
 
-    d=H.div( "hello")
+    d=Tag.div( "hello")
     d.clear()
     d.add("bye")
     d.add("bye")
     assert str(d) == "<div>byebye</div>"
 
-    div=H.div("hello",_style="border:1px solid red")
+    div=Tag.div("hello",_style="border:1px solid red")
     div["id"] = "mydiv"
-    div.add(H.h1("world"))
+    div.add(Tag.h1("world"))
 
 def test_childs():
     t = Tag.ul()
@@ -568,13 +569,13 @@ def test_innerHTML():
     assert t.innerHTML==""
     o=Tag.b("hello")
     t.add(o)
-    assert "<b id=" in str(t)
+    assert "<b>" in str(t)
     assert "<b>" in t.innerHTML
 
     # But ensure that with tagbase(H), it keeps the @id
     t=Tag.div()
     assert t.innerHTML==""
-    o=Tag.H.b("hello",_id="myb")
+    o=Tag.b("hello",_id="myb")
     t.add(o)
     assert "<b id=" in str(t)
     assert "<b id=" in t.innerHTML
@@ -599,7 +600,7 @@ if __name__=="__main__":
 
     # test_base()
     # test_ko()
-    # test_attrs()
+    test_attrs()
     # test_bad_tag_instanciation()
     # test_tag_generation_with_opt_params()
     # test_tag_generation_override_attr_at_construct()
@@ -613,4 +614,4 @@ if __name__=="__main__":
     # test_init_hr()
     # test_remove()
     # test_innerHTML()
-    test_elements_to_str()
+    # test_elements_to_str()

@@ -44,13 +44,13 @@ def test_ok_including_a_Tag_in_statics():
     # and a logger.warning is outputed
 
 def test_statics_in_real_statics():
-    s1=Tag.H.div( [1,"h",Tag.div("dyn"),Tag.H.div("dyn",_id=12)] )
+    # s1=Tag.H.div( [1,"h",Tag.div("dyn"),Tag.H.div("dyn",_id=12)] )
     s2=Tag.div( [1,"h",Tag.H.div("stat"),Tag.H.Section( Tag("yolo") )] )
 
-    assert "id=" in str(s1)
-    assert str(s1._ensureTagBase()) =='<div>1h<div>dyn</div><div id="12">dyn</div></div>'
-    assert "id=" in str(s2)
-    assert str(s2._ensureTagBase()) =="<div>1h<div>stat</div><Section><div>yolo</div></Section></div>"
+    # assert "id=" in str(s1)
+    # assert str(s1._ensureTagBase()) =='<div>1h<div>dyn</div><div id="12">dyn</div></div>'
+    # assert "id=" in str(s2)
+    assert str(s2) =="<div>1h<div>stat</div><Section><div>yolo</div></Section></div>"
 
 def test_render_title():
 
