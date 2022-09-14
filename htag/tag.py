@@ -53,9 +53,6 @@ class Elements(list):
         return f"<Elements {list(self)}>"
 
 
-class TagCreator(type):
-    def __getattr__(self,name:str) -> Type:
-        return type('Tag%s' % name.capitalize(), (Tag,), {**Tag.__dict__,"tag":name})
 
 
 class NotBindedCaller:
@@ -158,6 +155,10 @@ class Binder:
         return Caller(self.__instance,callback,args,kargs)
 
 
+class TagCreator(type):
+    def __getattr__(self,name:str) -> Type:
+        return type('Tag%s' % name.capitalize(), (Tag,), {**Tag.__dict__,"tag":name})
+
 class Tag(metaclass=TagCreator): # custom tag (to inherit)
 
     #======================================================================
@@ -177,9 +178,24 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
     # instance
     #======================================================================
     tag: str="div" # default one
-    js: StrNonable = None  # post script, useful for js/init when tag is rendered
+    js: StrNonable = None  # js script that is executed at each tag rendering
 
+    @property
+    def bind(self):
+        """ to bind method ! and return its js repr"""
+        return Binder(self)
 
+    @property
+    def childs(self) -> list:
+        return self._childs
+
+    @property
+    def attrs(self) -> dict:
+        return self._attrs
+
+    @property
+    def innerHTML(self) -> str:
+        return "".join([str(i) for i in self._childs if i is not None])
 
 
     #======================================================================
@@ -236,7 +252,7 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
 
 
     #======================================================================
-    # public methods/properties
+    # public methods
     #======================================================================
     def clear(self):
         """ remove all childs """
@@ -263,37 +279,20 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
 
     def add(self,elt:AnyTags):
         """ add a element to this tag """
-        if isinstance(elt,Tag):
-            elt.parent = self
-        elif not isinstance(elt,str) and hasattr(elt,"__iter__"):
-            elt=list(elt)
-            for i in elt:
-                if isinstance(i,Tag):
-                    i.parent = self
+        if elt is not None:
+            if isinstance(elt,Tag):
+                elt.parent = self
+            elif not isinstance(elt,str) and hasattr(elt,"__iter__"):
+                elt=list(elt)
+                for i in elt:
+                    if isinstance(i,Tag):
+                        i.parent = self
 
         self._childs.__add__(elt)
 
 
-    @property
-    def bind(self):
-        """ to bind method ! and return its js repr"""
-        return Binder(self)
-
-    @property
-    def childs(self) -> list:
-        return self._childs
-
-    @property
-    def attrs(self) -> dict:
-        return self._attrs
-
-    @property
-    def innerHTML(self) -> str:
-        return "".join([str(i) for i in self._childs if i is not None])
-
-
     #===============================================================================
-    # Override methods
+    # Overriden methods
     #===============================================================================
     async def __on__(self,eventjs:str,*a,**ka):
         """ new mechanism (could replace self.bind.<m>()) ... one day"""
