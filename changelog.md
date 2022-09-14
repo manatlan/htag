@@ -1,3 +1,6 @@
+
+ - BIG IMPROVMENT: no more TagBase/H concepts ... all is Tag only !!! Because a Tag render/str without @id when not attached to a HRenderer
+
 ## 0.8.4 "Event ibetter 2022/09/11
 
  - FIX: when event was null/undefined : it broke all ;-( ... now, it's ok!

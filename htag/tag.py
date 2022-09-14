@@ -159,9 +159,15 @@ class Binder:
 
 
 class Tag(metaclass=TagCreator): # custom tag (to inherit)
+
     # statics
     statics: list = [] # list of "Tag", imported at start in html>head
     imports = None
+
+    @classmethod
+    def find_tag(cls, obj_id:int):
+        return cls.__instances__.get(obj_id, None)
+
 
     # instance
     tag: str="div" # default one
@@ -172,20 +178,6 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
 
 
     #===================================================================================================<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Tagbase
-    def __le__(self, elt: AnyTags ):
-        self.add(elt)
-        return elt
-
-    def __iadd__(self,  elt: AnyTags):
-        ''' use "+=" instead of "<=" '''
-        self.add(elt)
-        return self
-
-    def __add__(self,  elt):
-        return Elements([self]) + elt
-    def __radd__(self,  elt):
-        return elt + Elements([self])
-
     def clear(self):
         self._childs=Elements()
 
@@ -204,6 +196,26 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
             if elt in self._childs:
                 self._childs.remove(elt)
                 return True
+    @property
+    def bind(self):
+        """ to bind method ! and return its js repr"""
+        return Binder(self)
+
+    #to override
+    def exit(self):
+        print("exit() DOES NOTHING (should be overriden)")
+
+    def add(self,elt:AnyTags):
+        if isinstance(elt,Tag):
+            elt.parent = self
+        elif not isinstance(elt,str) and hasattr(elt,"__iter__"):
+            elt=list(elt)
+            for i in elt:
+                if isinstance(i,Tag):
+                    i.parent = self
+
+        self._childs.__add__(elt)
+
 
 
     @property
@@ -220,40 +232,9 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         return "".join([str(i) for i in self._childs if i is not None])
 
 
-    def _getStateImage(self) -> str: #TODO: could disapear (can make something more inteligent here!)
-        """Return a str'image (state) of the object, for quick detection (see Stater())"""
-
-        logger.debug("Force Tag rendering (for state image): %s",repr(self))
-        str(self) # force a re-rendering (for builded lately)
-
-        image=lambda x: "[%s]"%id(x) if isinstance(x,Tag) else str(x)
-        return """%s%s:%s""" % (
-            self.tag,
-            self._attrs,
-            [image(i) for i in self._childs],
-        )
-
-    def _getTree(self) -> dict:
-        """ return a tree of TagBase childs """
-        ll=[]
-
-        for i in self._childs:
-            if isinstance(i,Tag):
-                ll.append( i._getTree() )
-
-        return {self:ll}
-
-    def __repr__(self):
-        return f"<{self.__class__.__name__}'{self.tag} {self._attrs.get('id')} (childs:{len(self._childs)})>"
-
-
     #===================================================================================================<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-    @classmethod
-    def find_tag(cls, obj_id:int):
-        return cls.__instances__.get(obj_id, None)
-
-    def fuckInit(self, content:AnyTags=None,**_attrs):  #TODO: ;-)
+    def __simulateOldInit(self, content:AnyTags=None,**_attrs):  #TODO: integrate in the real __init__ ;-)
         self.set(content)
 
         self._attrs={}
@@ -284,31 +265,21 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
             init = getattr(self,"init")
             init = init if callable(init) else None
 
-        if  1==0: # TODO: currently it refuses settings @id !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        # if  "_id" in attrs: # TODO: currently it refuses settings @id !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            raise HTagException("can't set the html attribut '_id'")
+        if init:
+            self.__simulateOldInit(None,**attrs)
+
+            if "hr" in kargs:
+                del kargs["hr"]
+            init(*args,**kargs)
+            self.__dict__.update(selfs)
         else:
-            the_id = id(self)
-            #attrs["_id"]=the_id   # force an @id !
-            if init:
-                self.fuckInit(None,**attrs)
-                #=================================================== in v <= 0.7.5
-                # init(*args,**selfs)
-                #===================================================
+            # if no own 'init' method, declare default args (selfs) as attributs instance
+            self.__dict__.update(selfs)
 
-                #=================================================== in v > 0.7.5
-                if "hr" in kargs:
-                    del kargs["hr"]
-                init(*args,**kargs)
-                self.__dict__.update(selfs)
-                #===================================================
-            else:
-                # if no own 'init' method, declare default args (selfs) as attributs instance
-                self.__dict__.update(selfs)
+            self.__simulateOldInit(*args, **attrs)    #TODO: useless ?????
 
-                self.fuckInit(*args, **attrs)    #TODO: useless ?????
-
-            Tag.__instances__[the_id]=self
+        # save the weakref to the tag, for Tag.find_tag(id) method
+        Tag.__instances__[id(self)]=self
 
     # new mechanism (could replace self.bind.<m>()) ... one day
     #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -375,17 +346,101 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         else:
             self._attrs[attr]=value
 
-    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    def __le__(self, elt: AnyTags ):
+        self.add(elt)
+        return elt
+
+    def __iadd__(self,  elt: AnyTags):
+        ''' use "+=" instead of "<=" '''
+        self.add(elt)
+        return self
+
+    def __add__(self,  elt):
+        return Elements([self]) + elt
+    def __radd__(self,  elt):
+        return elt + Elements([self])
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__}'{self.tag} {self._attrs.get('id')} (childs:{len(self._childs)})>"
+
+    def __call__(self, js:str):
+        """ Send "js to execute" (post js) now """
+        if self._hr:
+            current = self
+        else:
+            current = self.parent
+            while current is not None and current.parent is not None:
+                current = current.parent
+
+        if current is None or current._hr is None:
+            logger.error(f"call js is not possible, {repr(self)} is not tied to a parent/HRenderer !")
+        else:
+            current._hr._addInteractionScript( self._genIIFEScript(js) )
+
+    def __str__(self):
+        render = self._hasARenderMethod()
+        if render:
+            logger.debug("Tag.__str__() : %s rendering itself with its render() method", repr(self))
+            self.clear()
+            render()
+        else:
+            logger.debug("Tag.__str__() : render str for %s", repr(self))
+
+        needIds = self._isUsedInHrenderer()
+
+        # fix attrs, depending on hr
+        attrs = dict(self._attrs) # make a copy
+        if needIds:
+            if attrs.get("id"):
+                logger.error(f"Tag {repr(self)} had an @id, it was replaced for HRenderer needs !!!!")
+            attrs["id"]=id(self)
+
+        # rewrite attrs(dict) -> nattrs(list)
+        rattrs=[]
+        for k,v in attrs.items():
+            if v is not None:
+                if isinstance(v,bool):
+                    if v == True:
+                        rattrs.append(k)
+                else:
+                    if v!="":
+                        rattrs.append( '%s="%s"' % (k,html.escape( str(v) )) )
+
+        return """<%(tag)s%(attrs)s>%(content)s</%(tag)s>""" % dict(
+            tag=self.tag.replace("_","-"),
+            attrs=" ".join([""]+rattrs) if rattrs else "",
+            content="".join([str(i) for i in self._childs if i is not None]),
+        )
 
 
-    @property
-    def bind(self):
-        """ to bind method ! and return its js repr"""
-        return Binder(self)
 
-    #to override
-    def exit(self):
-        print("exit() DOES NOTHING (should be overriden)")
+
+
+    #===============================================================================
+    # privates methods
+    #===============================================================================
+    def _getStateImage(self) -> str: #TODO: could disapear (can make something more inteligent here!)
+        """Return a str'image (state) of the object, for quick detection (see Stater())"""
+
+        logger.debug("Force Tag rendering (for state image): %s",repr(self))
+        str(self) # force a re-rendering (for builded lately)
+
+        image=lambda x: "[%s]"%id(x) if isinstance(x,Tag) else str(x)
+        return """%s%s:%s""" % (
+            self.tag,
+            self._attrs,
+            [image(i) for i in self._childs],
+        )
+
+    def _getTree(self) -> dict:
+        """ return a tree of Tag childs """
+        ll=[]
+
+        for i in self._childs:
+            if isinstance(i,Tag):
+                ll.append( i._getTree() )
+
+        return {self:ll}
 
     def _getAllJs(self) -> list:
         """ get a list of IIFE js declared script of this tag and its children"""
@@ -404,57 +459,16 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
 
         return ll
 
-    def __call__(self, js:str):
-        """ Send "js to execute" (post js) now """
-        if self._hr:
-            current = self
-        else:
-            current = self.parent
-            while current is not None and current.parent is not None:
-                current = current.parent
-
-        if current is None or current._hr is None:
-            logger.error(f"call js is not possible, {repr(self)} is not tied to a parent/HRenderer !")
-        else:
-            current._hr._addInteractionScript( self._genIIFEScript(js) )
-
-    def add(self,elt:AnyTags):
-        """ override tagbase.add to feed 'tag.parent' with the parent
-            TODO: make it a lot better !
-        """
-        if isinstance(elt,Tag):
-            elt.parent = self
-        elif not isinstance(elt,str) and hasattr(elt,"__iter__"):
-            nelt=[]
-            for i in elt:
-                if isinstance(i,Tag):
-                    i.parent = self
-                nelt.append(i)
-            elt=nelt
-
-        self._childs.__add__(elt)
-
     def _genIIFEScript(self,js:str) -> str:
         return f"(function(tag){{ {js}\n }})(document.getElementById('{id(self)}'));"
 
-    def _hasRender(self):
+    def _hasARenderMethod(self):
         if hasattr(self,"render"):
             render = getattr(self,"render")
             if callable(render):
                 return render
 
-    def __str__(self):
-        render = self._hasRender()
-        if render:
-            logger.debug("Tag.__str__() : %s rendering itself with its render() method", repr(self))
-            self.clear()
-            render()
-        else:
-            logger.debug("Tag.__str__() : render str for %s", repr(self))
-
-        return self._render(list(self._attrs.items()), self._isHrendered())
-
-    def _isHrendered(self):
+    def _isUsedInHrenderer(self):
         root= self
         while 1:
             parent = root.parent
@@ -464,30 +478,4 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
                 root = parent
 
 
-    def _render(self,attrs,needIds):
-        rattrs=[]
-        if needIds:
-            d=dict(attrs)
-            #TODO: can overwrite a real id !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! do something !
-            d["id"]=id(self)
-            attrs = list(d.items())
-        # else:
-        #     attrs = [(k,v) for k,v in attrs if k!="id"]
-
-        for k,v in attrs:
-            if v is not None:
-                if isinstance(v,bool):
-                    if v == True:
-                        rattrs.append(k)
-                else:
-                    if v!="":
-                        rattrs.append( '%s="%s"' % (k,html.escape( str(v) )) )
-        return """<%(tag)s%(attrs)s>%(content)s</%(tag)s>""" % dict(
-            tag=self.tag.replace("_","-"),
-            attrs=" ".join([""]+rattrs) if rattrs else "",
-            content="".join([str(i) for i in self._childs if i is not None]),
-        )
-
-
-class H(Tag): pass
 

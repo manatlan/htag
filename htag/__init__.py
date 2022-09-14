@@ -7,7 +7,7 @@
 # https://github.com/manatlan/htag
 # #############################################################################
 
-from .tag import H,Tag,HTagException
+from .tag import Tag,HTagException
 
 __version__ = '0.8.4' # auto-updated from pypoetry.toml
 

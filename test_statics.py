@@ -1,4 +1,4 @@
-from htag import H,Tag,HTagException
+from htag import Tag,HTagException
 from htag.render import HRenderer
 import pytest
 
@@ -43,7 +43,7 @@ def test_build_lately():
     # test static discovering (in built lately)
     ################################################################
     class O(Tag.div):
-        statics=H.style("/*S1*/")
+        statics=Tag.style("/*S1*/")
 
     assert "/*S1*/" in str(HRenderer( O, "//"))
     ################################################################
@@ -66,8 +66,8 @@ def test_build_lately():
 
 #     sameContent="hello"
 #     sameattrs=dict(_class="hello")
-#     t1=H.a(sameContent,**sameattrs)
-#     t2=H.a(sameContent,**sameattrs)
+#     t1=Tag.a(sameContent,**sameattrs)
+#     t2=Tag.a(sameContent,**sameattrs)
 
 #     assert t1.md5 == t2.md5
 

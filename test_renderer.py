@@ -5,9 +5,9 @@ import pytest
 import asyncio
 import re
 
-from htag import H,Tag,HTagException
+from htag import Tag,HTagException
 from htag.render import Stater,HRenderer,fmtcaller
-from htag.tag import H
+
 
 
 anon=lambda t: str(t).replace( str(id(t)),"<id>" )
@@ -45,7 +45,7 @@ def test_ok_including_a_Tag_in_statics():
 
 def test_statics_in_real_statics():
     # s1=Tag.H.div( [1,"h",Tag.div("dyn"),Tag.H.div("dyn",_id=12)] )
-    s2=Tag.div( [1,"h",Tag.H.div("stat"),Tag.H.Section( Tag("yolo") )] )
+    s2=Tag.div( [1,"h",Tag.div("stat"),Tag.Section( Tag("yolo") )] )
 
     # assert "id=" in str(s1)
     # assert str(s1._ensureTagBase()) =='<div>1h<div>dyn</div><div id="12">dyn</div></div>'
@@ -117,7 +117,7 @@ def test_render_a_tag_with_interaction():
 
 def test_render_a_tag_with_child_interactions():
     class Obj(Tag):
-        statics=H.script("my")
+        statics=Tag.script("my")
 
         def __init__(self,name,**a):
             Tag.__init__(self,**a)
@@ -129,7 +129,7 @@ def test_render_a_tag_with_child_interactions():
 
 
     class MyDiv(Tag):
-        statics=H.script("my")
+        statics=Tag.script("my")
         js="SCRIPT1"
 
         def __init__(self,**a):
@@ -359,7 +359,7 @@ def test_build_immediatly_vs_lately():
             self["nb"] += 1
             self.clear()
             for i in range(self["nb"]):
-                self <= H.span("*")
+                self <= Tag.span("*")
 
     class Obj2(Tag.div):
         """ build lately """
@@ -376,7 +376,7 @@ def test_build_immediatly_vs_lately():
             self["name"]=self.name
             self["nb"]=self.nb
             for i in range(self.nb):
-                self <= H.span("*")
+                self <= Tag.span("*")
 
 
     o1=Obj("toto")
@@ -462,7 +462,7 @@ def test_discovering_js():
 # this test is NON SENSE, til statics are imported in static (not dynamic anymore)
 def test_discovering_css():
     class O(Tag):
-        statics=[H.style("/*CSS1*/")]
+        statics=[Tag.style("/*CSS1*/")]
 
     class OOI(Tag.div): # immediate rendering
         def init(self):
@@ -470,7 +470,7 @@ def test_discovering_css():
 
     class OOOI(Tag.div):  # immediate rendering
         def init(self):
-            self.set( H.div( O() ) )  # Tag in a TagBase
+            self.set( Tag.div( O() ) )  # Tag in a TagBase
 
     class OOL(Tag.div):   # lately rendering
         def render(self):

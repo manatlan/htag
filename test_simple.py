@@ -3,16 +3,16 @@
 from unittest.util import strclass
 import pytest
 
-from htag import H,Tag,HTagException
+from htag import Tag,HTagException
 
 ################################################################################################################
 def test_base():
-    assert str(H.div()) == "<div></div>"
-    assert str(H.div(None)) == "<div></div>"
-    assert str(H.div([])) == "<div></div>"
-    assert str(H.div("hello")) == "<div>hello</div>"
-    assert str(H.div([1,2,3])) == "<div>123</div>"
-    assert str(H.my_div("test")) == "<my-div>test</my-div>"
+    assert str(Tag.div()) == "<div></div>"
+    assert str(Tag.div(None)) == "<div></div>"
+    assert str(Tag.div([])) == "<div></div>"
+    assert str(Tag.div("hello")) == "<div>hello</div>"
+    assert str(Tag.div([1,2,3])) == "<div>123</div>"
+    assert str(Tag.my_div("test")) == "<my-div>test</my-div>"
 
 def test_base2():
     d=Tag.div("hello")
@@ -39,7 +39,7 @@ def test_base2():
     d <= gen()
     assert str(d) == "<div>012</div>"
 
-    d=H.div( gen() )
+    d=Tag.div( gen() )
     assert str(d) == "<div>012</div>"
 
 # def test_ko():
@@ -47,7 +47,7 @@ def test_base2():
     #     H() #explicitly forbiddent
 
     # with pytest.raises(HTagException):
-    #     H.span(no="kk")
+    #     Tag.span(no="kk")
 
 # def test_H():
 #     # Tag.H is special, it's a shortcut to H
@@ -55,20 +55,20 @@ def test_base2():
 #     assert  not issubclass(Tag.H, Tag)
 
 #     # ensure constructor, constructs well
-#     assert  issubclass(Tag.H.div, TagBase)
-#     assert  not issubclass(Tag.H.div, Tag)
+#     assert  issubclass(Tag.Tag.div, TagBase)
+#     assert  not issubclass(Tag.Tag.div, Tag)
 
 #     #whereas Tag.<> is dynamic (with @id), and inherit boths
 #     assert  issubclass(Tag.div, TagBase)
 #     assert  issubclass(Tag.div, Tag)
 
-#     #the main diff ... Tag.H.<> has no @id
-#     assert "id=" not in str(Tag.H.span("hello",_class="hello"))
+#     #the main diff ... Tag.Tag.<> has no @id
+#     assert "id=" not in str(Tag.Tag.span("hello",_class="hello"))
 #     #whereas ... Tag.<> has an @id
 #     assert "id=" in str(Tag.span("hello",_class="hello"))
 
 #     # it's the same construction
-#     assert str(Tag.H.span("hello",_class="hello")) == str(H.span("hello",_class="hello"))
+#     assert str(Tag.Tag.span("hello",_class="hello")) == str(Tag.span("hello",_class="hello"))
 
 def test_attrs():
     d=Tag.div(_data_text=12)
@@ -143,7 +143,7 @@ def test_tag_generation_with_opt_params():
             self.txt=txt
             # self["class"]="12"
             for i in range(1,self.nb+1):
-                self.add( H.li(f"{i} {self.txt}",_id=i) )
+                self.add( Tag.li(f"{i} {self.txt}",_id=i) )
 
     #Now, you can set a @id (BUT WILL BE OVERWRITTEN WHEN IN HR)
     s=NewTag(2,_id=12313213)
@@ -236,7 +236,7 @@ def test_generate_real_js():
     class NewTag(Tag.div):
         def __init__(self,**a):
             Tag.div.__init__(self,**a)
-            self.add( H.button( "width?",_onclick=self.bind.test( "width", b"window.innerWidth") ))
+            self.add( Tag.button( "width?",_onclick=self.bind.test( "width", b"window.innerWidth") ))
 
         def test(self,txt,width):
             print(txt,"=",width)
@@ -262,13 +262,13 @@ def test_generate_real_js():
 #             self <= "hello"
 #             self["id"] = 42
 
-#     class Test3(H.h1):
+#     class Test3(Tag.h1):
 #         def __init__(self):
 #             Tag.h1.__init__(self)
 #             self <= "hello"
 #             self["id"] = 42
 
-#     t1 = H.h1("hello",_id=42)
+#     t1 = Tag.h1("hello",_id=42)
 #     t2 = Test2()
 #     t3 = Test3()
 
@@ -278,7 +278,7 @@ def test_generate_real_js():
 
 # def test_base_concepts():
 #     # Build a TagBase
-#     o=H.h1("yo",_class="ya")
+#     o=Tag.h1("yo",_class="ya")
 #     assert isinstance(o, TagBase)
 #     assert not isinstance(o, Tag)
 #     assert str(o) == '<h1 class="ya">yo</h1>'
@@ -297,7 +297,7 @@ def test_generate_real_js():
 #         def __init__(self,name,**attrs):
 #             Tag.h2.__init__(self,**attrs)
 #             self["name"] = name
-#             self <= H.div(name)
+#             self <= Tag.div(name)
 
 #     o=Nimp2("yo",_class="ya")
 #     print( type(o),o.__class__,o )
@@ -314,11 +314,11 @@ def test_state_yield():
 
         def test(self):
             self.clear()
-            self <= H.h1("hello1")
+            self <= Tag.h1("hello1")
             self("/*JS1*/")
             yield
             self.clear()
-            self <= H.h1("hello2")
+            self <= Tag.h1("hello2")
             self("/*JS2*/")
 
     s=TEST()
@@ -349,20 +349,20 @@ def test_auto_instanciate_attributs():
 
 
 def test_iadd():
-    B=Tag.H.B()
-    C=Tag.H.C()
+    B=Tag.Tag.B()
+    C=Tag.Tag.C()
 
 
     # same concept "<=" & "+="
-    a1=Tag.H.A()
+    a1=Tag.Tag.A()
     a1 <= B
     a1 <= C
 
-    a2=Tag.H.A()
+    a2=Tag.Tag.A()
     a2 += B
     a2 += C
 
-    a3=Tag.H.A()
+    a3=Tag.Tag.A()
     a3.add( B )
     a3.add( C )
 
@@ -370,10 +370,10 @@ def test_iadd():
 
 
     # but not with "tuple"
-    a1=Tag.H.A()
+    a1=Tag.Tag.A()
     a1 <= B, C  # it's not a tuple (it's 2 statements)
 
-    a2=Tag.H.A()
+    a2=Tag.Tag.A()
     a2 += B, C  # it's a tuple
 
     assert str(a1) != str(a2)
@@ -382,7 +382,7 @@ def test_iadd():
 
 
     # btw, This is possible ... '<=' is chain'able
-    a1=Tag.H.A()
+    a1=Tag.Tag.A()
     a1 <= B <= C <= 12
     assert str(a1) == "<A><B><C>12</C></B></A>"
 
@@ -394,9 +394,9 @@ def test_iadd():
     # AVOID TO DO SOMETHING LIKE THAT
     # AVOID TO DO SOMETHING LIKE THAT
     # and it could be weird to mix them like that
-    a=Tag.H.A()
-    B=Tag.H.B()
-    C=Tag.H.C()
+    a=Tag.Tag.A()
+    B=Tag.Tag.B()
+    C=Tag.Tag.C()
     a += B <= C # '<=' is first, and return C ... so A will contain just C ... B is lost in the deep ;-(
     assert str(a) == "<A><C></C></A>"
     # AVOID TO DO SOMETHING LIKE THAT
@@ -405,24 +405,24 @@ def test_iadd():
 
     # "<=" return the added, so it could be chained (a<=b<=c)
     # "+=" can add mass object using a tuple form (without braces) ( a += b,c,d,e  ===  a <= (b,c,d,e) )
-    a1=Tag.H.A()
-    b=Tag.H.B()
-    c=Tag.H.C()
+    a1=Tag.Tag.A()
+    b=Tag.Tag.B()
+    c=Tag.Tag.C()
     a1+= b,c
 
-    a2=Tag.H.A()
-    b=Tag.H.B()
-    c=Tag.H.C()
+    a2=Tag.Tag.A()
+    b=Tag.Tag.B()
+    c=Tag.Tag.C()
     a2<= (b,c)
 
-    a3=Tag.H.A()
-    b=Tag.H.B()
-    c=Tag.H.C()
+    a3=Tag.Tag.A()
+    b=Tag.Tag.B()
+    c=Tag.Tag.C()
     a3<= b+c
 
-    a4=Tag.H.A()
-    b=Tag.H.B()
-    c=Tag.H.C()
+    a4=Tag.Tag.A()
+    b=Tag.Tag.B()
+    c=Tag.Tag.C()
     a4+= b+c
 
     assert str(a1)==str(a2)==str(a3)==str(a4)
@@ -430,9 +430,9 @@ def test_iadd():
 
 
 def test_add():
-    a=Tag.H.A()
-    b=Tag.H.B()
-    c=Tag.H.C()
+    a=Tag.Tag.A()
+    b=Tag.Tag.B()
+    c=Tag.Tag.C()
 
     assert 42+a == [42,a]
     assert a+None == None+a == [a]
@@ -446,9 +446,9 @@ def test_add():
     x=42+a
     assert x==[42,a]
 
-    a=Tag.H.A()
-    b=Tag.H.B()
-    c=Tag.H.C()
+    a=Tag.Tag.A()
+    b=Tag.Tag.B()
+    c=Tag.Tag.C()
 
     a.clear()
     a <= b+c+c+c
@@ -488,8 +488,8 @@ def test_add():
     assert x1 == [12,a,c,b,c,13,c]
 
 
-    a=Tag.H.A()
-    c=Tag.H.C()
+    a=Tag.Tag.A()
+    c=Tag.Tag.C()
     a+=c
     assert str(a) == "<A><C></C></A>"
 
@@ -584,11 +584,11 @@ def test_innerHTML():
 
 
 def test_elements_to_str():
-    l=Tag.H.div("hello")+Tag.H.div("world")
+    l=Tag.Tag.div("hello")+Tag.Tag.div("world")
     assert str(l) == "<div>hello</div><div>world</div>"
-    l=Tag.H.div("hello")+42
+    l=Tag.Tag.div("hello")+42
     assert str(l) == "<div>hello</div>42"
-    l=42+Tag.H.div("hello")
+    l=42+Tag.Tag.div("hello")
     assert str(l) == "42<div>hello</div>"
 
 if __name__=="__main__":
