@@ -111,7 +111,7 @@ class HRenderer:
         def feedStatics(tag):
             for i in ensureList(tag.statics):
                 if isinstance(i,Tag):
-                    if i.md5 not in [j.md5 for j in self._statics]:
+                    if str(i) not in self._statics:
                         self._statics.append( str(i) )
                 elif isinstance(i,str): # auto add as Tag.style // CSS
                     self._statics.append( Tag.H.style(i))
@@ -163,7 +163,10 @@ function action( o ) {
 
     if(o.hasOwnProperty("update"))
         Object.keys(o["update"]).forEach(key => {
-            document.getElementById( key ).outerHTML = o["update"][key];
+            if(key==0)
+                document.body.outerHTML = o["update"][key];
+            else
+                document.getElementById( key ).outerHTML = o["update"][key];
         });
     if(o.hasOwnProperty("stream"))
         Object.keys(o["stream"]).forEach(key => {
@@ -372,7 +375,7 @@ function jevent (e) {
         head <= self._statics
         head <= H.title( self.title )   # set a default title
 
-        body=H.body( "Loading...", _id=0 ) # IMPERSONATE (first interact on id #0)
+        body=H.body( "Loading..." ) # IMPERSONATE (first interact on id #0)
         return "<!DOCTYPE html>"+str(H.html( head+body ))
 
     @property

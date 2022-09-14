@@ -71,20 +71,20 @@ def test_build_lately():
 
 #     assert t1.md5 == t2.md5
 
-def test_Tag_md5():
-    class My(Tag.div):
-        def __init__(self,txt,**a):
-            Tag.div.__init__(self,**a)
-            self <= txt
+# def test_Tag_md5():
+#     class My(Tag.div):
+#         def __init__(self,txt,**a):
+#             Tag.div.__init__(self,**a)
+#             self <= txt
 
-    sameContent="hello"
-    sameattrs=dict(_class="hello")
-    t1=My(sameContent,**sameattrs)
-    t2=My(sameContent,**sameattrs)
+#     sameContent="hello"
+#     sameattrs=dict(_class="hello")
+#     t1=My(sameContent,**sameattrs)
+#     t2=My(sameContent,**sameattrs)
 
-    #md5 is computed, but not useful
-    #(as it's only for tagbase in statics)
-    assert t1.md5 != t2.md5 # so, it's different
+#     #md5 is computed, but not useful
+#     #(as it's only for tagbase in statics)
+#     assert t1.md5 != t2.md5 # so, it's different
 
 
 if __name__=="__main__":

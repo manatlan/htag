@@ -27,10 +27,10 @@ def test_fmtcaller():
 def getGeneratorId(resp):
     return int(re.findall( r"(\d+)", resp["next"])[0])
 
-def test_ko_try_render_a_tagbase():
+# def test_ko_try_render_a_tagbase():
 
-    with pytest.raises(HTagException):
-        HRenderer(H.div,"function interact() {}; start(); // the starter")
+#     with pytest.raises(HTagException):
+#         HRenderer(H.div,"function interact() {}; start(); // the starter")
 
 def test_ok_including_a_Tag_in_statics():
     class Style(Tag):

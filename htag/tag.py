@@ -262,11 +262,6 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
             else:
                 self[ k[1:].replace("_","-") ] = v
 
-        # compute a md5 (to indentify state for statics only now)
-        # WARN : attrs or content change -> doesn't affect md5 !
-        self.md5 = md5( str(self._attrs) + str(self._childs))
-
-
     def __init__(self, *args,**kargs):
         self._hr=None
         self.parent=None    #COULD DISAPPEAR SOON
@@ -288,7 +283,7 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
             init = getattr(self,"init")
             init = init if callable(init) else None
 
-        if  attrs.get("_id"): # when 0 it pass !
+        if  "_id" in attrs: # TODO: currently it refuses settings @id !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             raise HTagException("can't set the html attribut '_id'")
         else:
             the_id = id(self)
