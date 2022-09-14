@@ -1,5 +1,6 @@
 
  - BIG IMPROVMENT: no more TagBase/H concepts ... all is Tag only !!! Because a Tag render/str without @id when not attached to a HRenderer
+ - hrenderer instanciate the tag class with a real kargs `_hr_` (no more "hr" in the **kargs ... too confusing)
 
 ## 0.8.4 "Event ibetter 2022/09/11
 

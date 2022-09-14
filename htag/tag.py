@@ -201,8 +201,8 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
     #======================================================================
     # Constructor
     #======================================================================
-    def __init__(self, *args,**kargs):
-        self._hr=None
+    def __init__(self, *args,_hr_=None,**kargs):
+        self._hr=_hr_
         self.parent=None    #COULD DISAPPEAR SOON
         self.event={}       # NEW !!!!
         self._callbacks_={}
@@ -211,8 +211,6 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         for k,v in kargs.items():
             if k.startswith("_"):
                 attrs[k]=v
-            elif k=="hr":       # provided by the HRenderer when instanciating the Tag !
-                self._hr = v
             else:
                 selfs[k]=v
 
@@ -225,8 +223,6 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         if init:
             self.__simulateOldInit(None,**attrs)
 
-            if "hr" in kargs:
-                del kargs["hr"]
             init(*args,**kargs)
             self.__dict__.update(selfs)
         else:
@@ -273,6 +269,7 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
             if elt in self._childs:
                 self._childs.remove(elt)
                 return True
+
     def exit(self):
         """ method to override, for your own exit"""
         print("exit() DOES NOTHING (should be overriden)")

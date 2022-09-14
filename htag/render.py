@@ -91,12 +91,10 @@ class HRenderer:
 
         try:
             args,kargs = init
-            kargs["hr"] = self
-            tag = tagClass( *args,**kargs )
+            tag = tagClass( *args,_hr_=self,**kargs )
         except TypeError:
             logger.warning(f"Can't instanciate tag '{tagClass.__name__}' with {init} arguments, so instanciate it without argument !")
-            kargs={"hr": self}
-            tag = tagClass(**kargs)
+            tag = tagClass(_hr_=self)
 
         self.tag=tag
         self.tag.tag="body" # force first tag as body !!

@@ -511,7 +511,7 @@ def test_js_call_at_init():
 
     # NOW WORKS !!!!
     myhr=HRSimu()
-    x=TEST(hr=myhr)
+    x=TEST(_hr_=myhr)
     assert "/*JS1*/" in myhr.ijs
 
     assert "/*JS2*/" in x._getAllJs()[0]  # normal, coz it's an interaction script, not a static js
@@ -525,7 +525,7 @@ def test_init_hr():
             self <= A()
             self <= A()+A()+"hello"
 
-    t=TEST( hr="FAKE_HR" ) # simulate the hr which is setted by HRenderer IRL
+    t=TEST( _hr_="FAKE_HR" ) # simulate the hr which is setted by HRenderer IRL
     assert t._hr=="FAKE_HR"
     assert t.parent==None
     assert len(t.childs) == 4
