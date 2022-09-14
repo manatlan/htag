@@ -425,9 +425,12 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         if isinstance(elt,Tag):
             elt.parent = self
         elif not isinstance(elt,str) and hasattr(elt,"__iter__"):
+            nelt=[]
             for i in elt:
                 if isinstance(i,Tag):
                     i.parent = self
+                nelt.append(i)
+            elt=nelt
 
         self._childs.__add__(elt)
 

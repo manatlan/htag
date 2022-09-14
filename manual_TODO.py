@@ -12,3 +12,10 @@ print(s)
 hr=HRenderer(App,"")
 print(hr.tag)
 
+def gen():
+    for i in range(3):
+        yield i
+d=Tag.div()
+d.add( gen() )
+assert str(d) == "<div>012</div>"
+

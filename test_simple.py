@@ -1,10 +1,9 @@
 #!/usr/bin/python3 -u
 # -*- coding: utf-8 -*-
+from unittest.util import strclass
 import pytest
 
 from htag import H,Tag,HTagException
-
-anon=lambda t: str(t).replace( str(id(t)),"<id>" )
 
 ################################################################################################################
 def test_base():
@@ -146,14 +145,14 @@ def test_tag_generation_with_opt_params():
             for i in range(1,self.nb+1):
                 self.add( H.li(f"{i} {self.txt}",_id=i) )
 
-    # can't set an html attribut id
-    with pytest.raises(HTagException):
-        NewTag(2,_id=12313213)
+    #Now, you can set a @id (BUT WILL BE OVERWRITTEN WHEN IN HR)
+    s=NewTag(2,_id=12313213)
+    assert s["id"]==12313213
 
     # but can set an attribut on instance
     x=NewTag(2,id=12313213)
     assert x.id==12313213
-    assert x["id"] == id(x) # it's a real htag.tag, so it got a real html attribut
+    assert "id" not in x.attrs
 
     # can set attributs
     x=NewTag(2,param1="jiji",param2=42)
@@ -167,14 +166,14 @@ def test_tag_generation_with_opt_params():
         NewTag()
 
     g=NewTag(3,_class="jo",_style="border:1px solid red")
-    assert g["id"] == id(g)
+    assert "id" not in g.attrs
 
-    assert anon(g) == \
-         '''<h1 class="jo" style="border:1px solid red;" id="<id>"><li id="1">1 torchon</li><li id="2">2 torchon</li><li id="3">3 torchon</li></h1>'''
+    assert str(g) == \
+         '''<h1 class="jo" style="border:1px solid red;"><li id="1">1 torchon</li><li id="2">2 torchon</li><li id="3">3 torchon</li></h1>'''
 
     g=NewTag(3,txt="serviette",_class="jo",_style="border:1px solid red")
-    assert anon(g) == \
-        '''<h1 class="jo" style="border:1px solid red;" id="<id>"><li id="1">1 serviette</li><li id="2">2 serviette</li><li id="3">3 serviette</li></h1>'''
+    assert str(g) == \
+        '''<h1 class="jo" style="border:1px solid red;"><li id="1">1 serviette</li><li id="2">2 serviette</li><li id="3">3 serviette</li></h1>'''
 
 
 def test_tag_generation_override_attr_at_construct():
@@ -186,14 +185,14 @@ def test_tag_generation_override_attr_at_construct():
             self["class"]="classA"
 
     g=NewTag()
-    assert anon(g) == '<h1 id="<id>" class="classA"></h1>'
+    assert str(g) == '<h1 class="classA"></h1>'
 
     g=NewTag()
     g["class"]="classB"
-    assert anon(g) == '<h1 id="<id>" class="classB"></h1>'
+    assert str(g) == '<h1 class="classB"></h1>'
 
     g=NewTag(_class="classB")
-    assert anon(g) == '<h1 class="classA" id="<id>"></h1>' #TODO: should be classB ... no ? -> adapt
+    assert str(g) == '<h1 class="classA"></h1>' #TODO: should be classB ... no ? -> adapt
 
 
 
@@ -598,9 +597,10 @@ if __name__=="__main__":
     logging.basicConfig(format='[%(levelname)-5s] %(name)s: %(message)s',level=logging.DEBUG)
     # logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.DEBUG)
 
+    test_base2()
     # test_base()
     # test_ko()
-    test_attrs()
+    # test_attrs()
     # test_bad_tag_instanciation()
     # test_tag_generation_with_opt_params()
     # test_tag_generation_override_attr_at_construct()

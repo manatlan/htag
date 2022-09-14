@@ -129,8 +129,8 @@ class HRenderer:
             def rec( tag ):
                 if hasattr(tag, "imports") and tag.imports is not None:
                     imports = ensureList(tag.imports)
-                    # if not all([isinstance(c,type) and issubclass(c,TagBase) for c in imports]):
-                    #     raise HTagException("imports can contains only Tag classes")
+                    if not all([isinstance(c,type) and issubclass(c,Tag) for c in imports]):
+                        raise HTagException("imports can contains only Tag classes %s" % imports)
                     for c in imports:
                         feedStatics(c)
                         rec(c)

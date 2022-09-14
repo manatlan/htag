@@ -83,9 +83,9 @@ def test_render_a_tag_with_interaction():
 
     t=MyDiv()
     assert t.tag == "div" # the default one
-    assert t["id"] == id(t) # a inherited one got an id
+    assert t["id"] == None
     assert t["class"] == "my"
-    assert str(t).startswith("<div id") # solo rendering as a div
+    assert str(t).startswith("<div class") # solo rendering as a div
 
     js=lambda t: "\n".join(t._getAllJs())
 
@@ -324,9 +324,9 @@ def test_intelligent_rendering2():
 
     # test that the base feature works ;-)
     o=Obj()
-    assert anon(o)=='<div id="<id>">0</div>'
+    assert str(o)=='<div>0</div>'
     o.inc()
-    assert anon(o)=='<div id="<id>">1</div>'
+    assert str(o)=='<div>1</div>'
 
     # test that the state image mechanism works as expected
     s_before=o._getStateImage()
@@ -643,4 +643,5 @@ if __name__=="__main__":
     # test_render_title()
     # test_new()
     # test_render_a_tag_with_child_interactions()
+    # test_render_a_tag_with_interaction()
     test_imports()
