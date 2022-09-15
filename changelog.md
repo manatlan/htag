@@ -1,4 +1,4 @@
-## 0.8.4 "Event ibetter 2022/09/11
+## 0.8.4 "Event better 2022/09/11
 
  - FIX: when event was null/undefined : it broke all ;-( ... now, it's ok!
 
