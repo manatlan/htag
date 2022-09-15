@@ -24,7 +24,7 @@ But yes … the promise is here : **it's a GUI toolkit for building "beautiful" 
 
 [DEMO/TUTORIAL](https://htag.glitch.me/)
 
-[Changelog](https://github.com/manatlan/htag/blob/main/changelog.md)
+[Changelog](https://github.com/manatlan/htag/releases)
 
 [Available on pypi.org](https://pypi.org/project/htag/)
 
