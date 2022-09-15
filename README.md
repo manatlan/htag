@@ -2,7 +2,7 @@
 
 <img src="https://manatlan.github.io/htag/htag.png" width="100" height="100">
 
-[![Test](https://github.com/manatlan/htag/actions/workflows/unittests.yml/badge.svg)](https://github.com/manatlan/htag/actions/workflows/unittests.yml)
+[![Test](https://github.com/manatlan/htag/actions/workflows/on_commit_do_all_unittests.yml/badge.svg)](https://github.com/manatlan/htag/actions/workflows/on_commit_do_all_unittests.yml)
 
 <a href="https://pypi.org/project/htag/">
     <img src="https://badge.fury.io/py/htag.svg" alt="Package version">
