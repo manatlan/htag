@@ -339,6 +339,27 @@ async def test_bug():
     r=await S.hr.interact(15654654654546,"m",(),{})
     assert r["err"] # 15654654654546 is not an existing Tag or generator (dead objects ?)?!"
 
+@pytest.mark.asyncio
+async def test_bug_0_8_5(): 
+    """ many js statements rendered """
+
+    class Comp(Tag.div):
+        def init(self):
+            self.js = "console.log('YOLO');"
+            
+    class App(Tag.body):
+        def init(self):
+            self += Tag.div( Tag.div( Comp() ) )
+
+    hr=HRenderer( App, "// my starter")
+
+    # first interaction
+    r=await hr.interact(0,None,None,None,None)
+
+    # I should just find 1 YOLO (1 js) ... (but in 0.8.5 -> 4 ;-( )
+    assert r["post"].count("YOLO") == 1
+
+
 
 
 if __name__=="__main__":
