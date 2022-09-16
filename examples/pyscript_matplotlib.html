@@ -5,7 +5,7 @@
     <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <py-env>
-        - htag==0.8.7 # fixed version (to be sure it's working currently)
+        - htag==0.8.8 # fixed version (to be sure it's working currently)
         - matplotlib
     </py-env>
 </head>
@@ -27,11 +27,11 @@ class TagPlot(Tag.span):
 class App(Tag.body):
     def init(self):
         self.content = Tag.div()
-        
+
         # create the layout
         self += Tag.h2("MatPlotLib " + Tag.button("Random",_onclick=self.redraw_plt))
         self += self.content
-        
+
         self.redraw_plt()
 
     def redraw_plt(self,obj=None):
@@ -40,7 +40,7 @@ class App(Tag.body):
         plt.xlabel('Size of my list')
         my_list=[random.randint(1,10) for i in range(random.randint(20,50))]
         plt.plot( my_list )
-        
+
         self.content.clear()
         self.content += Tag.div(f"My list: {my_list}")
         self.content += TagPlot(plt)
