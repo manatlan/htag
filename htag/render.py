@@ -109,8 +109,8 @@ class HRenderer:
         def feedStatics(tag):
             for i in ensureList(tag.statics):
                 if isinstance(i,Tag):
-                    if str(i) not in self._statics:
-                        self._statics.append( str(i) )
+                    if i._hash_ not in [i._hash_ for i in self._statics]:
+                        self._statics.append( i )
                 elif isinstance(i,str): # auto add as Tag.style // CSS
                     self._statics.append( Tag.style(i))
                 elif isinstance(i,bytes): # auto add as Tag.script // JS

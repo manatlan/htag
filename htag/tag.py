@@ -7,11 +7,13 @@
 # https://github.com/manatlan/htag
 # #############################################################################
 import html,json
-#import hashlib
+import hashlib
 import logging,types,asyncio
 import weakref
 from typing import Sequence,Union,Optional,Any,Callable,Type
 from .attrs import StrClass,StrStyle
+
+md5= lambda x: hashlib.md5(x.encode('utf-8')).hexdigest()
 
 AnyTags = Union[ Optional[Any], Sequence[Any]]
 StrNonable = Optional[str]
@@ -234,6 +236,8 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         # save the weakref to the tag, for Tag.find_tag(id) method
         Tag.__instances__[id(self)]=self
 
+        # compute an hash at creation time (used in hrender to identify doubles)
+        self._hash_ = md5( str(self._attrs.items())+str(self.childs) )
 
     def __simulateOldInit(self, content:AnyTags=None,**_attrs):  #TODO: integrate in the real __init__ ;-)
         self.set(content)
