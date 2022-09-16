@@ -340,18 +340,21 @@ async def test_bug():
     assert r["err"] # 15654654654546 is not an existing Tag or generator (dead objects ?)?!"
 
 @pytest.mark.asyncio
-async def test_bug_0_8_5(): 
+async def test_bug_0_8_5():
     """ many js statements rendered """
 
     class Comp(Tag.div):
         def init(self):
             self.js = "console.log('YOLO');"
-            
+
     class App(Tag.body):
         def init(self):
             self += Tag.div( Tag.div( Comp() ) )
 
+    #TODO: use Simu ;-)
     hr=HRenderer( App, "// my starter")
+
+    assert len(App()._getAllJs()) == 1
 
     # first interaction
     r=await hr.interact(0,None,None,None,None)
@@ -371,4 +374,5 @@ if __name__=="__main__":
     # asyncio.run( test_js_at_init1() )
     # asyncio.run( test_js_at_init2() )
     # asyncio.run( test_js_at_init3() )
-    asyncio.run( test_simplest() )
+    # asyncio.run( test_simplest() )
+    asyncio.run( test_bug_0_8_5() )

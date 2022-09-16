@@ -457,13 +457,9 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
             logger.debug("Init Script (.js) found in %s --> '%s'",repr(self),self.js)
             ll.append( self._genIIFEScript( self.js ) ) #IIFE !
 
-        def rec(childs:Sequence):
-            for i in childs:
-                if isinstance(i,Tag):
-                    ll.extend( i._getAllJs() )
-                    rec(i._childs)
-
-        rec(self._childs)
+        for i in self._childs:
+            if isinstance(i,Tag):
+                ll.extend( i._getAllJs() )
 
         return ll
 
