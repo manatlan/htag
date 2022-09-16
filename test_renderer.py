@@ -5,9 +5,9 @@ import pytest
 import asyncio
 import re
 
-from htag import H,Tag,HTagException
+from htag import Tag,HTagException
 from htag.render import Stater,HRenderer,fmtcaller
-from htag.tag import H
+
 
 
 anon=lambda t: str(t).replace( str(id(t)),"<id>" )
@@ -27,10 +27,10 @@ def test_fmtcaller():
 def getGeneratorId(resp):
     return int(re.findall( r"(\d+)", resp["next"])[0])
 
-def test_ko_try_render_a_tagbase():
+# def test_ko_try_render_a_tagbase():
 
-    with pytest.raises(HTagException):
-        HRenderer(H.div,"function interact() {}; start(); // the starter")
+#     with pytest.raises(HTagException):
+#         HRenderer(H.div,"function interact() {}; start(); // the starter")
 
 def test_ok_including_a_Tag_in_statics():
     class Style(Tag):
@@ -44,13 +44,13 @@ def test_ok_including_a_Tag_in_statics():
     # and a logger.warning is outputed
 
 def test_statics_in_real_statics():
-    s1=Tag.H.div( [1,"h",Tag.div("dyn"),Tag.H.div("dyn",_id=12)] )
-    s2=Tag.div( [1,"h",Tag.H.div("stat"),Tag.H.Section( Tag("yolo") )] )
+    # s1=Tag.H.div( [1,"h",Tag.div("dyn"),Tag.H.div("dyn",_id=12)] )
+    s2=Tag.div( [1,"h",Tag.div("stat"),Tag.Section( Tag("yolo") )] )
 
-    assert "id=" in str(s1)
-    assert str(s1._ensureTagBase()) =='<div>1h<div>dyn</div><div id="12">dyn</div></div>'
-    assert "id=" in str(s2)
-    assert str(s2._ensureTagBase()) =="<div>1h<div>stat</div><Section><div>yolo</div></Section></div>"
+    # assert "id=" in str(s1)
+    # assert str(s1._ensureTagBase()) =='<div>1h<div>dyn</div><div id="12">dyn</div></div>'
+    # assert "id=" in str(s2)
+    assert str(s2) =="<div>1h<div>stat</div><Section><div>yolo</div></Section></div>"
 
 def test_render_title():
 
@@ -83,9 +83,9 @@ def test_render_a_tag_with_interaction():
 
     t=MyDiv()
     assert t.tag == "div" # the default one
-    assert t["id"] == id(t) # a inherited one got an id
+    assert t["id"] == None
     assert t["class"] == "my"
-    assert str(t).startswith("<div id") # solo rendering as a div
+    assert str(t).startswith("<div class") # solo rendering as a div
 
     js=lambda t: "\n".join(t._getAllJs())
 
@@ -117,7 +117,7 @@ def test_render_a_tag_with_interaction():
 
 def test_render_a_tag_with_child_interactions():
     class Obj(Tag):
-        statics=H.script("my")
+        statics=Tag.script("my")
 
         def __init__(self,name,**a):
             Tag.__init__(self,**a)
@@ -129,7 +129,7 @@ def test_render_a_tag_with_child_interactions():
 
 
     class MyDiv(Tag):
-        statics=H.script("my")
+        statics=Tag.script("my")
         js="SCRIPT1"
 
         def __init__(self,**a):
@@ -324,9 +324,9 @@ def test_intelligent_rendering2():
 
     # test that the base feature works ;-)
     o=Obj()
-    assert anon(o)=='<div id="<id>">0</div>'
+    assert str(o)=='<div>0</div>'
     o.inc()
-    assert anon(o)=='<div id="<id>">1</div>'
+    assert str(o)=='<div>1</div>'
 
     # test that the state image mechanism works as expected
     s_before=o._getStateImage()
@@ -359,7 +359,7 @@ def test_build_immediatly_vs_lately():
             self["nb"] += 1
             self.clear()
             for i in range(self["nb"]):
-                self <= H.span("*")
+                self <= Tag.span("*")
 
     class Obj2(Tag.div):
         """ build lately """
@@ -376,7 +376,7 @@ def test_build_immediatly_vs_lately():
             self["name"]=self.name
             self["nb"]=self.nb
             for i in range(self.nb):
-                self <= H.span("*")
+                self <= Tag.span("*")
 
 
     o1=Obj("toto")
@@ -462,7 +462,7 @@ def test_discovering_js():
 # this test is NON SENSE, til statics are imported in static (not dynamic anymore)
 def test_discovering_css():
     class O(Tag):
-        statics=[H.style("/*CSS1*/")]
+        statics=[Tag.style("/*CSS1*/")]
 
     class OOI(Tag.div): # immediate rendering
         def init(self):
@@ -470,7 +470,7 @@ def test_discovering_css():
 
     class OOOI(Tag.div):  # immediate rendering
         def init(self):
-            self.set( H.div( O() ) )  # Tag in a TagBase
+            self.set( Tag.div( O() ) )  # Tag in a TagBase
 
     class OOL(Tag.div):   # lately rendering
         def render(self):
@@ -499,32 +499,30 @@ def test_discovering_css():
 def test_imports():
 
     class Ya(Tag.div):
-        statics = Tag.H.style("""body {font-size:100px}""", _id="Ya")
+        statics = Tag.style("""body {font-size:100px}""", _id="Ya")
 
         def init(self):
             self <= "Ya"
 
 
     class Yo(Tag.div):
-        statics = Tag.H.style("""body {background:#CFC;}""", _id="Yo")
+        statics = Tag.style("""body {background:#CFC;}""", _id="Yo")
 
         def init(self):
             self <= "Yo"
 
 
     class AppWithImport(Tag.body):
-        statics = Tag.H.style("""body {color: #080}""", _id="main")
+        statics = Tag.style("""body {color: #080}""", _id="main")
         imports = Yo
 
         def init(self):
-
             self <= Yo()
 
     class AppWithoutImport(Tag.body):
-        statics = Tag.H.style("""body {color: #080}""", _id="main")
+        statics = Tag.style("""body {color: #080}""", _id="main")
 
         def init(self):
-
             self <= Yo()
 
     html=str(HRenderer( AppWithImport, ""))
@@ -644,4 +642,6 @@ if __name__=="__main__":
     # test_statics_in_real_statics()
     # test_render_title()
     # test_new()
-    test_render_a_tag_with_child_interactions()
+    # test_render_a_tag_with_child_interactions()
+    # test_render_a_tag_with_interaction()
+    test_imports()

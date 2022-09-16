@@ -7,7 +7,7 @@
 # https://github.com/manatlan/htag
 # #############################################################################
 
-from .tag import H,Tag,HTagException
+from .tag import Tag,HTagException
 
 __version__ = "0.0.0" # auto-updated
 

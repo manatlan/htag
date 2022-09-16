@@ -9,7 +9,7 @@
 import json,asyncio,types,traceback
 
 from . import __version__
-from .tag import HTagException,H, Tag, TagBase, BaseCaller
+from .tag import HTagException,Tag, BaseCaller
 
 from typing import Callable, Optional
 
@@ -91,12 +91,10 @@ class HRenderer:
 
         try:
             args,kargs = init
-            kargs["hr"] = self
-            tag = tagClass( *args,**kargs )
+            tag = tagClass( *args,_hr_=self,**kargs )
         except TypeError:
             logger.warning(f"Can't instanciate tag '{tagClass.__name__}' with {init} arguments, so instanciate it without argument !")
-            kargs={"hr": self}
-            tag = tagClass(**kargs)
+            tag = tagClass(_hr_=self)
 
         self.tag=tag
         self.tag.tag="body" # force first tag as body !!
@@ -110,16 +108,13 @@ class HRenderer:
 
         def feedStatics(tag):
             for i in ensureList(tag.statics):
-                if isinstance(i,TagBase):
-                    if isinstance(i,Tag):
-                        i = i._ensureTagBase()
-
-                    if i.md5 not in [j.md5 for j in self._statics]:
-                        self._statics.append( i )
+                if isinstance(i,Tag):
+                    if str(i) not in self._statics:
+                        self._statics.append( str(i) )
                 elif isinstance(i,str): # auto add as Tag.style // CSS
-                    self._statics.append( Tag.H.style(i))
+                    self._statics.append( Tag.style(i))
                 elif isinstance(i,bytes): # auto add as Tag.script // JS
-                    self._statics.append( Tag.H.script(i.decode()))
+                    self._statics.append( Tag.script(i.decode()))
                 else:
                     raise HTagException("Included static is bad")
 
@@ -132,8 +127,8 @@ class HRenderer:
             def rec( tag ):
                 if hasattr(tag, "imports") and tag.imports is not None:
                     imports = ensureList(tag.imports)
-                    if not all([isinstance(c,type) and issubclass(c,TagBase) for c in imports]):
-                        raise HTagException("imports can contains only Tag classes")
+                    if not all([isinstance(c,type) and issubclass(c,Tag) for c in imports]):
+                        raise HTagException("imports can contains only Tag classes %s" % imports)
                     for c in imports:
                         feedStatics(c)
                         rec(c)
@@ -166,7 +161,10 @@ function action( o ) {
 
     if(o.hasOwnProperty("update"))
         Object.keys(o["update"]).forEach(key => {
-            document.getElementById( key ).outerHTML = o["update"][key];
+            if(key==0)
+                document.body.outerHTML = o["update"][key];
+            else
+                document.getElementById( key ).outerHTML = o["update"][key];
         });
     if(o.hasOwnProperty("stream"))
         Object.keys(o["stream"]).forEach(key => {
@@ -243,7 +241,7 @@ function jevent (e) {
 %s
 """ % (BaseCaller( None ), js)
 
-        self._statics.append( H.script( js_base ))
+        self._statics.append( Tag.script( js_base ))
 
         self._loop={}   # for savng generator, to keep them during GC
 
@@ -368,15 +366,15 @@ function jevent (e) {
         return rep
 
     def __str__(self) -> str:
-        head=H.head()
-        head <= H.meta(_charset="utf-8")
-        head <= H.meta(_name="viewport",_content="width=device-width, initial-scale=1")
-        head <= H.meta(_name="version",_content=f"htag {__version__}")
+        head=Tag.head()
+        head <= Tag.meta(_charset="utf-8")
+        head <= Tag.meta(_name="viewport",_content="width=device-width, initial-scale=1")
+        head <= Tag.meta(_name="version",_content=f"htag {__version__}")
         head <= self._statics
-        head <= H.title( self.title )   # set a default title
+        head <= Tag.title( self.title )   # set a default title
 
-        body=H.body( "Loading...", _id=0 ) # IMPERSONATE (first interact on id #0)
-        return "<!DOCTYPE html>"+str(H.html( head+body ))
+        body=Tag.body( "Loading..." )
+        return "<!DOCTYPE html>"+str(Tag.html( head+body ))
 
     @property
     def title(self) -> str:
