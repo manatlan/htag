@@ -1,4 +1,7 @@
 name: "On Tag -> Deploy a release to pypi"
+
+#TODO: in the future, try to do that : https://mestrak.com/blog/semantic-release-with-python-poetry-github-actions-20nn
+
 on:
   push:
     tags:
