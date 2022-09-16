@@ -35,14 +35,15 @@ interact=async function(o) {
         # install statics in headers
         window.document.head.innerHTML=""
         for s in self.hr._statics:
-            tag=window.document.createElement(s.tag)
-            tag.innerHTML = "".join([str(i) for i in s.childs if i is not None])
-            for key,value in s.attrs.items():
-                setattr(tag, key, value)
-            window.document.head.appendChild(tag)
+            if isinstance(s,Tag):
+                tag=window.document.createElement(s.tag)
+                tag.innerHTML = "".join([str(i) for i in s.childs if i is not None])
+                for key,value in s.attrs.items():
+                    setattr(tag, key, value)
+                window.document.head.appendChild(tag)
 
         # install the first object in body
-        window.document.body.outerHTML=str(Tag.H.body( _id=0 ))
+        window.document.body.outerHTML=str(Tag.body( _id=0 ))
 
         # and start the process
         window.start()
