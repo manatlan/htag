@@ -5,7 +5,7 @@
 [![Test](https://github.com/manatlan/htag/actions/workflows/on_commit_do_all_unittests.yml/badge.svg)](https://github.com/manatlan/htag/actions/workflows/on_commit_do_all_unittests.yml)
 
 <a href="https://pypi.org/project/htag/">
-    <img src="https://badge.fury.io/py/htag.svg" alt="Package version">
+    <img src="https://badge.fury.io/py/htag.svg?x" alt="Package version">
 </a>
 
 
