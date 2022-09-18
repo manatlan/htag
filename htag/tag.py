@@ -306,8 +306,8 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         """
         if elt is not None:
             if isinstance(elt,Tag):
-                # if elt.parent is not None:    #TODO: in the near future ;-)
-                #     raise HTagException(f"Can't add {repr(elt)} to {repr(self)} childs, it's already parented !")
+                if elt.parent is not None:
+                    raise HTagException(f"Can't add {repr(elt)} to {repr(self)} childs, it's already parented !")
                 elt._parent = self
                 self._childs.__add__(elt)
             elif not isinstance(elt,str) and hasattr(elt,"__iter__"):

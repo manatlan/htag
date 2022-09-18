@@ -107,14 +107,18 @@ class HRenderer:
         ensureList=lambda x: list(x) if type(x) in [list,tuple] else [x]
 
         def feedStatics(tag):
+
+            def appendIfNotPresent(i):
+                if i._hash_ not in [i._hash_ for i in self._statics]:
+                    self._statics.append( i )
+
             for i in ensureList(tag.statics):
                 if isinstance(i,Tag):
-                    if i._hash_ not in [i._hash_ for i in self._statics]:
-                        self._statics.append( i )
+                    appendIfNotPresent(i)
                 elif isinstance(i,str): # auto add as Tag.style // CSS
-                    self._statics.append( Tag.style(i))
+                    appendIfNotPresent( Tag.style(i))
                 elif isinstance(i,bytes): # auto add as Tag.script // JS
-                    self._statics.append( Tag.script(i.decode()))
+                    appendIfNotPresent( Tag.script(i.decode()))
                 else:
                     raise HTagException("Included static is bad")
 
@@ -367,11 +371,13 @@ function jevent (e) {
 
     def __str__(self) -> str:
         head=Tag.head()
-        head <= Tag.meta(_charset="utf-8")
-        head <= Tag.meta(_name="viewport",_content="width=device-width, initial-scale=1")
-        head <= Tag.meta(_name="version",_content=f"htag {__version__}")
-        head <= self._statics
-        head <= Tag.title( self.title )   # set a default title
+        head += Tag.meta(_charset="utf-8")
+        head += Tag.meta(_name="viewport",_content="width=device-width, initial-scale=1")
+        head += Tag.meta(_name="version",_content=f"htag {__version__}")
+        for i in self._statics:
+            i._parent=None  #unparent Static Tag (to be able to re-add, at each rendering/str'ing)
+            head += i
+        head += Tag.title( self.title )   # set a default title
 
         body=Tag.body( "Loading..." )
         return "<!DOCTYPE html>"+str(Tag.html( head+body ))

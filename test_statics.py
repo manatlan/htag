@@ -86,6 +86,29 @@ def test_build_lately():
 #     #(as it's only for tagbase in statics)
 #     assert t1.md5 != t2.md5 # so, it's different
 
+def test_doubbles_statics():
+    class AppSS(Tag.div):
+        statics = "kiki","kiki"
+        imports=[] # just to avoid import all Tag in the scoped process
+        def init(self,m="default"):
+            self <= m
+            self <= Tag.span("world")
+
+    hr1=HRenderer(AppSS,"")
+    assert len(hr1._statics)==2                      # 2 real statics
+    assert str(hr1).count("<style>kiki</style>")==1  # but just one rendered (coz they are identicals (_hash_))
+
+    class AppST(Tag.div):
+        statics = Tag.style("kiki"),Tag.style("kiki")
+        imports=[] # just to avoid import all Tag in the scoped process
+        def init(self,m="default"):
+            self <= m
+            self <= Tag.span("world")
+
+    hr2=HRenderer(AppST,"")
+    assert len(hr2._statics)==2                      # 2 real statics
+    assert str(hr2).count("<style>kiki</style>")==1  # but just one rendered (coz they are identicals (_hash_))
+
 
 if __name__=="__main__":
 

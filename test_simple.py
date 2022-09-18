@@ -350,32 +350,29 @@ def test_auto_instanciate_attributs():
 
 
 def test_iadd():
-    B=Tag.Tag.B()
-    C=Tag.Tag.C()
-
 
     # same concept "<=" & "+="
-    a1=Tag.Tag.A()
-    a1 <= B
-    a1 <= C
+    a1=Tag.A()
+    a1 <= Tag.B()
+    a1 <= Tag.C()
 
-    a2=Tag.Tag.A()
-    a2 += B
-    a2 += C
+    a2=Tag.A()
+    a2 += Tag.B()
+    a2 += Tag.C()
 
-    a3=Tag.Tag.A()
-    a3.add( B )
-    a3.add( C )
+    a3=Tag.A()
+    a3.add( Tag.B() )
+    a3.add( Tag.C() )
 
     assert str(a1)==str(a3)==str(a2)
 
 
     # but not with "tuple"
-    a1=Tag.Tag.A()
-    a1 <= B, C  # it's not a tuple (it's 2 statements)
+    a1=Tag.A()
+    a1 <= Tag.B(), Tag.C()  # it's not a tuple (it's 2 statements)
 
-    a2=Tag.Tag.A()
-    a2 += B, C  # it's a tuple
+    a2=Tag.A()
+    a2 += Tag.B(), Tag.C()   # it's a tuple
 
     assert str(a1) != str(a2)
     assert str(a1) == "<A><B></B></A>"
@@ -383,47 +380,47 @@ def test_iadd():
 
 
     # btw, This is possible ... '<=' is chain'able
-    a1=Tag.Tag.A()
-    a1 <= B <= C <= 12
+    a1=Tag.A()
+    a1 <= Tag.B() <= Tag.C() <= 12
     assert str(a1) == "<A><B><C>12</C></B></A>"
 
     # but syntax error, for that
     ## a1 += B += C
 
 
-    # AVOID TO DO SOMETHING LIKE THAT
-    # AVOID TO DO SOMETHING LIKE THAT
-    # AVOID TO DO SOMETHING LIKE THAT
-    # and it could be weird to mix them like that
-    a=Tag.Tag.A()
-    B=Tag.Tag.B()
-    C=Tag.Tag.C()
-    a += B <= C # '<=' is first, and return C ... so A will contain just C ... B is lost in the deep ;-(
-    assert str(a) == "<A><C></C></A>"
-    # AVOID TO DO SOMETHING LIKE THAT
-    # AVOID TO DO SOMETHING LIKE THAT
-    # AVOID TO DO SOMETHING LIKE THAT
+    # # AVOID TO DO SOMETHING LIKE THAT
+    # # AVOID TO DO SOMETHING LIKE THAT
+    # # AVOID TO DO SOMETHING LIKE THAT
+    # # and it could be weird to mix them like that
+    # a=Tag.A()
+    # B=Tag.B()
+    # C=Tag.C()
+    # a += B <= C # '<=' is first, and return C ... so A will contain just C ... B is lost in the deep ;-(
+    # assert str(a) == "<A><C></C></A>"
+    # # AVOID TO DO SOMETHING LIKE THAT
+    # # AVOID TO DO SOMETHING LIKE THAT
+    # # AVOID TO DO SOMETHING LIKE THAT
 
     # "<=" return the added, so it could be chained (a<=b<=c)
     # "+=" can add mass object using a tuple form (without braces) ( a += b,c,d,e  ===  a <= (b,c,d,e) )
-    a1=Tag.Tag.A()
-    b=Tag.Tag.B()
-    c=Tag.Tag.C()
+    a1=Tag.A()
+    b=Tag.B()
+    c=Tag.C()
     a1+= b,c
 
-    a2=Tag.Tag.A()
-    b=Tag.Tag.B()
-    c=Tag.Tag.C()
+    a2=Tag.A()
+    b=Tag.B()
+    c=Tag.C()
     a2<= (b,c)
 
-    a3=Tag.Tag.A()
-    b=Tag.Tag.B()
-    c=Tag.Tag.C()
+    a3=Tag.A()
+    b=Tag.B()
+    c=Tag.C()
     a3<= b+c
 
-    a4=Tag.Tag.A()
-    b=Tag.Tag.B()
-    c=Tag.Tag.C()
+    a4=Tag.A()
+    b=Tag.B()
+    c=Tag.C()
     a4+= b+c
 
     assert str(a1)==str(a2)==str(a3)==str(a4)
@@ -431,9 +428,9 @@ def test_iadd():
 
 
 def test_add():
-    a=Tag.Tag.A()
-    b=Tag.Tag.B()
-    c=Tag.Tag.C()
+    a=Tag.A()
+    b=Tag.B()
+    c=Tag.C()
 
     assert 42+a == [42,a]
     assert a+None == None+a == [a]
@@ -447,12 +444,12 @@ def test_add():
     x=42+a
     assert x==[42,a]
 
-    a=Tag.Tag.A()
-    b=Tag.Tag.B()
-    c=Tag.Tag.C()
+    a=Tag.A()
+    b=Tag.B()
+    c=Tag.C()
 
     a.clear()
-    a <= b+c+c+c
+    a <= b+c+Tag.C()+Tag.C()
     assert str(a) == "<A><B></B><C></C><C></C><C></C></A>"
 
     a.clear()
@@ -489,8 +486,8 @@ def test_add():
     assert x1 == [12,a,c,b,c,13,c]
 
 
-    a=Tag.Tag.A()
-    c=Tag.Tag.C()
+    a=Tag.A()
+    c=Tag.C()
     a+=c
     assert str(a) == "<A><C></C></A>"
 

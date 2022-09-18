@@ -72,16 +72,37 @@ def test_unparenting_clear():
     assert childchild.root == child
 
 
-#TODO: should not be possible !!!!
-# def test_cant_add_many_times():
-#     parent1 = Tag.div()
-#     parent2 = Tag.div()
+def test_cant_add_many_times():
+    parent1 = Tag.div()
+    parent2 = Tag.div()
 
-#     a_child = Tag.span()
-#     parent1 += a_child
+    a_child = Tag.span()
+    parent1 += a_child
 
-#     with pytest.raises(HTagException):
-#         parent2 += a_child
+    # can't be added to another one
+    with pytest.raises(HTagException):
+        parent2 += a_child
+
+    assert a_child.parent == parent1
+
+    # clear parent1
+    parent1.clear()
+
+    # so the child is no more in parent1
+    # we can add it to parent2
+    parent2 += a_child
+    assert a_child.parent == parent2
+
+def test_cant_add_many_times2():
+    parent = Tag.div()
+    a_child = Tag.span()
+
+    with pytest.raises(HTagException):
+        parent += [a_child,a_child]
+
+    #can't add itself to itself (non-sense)
+    with pytest.raises(HTagException):
+        a_child += a_child
 
 if __name__=="__main__":
     test_unparenting_clear()

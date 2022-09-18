@@ -621,6 +621,21 @@ def test_new():
     asyncio.run( assertion(">==42==</body>") )
 
 
+def test_new_base():
+    class App(Tag.div):
+        def init(self,m="default",**a):
+            self <= m
+            self <= Tag.span("world")
+
+    #til it's not in a hrenderer, there is no @id
+    assert str( App() ) == "<div>default<span>world</span></div>"
+
+    # and you can add yourself, if needed
+    assert str( App(_id="myid") ) == '<div id="myid">default<span>world</span></div>'
+
+    hr=HRenderer(App,"")
+    assert str(hr.tag).count("id=") == 2 # body & span
+
 if __name__=="__main__":
     # test_ko_try_render_a_tagbase()
     # test_render_a_tag_with_interaction()
@@ -644,4 +659,4 @@ if __name__=="__main__":
     # test_new()
     # test_render_a_tag_with_child_interactions()
     # test_render_a_tag_with_interaction()
-    test_imports()
+    test_new_base()
