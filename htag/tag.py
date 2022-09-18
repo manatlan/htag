@@ -373,7 +373,7 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         return elt + Elements([self])
 
     def __repr__(self):
-        return f"<{self.__class__.__name__}'{self.tag} {self._attrs.get('id')} (childs:{len(self._childs)})>"
+        return f"<{self.__class__.__name__}'{self.tag} {id(self)} (childs:{len(self._childs)})>"
 
     def __call__(self, js:str):
         """ Send "js to execute" (post js) now """
