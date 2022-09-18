@@ -181,6 +181,9 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
     #======================================================================
     tag: str="div" # default one
     js: StrNonable = None  # js script that is executed at each tag rendering
+    parent=None
+    event=None
+    _hash_=None
 
     @property
     def bind(self):
@@ -205,7 +208,7 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
     #======================================================================
     def __init__(self, *args,_hr_=None,**kargs):
         self._hr=_hr_
-        self.parent=None    #COULD DISAPPEAR SOON
+        self.parent=None
         self.event={}       # NEW !!!!
         self._callbacks_={}
         attrs={}
@@ -244,10 +247,10 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
 
         self._attrs={}
         for k,v in _attrs.items():
-            if not k.startswith("_"):
-                raise HTagException(f"Can't set attributs without underscore ('{k}' should be '_{k}')") # for convention only ;-(
-            else:
+            if k.startswith("_"):
                 self[ k[1:].replace("_","-") ] = v
+            else:
+                raise HTagException(f"Can't set attributs without underscore ('{k}' should be '_{k}')") # for convention only ;-(
 
 
 
@@ -256,6 +259,9 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
     #======================================================================
     def clear(self):
         """ remove all childs """
+        for t in self._childs:      # remove parenting
+            if isinstance(t,Tag):
+                t.parent=None
         self._childs=Elements()
 
     def set(self,elt:AnyTags):
@@ -272,6 +278,7 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         else:
             if elt in self._childs:
                 self._childs.remove(elt)
+                elt.parent=None #remove parenting
                 return True
 
     def exit(self):
@@ -328,17 +335,14 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         if r is None:
             if attr.startswith("on"):
                 # self._attrs["class"]=StrClass()
-                return NotBindedCaller(self,attr)
+                r = NotBindedCaller(self,attr)
             elif attr == "style":
                 self._attrs["style"]=StrStyle()
-                return self._attrs["style"]
+                r = self._attrs["style"]
             elif attr == "class":
                 self._attrs["class"]=StrClass()
-                return self._attrs["class"]
-            else:
-                return r
-        else:
-            return r
+                r = self._attrs["class"]
+        return r
 
 
     def __setitem__(self,attr:str,value):
