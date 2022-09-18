@@ -181,9 +181,6 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
     #======================================================================
     tag: str="div" # default one
     js: StrNonable = None  # js script that is executed at each tag rendering
-    parent=None
-    event=None
-    _hash_=None
 
     @property
     def bind(self):
@@ -211,6 +208,8 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         self.parent=None
         self.event={}       # NEW !!!!
         self._callbacks_={}
+        self._childs=[]
+        self._attrs={}
         attrs={}
         selfs={}
         for k,v in kargs.items():
