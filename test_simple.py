@@ -1,5 +1,6 @@
 #!/usr/bin/python3 -u
 # -*- coding: utf-8 -*-
+from curses.ascii import HT
 from unittest.util import strclass
 import pytest
 
@@ -590,6 +591,61 @@ def test_elements_to_str():
     assert str(l) == "<div>hello</div>42"
     l=42+Tag.Tag.div("hello")
     assert str(l) == "42<div>hello</div>"
+
+
+def test_autoset_private_properties():
+
+    # can't set "event" (it's a private prop)
+    with pytest.raises(HTagException):
+        Tag.div(event=42)
+
+    # the real private property is "_event" but you can do this
+    # because it will just set the html attribute, like this
+    assert Tag.div(_event=42).attrs["event"]==42
+
+    # can't set ... (it's a private prop)
+    with pytest.raises(HTagException):
+        Tag.div(add=42)
+
+    # can't set ... (it's a private prop)
+    with pytest.raises(HTagException):
+        Tag.div(clear=42)
+
+    # can't set ... (it's a private prop)
+    with pytest.raises(HTagException):
+        Tag.div(exit=42)
+
+    # can't set ... (it's a private prop)
+    with pytest.raises(HTagException):
+        Tag.div(childs=42)
+
+    # can't set ... (it's a private prop)
+    with pytest.raises(HTagException):
+        Tag.div(attrs=42)
+
+    # can't set ... (it's a private prop)
+    with pytest.raises(HTagException):
+        Tag.div(bind=42)
+
+    # can't set ... (it's a private prop)
+    with pytest.raises(HTagException):
+        Tag.div(innerHTML=42)
+
+    # can't set ... (it's a private prop)
+    with pytest.raises(HTagException):
+        Tag.div(parent=42)
+
+    # can't set ... (it's a private prop)
+    with pytest.raises(HTagException):
+        Tag.div(root=42)
+
+    # can't set ... (it's a private prop)
+    with pytest.raises(HTagException):
+        Tag.div(tag=42)
+
+    # but "js" is the only private property auto-set'able
+    Tag.div(js="yo")
+
 
 if __name__=="__main__":
 

@@ -265,7 +265,7 @@ function jevent (e) {
                 state = Stater(self.tag)
                 obj = Tag.find_tag(oid)
                 if obj:
-                    obj.event=event or {}
+                    obj._event=event or {}
 
                     # call the method
                     method=getattr(obj,method_name)

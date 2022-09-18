@@ -6,6 +6,7 @@
 #
 # https://github.com/manatlan/htag
 # #############################################################################
+from curses.ascii import HT
 import html,json
 import hashlib
 import logging,types,asyncio
@@ -199,35 +200,52 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
     def innerHTML(self) -> str:
         return "".join([str(i) for i in self._childs if i is not None])
 
+    @property
+    def root(self) -> "Tag":
+        root= self
+        while root.parent is not None:
+            root = root.parent
+        return root
+
+    @property
+    def parent(self):
+        return self._parent
+
+
+    @property
+    def event(self):
+        return self._event
+
 
     #======================================================================
     # Constructor
     #======================================================================
     def __init__(self, *args,_hr_=None,**kargs):
+        self._event={}       # NEW !!!!
         self._hr=_hr_
-        self.parent=None
-        self.event={}       # NEW !!!!
+        self._parent=None
         self._callbacks_={}
-        self._childs=[]
+        self._childs=Elements()
         self._attrs={}
+        self._hash_=None
         attrs={}
         selfs={}
         for k,v in kargs.items():
             if k.startswith("_"):
                 attrs[k]=v
             else:
+                if k!="js" and k in dir(self):
+                    raise HTagException(f"Can't autoset property '{k}' in '{repr(self)}', private property !")
                 selfs[k]=v
 
         # own a simplified init() ?
-        init=None
         if hasattr(self,"init"):
             init = getattr(self,"init")
             init = init if callable(init) else None
 
-        if init:
             self.__simulateOldInit(None,**attrs)
 
-            init(*args,**kargs)
+            if init: init(*args,**kargs)
             self.__dict__.update(selfs)
         else:
             # if no own 'init' method, declare default args (selfs) as attributs instance
@@ -244,7 +262,6 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
     def __simulateOldInit(self, content:AnyTags=None,**_attrs):  #TODO: integrate in the real __init__ ;-)
         self.set(content)
 
-        self._attrs={}
         for k,v in _attrs.items():
             if k.startswith("_"):
                 self[ k[1:].replace("_","-") ] = v
@@ -260,7 +277,7 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         """ remove all childs """
         for t in self._childs:      # remove parenting
             if isinstance(t,Tag):
-                t.parent=None
+                t.remove()
         self._childs=Elements()
 
     def set(self,elt:AnyTags):
@@ -268,17 +285,16 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         self.clear()
         self.add( elt)
 
-
     def remove(self, elt=None):
         """Remove an object(elt) from its childs, or itself (if none), if attached (has parent)"""
         if elt is None:
-            if self.parent:
-                return self.parent.remove(self)
+            if self._parent:
+                return self._parent.remove(self)
         else:
             if elt in self._childs:
                 self._childs.remove(elt)
                 if isinstance(elt,Tag):
-                    elt.parent=None #remove parenting
+                    elt._parent=None #remove parenting
                 return True
 
     def exit(self):
@@ -286,17 +302,19 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         print("exit() DOES NOTHING (should be overriden)")
 
     def add(self,elt:AnyTags):
-        """ add a element to this tag """
+        """ add a element to this tag
+        """
         if elt is not None:
             if isinstance(elt,Tag):
-                elt.parent = self
+                # if elt.parent is not None:    #TODO: in the near future ;-)
+                #     raise HTagException(f"Can't add {repr(elt)} to {repr(self)} childs, it's already parented !")
+                elt._parent = self
+                self._childs.__add__(elt)
             elif not isinstance(elt,str) and hasattr(elt,"__iter__"):
-                elt=list(elt)
-                for i in elt:
-                    if isinstance(i,Tag):
-                        i.parent = self
-
-        self._childs.__add__(elt)
+                for i in list(elt):
+                    self.add( i )
+            else:
+                self._childs.__add__(elt)
 
 
     #===============================================================================
@@ -384,7 +402,7 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         if self._hr:
             current = self
         else:
-            current = self.parent
+            current = self._parent
             while current is not None and current.parent is not None:
                 current = current.parent
 
@@ -402,7 +420,7 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         else:
             logger.debug("Tag.__str__() : render str for %s", repr(self))
 
-        needIds = self._isUsedInHrenderer()
+        needIds = self.root._hr is not None
 
         # fix attrs, depending on hr
         attrs = dict(self._attrs) # make a copy
@@ -480,14 +498,6 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
             if callable(render):
                 return render
 
-    def _isUsedInHrenderer(self):
-        root= self
-        while 1:
-            parent = root.parent
-            if parent is None:
-                return root._hr is not None
-            else:
-                root = parent
 
 
 
