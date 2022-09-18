@@ -170,6 +170,8 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
     statics: list = [] # list of "Tag", imported at start in html>head
     imports = None
 
+    OLDMECHANISM:bool = True # WILL DISAPPEAR SOON ;-)
+
     __instances__ = weakref.WeakValueDictionary()
 
     @classmethod
@@ -306,8 +308,9 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         """
         if elt is not None:
             if isinstance(elt,Tag):
-                if (not reparent) and (elt.parent is not None):
-                    raise HTagException(f"Can't add {repr(elt)} to {repr(self)} childs, it's already parented !")
+                if not Tag.OLDMECHANISM:
+                    if (not reparent) and (elt.parent is not None):
+                        raise HTagException(f"Can't add {repr(elt)} to {repr(self)} childs, it's already parented !")
                 elt._parent = self
                 self._childs.__add__(elt)
             elif not isinstance(elt,str) and hasattr(elt,"__iter__"):
