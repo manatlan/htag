@@ -301,12 +301,12 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         """ method to override, for your own exit"""
         print("exit() DOES NOTHING (should be overriden)")
 
-    def add(self,elt:AnyTags):
+    def add(self, elt:AnyTags, reparent=False):
         """ add a element to this tag
         """
         if elt is not None:
             if isinstance(elt,Tag):
-                if elt.parent is not None:
+                if (not reparent) and (elt.parent is not None):
                     raise HTagException(f"Can't add {repr(elt)} to {repr(self)} childs, it's already parented !")
                 elt._parent = self
                 self._childs.__add__(elt)

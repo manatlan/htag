@@ -375,8 +375,7 @@ function jevent (e) {
         head += Tag.meta(_name="viewport",_content="width=device-width, initial-scale=1")
         head += Tag.meta(_name="version",_content=f"htag {__version__}")
         for i in self._statics:
-            i._parent=None  #unparent Static Tag (to be able to re-add, at each rendering/str'ing)
-            head += i
+            head.add(i,True)    # force reparenting
         head += Tag.title( self.title )   # set a default title
 
         body=Tag.body( "Loading..." )
