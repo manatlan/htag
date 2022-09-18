@@ -277,7 +277,8 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         else:
             if elt in self._childs:
                 self._childs.remove(elt)
-                elt.parent=None #remove parenting
+                if isinstance(elt,Tag):
+                    elt.parent=None #remove parenting
                 return True
 
     def exit(self):
