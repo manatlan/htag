@@ -107,6 +107,13 @@ def t0():
     parent.add( a_child, True)  # force reparent
     parent.add( a_child, True)  # force reparent
 
+def t00():
+    parent = Tag.div()
+    a_child = Tag.span()
+
+    parent.add( a_child, False)  # don't force reparent (default)
+    parent.add( a_child, False)  # don't force reparent (default)
+
 def t1():
     parent = Tag.div()
     a_child = Tag.span()
@@ -148,6 +155,7 @@ def test_strictmode_off():
         Tag.STRICT_MODE=False
 
         t0()
+        t00()
 
         t1()
         t2()
@@ -165,6 +173,9 @@ def test_strictmode_on():
         Tag.STRICT_MODE=True
 
         t0()
+
+        with pytest.raises(HTagException):
+            t00()
 
         with pytest.raises(HTagException):
             t1()
