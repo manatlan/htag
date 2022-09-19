@@ -6,7 +6,6 @@
 #
 # https://github.com/manatlan/htag
 # #############################################################################
-from curses.ascii import HT
 import html,json
 import hashlib
 import logging,types,asyncio
