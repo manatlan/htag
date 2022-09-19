@@ -189,8 +189,8 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         return Binder(self)
 
     @property
-    def childs(self) -> list:
-        return self._childs
+    def childs(self) -> tuple:
+        return tuple(self._childs)
 
     @property
     def attrs(self) -> dict:

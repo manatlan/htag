@@ -303,12 +303,12 @@ async def test_yield():
 
     r=await hr.init()
 
-    assert o.childs==[]
+    assert o.childs==()
 
     r=await hr.interact(o).inc()
 
     # first yield, yield nothing
-    assert o.childs==[]
+    assert o.childs==()
 
     assert r["next"]
     assert "stream" not in r
@@ -316,7 +316,7 @@ async def test_yield():
     r=await hr.doNext( r)
 
     # seconf yield, yield list("abc")
-    assert o.childs==['a', 'b', 'c']
+    assert o.childs==('a', 'b', 'c')
     assert "stream" in r
     assert r["stream"][id(o)]=="abc"
     assert r["next"]
@@ -324,7 +324,7 @@ async def test_yield():
 
     r=await hr.doNext( r)
 
-    assert o.childs==['a', 'b', 'c', 'd']
+    assert o.childs==('a', 'b', 'c', 'd')
     assert "stream" in r
     assert r["stream"][id(o)]=="d"
     assert r["next"]

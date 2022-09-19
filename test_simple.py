@@ -113,9 +113,9 @@ def test_childs():
     assert len(t.childs)==1
     assert t.childs[0].tag == "li"
 
-    t.childs.append( Tag.li() )
-    assert len(t.childs)==2
-    assert t.childs[-1].tag == "li"
+    # t.childs.append( Tag.li() )
+    # assert len(t.childs)==2
+    # assert t.childs[-1].tag == "li"
 
     t.clear()
     assert len(t.childs)==0
@@ -126,8 +126,8 @@ def test_childs():
     t <= (Tag.li(),Tag.li())
     assert len(t.childs)==4
 
-    del t.childs[2]
-    assert len(t.childs)==3
+    # del t.childs[2]
+    # assert len(t.childs)==3
 
     t.set( Tag.li() )
     assert len(t.childs)==1
@@ -464,7 +464,7 @@ def test_add():
     a.add( b+"kkk"+42+None+78 )
     assert str(a) == "<A><B></B>kkk4278</A>"
 
-    a.childs.append( c )
+    a+=c
     assert str(a) == "<A><B></B>kkk4278<C></C></A>"
 
     x=12+(a+c)+(b+c)

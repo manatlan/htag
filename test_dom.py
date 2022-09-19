@@ -97,17 +97,95 @@ def test_cant_add_many_times():
     parent2 += a_child
     assert a_child.parent == parent2
 
-def test_cant_add_many_times2():
+#####################################################################
+#####################################################################
+#####################################################################
+def t0():
     parent = Tag.div()
-    parent.STRICT_MODE=True
     a_child = Tag.span()
 
-    with pytest.raises(HTagException):
-        parent += [a_child,a_child]
+    parent.add( a_child, True)  # force reparent
+    parent.add( a_child, True)  # force reparent
 
-    #can't add itself to itself (non-sense)
-    with pytest.raises(HTagException):
-        a_child += a_child
+def t1():
+    parent = Tag.div()
+    a_child = Tag.span()
+
+    parent += a_child
+    parent += a_child   # raise
+
+def t2():
+    parent = Tag.div()
+    a_child = Tag.span()
+
+    parent += [a_child,a_child] # raise
+
+def t3():
+    parent = Tag.div()
+    a_child = Tag.span()
+
+    parent += Tag.div(a_child)
+    parent += Tag.div(a_child)  # raise
+
+
+def t4():
+    parent = Tag.div()
+    a_child = Tag.span()
+
+    parent <= Tag.div() <= a_child
+    parent <= Tag.div() <= a_child  # raise
+
+def t5():
+    parent = Tag.div()
+    a_child = Tag.span()
+
+    parent.childs.append( a_child ) # since 'childs' is a tuple -> AttributeError
+    parent.childs.append( a_child )
+
+def test_strictmode_off():
+    old=Tag.STRICT_MODE
+    try:
+        Tag.STRICT_MODE=False
+
+        t0()
+
+        t1()
+        t2()
+        t3()
+        t4()
+
+        with pytest.raises(AttributeError): # AttributeError: 'tuple' object has no attribute 'append'
+            t5()
+    finally:
+        Tag.STRICT_MODE=old
+
+def test_strictmode_on():
+    old=Tag.STRICT_MODE
+    try:
+        Tag.STRICT_MODE=True
+
+        t0()
+
+        with pytest.raises(HTagException):
+            t1()
+
+        with pytest.raises(HTagException):
+            t2()
+
+        with pytest.raises(HTagException):
+            t3()
+
+        with pytest.raises(HTagException):
+            t4()
+
+        with pytest.raises(AttributeError): # AttributeError: 'tuple' object has no attribute 'append'
+            t5()
+
+    finally:
+        Tag.STRICT_MODE=old
+
+
 
 if __name__=="__main__":
-    test_unparenting_clear()
+    # test_unparenting_clear()
+    t0()
