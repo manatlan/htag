@@ -73,43 +73,41 @@ def test_unparenting_clear():
 
 
 def test_cant_add_many_times():
-    try:
-        Tag.OLDMECHANISM = False
-        parent1 = Tag.div()
-        parent2 = Tag.div()
+    parent1 = Tag.div()
+    parent2 = Tag.div()
 
-        a_child = Tag.span()
-        parent1 += a_child
+    parent1.STRICT_MODE=True
+    parent2.STRICT_MODE=True
 
-        # can't be added to another one
-        with pytest.raises(HTagException):
-            parent2 += a_child
 
-        assert a_child.parent == parent1
+    a_child = Tag.span()
+    parent1 += a_child
 
-        # clear parent1
-        parent1.clear()
-
-        # so the child is no more in parent1
-        # we can add it to parent2
+    # can't be added to another one
+    with pytest.raises(HTagException):
         parent2 += a_child
-        assert a_child.parent == parent2
-    finally:
-        Tag.OLDMECHANISM = True
+
+    assert a_child.parent == parent1
+
+    # clear parent1
+    parent1.clear()
+
+    # so the child is no more in parent1
+    # we can add it to parent2
+    parent2 += a_child
+    assert a_child.parent == parent2
+
 def test_cant_add_many_times2():
-    try:
-        Tag.OLDMECHANISM = False
-        parent = Tag.div()
-        a_child = Tag.span()
+    parent = Tag.div()
+    parent.STRICT_MODE=True
+    a_child = Tag.span()
 
-        with pytest.raises(HTagException):
-            parent += [a_child,a_child]
+    with pytest.raises(HTagException):
+        parent += [a_child,a_child]
 
-        #can't add itself to itself (non-sense)
-        with pytest.raises(HTagException):
-            a_child += a_child
-    finally:
-        Tag.OLDMECHANISM = True
+    #can't add itself to itself (non-sense)
+    with pytest.raises(HTagException):
+        a_child += a_child
 
 if __name__=="__main__":
     test_unparenting_clear()
