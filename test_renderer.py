@@ -332,6 +332,13 @@ def test_intelligent_rendering2():
     s_before=o._getStateImage()
     o.inc()
     s_after=o._getStateImage()
+    ######################################################
+    ######################################################
+    ######################################################
+    # assert s_after == s_before.replace(">1<",">2<") with _getStateImage() -> pure str
+    ######################################################
+    ######################################################
+    ######################################################
     assert s_after == s_before.replace("['1']","['2']")
 
     # test the stater
@@ -659,4 +666,5 @@ if __name__=="__main__":
     # test_new()
     # test_render_a_tag_with_child_interactions()
     # test_render_a_tag_with_interaction()
-    test_new_base()
+    # test_new_base()
+    test_intelligent_rendering2()

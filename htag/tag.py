@@ -479,6 +479,15 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
     def _getStateImage(self) -> str: #TODO: could disapear (can make something more inteligent here!)
         """Return a str'image (state) of the object, for quick detection (see Stater())"""
         logger.debug("Force Tag rendering (for state image): %s",repr(self))
+
+        ###################################################################### this could be better !
+        ######################################################################
+        ######################################################################
+        # return str(self) # force a re-rendering (for builded lately)
+        ######################################################################
+        ######################################################################
+        ######################################################################
+
         str(self) # force a re-rendering (for builded lately)
 
         image=lambda x: "[%s]"%id(x) if isinstance(x,Tag) else str(x)
@@ -494,7 +503,11 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
 
         for i in self._childs:
             if isinstance(i,Tag):
-                ll.append( i._getTree() )
+                if i.tag is None:
+                    # remove the placeholder existence, in the tree !
+                    ll.extend( [i._getTree() for i in i._childs if isinstance(i,Tag)] )
+                else:
+                    ll.append( i._getTree() )
 
         return {self:ll}
 

@@ -1,9 +1,15 @@
 from htag import Tag,HTagException
-from htag.render import HRenderer
+from htag.render import HRenderer,Stater
 import asyncio
+from pprint import pprint
 
 import htbulma as b
 import pytest
+
+import re
+def anon(x):
+    return re.sub(r'id="\d+"','*id*',str(x))
+
 
 def test_base():
     # test a placeholder
@@ -35,6 +41,35 @@ def test_base():
     assert s._getTree() == { s: [ {B:[]} ]}
 
     assert "placeholder" in repr(s).lower()
+
+
+def test_tree():
+
+    # normal case (just verify all is ok)
+    t=Tag.body()
+
+    A= Tag.A()
+    B= Tag.B()
+    C= Tag.C()
+
+    t <= A <= [B,C]
+
+    assert t._getTree() == {
+        t:[ {A: [{B:[]},{C:[]}]}]
+    }
+
+
+    # And now A is a placeholder
+    t=Tag.body()
+
+    A= Tag()
+    B= Tag.B()
+    C= Tag.C()
+
+    t <= A <= [B,C]
+    assert t._getTree() == {        # A is cleared from the tree
+        t:[{B:[]},{C:[]}]
+    }
 
 
 def test_at_construction():
@@ -75,43 +110,56 @@ async def test_placeholder_to_body():
 
     assert r["update"][0] == f'<body id="{id(hr.tag)}">hello</body>'
 
-import re
-def anon(x):
-    return re.sub(r'id="\d+"','*id*',str(x))
 
-@pytest.mark.asyncio
-async def test_using_a_placeholder():
-    """ many js statements rendered """
+def test_placeholder_mod_guess():
 
-    class Jo(Tag):
-        def init(self):
-            self <= Tag.b("hello")+Tag.c("world")
+    t=Tag.body()
 
-        def cls(self):
-            self.clear()
+    A= Tag()
+    B= Tag.B()
+    C= Tag.C()
 
-    class App(Tag.body):
-        imports=[]  # to avoid importing all scopes
-        def init(self):
-            self += Jo()
+    t <= A <= [B,C]
+    assert t._getTree() == {        # A is not in the tree !!!!
+        t:[{B:[]},{C:[]}]
+    }
 
-    #TODO: use Simu ;-)
-    hr=HRenderer( App, "// my starter")
+    # but exists IRL ;-)
+    D=Tag.D()
+    A<=D
+    assert t._getTree() == {        # A is not in the tree !!!!
+        t:[{B:[]},{C:[]},{D:[]}]
+    }
 
-    # first interaction
-    r=await hr.interact(0,None,None,None,None)
-    print(r)
-    assert anon(r["update"][0] ) == "<body *id*><b *id*>hello</b><c *id*>world</c></body>"
 
-    ## interact with jo instance (call cls)
-    jo = hr.tag.childs[0]
-    r=await hr.interact( id(jo), "cls", [], {})
-    print(r["update"])
-    assert id(jo) not in r["update"]
+    s=Stater(t)
+
+    print("BEFORE:",t)
+    # A.clear()
+    A<="hllll"
+    print("AFTER: ",t)
+
+    mod = s.guess()
+
+    # IT SHOULD BE LIKE THIS !!!!!
+    # IT SHOULD BE LIKE THIS !!!!!
+    # IT SHOULD BE LIKE THIS !!!!!
+    assert mod == [t]   # body has changed !
+    # IT SHOULD BE LIKE THIS !!!!!
+    # IT SHOULD BE LIKE THIS !!!!!
+    # IT SHOULD BE LIKE THIS !!!!!
 
 
 if __name__=="__main__":
-    test_base()
-    test_at_construction()
-    asyncio.run( test_placeholder_to_body() )
-    asyncio.run( test_using_a_placeholder() )
+
+    import logging
+    logging.basicConfig(format='[%(levelname)-5s] %(name)s: %(message)s',level=logging.DEBUG)
+    logging.getLogger("htag.tag").setLevel( logging.ERROR )
+
+    # test_base()
+    # test_tree()
+    # test_at_construction()
+    # asyncio.run( test_placeholder_to_body() )
+    # asyncio.run( test_using_a_placeholder() )
+
+    test_placeholder_mod_guess()
