@@ -503,11 +503,7 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
 
         for i in self._childs:
             if isinstance(i,Tag):
-                if i.tag is None:
-                    # remove the placeholder existence, in the tree !
-                    ll.extend( [i._getTree() for i in i._childs if isinstance(i,Tag)] )
-                else:
-                    ll.append( i._getTree() )
+                ll.append( i._getTree() )
 
         return {self:ll}
 

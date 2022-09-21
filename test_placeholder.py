@@ -67,8 +67,11 @@ def test_tree():
     C= Tag.C()
 
     t <= A <= [B,C]
-    assert t._getTree() == {        # A is cleared from the tree
-        t:[{B:[]},{C:[]}]
+    # assert t._getTree() == {        # A is cleared from the tree
+    #     t:[{B:[]},{C:[]}]
+    # }
+    assert t._getTree() == {          # A is in the tree
+        t:[ {A: [{B:[]},{C:[]}]}]
     }
 
 
@@ -120,17 +123,6 @@ def test_placeholder_mod_guess():
     C= Tag.C()
 
     t <= A <= [B,C]
-    assert t._getTree() == {        # A is not in the tree !!!!
-        t:[{B:[]},{C:[]}]
-    }
-
-    # but exists IRL ;-)
-    D=Tag.D()
-    A<=D
-    assert t._getTree() == {        # A is not in the tree !!!!
-        t:[{B:[]},{C:[]},{D:[]}]
-    }
-
 
     s=Stater(t)
 

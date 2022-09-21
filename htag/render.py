@@ -68,6 +68,10 @@ class Stater:
                 if state_after != state_before:
                     logger.debug("STATE BEFORE for %s = '%s'", repr(tag), state_before )
                     logger.debug("STATE AFTER  for %s = '%s'", repr(tag), state_after )
+
+                    while tag.tag is None:
+                        tag = tag.parent
+
                     modifieds.append(tag)
                 else:
                     # no need to control childs, coz the parent will redraw all (childs too)
@@ -75,7 +79,8 @@ class Stater:
 
         rec( [self.tag._getTree()] )
         logger.debug("Stater.guess(), modifieds components : %s", [repr(i) for i in modifieds])
-        return modifieds
+
+        return list(tuple(modifieds))   # ensure unicity
 
 
 class HRenderer:
