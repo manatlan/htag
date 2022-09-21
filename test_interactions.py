@@ -170,7 +170,7 @@ async def test_simplest():
 @pytest.mark.asyncio
 async def test_rendering(): #TODO: redefine coz norender is gone, so this test is perhaps non sense
 
-    class Object(Tag):
+    class Object(Tag.div):
         def init(self):
             self["nb"]=0
 
@@ -181,7 +181,7 @@ async def test_rendering(): #TODO: redefine coz norender is gone, so this test i
             self["nb"]+=1
 
 
-    class P(Tag):
+    class P(Tag.div):
         def init(self):
 
             self.o1 = Object()
@@ -267,7 +267,7 @@ async def test_rendering(): #TODO: redefine coz norender is gone, so this test i
 @pytest.mark.asyncio
 async def test_simplest_async(): #TODO: redefine coz norender is gone, so this test is perhaps non sense
 
-    class Object(Tag):
+    class Object(Tag.div):
         def init(self):
             self["nb"]=0
 
@@ -290,7 +290,7 @@ async def test_simplest_async(): #TODO: redefine coz norender is gone, so this t
 @pytest.mark.asyncio
 async def test_yield():
 
-    class Object(Tag):
+    class Object(Tag.div):
 
         def inc(self):
             yield

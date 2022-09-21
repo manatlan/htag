@@ -45,7 +45,7 @@ def test_ok_including_a_Tag_in_statics():
 
 def test_statics_in_real_statics():
     # s1=Tag.H.div( [1,"h",Tag.div("dyn"),Tag.H.div("dyn",_id=12)] )
-    s2=Tag.div( [1,"h",Tag.div("stat"),Tag.Section( Tag("yolo") )] )
+    s2=Tag.div( [1,"h",Tag.div("stat"),Tag.Section( Tag.div("yolo") )] )
 
     # assert "id=" in str(s1)
     # assert str(s1._ensureTagBase()) =='<div>1h<div>dyn</div><div id="12">dyn</div></div>'
@@ -70,7 +70,7 @@ def test_render_title():
 
 def test_render_a_tag_with_interaction():
 
-    class MyDiv(Tag):
+    class MyDiv(Tag.div):
         js="SCRIPT1"
 
         def __init__(self,**a):
@@ -247,7 +247,7 @@ def test_interact_error():
 
 def test_intelligent_rendering():
 
-    class Obj(Tag):
+    class Obj(Tag.div):
 
         def __init__(self,name,**a):
             Tag.__init__(self,**a)
@@ -257,7 +257,7 @@ def test_intelligent_rendering():
         def inc(self):
             self["nb"] += 1
 
-    class MyDiv(Tag):
+    class MyDiv(Tag.div):
         js="SCRIPT1"
 
         def __init__(self,**a):
@@ -310,7 +310,7 @@ def test_intelligent_rendering():
 
 def test_intelligent_rendering2():
 
-    class Obj(Tag):
+    class Obj(Tag.div):
 
         def __init__(self,**a):
             super().__init__(**a)
