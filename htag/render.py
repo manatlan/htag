@@ -72,6 +72,9 @@ class Stater:
                     while tag.tag is None:
                         tag = tag.parent
 
+                    if tag is None: # should be impossible
+                        raise HTagException("no real parent ?!?")
+
                     modifieds.append(tag)
                 else:
                     # no need to control childs, coz the parent will redraw all (childs too)
