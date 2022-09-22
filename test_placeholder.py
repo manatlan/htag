@@ -9,6 +9,20 @@ import re
 def anon(x):
     return re.sub(r'id="\d+"','*id*',str(x))
 
+def test_concept():
+    h= Tag.hello("world")
+    t=Tag(Tag(Tag(Tag( h ))))
+    assert str(h) == str(t)
+
+def test_concept_inherited():
+    class PlaceHolder(Tag):
+        pass
+
+    h= Tag.hello("world")
+    t=PlaceHolder(PlaceHolder(PlaceHolder(PlaceHolder( h ))))
+    assert str(h) == str(t)
+
+
 
 def test_base():
     # test a placeholder
