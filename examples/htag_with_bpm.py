@@ -2,118 +2,120 @@
 import os,sys; sys.path.insert(0,os.path.dirname(os.path.dirname(__file__)))
 
 """
+For bigger project ... it's a good practice to start
+with an unique "source of truth" (all data in one place).
 
-BPM is a new thing ... it's a BPM (for now, only available if pyyaml is here)
-Because HTAG is really convenient to be used in a BPM
-Here is a example with htag.BPM .
+Here is a example
 
+Principes:
+- You make a private dict in your htag component -> THE store
+  (all data will be read/write from here)
+- In your component, you only have read access on this store.
+- and ONLY yours (inter-)actions can mutate this store
+
+see pinia/vuex for vuejs, or ngrx for angular, etc ...
 """
 
-from htag import Tag,BPM
-
-
+from htag import Tag
 from dataclasses import dataclass
 
+# the DB simulation part
+#.......................................................................
 @dataclass
-class Produit:
+class Product:
     name: str
     price: int
 
-PRODUITS={
-    "ref1":Produit("Olive",10),
-    "ref4":Produit("Pomme",2),
-    "ref5":Produit("Poire",3),
+PRODUCTS={
+    "ref1":Product("Peach",10),
+    "ref4":Product("Apple",2),
+    "ref5":Product("Pear",3),
+    "ref7":Product("Banana",3),
 }
 
-
-class MyBPM(BPM):
-    """
-    START:
-        - call CLEAR
-        - call LISTE
-
-    LISTE:
-        - redraw omain PageList
-
-    SELECT:
-        - redraw omain PageProduit <selected>
-
-    ADD:
-        - addBasket <selected>
-        - redraw obasket Basket <baskets>
-
-    CLEAR:
-        - set:
-            key: baskets
-            value: []
-        - redraw obasket Basket <baskets>
-    """
-
-    # more specific keywords language :
-
-    def addBasket(self,ref):
-        self.state["baskets"].append( ref )
+# a class to provide only readacess to your store (dict)
+#.......................................................................
+class Store:
+    def __init__(self, store:dict ):
+        self.__store = store
+    def __getitem__(self,k):
+        return self.__store.get(k)
 
 
-
+# the components :
+#.......................................................................
 class PageList(Tag.div):
     def init(self):
-        self <= Tag.h1("Produits")
-        for ref,produit in PRODUITS.items():
+        self <= Tag.h1("Products")
+        for ref,p in PRODUCTS.items():
             d=Tag.div(_style="border:1px dotted black;display:inline-block;width:100px;height:100px")
-            d<=Tag.h3(produit.name)
-            d<=Tag.button("Voir", value=ref, _onclick = lambda o: self.root.next('SELECT',selected=o.value) )
-            d<=Tag.button("Add", value=ref,_onclick = lambda o: self.root.next('ADD',selected=o.value) )
+            d<=Tag.h3(p.name)
+            d<=Tag.button("View", value=ref, _onclick = lambda o: self.root.action('SELECT',selected=o.value) )
+            d<=Tag.button("Add", value=ref,_onclick = lambda o: self.root.action('ADD',selected=o.value) )
             self <= d
 
-class PageProduit(Tag.div):
+class PageProduct(Tag.div):
     def init(self,ref):
-        produit = PRODUITS[ref]
+        p = PRODUCTS[ref]
 
-        b=Tag.button("back", _onclick = lambda o: self.root.next('LISTE') )
-        self <= Tag.h1(b+f"Produits > {produit.name}")
-        self <= Tag.h3(f"Price: {produit.price}€")
-        self <= Tag.button("Add", _onclick = lambda o: self.root.next('ADD',selected=ref) )
+        b=Tag.button("back", _onclick = lambda o: self.root.action('LISTE') )
+        self <= Tag.h1(b+f"Products > {p.name}")
+        self <= Tag.h3(f"Price: {p.price}€")
+        self <= Tag.button("Add", _onclick = lambda o: self.root.action('ADD',selected=ref) )
 
 class Basket(Tag.div):
-    def init(self,liste:list):
+
+    def render(self): # dynamic rendering (so it can react on store changes)
+        liste = self.root.store["baskets"]
+
         if liste:
             somme=0
             for ref in liste:
-                produit = PRODUITS[ref]
-                self <= Tag.li( f"{produit.name}: {produit.price}€" )
-                somme+=produit.price
+                p = PRODUCTS[ref]
+                self <= Tag.li( f"{p.name}: {p.price}€" )
+                somme+=p.price
             self <= Tag.b(f"Total: {somme}€")
-            self <= Tag.button("clear", _onclick = lambda o: self.root.next('CLEAR') )
+            self <= Tag.button("clear", _onclick = lambda o: self.root.action('CLEAR') )
         else:
             self <= "vide"
 
+# and your main tag (which will be runned in a runner)
+#.......................................................................
 
 class App(Tag.body):
     def init(self):
-        # init objects
-        self.omain = Tag.div()
-        self.obasket = Tag.div(_style="position:fixed;top:0px;right:0px;background:yellow")
+        # the private store
+        self.__store = {"baskets": []}
 
-        # create layout
-        self <= self.omain + self.obasket
+        # the public store (read only)
+        self.store = Store( self.__store )
 
-        # start bpm
-        self.bpm=MyBPM({} , [PageList,PageProduit,Basket] )
-        self.next("START")
+        # prepare layout
+        self.main = Tag() # placeholder !
 
-    def next(self,node,**params):
-        self.bpm( node,**params)
+        # draw layout
+        self <= self.main + Tag.div(Basket(),_style="position:fixed;top:0px;right:0px;background:yellow")
 
-        # draw objects managed in bpm
-        self.omain.set( self.bpm.draw("omain") )
-        self.obasket.set( self.bpm.draw("obasket") )
+        # 1st action
+        self.action("LISTE")
 
-        # just displaying some infos
-        print(":::: state",self.bpm.state)
+    def action(self, action, **params):
+        """ here are the mutations for your actions
+            The best practice : the store is mutated only in this place !
+        """
+        if action == "LISTE":
+            self.main.set(PageList() )
+        elif action == "SELECT":
+            self.main.set(PageProduct( params["selected"] ) )
+        elif action == "ADD":
+            self.__store["baskets"].append( params["selected"] )
+        elif action == "CLEAR":
+            self.__store["baskets"] = []
 
+        print("NEW STORE:",self.__store)
 
-#=================================================================================
+# the runner part
+#.......................................................................
 from htag.runners import DevApp as Runner
 # from htag.runners import BrowserHTTP as Runner
 # from htag.runners import ChromeApp as Runner
