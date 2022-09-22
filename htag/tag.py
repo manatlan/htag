@@ -477,18 +477,14 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
     # privates methods
     #===============================================================================
     def _getStateImage(self) -> str: #TODO: could disapear (can make something more inteligent here!)
-        """Return a str'image (state) of the object, for quick detection (see Stater())"""
-        logger.debug("Force Tag rendering (for state image): %s",repr(self))
-
-        ###################################################################### this could be better !
-        ######################################################################
-        ######################################################################
-        # return str(self) # force a re-rendering (for builded lately)
-        ######################################################################
-        ######################################################################
-        ######################################################################
-
-        str(self) # force a re-rendering (for builded lately)
+        """Return a str'image (state) of the object, for quick detection (see Stater())
+           (btw child tags are represented by its id, to help Stater.guess for detection)
+        """
+        render = self._hasARenderMethod()
+        if render: # force a re-rendering (for builded lately)
+            logger.debug("Tag._getStateImage() : %s rendering itself with its render() method", repr(self))
+            self.clear()
+            render()
 
         image=lambda x: "[%s]"%id(x) if isinstance(x,Tag) else str(x)
         return """%s%s:%s""" % (
