@@ -179,13 +179,17 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
     #======================================================================
     # instance
     #======================================================================
-    tag: str="div" # default one
+    tag: StrNonable = None # default one
     js: StrNonable = None  # js script that is executed at each tag rendering
     STRICT_MODE:bool=False
 
     @property
     def bind(self):
         """ to bind method ! and return its js repr"""
+
+        if self.tag is None:
+            raise HTagException("This tag is a placeholder, it can't manage html attributs")
+
         return Binder(self)
 
     @property
@@ -194,6 +198,10 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
 
     @property
     def attrs(self) -> dict:
+
+        if self.tag is None:
+            raise HTagException("This tag is a placeholder, it can't manage html attributs")
+
         return self._attrs
 
     @property
@@ -228,6 +236,8 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         self._childs=Elements()
         self._attrs={}
         self._hash_=None
+
+        # sorts kargs -> selfs/attrs
         attrs={}
         selfs={}
         for k,v in kargs.items():
@@ -349,6 +359,10 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
 
 
     def __getitem__(self,attr:str) -> Any:
+
+        if self.tag is None:
+            raise HTagException("This tag is a placeholder, it can't manage html attributs")
+
         attr=attr.strip().lower()
         r=self._attrs.get(attr,None)
         if r is None:
@@ -365,6 +379,10 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
 
 
     def __setitem__(self,attr:str,value):
+
+        if self.tag is None:
+            raise HTagException("This tag is a placeholder, it can't manage html attributs")
+
         attr=attr.strip().lower()
         if type(value) in [types.FunctionType,types.MethodType]:
             value = Caller( self, value, (), {})
@@ -396,7 +414,10 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         return elt + Elements([self])
 
     def __repr__(self):
-        return f"<{self.__class__.__name__}'{self.tag} {id(self)} (childs:{len(self._childs)})>"
+        if self.tag is None:
+            return f"<{self.__class__.__name__}'PLACEHOLDER {id(self)} (childs:{len(self._childs)})>"
+        else:
+            return f"<{self.__class__.__name__}'{self.tag} {id(self)} (childs:{len(self._childs)})>"
 
     def __call__(self, js:str):
         """ Send "js to execute" (post js) now """
@@ -423,29 +444,32 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
 
         needIds = self.root._hr is not None
 
-        # fix attrs, depending on hr
-        attrs = dict(self._attrs) # make a copy
-        if needIds:
-            if attrs.get("id"):
-                logger.warn("!!! **WARNING** Tag %s had an @id=%s, it was replaced for HRenderer needs !!!", repr(self),attrs["id"])
-            attrs["id"]=id(self)
+        if self.tag is None:
+            return "".join([str(i) for i in self._childs if i is not None])
+        else:
+            # fix attrs, depending on hr
+            attrs = dict(self._attrs) # make a copy
+            if needIds:
+                if attrs.get("id"):
+                    logger.warn("!!! **WARNING** Tag %s had an @id=%s, it was replaced for HRenderer needs !!!", repr(self),attrs["id"])
+                attrs["id"]=id(self)
 
-        # rewrite attrs(dict) -> nattrs(list)
-        rattrs=[]
-        for k,v in attrs.items():
-            if v is not None:
-                if isinstance(v,bool):
-                    if v == True:
-                        rattrs.append(k)
-                else:
-                    if v!="":
-                        rattrs.append( '%s="%s"' % (k,html.escape( str(v) )) )
+            # rewrite attrs(dict) -> nattrs(list)
+            rattrs=[]
+            for k,v in attrs.items():
+                if v is not None:
+                    if isinstance(v,bool):
+                        if v == True:
+                            rattrs.append(k)
+                    else:
+                        if v!="":
+                            rattrs.append( '%s="%s"' % (k,html.escape( str(v) )) )
 
-        return """<%(tag)s%(attrs)s>%(content)s</%(tag)s>""" % dict(
-            tag=self.tag.replace("_","-"),
-            attrs=" ".join([""]+rattrs) if rattrs else "",
-            content="".join([str(i) for i in self._childs if i is not None]),
-        )
+            return """<%(tag)s%(attrs)s>%(content)s</%(tag)s>""" % dict(
+                tag=self.tag.replace("_","-"),
+                attrs=" ".join([""]+rattrs) if rattrs else "",
+                content="".join([str(i) for i in self._childs if i is not None]),
+            )
 
 
 
@@ -455,10 +479,14 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
     # privates methods
     #===============================================================================
     def _getStateImage(self) -> str: #TODO: could disapear (can make something more inteligent here!)
-        """Return a str'image (state) of the object, for quick detection (see Stater())"""
-
-        logger.debug("Force Tag rendering (for state image): %s",repr(self))
-        str(self) # force a re-rendering (for builded lately)
+        """Return a str'image (state) of the object, for quick detection (see Stater())
+           (btw child tags are represented by its id, to help Stater.guess for detection)
+        """
+        render = self._hasARenderMethod()
+        if render: # force a re-rendering (for builded lately)
+            logger.debug("Tag._getStateImage() : %s rendering itself with its render() method", repr(self))
+            self.clear()
+            render()
 
         image=lambda x: "[%s]"%id(x) if isinstance(x,Tag) else str(x)
         return """%s%s:%s""" % (

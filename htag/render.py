@@ -41,7 +41,6 @@ class Stater:
         (intelligent rendering)
     """
     def __init__(self, tag: Tag ):
-        logger.debug("Stater.__init__(), save state before interactions ")
         self.tag=tag
         self._states={}
 
@@ -64,19 +63,27 @@ class Stater:
         def rec( childs):
             for obj in childs:
                 tag,childs= list(obj.items())[0]
-                state_after = tag._getStateImage()
                 state_before= self._states.get( id(tag) )
-                if state_after != state_before and isinstance(tag,Tag):
+                state_after = tag._getStateImage()
+                if state_after != state_before:
                     logger.debug("STATE BEFORE for %s = '%s'", repr(tag), state_before )
                     logger.debug("STATE AFTER  for %s = '%s'", repr(tag), state_after )
+
+                    while tag.tag is None:
+                        tag = tag.parent
+
+                    if tag is None: # should be impossible
+                        raise HTagException("no real parent ?!?")
+
                     modifieds.append(tag)
                 else:
-                    # no need to see childs, coz the parent will redraw all (childs too)
+                    # no need to control childs, coz the parent will redraw all (childs too)
                     rec(childs)
 
         rec( [self.tag._getTree()] )
         logger.debug("Stater.guess(), modifieds components : %s", [repr(i) for i in modifieds])
-        return modifieds
+
+        return list(tuple(modifieds))   # ensure unicity
 
 
 class HRenderer:
@@ -161,12 +168,21 @@ function _error(txt,env) {
         console.log( env+" ERROR:", txt );
 }
 
+function try_js( code ) {
+    try{ eval( code ) }
+    catch(e) {
+        _error(e, "JS");
+        throw e
+    }
+}
+
+
 function action( o ) {
 
     if(o.hasOwnProperty("update"))
         Object.keys(o["update"]).forEach(key => {
             if(key==0)
-                document.body.outerHTML = o["update"][key];
+                document.body.outerHTML = o["update"][0];
             else
                 document.getElementById( key ).outerHTML = o["update"][key];
         });
@@ -175,8 +191,8 @@ function action( o ) {
             document.getElementById( key ).innerHTML += o["stream"][key];
         });
 
-    if(o.hasOwnProperty("post")) {try{ eval( o["post"] )} catch(e) {_error(e, "JS");throw e}};
-    if(o.hasOwnProperty("next")) {try{ eval( o["next"] )} catch(e) {_error(e, "JS");throw e}};
+    if(o.hasOwnProperty("post")) try_js(o["post"]);
+    if(o.hasOwnProperty("next")) try_js(o["next"]);
     if(o.hasOwnProperty("err")) _error( o["err"], "PYTHON")
 }
 
