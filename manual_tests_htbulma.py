@@ -42,11 +42,11 @@ class Star2(Tag.div): # it's a component ;-)
 class App(Tag.body):
 
   def init(self):
-    self._mbox = b.MBox(self)
+    self._s = b.Service(self)
 
     nav = b.Nav("My App")
-    nav.addEntry("entry 1", lambda: self._mbox.show( "You choose 1" ) )
-    nav.addEntry("entry 2", lambda: self._mbox.show( "You choose 2" ) )
+    nav.addEntry("entry 1", lambda: self._s.alert( "You choose 1" ) )
+    nav.addEntry("entry 2", lambda: self._s.alert( "You choose 2" ) )
 
     tab = b.Tabs()
     tab.addTab("Tab 1", Tag.b("Set star1s") + Star1(12) )
