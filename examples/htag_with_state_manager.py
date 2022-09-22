@@ -13,7 +13,7 @@ Principes:
 - In your component, you only have read access on this store.
 - and ONLY yours (inter-)actions can mutate this store
 
-see pinia/vuex for vuejs, or ngrx for angular, etc ...
+See pinia/vuex for vuejs, redux for react, or ngrx for angular, etc ...
 """
 
 from htag import Tag
