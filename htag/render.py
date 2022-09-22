@@ -168,12 +168,21 @@ function _error(txt,env) {
         console.log( env+" ERROR:", txt );
 }
 
+function try_js( code ) {
+    try{ eval( code ) }
+    catch(e) {
+        _error(e, "JS");
+        throw e
+    }
+}
+
+
 function action( o ) {
 
     if(o.hasOwnProperty("update"))
         Object.keys(o["update"]).forEach(key => {
             if(key==0)
-                document.body.outerHTML = o["update"][key];
+                document.body.outerHTML = o["update"][0];
             else
                 document.getElementById( key ).outerHTML = o["update"][key];
         });
@@ -182,8 +191,8 @@ function action( o ) {
             document.getElementById( key ).innerHTML += o["stream"][key];
         });
 
-    if(o.hasOwnProperty("post")) {try{ eval( o["post"] )} catch(e) {_error(e, "JS");throw e}};
-    if(o.hasOwnProperty("next")) {try{ eval( o["next"] )} catch(e) {_error(e, "JS");throw e}};
+    if(o.hasOwnProperty("post")) try_js(o["post"]);
+    if(o.hasOwnProperty("next")) try_js(o["next"]);
     if(o.hasOwnProperty("err")) _error( o["err"], "PYTHON")
 }
 
