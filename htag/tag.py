@@ -236,6 +236,8 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         self._childs=Elements()
         self._attrs={}
         self._hash_=None
+
+        # sorts kargs -> selfs/attrs
         attrs={}
         selfs={}
         for k,v in kargs.items():
