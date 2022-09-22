@@ -127,7 +127,8 @@ def test_ph_mod_a_leaf_and_its_parent(env_placeholder):
 
     mod(D)
     mod(B)
-    assert s.guess()==[B]   # just B (coz B include D)
+    # assert s.guess()==[B]   # just B (coz B include D)
+    assert s.guess()==[A]   # just B (coz B include D)
 
 def test_ph_mod_the_root(env_placeholder):
     s,A,B,C,D,mod = env_placeholder

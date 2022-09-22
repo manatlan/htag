@@ -3,7 +3,6 @@ from htag.render import HRenderer,Stater
 import asyncio
 from pprint import pprint
 
-import htbulma as b
 import pytest
 
 import re
