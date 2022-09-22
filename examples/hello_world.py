@@ -1,3 +1,5 @@
+import os,sys; sys.path.insert(0,os.path.dirname(os.path.dirname(__file__)))
+
 # the simplest htag'app, in the best env to start development (hot reload/refresh)
 from htag import Tag
 

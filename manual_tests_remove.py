@@ -1,5 +1,4 @@
 import sys
-from tkinter import TRUE
 from htag import Tag # the only thing you'll need ;-)
 
 

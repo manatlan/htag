@@ -1,3 +1,5 @@
+import os,sys; sys.path.insert(0,os.path.dirname(os.path.dirname(__file__)))
+
 from htag import Tag
 import html
 
@@ -17,7 +19,8 @@ class Ed(Tag.div):
         super().__init__(_style="width:%s;height:%s;" % (width,height))
         placeholder="myed%s" % id(self)
 
-        self <= Tag.H.div(self.value,_id=placeholder,_style="width:100%;height:100%;min-height:20px;")
+        oed= Tag.H.div(self.value,_style="width:100%;height:100%;min-height:20px;")
+        self <= oed
         self.onsave=onsave
 
         self.js = """
@@ -38,7 +41,7 @@ tag.ed.commands.addCommand({
     readOnly: "True",
     exec: commandSave,
 })
-""" % (placeholder,mode, self.bind._save( b"tag.ed.getValue()"))
+""" % (id(oed),mode, self.bind._save( b"tag.ed.getValue()"))
 
     def _save(self,value):
         self.value = value
