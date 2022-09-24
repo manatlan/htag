@@ -1,6 +1,5 @@
 #!/usr/bin/python3 -u
 # -*- coding: utf-8 -*-
-from curses.ascii import HT
 from unittest.util import strclass
 import pytest
 
