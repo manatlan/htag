@@ -20,8 +20,15 @@ classifiers = [
 python = "^3.7"
 
 [tool.poetry.dev-dependencies]
-pytest = "^3.0"
-pytest-cov = "^2.6"
+pytest = "^6"
+pytest-cov = "^3"
+pytest-asyncio="^0.19"
+uvicorn = "^0.18"
+starlette = "^0.20"
+tornado ="^6.2"
+kivy = "*"
+pywebview = "^3.6"
+fake-winreg = "^1.6"
 
 [build-system]
 requires = ["poetry>=0.12"]
