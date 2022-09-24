@@ -22,4 +22,4 @@ jobs:
         with:
           poetry-version: ${{ matrix.poetry-version }}
       - name: View poetry --help
-        run: poetry --help
+        run: poetry run pytest
