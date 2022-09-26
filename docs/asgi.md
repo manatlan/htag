@@ -61,3 +61,30 @@ class App(Tag.div):
 app = BrowserStarletteHTTP(App)
 app.add_route("/style.css", mymethod_to_return_style_css )
 ```
+
+## You can serve multiple Tag via endpoints
+
+This features is only available for [WebHTTP](https://manatlan.github.io/htag/runners/#webhttp) (and DevApp).
+(in the past (<0.8.0), WebHTTP could serve multiples tags, but this feature was removed, but can be handle with this trick)
+
+```python
+from htag.runners import WebHTTP as Runner
+
+class Tag1(Tag.div):
+    ...
+
+class Tag2(Tag.div):
+    ...
+
+
+app=Runner(Tag1)
+app.add_route("/endpointTag2", lambda request: app.serve(request,Tag2) )
+
+if __name__=="__main__":
+    app.run()
+```
+
+So, the default endpoint "/" serves `Tag1`, and the other endpoint "/endpointTag2" serves `Tag2`.
+
+
+
