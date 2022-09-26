@@ -23,6 +23,5 @@ jobs:
           poetry-version: ${{ matrix.poetry-version }}
       - name: poetry run pytest
         run: | 
-            pip install --pre pythonnet
             poetry install 
             poetry run pytest
