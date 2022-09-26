@@ -59,13 +59,18 @@ class App(Tag.div):
     ...
 
 app = BrowserStarletteHTTP(App)
+
+from starlette.responses import Response
+def mymethod_to_return_style_css(request):
+    return Response("...")
+
 app.add_route("/style.css", mymethod_to_return_style_css )
 ```
 
 ## You can serve multiple Tag via endpoints
 
-This features is only available for [WebHTTP](https://manatlan.github.io/htag/runners/#webhttp) (and DevApp).
-(in the past (<0.8.0), WebHTTP could serve multiples tags, but this feature was removed, but can be handle with this trick)
+This feature is only available for [WebHTTP](https://manatlan.github.io/htag/runners/#webhttp) (and DevApp).
+(in the past (<0.8.0), WebHTTP could natively serve multiples tags, but this feature was removed (for consistency), but can be handle with this trick)
 
 ```python
 from htag.runners import WebHTTP as Runner
