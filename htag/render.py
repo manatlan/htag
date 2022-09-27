@@ -113,13 +113,26 @@ class HRenderer:
 
         ensureList=lambda x: list(x) if type(x) in [list,tuple] else [x]
 
-        def feedStatics(tag):
+        def feedStatics(tag): # tag can be an instance or a class
+            #TODO: this method is really complex, it could be simpler
 
-            def appendIfNotPresent(i):
-                if i._hash_ not in [i._hash_ for i in self._statics]:
-                    self._statics.append( i )
+            def detectStatics(c):
+                ll=[]
+                if hasattr(c,"__bases__"):
+                    scan = c.__bases__
+                else:
+                    scan = c.__class__.__bases__
+                for i in scan:
+                    if issubclass(i,Tag):
+                        ll.extend( ensureList(i.statics) )
+                ll.extend(ensureList(c.statics))
+                return ll
 
-            for i in ensureList(tag.statics):
+            def appendIfNotPresent(tag):
+                if tag._hash_ not in [i._hash_ for i in self._statics]:
+                    self._statics.append( tag )
+
+            for i in detectStatics(tag):
                 if isinstance(i,Tag):
                     appendIfNotPresent(i)
                 elif isinstance(i,str): # auto add as Tag.style // CSS
@@ -127,7 +140,7 @@ class HRenderer:
                 elif isinstance(i,bytes): # auto add as Tag.script // JS
                     appendIfNotPresent( Tag.script(i.decode()))
                 else:
-                    raise HTagException("Included static is bad")
+                    raise HTagException(f"Included static is bad {i}")
 
 
         if hasattr(self.tag, "imports") and self.tag.imports is not None:
@@ -149,8 +162,8 @@ class HRenderer:
             # there is no "imports" attribut
             # so try to imports statics using Tag subclasses
             logger.info("Include statics from Tag's subclasses")
-            def rec( tag ):
-                for c in tag.__subclasses__():
+            def rec( cls ):
+                for c in cls.__subclasses__():
                     feedStatics(c)
                     rec(c)
 

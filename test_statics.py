@@ -109,6 +109,23 @@ def test_doubbles_statics():
     assert len(hr2._statics)==2                      # 2 real statics
     assert str(hr2).count("<style>kiki</style>")==1  # but just one rendered (coz they are identicals (_hash_))
 
+def test_inherit_bases():
+    class A(Tag):
+        statics = "StylesA"
+        imports=[]
+
+    class B(A):
+        statics = "StylesB"
+        imports=[]
+
+    hr=HRenderer(A,"")
+    styles=[i for i in hr._statics if i.tag=="style"]
+    assert len(styles)==1
+
+    hr=HRenderer(B,"")
+    styles=[i for i in hr._statics if i.tag=="style"]
+    assert len(styles)==2    
+
 
 if __name__=="__main__":
 
