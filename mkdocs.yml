@@ -15,6 +15,7 @@ edit_uri: ""
 nav:
     - Introduction: 'index.md'
     - Tutorial: 'tutorial.md'
+    - Concepts: concepts.md
     - Runners: 'runners.md'
 
 markdown_extensions:

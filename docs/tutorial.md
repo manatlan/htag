@@ -41,7 +41,7 @@ Here is another htag app, which will use the same component (MyText) for "hello"
 from htag import Tag
 
 class MyText(Tag.span):
-    def init(self,txt):
+    def init(self,txt, *a):
         self <= txt
 
 class App(Tag.body):
