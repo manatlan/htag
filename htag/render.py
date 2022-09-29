@@ -190,7 +190,18 @@ function try_js( code ) {
 }
 
 
-function action( o ) {
+function action( payload ) {
+    if(typeof payload == "string") {
+        try {
+            let o=JSON.parse(payload);
+        } catch(e) {
+            // it's not json (so a big python error, or an http trouble)
+            _error( payload, "COM"); // so it's a COM error
+            return;
+        }
+    }
+    else // ensure compat with old system
+        o = payload;
 
     if(o.hasOwnProperty("update"))
         Object.keys(o["update"]).forEach(key => {
