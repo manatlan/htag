@@ -191,9 +191,10 @@ function try_js( code ) {
 
 
 function action( payload ) {
+    let o;
     if(typeof payload == "string") {
         try {
-            let o=JSON.parse(payload);
+            o=JSON.parse(payload);
         } catch(e) {
             // it's not json (so a big python error, or an http trouble)
             _error( payload, "COM"); // so it's a COM error

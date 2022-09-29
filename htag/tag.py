@@ -139,7 +139,7 @@ class BaseCaller(NotBindedCaller):
         interact=dict(id=0,method=self.mname,args=self.args,kargs=self.kargs,event=b"jevent(event)")
         if self.instance is not None: interact["id"]=id(self.instance)
         gen = lambda ll: (";".join(ll))+";" if ll else ""
-        return f"""try{{{gen(self._befores)}interact( {stringify(interact)} );{gen(self._afters)}}} catch(e) {{_error(e,"JS")}}"""
+        return f"""try{{{gen(self._befores)}interact( {stringify(interact)} );{gen(self._afters)}}} catch(e) {{_error(e,"JS");throw e;}}"""
 
 class Binder:
     def __init__(self,btag_instance):
