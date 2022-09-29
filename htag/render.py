@@ -179,13 +179,13 @@ function _error(txt,env) {
         error( env+" ERROR: "+txt );
     else
         console.log( env+" ERROR:", txt );
+    throw txt; // throw the js/py execption in the js console (and stop the process)
 }
 
 function try_js( code ) {
     try{ eval( code ) }
     catch(e) {
         _error(e, "JS");
-        throw e
     }
 }
 
@@ -197,11 +197,10 @@ function action( payload ) {
             o=JSON.parse(payload);
         } catch(e) {
             // it's not json (so a big python error, or an http trouble)
-            _error( payload, "COM"); // so it's a COM error
-            return;
+            _error( payload, "COM"); // so it's a COM error (an interaction returning other than json)
         }
     }
-    else // ensure compat with old system
+    else // ensure compat with old system (PyWebView here!)
         o = payload;
 
     if(o.hasOwnProperty("update"))

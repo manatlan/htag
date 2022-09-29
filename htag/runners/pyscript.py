@@ -23,8 +23,7 @@ class PyScript:
 
         js = """
 interact=async function(o) {
- let actions = await window.interactions( JSON.stringify(o) );
- action( JSON.parse(actions) )
+ action( await window.interactions( JSON.stringify(o) ) );
 }"""
         self.hr = HRenderer(self.tagClass, js, init=common.url2ak( window.document.location.href ))
 

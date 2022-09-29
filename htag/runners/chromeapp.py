@@ -172,7 +172,7 @@ class ChromeApp:
 
         js = """
 async function interact( o ) {
-    action( await (await window.fetch("/",{method:"POST", body:JSON.stringify(o)})).json() )
+    action( await (await window.fetch("/",{method:"POST", body:JSON.stringify(o)})).text() )
 }
 
 window.addEventListener('DOMContentLoaded', start );

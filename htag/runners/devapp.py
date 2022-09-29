@@ -97,9 +97,13 @@ ws.onopen = function() {console.info("[htag start]");start()};
 ws.onclose = function() {document.body.innerHTML="Refreshing";window.location.reload()}
 
 ws.onmessage = function(e) {
-    let data = JSON.parse(e.data);
-    console.info("[htag action]",e.data.length,data)
-    action( data );
+    try {
+        console.info("[htag action]",e.data.length,JSON.parse(e.data));
+    }
+    catch(e) {
+        console.info("[htag action] ERROR:",e.data.length,e.data)
+    }
+    action( e.data );
 };
 """ % className
         self.hrenderers[className]=HRenderer(tagClass, js, self.killme, fullerror=True, statics=[template,], init=init)

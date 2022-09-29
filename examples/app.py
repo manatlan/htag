@@ -117,7 +117,16 @@ logging.basicConfig(format='[%(levelname)-5s] %(name)s: %(message)s',level=loggi
 
 logging.getLogger("htag.tag").setLevel( logging.WARNING )
 
+# from htag.runners import BrowserHTTP as Runner
 from htag.runners import DevApp as Runner
+# from htag.runners import PyWebView as Runner
+# from htag.runners import BrowserStarletteHTTP as Runner
+# from htag.runners import BrowserStarletteWS as Runner
+# from htag.runners import BrowserTornadoHTTP as Runner
+# from htag.runners import WebHTTP as Runner
+# from htag.runners import AndroidApp as Runner
+# from htag.runners import ChromeApp as Runner
+
 r=Runner( Page )
 if __name__=="__main__":
     r.run()

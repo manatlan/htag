@@ -55,7 +55,7 @@ async function interact( o ) {
 var ws = new WebSocket("ws://"+document.location.host+"/ws");
 ws.onopen = start;
 ws.onmessage = function(e) {
-    action( JSON.parse(e.data) );
+    action( e.data );
 };
 """
         return HRenderer(self.tagClass, js, lambda: os._exit(0), init=init)
