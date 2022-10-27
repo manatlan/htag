@@ -13,7 +13,7 @@ Can't be simpler !
 """
 
 class Calc(Tag.div):
-    statics=[Tag.H.style("""
+    statics=[Tag.style("""
 .mycalc *,button {font-size:2em;font-family: monospace}
 """)]
 

@@ -20,6 +20,7 @@ def data_source():
         #"PyWebWiew",    # before 0.8.0 (mispelling)
         "PyWebView",
         #"ChromeApp", # need Chrome installed ;-(
+        #"WinApp", # need Chrome installed ;-(
         "AndroidApp",
         "BrowserTornadoHTTP",
         "PyScript",

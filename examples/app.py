@@ -1,11 +1,9 @@
 import os,sys; sys.path.insert(0,os.path.dirname(os.path.dirname(__file__)))
 from htag import Tag
-H=Tag.H
 
 """
 example, mainly for my visual tests
 
-(But NOT A GOOD EXAMPLE/PRACTICE (mainly tests with "Tag.H"! avoid that ;-))
 
 """
 
@@ -58,21 +56,21 @@ class Page(Tag.body):
 
         self.add( self.c1 )
         self.add( self.c2 )
-        self.add( H.button("alert",_onclick="alert(document.querySelector('input').value)",_class="button") )
+        self.add( Tag.button("alert",_onclick="alert(document.querySelector('input').value)",_class="button") )
 
-        self.t=H.input(_value="",_onchange=self.bind.press(b"this.value"))
+        self.t=Tag.input(_value="",_onchange=self.bind.press(b"this.value"))
         self.add( self.t )
 
-        s=H.div()
-        s<= H.button("BUG JS pre",_onclick=self.bind.bugjs(txt=b"gfdsfsgfds()"),_class="button")
-        s<= H.button("BUG JS post",_onclick=self.bind.bugjs(),_class="button")
-        s<= H.button("BUG PY (normal)",_onclick=self.bind.bugpy(),_class="button")
-        s<= H.button("BUG PY (gen)",_onclick=self.bind.bugpysg(),_class="button")
-        s<= H.button("BUG PY (async gen)",_onclick=self.bind.bugpyag(),_class="button")
+        s=Tag.div()
+        s<= Tag.button("BUG JS pre",_onclick=self.bind.bugjs(txt=b"gfdsfsgfds()"),_class="button")
+        s<= Tag.button("BUG JS post",_onclick=self.bind.bugjs(),_class="button")
+        s<= Tag.button("BUG PY (normal)",_onclick=self.bind.bugpy(),_class="button")
+        s<= Tag.button("BUG PY (gen)",_onclick=self.bind.bugpysg(),_class="button")
+        s<= Tag.button("BUG PY (async gen)",_onclick=self.bind.bugpyag(),_class="button")
         self <= s
 
-        self.add( H.button("Sync Yield",_onclick=self.bind.testSYield(),_class="button") )
-        self.add( H.button("ASync Yield",_onclick=self.bind.testAYield(),_class="button") )
+        self.add( Tag.button("Sync Yield",_onclick=self.bind.testSYield(),_class="button") )
+        self.add( Tag.button("ASync Yield",_onclick=self.bind.testAYield(),_class="button") )
 
         self.js="console.log(42)"
 
@@ -118,7 +116,7 @@ logging.basicConfig(format='[%(levelname)-5s] %(name)s: %(message)s',level=loggi
 logging.getLogger("htag.tag").setLevel( logging.WARNING )
 
 # from htag.runners import BrowserHTTP as Runner
-from htag.runners import DevApp as Runner
+# from htag.runners import DevApp as Runner
 # from htag.runners import PyWebView as Runner
 # from htag.runners import BrowserStarletteHTTP as Runner
 # from htag.runners import BrowserStarletteWS as Runner
@@ -126,6 +124,7 @@ from htag.runners import DevApp as Runner
 # from htag.runners import WebHTTP as Runner
 # from htag.runners import AndroidApp as Runner
 # from htag.runners import ChromeApp as Runner
+from htag.runners import WinApp as Runner
 
 r=Runner( Page )
 if __name__=="__main__":

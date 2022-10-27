@@ -12,7 +12,7 @@ class Button(Tag.button): # this Tag will be rendered as a <button>
 
     # this allow you to include statics in headers
     # (it will be included only once !!!)
-    statics = [Tag.H.style("button.my {background:yellow; border:1px solid black; border-radius:4px}")]
+    statics = [Tag.style("button.my {background:yellow; border:1px solid black; border-radius:4px}")]
 
     def __init__(self,txt, callback):
         super().__init__()
@@ -74,12 +74,12 @@ class Page(Tag.body): # define a <body>, but the renderer will force it to <body
         # (during the __str__ rendering)
 
         # we put a title
-        self <= Tag.H.h1("Best movies ;-)")   # here is shortcut to create "<h1>Best movies ;-)</h1>"
+        self <= Tag.h1("Best movies ;-)")   # here is shortcut to create "<h1>Best movies ;-)</h1>"
                                             # (it works for any html tag you want ;-)
 
         # and add our stuff, sorted by nb of stars
         for name,star in sorted( self.movies, key=lambda x: -x[1].nb ):
-            self <= Tag.H.div( [name,star] )
+            self <= Tag.div( [name,star] )
 
 
 

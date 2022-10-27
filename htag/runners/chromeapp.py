@@ -145,6 +145,8 @@ class ChromeApp:
     the current chrome installation, in a headless mode.
     (it's a little bit like pywebview/cef technics, but based on the real installed chrome)
 
+    new: you can set a host & a size (tuple (width,height)) at run (like WinApp)
+
     BTW : it uses Starlette/http as backend server
     """
     def __init__(self,tagClass:type):
@@ -153,9 +155,8 @@ class ChromeApp:
         self.hrenderer = None
         self.tagClass = tagClass
 
-    def _run_the_base(self,port=8707):
-        host = "127.0.0.1"
-        self._chromeapp = _ChromeApp(f"http://{host}:{port}",size=(800,600))
+    def _run_the_base(self,host,port,size):
+        self._chromeapp = _ChromeApp(f"http://{host}:{port}",size=size)
 
         asgi=Starlette(debug=True, routes=[
             Route('/', self.GET, methods=["GET"]),
@@ -189,8 +190,8 @@ window.addEventListener('DOMContentLoaded', start );
         dico = await self.hrenderer.interact(data["id"],data["method"],data["args"],data["kargs"],data.get("event"))
         return JSONResponse(dico)
 
-    def run(self,port=8707):
-        self._run_the_base(port)
+    def run(self, host="127.0.0.1", port=8000 , size=(800,600)):   # localhost, by default !!
+        self._run_the_base(host,port,size)
         self._server.start()
         self._chromeapp.wait()
         os._exit(0) # to force quit the thread/uvicorn server

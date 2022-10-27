@@ -140,7 +140,7 @@ def test_ko():
 
 
     rt=Tag.div()
-    a=Tag.H.a("link")
+    a=Tag.a("link")
     a["onclick"]=rt.bind( test_ko )                            # possible
     assert isinstance( a["onclick"], Caller )
 

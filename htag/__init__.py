@@ -9,8 +9,7 @@
 
 from .tag import Tag,HTagException
 
-
 __version__ = "0.0.0" # auto-updated
 
-__all__= ["Tag","HTagException","BPM"]
+__all__= ["Tag","HTagException"]
 

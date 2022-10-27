@@ -7,11 +7,11 @@ class Ed(Tag.div):
     """ A class which embed the ace editor (python syntax) """
 
     statics = [
-        Tag.H.script(_src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ace.js"),
-        Tag.H.script(_src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/mode-python.js"),
-        Tag.H.script(_src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/theme-cobalt.js"),
-        Tag.H.script(_src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ext-searchbox.js"),
-        Tag.H.script(_src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ext-language_tools.js"),
+        Tag.script(_src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ace.js"),
+        Tag.script(_src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/mode-python.js"),
+        Tag.script(_src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/theme-cobalt.js"),
+        Tag.script(_src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ext-searchbox.js"),
+        Tag.script(_src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ext-language_tools.js"),
     ]
 
     def __init__(self,value,width="100%",height="100%",mode="python",onsave=None):
@@ -19,7 +19,7 @@ class Ed(Tag.div):
         super().__init__(_style="width:%s;height:%s;" % (width,height))
         placeholder="myed%s" % id(self)
 
-        oed= Tag.H.div(self.value,_style="width:100%;height:100%;min-height:20px;")
+        oed= Tag.div(self.value,_style="width:100%;height:100%;min-height:20px;")
         self <= oed
         self.onsave=onsave
 
@@ -50,7 +50,7 @@ tag.ed.commands.addCommand({
 
 class App(Tag.body):
     """ Using a component which embed the ace editor """
-    statics=[Tag.H.style("""
+    statics=[Tag.style("""
 html, body {width:100%;height:100%;margin:0px}
 """)]
     imports=Ed  # IRL, this line is not needed
