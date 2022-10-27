@@ -2,7 +2,7 @@
 # Concepts
 
 Here are the concepts, for 1.0 version. (but all is here since 0.8.15)
-(For now, some concepts are presented in [tutorial](tutorial). But here, it's my global plan to make a minimal doc ;-) )
+(For now, some concepts are presented in [tutorial](../tutorial). But here, it's my global plan to make a minimal doc ;-) )
 
 ## Technically 
 TODO: how it's work
@@ -37,4 +37,4 @@ TODO: ... And hrenderer/runners (and url queryparams)
 
 ## Runners
 TODO: (and using asgi) (and state management)
-For now, [See runners](runners)
+For now, [See runners](../runners)
