@@ -11,15 +11,19 @@ In fact, it will render it as a SPA, and will manage all interactions for you (b
 
 Everything is done in 3 layers :
 
-* `Tag`: the module to build your UI (it's a metaclass to build html/htag components)
-* `HRenderer` : the abstraction layer between `Tag` and `Runner` (which make all the magic)
-* `Runner` : the process which will run the **main tag** (AKA the **htag app**) in a context.
+* **`Tag`**: the module to build your UI (it's a metaclass to build html/htag components)
+* `HRenderer` : the abstraction layer between `Tag` (^) and `Runner` (v) (which make all the magic). You can forget it.
+* **`Runner`** : the process which will run the **main tag** (AKA the **htag app**) in a context.
+
+The `Runner` will manage the underlying communications between the UI (the front (html)), and the python code (the back (python)), in differents manners, depending on the `Runner` which is used. (ex: Some use HTTP only, some use HTTP or WS, some use inproc/direct calls ... depending of the technologies used by the `Runner`)
 
 There are a lot of [runners](../runners), which comes OOTB with [htag](https://pypi.org/project/htag/). Just grab the one which suit your needs. All you need to know is how to build a GUI App with the `htag.Tag` !
 
+It's the purpose of this page ;-)
+
 
 ## Tag construction 
-TODO: (and inherit open/closed (the **a trick))
+TODO: (and inherit open/closed (the `**a` trick))
 TODO: (placeholder) 
 
 ## Tag properties : parent and root 
