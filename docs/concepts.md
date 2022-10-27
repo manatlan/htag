@@ -15,12 +15,13 @@ Everything is done in 3 layers :
 * `HRenderer` : the abstraction layer between `Tag` (^) and `Runner` (v) (which make all the magic). You can forget it.
 * **`Runner`** : the process which will run the **main tag** (AKA the **htag app**) in a context.
 
-The `Runner` will manage the underlying communications between the UI (the front (html)), and the python code (the back (python)), in differents manners, depending on the `Runner` which is used. (ex: Some use HTTP only, some use HTTP or WS, some use inproc/direct calls ... depending of the technologies used by the `Runner`)
+The `Runner` will manage the underlying communications between the UI (the front (python htag > html)), and the python code (the back (python)), in differents manners, depending on the `Runner` which is used. (ex: Some use HTTP only, some use HTTP or WS, some use inproc/direct calls ... depending of the technologies used by the `Runner`)
 
-There are a lot of [runners](../runners), which comes OOTB with [htag](https://pypi.org/project/htag/). Just grab the one which suit your needs. All you need to know is how to build a GUI App with the `htag.Tag` !
+There are a lot of [runners](../runners), which comes OOTB with [htag](https://pypi.org/project/htag/). Just grab the one which suit your needs. All you need to know is how to build a GUI App with the `htag.Tag`, and it's the purpose of this page ;-)
 
-It's the purpose of this page ;-)
+But the main concept is here: you can developp an **Htag App** which will work anywhere; as a web app, as a desktop app, or as an android app : it will be the same codebase (just depending on the `Runner` context)
 
+The second concept : ...
 
 ## Tag construction 
 TODO: (and inherit open/closed (the `**a` trick))
