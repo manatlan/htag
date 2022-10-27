@@ -21,7 +21,7 @@ There are a lot of [runners](../runners), which comes OOTB with [htag](https://p
 
 But the main concept is here: you can developp an **Htag App** which will work anywhere; as a web app, as a desktop app, or as an android app : it will be the same codebase (just depending on the `Runner` context)
 
-The second concept : ...
+It can be seen as a "VueJs|Angular|React" framework on python side; a statefull instance which manage/render htag's components on server side (states changes are handled by the interactions between the front and the back)
 
 ## Tag construction 
 TODO: (and inherit open/closed (the `**a` trick))
