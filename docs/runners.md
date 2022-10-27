@@ -7,7 +7,7 @@ For example :
  * [BrowserHTTP](#browserhttp) is really adapted to run your htag app with just pure python.
  * [DevApp](#devapp) is the perfect runner during developpement process, because it autoreloads (and autorefreshs UI) on file changes, and it's easy to follow http interactions in devtools/console of your browser.
  * [PyWebView](#pywebview) is the perfect solution, to deliver a gui python app, as a freezed exe (embbeding the pywebview/cef).
- * [ChromeApp](#chromeapp) is the perfect solution to deliver a gui python app, with minimal footprints, because it will reuse the installed chrome of the computer.
+ * [ChromeApp](#chromeapp) is the perfect solution to deliver a gui python app, with minimal footprints, because it will reuse the installed chrome of the computer. (see [WinApp](#winapp) too)
  * [PyScript](#pyscript) is fun, if you only have a browser (no need of python ;-), just html !
 
 But, in all cases, your **htag app** will run in all theses runners, in the same way !
@@ -138,6 +138,7 @@ BrowserStarletteWS( App ).run()
 
 ## ChromeApp
 Run a http server (using starlette/uvicorn), and open the default chrome, in [App Mode](https://technastic.com/open-websites-in-application-mode-google-chrome/), to render the HTag app.
+(See [WinApp](#winapp), for MS Windows)
 
 Run your `App` (htag.Tag class) like this :
 
@@ -156,6 +157,7 @@ ChromeApp( App ).run()
  - the app can `self.exit()`
  - and [a lot of features](../asgi/), because it's astarlette/asgi.
  - Understand [query params from url](../query_params/) to instanciate the main htag class
+ - you can define the size of the window (`.run( size=(1024,600) )`)
 
 **Cons**
 
@@ -361,7 +363,38 @@ WebHTTP( App ).run()
  - need external libs
 
 
+## WinApp
+Run a http server (using tornado), and open the default installed chrome, in [App Mode](https://technastic.com/open-websites-in-application-mode-google-chrome/), to render the HTag app.
+(See [ChromeApp](#chromeapp), another variant)
 
+Seems similar to [ChromeApp](#chromeapp), but got better results on MS Windows platforms, when your python file is `.pyw` (because process is better managed, with tornado than with uvicorn).
+And it closes all (tornado server & chrome app) when it throws exceptions (the stacktrace is outputed in a `.error.txt` file). This runner is pefect for endusers `.pyw` scripts. But when developping, it's a lot better to use [DevApp](#devapp) !
+
+On MS Windows : just double click your `.pyw`, and it will run a chrome app mode (windowed app), and when you close the windowed app, it will close all. And if you put a favicon (link tag), the icon is used in the window, and in the windows task bar... neat (there are no more any other python process spawned in the windows task bar (like the [ChromeApp runner](#chromeapp))!
+
+Run your `App` (htag.Tag class) like this :
+
+```python
+from htag.runners import WinApp
+WinApp( App ).run()
+```
+
+[source](https://github.com/manatlan/htag/blob/main/htag/runners/winapp.py)
+
+**Pros**
+
+ - perfect on MS Windows platforms, as `.pyw` files
+ - the http server is robust
+ - looks like a cef/electron app, without cef (reuse installed chrome)
+ - the app can `self.exit()`
+ - Understand [query params from url](../query_params/) to instanciate the main htag class
+ - you can define the size of the window (`.run( size=(1024,600) )`)
+
+**Cons**
+
+ - Not suited at all for development : debugging is complex (everything is in the socket), and it closes all on (py) errors.
+ - need external libs (just tornado)
+ - need an installed chrome
 
 
 
@@ -375,13 +408,13 @@ WebHTTP( App ).run()
 
 ## Summary
 
- | Features :                             | AndroidApp | BrowserHTTP | BrowserStarletteHTTP | BrowserStarletteWS | ChromeApp | DevApp | PyScript | PyWebView | BrowserTornadoHTTP | WebHTTP |
- |:---------------------------------------|:----------:|:-----------:|:--------------------:|:------------------:|:---------:|:------:|:--------:|:---------:|:------------------:|:-------:|
- | Work without external libs             |            | yes         |                      |                    |           |        | yes      |           |                    |         |
- | Work on android                        | yes        |             |                      |                    |           |        | yes      |           |                    |         |
- | Is ASGI/Starlette/uvicorn based        |            |             | yes                  | yes                | yes       | yes    |          |           |                    | yes     |
- | Can `self.exit()`                      | (should)   | yes         | yes                  | yes                | yes       | no ;-( |          | yes       |  yes               | no!     |
- | Can use url query params               | yes        | yes         | yes                  | yes                | yes       | yes    | yes      |           |  yes               | yes     |
+ | Features :                             | AndroidApp | BrowserHTTP | BrowserStarletteHTTP | BrowserStarletteWS | ChromeApp | DevApp | PyScript | PyWebView | BrowserTornadoHTTP | WebHTTP | WinApp  |
+ |:---------------------------------------|:----------:|:-----------:|:--------------------:|:------------------:|:---------:|:------:|:--------:|:---------:|:------------------:|:-------:|:-------:|
+ | Work without external libs             |            | yes         |                      |                    |           |        | yes      |           |                    |         |         |
+ | Work on android                        | yes        |             |                      |                    |           |        | yes      |           |                    |         |         |
+ | Is ASGI/Starlette/uvicorn based        |            |             | yes                  | yes                | yes       | yes    |          |           |                    | yes     |         |
+ | Can `self.exit()`                      | (should)   | yes         | yes                  | yes                | yes       | no ;-( |          | yes       |  yes               | no!     |  yes    |
+ | Can use url query params               | yes        | yes         | yes                  | yes                | yes       | yes    | yes      |           |  yes               | yes     |  yes    |
 
 
 Htag provides somes [`runners`](https://github.com/manatlan/htag/runners) ootb. But they are just here for the show. IRL: you should build your own, for your needs.
