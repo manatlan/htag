@@ -24,6 +24,28 @@ But the main concept is here: you can developp an **Htag App** which will work a
 It can be seen as a "VueJs|Angular|React" framework on python side; a statefull instance which manage/render htag's components (states changes are handled by the interactions between the front and the back)
 
 ## Tag construction 
+
+`htag.Tag` is a metaclass helper to build an html tag.
+
+```python
+from htag import Tag
+
+mydiv = Tag.div("hello world")
+```
+`mydiv` will produce a html ouptut as `<div>hello world</div>` ;-)
+
+The firt parameter is the default content of the object, and can be everything (which have a `__str__` method)
+
+Here are some others tag constructions :
+
+``` python
+Tag.div(42)                           # --> <div>42</div>
+Tag.div()                             # --> <div></div>
+Tag.div( "hello " + Tag.b("world") )  # --> <div>hello <b>world</b></div>
+Tag.what_you_want("hello")            # --> <what-you-want>hello</what-you-want>
+```
+. . .
+
 TODO: (and inherit open/closed (the `**a` trick))
 TODO: (placeholder) 
 
