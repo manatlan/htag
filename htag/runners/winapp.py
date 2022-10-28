@@ -12,9 +12,8 @@ from ..render import HRenderer
 from . import common
 from .chromeapp import _ChromeApp
 
-
-import inspect,traceback,sys
-import os,json,asyncio
+import traceback,sys
+import os,json,asyncio,html
 import tornado.ioloop
 import tornado.web
 import tornado.websocket
@@ -26,7 +25,6 @@ class WinApp:
 
     It's the same as ChromeApp (which it reuses) ... BUT :
     - the backend use HTTP/WS with tornado (not uvicorn !!!!)
-    - When (python) errors -> it closes all (and generate a file ".error.txt", with the traceback error !)
     - as it doesn't use uvicon, it's the perfect solution on windows (for .pyw files)
     """
 
@@ -50,8 +48,9 @@ class WinApp:
             if self.hrenderer and self.hrenderer.init == init:
                 return self.hrenderer
 
-            # ws.onerror and ws.onclose shouldn't be visible, because server side stops all !
+            # ws.onerror and ws.onclose shouldn't be visible, because server side stops all when socket close !
             js = """
+
 async function interact( o ) {
     ws.send( JSON.stringify(o) );
 }
@@ -62,26 +61,13 @@ ws.onmessage = function(e) {
     action( e.data );
 };
 ws.onerror = function(e) {
-    document.body.innerHTML="WS ERROR"
+    console.error("WS ERROR");
 };
 ws.onclose = function(e) {
-    document.body.innerHTML="WS CLOSED"
+    console.error("WS CLOSED");
 };
 """
-            return HRenderer(self.tagClass, js, lambda: os._exit(0), init=init, fullerror=True)
-
-        fi= inspect.getframeinfo(sys._getframe(1))
-        error_file = fi.filename+".error.txt"
-
-        def exit(msgerreur=None):
-            if msgerreur:
-                with open(error_file,"w+") as fid:
-                    fid.write( msgerreur )
-                error_code=-1
-            else:
-                error_code=0
-            self.chromeapp.exit()
-            os._exit(error_code)
+            return HRenderer(self.tagClass, js, lambda: os._exit(0), init=init, fullerror=False)
 
         class MainHandler(tornado.web.RequestHandler):
             async def get(this):
@@ -89,26 +75,27 @@ ws.onclose = function(e) {
                     self.hrenderer = instanciate( str(this.request.uri) )
                     this.write( str(self.hrenderer) )
                 except Exception as e:
-                    exit( traceback.format_exc() )
+                    # show a error title
+                    this.write( str(Tag.title("""Error (at start)""")) )
+                    
+                    # connect the websocket (to be able to kill chrome on ws.on_close)
+                    this.write( str(Tag.script("""new WebSocket("ws://"+document.location.host+"/ws");""")) )
+                    
+                    # show a stacktrace (in console), and a minimal error in front side
+                    stacktrace = traceback.format_exc()
+                    print(stacktrace)
+                    this.write( "<pre>%s</pre>" % html.escape(str(e)) )
 
         class SocketHandler(tornado.websocket.WebSocketHandler):
             async def on_message(this, data):
                 data=json.loads(data)
                 actions = await self.hrenderer.interact(data["id"],data["method"],data["args"],data["kargs"],data.get("event"))
-                if "err" in actions:    # soft err'ors -> we quit !
-                    exit(actions["err"])
-                else:
-                    this.write_message(json.dumps(actions))
+                this.write_message(json.dumps(actions))
 
             def on_close(this):
-                exit()
-
-        if os.path.isfile(error_file):
-            os.unlink(error_file)
+                self.chromeapp.exit()
+                os._exit(0)
 
         app = tornado.web.Application([(r"/", MainHandler),(r"/ws", SocketHandler)])
         app.listen(port)
         tornado.ioloop.IOLoop.current().start()
-
-
-
