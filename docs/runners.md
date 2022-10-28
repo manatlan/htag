@@ -368,7 +368,6 @@ Run a http server (using tornado), and open the default installed chrome, in [Ap
 (See [ChromeApp](#chromeapp), another variant)
 
 Seems similar to [ChromeApp](#chromeapp), but got better results on MS Windows platforms, when your python file is `.pyw` (because process is better managed, with tornado than with uvicorn).
-And it closes all (tornado server & chrome app) when it throws exceptions (the stacktrace is outputed in a `.error.txt` file). This runner is pefect for endusers `.pyw` scripts. But when developping, it's a lot better to use [DevApp](#devapp) !
 
 On MS Windows : just double click your `.pyw`, and it will run a chrome app mode (windowed app), and when you close the windowed app, it will close all. And if you put a favicon (link tag), the icon is used in the window, and in the windows task bar... neat (there are no more any other python process spawned in the windows task bar (like the [ChromeApp runner](#chromeapp))!
 
