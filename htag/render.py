@@ -87,12 +87,12 @@ class Stater:
 
 
 class HRenderer:
-    def __init__(self, tagClass: type, js:str, exit_callback:Optional[Callable]=None, init= ((),{}), stacktrace=False, statics=[] ):
+    def __init__(self, tagClass: type, js:str, exit_callback:Optional[Callable]=None, init= ((),{}), fullerror=False, statics=[] ):
         """ tag object will be setted as a 'body' tag ! """
         """ js should containt an interact method, and an initializer to call the start()"""
         if not issubclass(tagClass, Tag): raise HTagException("HRenderer can only handle tag subclasses !")
         if not isinstance(statics, list): raise HTagException("HRenderer statics should be a list !")
-        self.fullerror = stacktrace
+        self.fullerror = fullerror
         self._interaction_scripts=[]
         self.init = tuple( [tuple(init[0]),dict(init[1])] ) # save args/kargs whose initialized the instance
 
