@@ -106,7 +106,7 @@ ws.onmessage = function(e) {
     action( e.data );
 };
 """ % className
-        self.hrenderers[className]=HRenderer(tagClass, js, self.killme, stacktrace=True, statics=[template,], init=init)
+        self.hrenderers[className]=HRenderer(tagClass, js, self.killme, fullerror=True, statics=[template,], init=init)
         return self.hrenderers[className]
 
 

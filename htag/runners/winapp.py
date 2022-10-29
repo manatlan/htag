@@ -65,7 +65,7 @@ ws.onclose = function(e) {
     console.error("WS CLOSED");
 };
 """
-            return HRenderer(self.tagClass, js, lambda: os._exit(0), init=init, stacktrace=False)
+            return HRenderer(self.tagClass, js, lambda: os._exit(0), init=init, fullerror=False)
 
         class MainHandler(tornado.web.RequestHandler):
             async def get(this):
