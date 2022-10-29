@@ -128,7 +128,7 @@ class WebHTTP(Starlette):
 
             logger.info("INTERACT WITH SESSION %s (sessions:%s)",sesid,len(self.sessions))
             data=await request.json()
-            actions = await hr.interact(data["id"],data["method"],data["args"],data["kargs"])
+            actions = await hr.interact(data["id"],data["method"],data["args"],data["kargs"],data["event"])
             return JSONResponse(actions)
 
         else:
