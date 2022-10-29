@@ -138,7 +138,9 @@ BrowserStarletteWS( App ).run()
 
 ## ChromeApp
 Run a http server (using starlette/uvicorn), and open the default chrome, in [App Mode](https://technastic.com/open-websites-in-application-mode-google-chrome/), to render the HTag app.
-(See [WinApp](#winapp), for MS Windows)
+(See [WinApp](#winapp), another variant)
+
+On MS Windows : just double click your `.pyw`, and it will run a chrome app mode (windowed app), and when you close the windowed app, it will close all. And if you put a favicon (link tag), the icon is used in the window, and in the windows task bar... neat (there are no more any other python process spawned in the windows task bar !
 
 Run your `App` (htag.Tag class) like this :
 
@@ -151,8 +153,9 @@ ChromeApp( App ).run()
 
 **Pros**
 
+ - perfect on MS Windows platforms, as `.pyw` files
+ - it closes the server side when windowed app is closed !!
  - the http server is (ultra) robust
- - debugging is simple (can see http exchanges in the browser dev tools)
  - looks like a cef/electron app, without cef (reuse installed chrome)
  - the app can `self.exit()`
  - and [a lot of features](../asgi/), because it's astarlette/asgi.
@@ -367,9 +370,7 @@ WebHTTP( App ).run()
 Run a http server (using tornado), and open the default installed chrome, in [App Mode](https://technastic.com/open-websites-in-application-mode-google-chrome/), to render the HTag app.
 (See [ChromeApp](#chromeapp), another variant)
 
-Seems similar to [ChromeApp](#chromeapp), but got better results on MS Windows platforms, when your python file is `.pyw` (because process is better managed, with tornado than with uvicorn).
-
-On MS Windows : just double click your `.pyw`, and it will run a chrome app mode (windowed app), and when you close the windowed app, it will close all. And if you put a favicon (link tag), the icon is used in the window, and in the windows task bar... neat (there are no more any other python process spawned in the windows task bar (like the [ChromeApp runner](#chromeapp))!
+On MS Windows : just double click your `.pyw`, and it will run a chrome app mode (windowed app), and when you close the windowed app, it will close all. And if you put a favicon (link tag), the icon is used in the window, and in the windows task bar... neat (there are no more any other python process spawned in the windows task bar !
 
 Run your `App` (htag.Tag class) like this :
 
@@ -383,6 +384,7 @@ WinApp( App ).run()
 **Pros**
 
  - perfect on MS Windows platforms, as `.pyw` files
+ - it closes the server side when windowed app is closed !!
  - the http server is robust
  - looks like a cef/electron app, without cef (reuse installed chrome)
  - the app can `self.exit()`
@@ -391,7 +393,7 @@ WinApp( App ).run()
 
 **Cons**
 
- - Not suited at all for development : debugging is complex (everything is in the socket), and it closes all on (py) errors.
+ - Not suited at all for development : debugging is complex (everything is in the socket)
  - need external libs (just tornado)
  - need an installed chrome
 
@@ -411,7 +413,7 @@ WinApp( App ).run()
  |:---------------------------------------|:----------:|:-----------:|:--------------------:|:------------------:|:---------:|:------:|:--------:|:---------:|:------------------:|:-------:|:-------:|
  | Work without external libs             |            | yes         |                      |                    |           |        | yes      |           |                    |         |         |
  | Work on android                        | yes        |             |                      |                    |           |        | yes      |           |                    |         |         |
- | Is ASGI/Starlette/uvicorn based        |            |             | yes                  | yes                | yes       | yes    |          |           |                    | yes     |         |
+ | Is ASGI (with Starlette/uvicorn        |            |             | yes                  | yes                |           | yes    |          |           |                    | yes     |         |
  | Can `self.exit()`                      | (should)   | yes         | yes                  | yes                | yes       | no ;-( |          | yes       |  yes               | no!     |  yes    |
  | Can use url query params               | yes        | yes         | yes                  | yes                | yes       | yes    | yes      |           |  yes               | yes     |  yes    |
 

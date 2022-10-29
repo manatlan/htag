@@ -61,9 +61,7 @@ ws.onmessage = function(e) {
         return HRenderer(self.tagClass, js, lambda: os._exit(0), init=init)
 
     async def GET(self,request):
-
         self.hrenderer=self.instanciate( str(request.url) )
-
         return HTMLResponse( str(self.hrenderer) )
 
     def run(self, host="127.0.0.1", port=8000, openBrowser=True):   # localhost, by default !!

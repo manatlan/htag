@@ -14,10 +14,12 @@ from . import common
 
 import os
 
-import uvicorn
+import uvicorn,json
 from starlette.applications import Starlette
 from starlette.responses import HTMLResponse,JSONResponse
 from starlette.routing import Route
+from starlette.routing import Route,WebSocketRoute
+from starlette.endpoints import WebSocketEndpoint
 
 #="="="="="="="="="="="="="="="="="="="="="="="="="="="="="="="="="="="="="="="
 # mainly code from the good old guy ;-)
@@ -155,28 +157,30 @@ class ChromeApp:
         self.hrenderer = None
         self.tagClass = tagClass
 
-    def _run_the_base(self,host,port,size):
-        self._chromeapp = _ChromeApp(f"http://{host}:{port}",size=size)
-
-        asgi=Starlette(debug=True, routes=[
-            Route('/', self.GET, methods=["GET"]),
-            Route('/', self.POST, methods=["POST"]),
-        ])
-
-        self._server = threading.Thread(name='ChromeAppServer', target=uvicorn.run,args=(asgi,),kwargs=dict(host=host, port=port))
-
 
     def instanciate(self,url:str):
         init = common.url2ak(url)
         if self.hrenderer and self.hrenderer.init == init:
             return self.hrenderer
 
+        # ws.onerror and ws.onclose shouldn't be visible, because server side stops all when socket close !
         js = """
+
 async function interact( o ) {
-    action( await (await window.fetch("/",{method:"POST", body:JSON.stringify(o)})).text() )
+    ws.send( JSON.stringify(o) );
 }
 
-window.addEventListener('DOMContentLoaded', start );
+var ws = new WebSocket("ws://"+document.location.host+"/ws");
+ws.onopen = start;
+ws.onmessage = function(e) {
+    action( e.data );
+};
+ws.onerror = function(e) {
+    console.error("WS ERROR");
+};
+ws.onclose = function(e) {
+    console.error("WS CLOSED");
+};
 """
         return HRenderer(self.tagClass, js, self._chromeapp.exit, init=init )
 
@@ -185,13 +189,27 @@ window.addEventListener('DOMContentLoaded', start );
         self.hrenderer = self.instanciate( str(request.url) )
         return HTMLResponse( str(self.hrenderer) )
 
-    async def POST(self,request) -> JSONResponse:
-        data = await request.json()
-        dico = await self.hrenderer.interact(data["id"],data["method"],data["args"],data["kargs"],data.get("event"))
-        return JSONResponse(dico)
-
     def run(self, host="127.0.0.1", port=8000 , size=(800,600)):   # localhost, by default !!
-        self._run_the_base(host,port,size)
+        self._chromeapp = _ChromeApp(f"http://{host}:{port}",size=size)
+
+        class WsInteract(WebSocketEndpoint):
+            encoding = "json"
+
+            async def on_receive(this, websocket, data):
+                actions = await self.hrenderer.interact(data["id"],data["method"],data["args"],data["kargs"],data.get("event"))
+                await websocket.send_text( json.dumps(actions) )
+
+            async def on_disconnect(this, websocket, close_code):
+                print("!!! exit on socket.close !!!")
+                self._chromeapp.exit()
+                os._exit(0)
+
+        asgi=Starlette(debug=True, routes=[
+            Route('/', self.GET, methods=["GET"]),
+            WebSocketRoute("/ws", WsInteract),
+        ])
+
+        self._server = threading.Thread(name='ChromeAppServer', target=uvicorn.run,args=(asgi,),kwargs=dict(host=host, port=port))
         self._server.start()
         self._chromeapp.wait()
         os._exit(0) # to force quit the thread/uvicorn server

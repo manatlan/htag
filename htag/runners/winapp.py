@@ -31,6 +31,7 @@ class WinApp:
     def __init__(self,tagClass:type):
         assert issubclass(tagClass,Tag)
         self.tagClass = tagClass
+        self.hrenderer = None
 
         try: # https://bugs.python.org/issue37373 FIX: tornado/py3.8 on windows
             if sys.platform == 'win32':
@@ -39,9 +40,6 @@ class WinApp:
             pass
 
     def run(self, host="127.0.0.1", port=8000 , size=(800,600)):   # localhost, by default !!
-        self.chromeapp = _ChromeApp(f"http://{host}:{port}",size=size)
-
-        self.hrenderer = None
 
         def instanciate(url:str):
             init = common.url2ak(url)
@@ -67,24 +65,12 @@ ws.onclose = function(e) {
     console.error("WS CLOSED");
 };
 """
-            return HRenderer(self.tagClass, js, lambda: os._exit(0), init=init, fullerror=False)
+            return HRenderer(self.tagClass, js, lambda: os._exit(0), init=init, stacktrace=False)
 
         class MainHandler(tornado.web.RequestHandler):
             async def get(this):
-                try:
-                    self.hrenderer = instanciate( str(this.request.uri) )
-                    this.write( str(self.hrenderer) )
-                except Exception as e:
-                    # show a error title
-                    this.write( str(Tag.title("""Error (at start)""")) )
-                    
-                    # connect the websocket (to be able to kill chrome on ws.on_close)
-                    this.write( str(Tag.script("""new WebSocket("ws://"+document.location.host+"/ws");""")) )
-                    
-                    # show a stacktrace (in console), and a minimal error in front side
-                    stacktrace = traceback.format_exc()
-                    print(stacktrace)
-                    this.write( "<pre>%s</pre>" % html.escape(str(e)) )
+                self.hrenderer = instanciate( str(this.request.uri) )
+                this.write( str(self.hrenderer) )
 
         class SocketHandler(tornado.websocket.WebSocketHandler):
             async def on_message(this, data):
@@ -93,9 +79,11 @@ ws.onclose = function(e) {
                 this.write_message(json.dumps(actions))
 
             def on_close(this):
+                print("!!! exit on socket.close !!!")
                 self.chromeapp.exit()
                 os._exit(0)
 
+        self.chromeapp = _ChromeApp(f"http://{host}:{port}",size=size)
         app = tornado.web.Application([(r"/", MainHandler),(r"/ws", SocketHandler)])
         app.listen(port)
         tornado.ioloop.IOLoop.current().start()

@@ -48,7 +48,7 @@ class Cpt(Tag.div):
 import time,asyncio
 
 class Page(Tag.body):
-    statics=css,b"window.error=function(txt) {document.body.innerHTML += txt}"
+    statics=css,b"window.error=function(txt) {document.body.innerHTML += txt}","body {background:#CCC}"
 
     def init(self):
         self.c1=CptWithStars(0)
@@ -71,6 +71,7 @@ class Page(Tag.body):
 
         self.add( Tag.button("Sync Yield",_onclick=self.bind.testSYield(),_class="button") )
         self.add( Tag.button("ASync Yield",_onclick=self.bind.testAYield(),_class="button") )
+        self.add( Tag.button("exit",_onclick=lambda o: self.exit(),_class="button") )
 
         self.js="console.log(42)"
 

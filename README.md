@@ -32,14 +32,7 @@ But yes … the promise is here : **it's a GUI toolkit for building "beautiful" 
 
 ## To have a look
 
-See the [demo source code](https://github.com/manatlan/htag/blob/main/examples/demo.py)
-
-To try it :
-
-    $ pip3 install htag pywebview
-    $ wget https://raw.githubusercontent.com/manatlan/htag/main/examples/demo.py
-    $ python3 demo.py
-
+TODO: need to find a super demo ;-)
 
 ## ROADMAP to 1.0.0
 

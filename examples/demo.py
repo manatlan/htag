@@ -1,10 +1,6 @@
-import sys
-try:
-    from htag import Tag # the only thing you'll need ;-)
-except:
-    print("ERROR: You'll need to 'pip install htag'")
-    sys.exit(-1)
+import os,sys; sys.path.insert(0,os.path.dirname(os.path.dirname(__file__)))
 
+from htag import Tag # the only thing you'll need ;-)
 
 
 class Button(Tag.button): # this Tag will be rendered as a <button>
@@ -84,8 +80,8 @@ class Page(Tag.body): # define a <body>, but the renderer will force it to <body
 
 
 # and execute it in a pywebview instance
-from htag.runners import *
-PyWebWiew( Page ).run()
+from htag.runners import PyWebView
+PyWebView( Page ).run()
 
 # here is another runner, in a simple browser (thru ajax calls)
 # BrowserHTTP( Page ).run()

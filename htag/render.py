@@ -87,21 +87,27 @@ class Stater:
 
 
 class HRenderer:
-    def __init__(self, tagClass: type, js:str, exit_callback:Optional[Callable]=None, init= ((),{}), fullerror=False, statics=[] ):
+    def __init__(self, tagClass: type, js:str, exit_callback:Optional[Callable]=None, init= ((),{}), stacktrace=False, statics=[] ):
         """ tag object will be setted as a 'body' tag ! """
         """ js should containt an interact method, and an initializer to call the start()"""
         if not issubclass(tagClass, Tag): raise HTagException("HRenderer can only handle tag subclasses !")
         if not isinstance(statics, list): raise HTagException("HRenderer statics should be a list !")
-        self.fullerror = fullerror
+        self.fullerror = stacktrace
         self._interaction_scripts=[]
         self.init = tuple( [tuple(init[0]),dict(init[1])] ) # save args/kargs whose initialized the instance
 
         try:
-            args,kargs = init
-            tag = tagClass( *args,_hr_=self,**kargs )
-        except TypeError:
-            logger.warning(f"Can't instanciate tag '{tagClass.__name__}' with {init} arguments, so instanciate it without argument !")
-            tag = tagClass(_hr_=self)
+            try:
+                args,kargs = init
+                tag = tagClass( *args,_hr_=self,**kargs )
+            except TypeError:
+                logger.warning(f"Can't instanciate tag '{tagClass.__name__}' with {init} arguments, so instanciate it without argument !")
+                tag = tagClass(_hr_=self)
+        except Exception as e:
+            print("ERROR",e)
+            stacktrace=traceback.format_exc()
+            logger.error("Exception %s:\n%s", e, stacktrace)
+            tag=Tag.body(f"init error : {e}",js="document.title='HTag Error'")
 
         self.tag=tag
         self.tag.tag="body" # force first tag as body !!
@@ -143,21 +149,21 @@ class HRenderer:
                     raise HTagException(f"Included static is bad {i}")
 
 
-        if hasattr(self.tag, "imports") and self.tag.imports is not None:
+        if hasattr(tagClass, "imports") and tagClass.imports is not None:
             # there is an "imports" attribut
             # so, try to import statics according "imports" attrs on tags
             logger.info("Include statics from Tag's imports attibut")
-            feedStatics(self.tag)
-            def rec( tag ):
-                if hasattr(tag, "imports") and tag.imports is not None:
-                    imports = ensureList(tag.imports)
+            feedStatics(tagClass)
+            def rec( tagc ):
+                if hasattr(tagc, "imports") and tagc.imports is not None:
+                    imports = ensureList(tagc.imports)
                     if not all([isinstance(c,type) and issubclass(c,Tag) for c in imports]):
                         raise HTagException("imports can contains only Tag classes %s" % imports)
                     for c in imports:
                         feedStatics(c)
                         rec(c)
 
-            rec( self.tag )
+            rec( tagClass )
         else:
             # there is no "imports" attribut
             # so try to imports statics using Tag subclasses
@@ -379,9 +385,9 @@ function jevent (e) {
 
         except Exception as e:
             print("ERROR",e)
-            fullerror=traceback.format_exc()
-            logger.error("Exception %s:\n%s", e, fullerror)
-            rep={"err": fullerror if self.fullerror else str(e) }
+            stacktrace=traceback.format_exc()
+            logger.error("Exception %s:\n%s", e, stacktrace)
+            rep={"err": stacktrace if self.fullerror else str(e) }
 
         logger.info("RETURN --> %s",json.dumps(rep,indent=4))
 
