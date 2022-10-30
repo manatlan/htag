@@ -19,6 +19,7 @@ from . import common
 - can handle multiple "tag class", and brings query_params as "query_params:dict" when instanciate tag
 - the session are purged automatically after timeout/5m of inactivity
 - "http get query_params" are passed at Tag'init, if it accepts a query_params:dict param. (needed for https://htag.glitch.me)
+- the main root is setable with path parameter (default: "/")
 """
 
 import uuid
