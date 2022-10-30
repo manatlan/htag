@@ -33,6 +33,8 @@ from starlette.responses import HTMLResponse,JSONResponse,Response
 from starlette.routing import Route
 logger = logging.getLogger(__name__)
 
+QN = lambda klass: (klass.__module__+"."+klass.__qualname__).replace("__main__.","")
+
 class WebHTTP(Starlette):
     """ Simple ASync Web Server (with starlette) with HTTP interactions with htag.
         can handle multiple instances & multiples Tag
@@ -95,16 +97,16 @@ class WebHTTP(Starlette):
         """ get|create an instance of `klass` for user session `htuid`
         (get|save it into self.sessions)
         """
-        sesid = f"{klass.__name__}|{htuid}"   # there can be only one instance of klass, at a time !
+        sesid = f"{QN(klass)}|{htuid}"   # there can be only one instance of klass, at a time !
 
         logger.info("intanciate : renew=%s",renew)
         if renew==False and (sesid in self.sessions) and self.sessions[sesid]["renderer"].init == init:
             # same url (same klass/params), same htuid -> same instance
-            logger.info("intanciate : Reuse Renderer %s for %s",klass.__name__,sesid)
+            logger.info("intanciate : Reuse Renderer %s for %s",QN(klass),sesid)
             hr=self.sessions[sesid]["renderer"]
         else:
             # url has changed ... recreate an instance
-            logger.info("intanciate : Create Renderer %s for %s",klass.__name__,sesid)
+            logger.info("intanciate : Create Renderer %s for %s",QN(klass),sesid)
             js = """
                 async function interact( o ) {
                     action( await (await window.fetch("/%s",{method:"POST", body:JSON.stringify(o)})).text() )
