@@ -41,16 +41,17 @@ class WebHTTP(Starlette):
 
         The instance is an ASGI htag app
     """
-    def __init__(self,tagClass:type, timeout=5*60, path="/"):
-        assert issubclass(tagClass,Tag)
+    def __init__(self,tagClass:type=None, timeout=5*60):
+        if tagClass: assert issubclass(tagClass,Tag)
         self.sessions={} # nb htag instances (htag x user)
         self.tagClass=tagClass
         self.timeout=timeout
 
-        Starlette.__init__(self,debug=True, routes=[
-            Route(path,   self.GET,   methods=["GET"]),
-            Route('/{sesid}',   self.POST,  methods=["POST"]),
-        ], on_startup=[self._purgeSessions])
+        routes=[ Route('/{sesid}',   self.POST,  methods=["POST"]) ]
+        if tagClass:
+            routes.append( Route("/",   self.GET,   methods=["GET"]) )
+
+        Starlette.__init__(self,debug=True, routes=routes, on_startup=[self._purgeSessions])
 
     async def _purgeSessions(self):
 

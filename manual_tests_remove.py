@@ -33,6 +33,13 @@ class Page(Tag.body): # define a <body>, but the renderer will force it to <body
         print("Should appear", o["class"])
         o["class"].toggle("fun")
 
+class Page2(Tag.body): # define a <body>, but the renderer will force it to <body> in all cases
+    def init(self):
+        self+="Hello"
+        self+=Tag.a("remover",_href="/p")
+
+
+
 # and execute it in a pywebview instance
 from htag.runners import *
 # PyWebWiew( Page ).run()
@@ -40,7 +47,10 @@ from htag.runners import *
 # here is another runner, in a simple browser (thru ajax calls)
 # ChromeApp( Page ).run()
 # BrowserHTTP( Page ).run()
-app=DevApp( Page )
+# app=DevApp( Page )
+app=WebHTTP( Page2 )
+app.add_route("/p", lambda request: app.serve( request, Page ) )
+app.add_route("/b", lambda request: app.serve( request, Page2 ) )
 if __name__ == "__main__":
     # BrowserTornadoHTTP( Page ).run()
     app.run()
