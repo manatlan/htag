@@ -20,6 +20,7 @@ from . import common
 - the session are purged automatically after timeout/5m of inactivity
 - "http get query_params" are passed at Tag'init, if it accepts a query_params:dict param. (needed for https://htag.glitch.me)
 - the main root is setable with path parameter (default: "/")
+- add renew (bool) parametter on .serve() (and instanciate), to force renewal in all cases.
 """
 
 import uuid
@@ -64,10 +65,9 @@ class WebHTTP(Starlette):
         asyncio.ensure_future( purge() )
 
     async def GET(self,request) -> HTMLResponse:
-        print( "NB SES=",len(self.sessions) )
         return self.serve(request, self.tagClass )
 
-    def serve(self,request, klass, init=None) -> HTMLResponse:
+    def serve(self,request, klass, init=None, renew=False) -> HTMLResponse:
         """ Serve for the `request`, an instance of the class 'klass'
         initialized with `init` (tuple (*args,**kargs))
         if init is None : takes them from request.url ;-)
@@ -85,23 +85,26 @@ class WebHTTP(Starlette):
             assert type(init[0])==tuple
             assert type(init[1])==dict
 
-        hr = self.instanciate(htuid, klass, init )
+        hr = self.instanciate(htuid, klass, init , renew)
 
         r = HTMLResponse( str(hr) )
         r.set_cookie("htuid",htuid,path="/")
         return r
 
-    def instanciate(self, htuid, klass, init) -> HRenderer:
+    def instanciate(self, htuid, klass, init, renew) -> HRenderer:
         """ get|create an instance of `klass` for user session `htuid`
         (get|save it into self.sessions)
         """
         sesid = f"{klass.__name__}|{htuid}"   # there can be only one instance of klass, at a time !
 
-        if sesid in self.sessions and self.sessions[sesid]["renderer"].init == init:
+        logger.info("intanciate : renew=%s",renew)
+        if renew==False and (sesid in self.sessions) and self.sessions[sesid]["renderer"].init == init:
             # same url (same klass/params), same htuid -> same instance
+            logger.info("intanciate : Reuse Renderer %s for %s",klass.__name__,sesid)
             hr=self.sessions[sesid]["renderer"]
         else:
             # url has changed ... recreate an instance
+            logger.info("intanciate : Create Renderer %s for %s",klass.__name__,sesid)
             js = """
                 async function interact( o ) {
                     action( await (await window.fetch("/%s",{method:"POST", body:JSON.stringify(o)})).text() )
@@ -109,7 +112,6 @@ class WebHTTP(Starlette):
 
                 window.addEventListener('DOMContentLoaded', start );
             """ % sesid
-
             hr=HRenderer(klass, js, init=init ) # NO EXIT !!
 
         # update session info
@@ -126,6 +128,8 @@ class WebHTTP(Starlette):
 
         if sesid in self.sessions:
             hr = self.sessions[ sesid ]["renderer"]
+
+            self.sessions[ sesid ]["lastaccess"]=time.time()
 
             logger.info("INTERACT WITH SESSION %s (sessions:%s)",sesid,len(self.sessions))
             data=await request.json()
