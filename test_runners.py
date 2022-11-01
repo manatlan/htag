@@ -68,5 +68,40 @@ def test_url2ak():
     assert common.url2ak("http://jojo.com/?1%202&kiki&a=3&b=5&b=6#yolo") == (('1 2', 'kiki'), {'a': '3', 'b': '6'})
 
 
+def test_session():
+    s=common.Sessions()
+    # assert in all case, it returns a dict {apps,session}
+    x=s.get_ses("guid1")
+    assert x["apps"]=={}        # its running apps
+    assert x["session"]=={}     # its session dict
+
+    # test base concept of session
+    x["session"]["my_var"]="hello"
+
+    x=s.get_ses("guid2")
+    assert x["session"]=={}
+
+    x=s.get_ses("guid1")
+    assert "my_var" in x["session"]
+
+def test_session_apps():
+    s=common.Sessions()
+
+    s.set_hr( "fqn1|guid", "hr1")
+
+    assert s.htuids == ["guid"]
+    assert s.sesids == ["fqn1|guid"]
+
+    s.set_hr( "fqn2|guid", "hr2")
+
+    assert s.htuids == ["guid"]
+    assert s.sesids == ["fqn1|guid","fqn2|guid"]
+    
+    assert s.del_hr( "fqn?|guid")==False
+    assert s.del_hr( "fqn2|guid")==True
+
+    assert s.htuids == ["guid"]
+    assert s.sesids == ["fqn1|guid"]
+
 if __name__=="__main__":
     test_default()

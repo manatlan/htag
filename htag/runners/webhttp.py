@@ -43,7 +43,7 @@ class WebHTTP(Starlette):
     """
     def __init__(self,tagClass:type=None, timeout=5*60):
         if tagClass: assert issubclass(tagClass,Tag)
-        self.sessions={} # nb htag instances (htag x user)
+        self.sessions=common.Sessions()
         self.tagClass=tagClass
         self.timeout=timeout
 
@@ -57,12 +57,7 @@ class WebHTTP(Starlette):
 
         async def purge():
             while True:
-                now=time.time()
-                for ses_id,ses_info in list(self.sessions.items()):
-                    if now - ses_info["lastaccess"] > self.timeout:
-                        logger.info("PURGE SESSION: %s (sessions:%s)", ses_id, len(self.sessions))
-                        del self.sessions[ses_id]
-
+                self.sessions.purge( self.timeout )
                 await asyncio.sleep(60) # check every 60s
 
         asyncio.ensure_future( purge() )
@@ -89,7 +84,7 @@ class WebHTTP(Starlette):
             assert type(init[1])==dict
 
         hr = self.instanciate(htuid, klass, init , renew)
-
+        
         r = HTMLResponse( str(hr) )
         r.set_cookie("htuid",htuid,path="/")
         return r
@@ -101,10 +96,10 @@ class WebHTTP(Starlette):
         sesid = f"{QN(klass)}|{htuid}"   # there can be only one instance of klass, at a time !
 
         logger.info("intanciate : renew=%s",renew)
-        if renew==False and (sesid in self.sessions) and self.sessions[sesid]["renderer"].init == init:
+        hr=self.sessions.get_hr( sesid )
+        if renew==False and hr and hr.init == init:
             # same url (same klass/params), same htuid -> same instance
             logger.info("intanciate : Reuse Renderer %s for %s",QN(klass),sesid)
-            hr=self.sessions[sesid]["renderer"]
         else:
             # url has changed ... recreate an instance
             logger.info("intanciate : Create Renderer %s for %s",QN(klass),sesid)
@@ -115,13 +110,15 @@ class WebHTTP(Starlette):
 
                 window.addEventListener('DOMContentLoaded', start );
             """ % sesid
+            
+            # create a session property on the future main tag instance
+            klass.session = self.sessions.get_ses(htuid)["session"]
+            
             hr=HRenderer(klass, js, init=init ) # NO EXIT !!
 
+
         # update session info
-        self.sessions[ sesid ] = dict(
-            lastaccess=time.time(),
-            renderer=hr,
-        )
+        self.sessions.set_hr( sesid, hr)
 
         return hr
 
@@ -129,20 +126,15 @@ class WebHTTP(Starlette):
     async def POST(self,request) -> Response:
         sesid=request.path_params.get('sesid',None)
 
-        if sesid in self.sessions:
-            hr = self.sessions[ sesid ]["renderer"]
-
-            self.sessions[ sesid ]["lastaccess"]=time.time()
-
-            logger.info("INTERACT WITH SESSION %s (sessions:%s)",sesid,len(self.sessions))
+        hr=self.sessions.get_hr(sesid)
+        if hr:
+            logger.info("INTERACT WITH SESSION %s",sesid)
             data=await request.json()
             actions = await hr.interact(data["id"],data["method"],data["args"],data["kargs"],data["event"])
             return JSONResponse(actions)
-
         else:
             # session expired or bad call
             return HTMLResponse( "400 BAD REQUEST" , status_code=400 )
-
 
 
     def run(self, host="0.0.0.0", port=8000):   # wide, by default !!
