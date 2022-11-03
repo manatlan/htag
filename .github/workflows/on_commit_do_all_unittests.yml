@@ -26,7 +26,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         python -m pip install pytest pytest-asyncio
-        python -m pip install uvicorn starlette tornado pywebview fake-winreg
+        python -m pip install uvicorn starlette tornado kivy pywebview fake-winreg
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
     - name: Test with pytest
