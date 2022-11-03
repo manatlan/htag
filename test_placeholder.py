@@ -122,9 +122,9 @@ async def test_placeholder_to_body():
     assert hr.tag.tag == "body"
 
     # first interaction
-    r=await hr.interact(0,None,None,None,None)
+    # r=await hr.interact(0,None,None,None,None)
 
-    assert r["update"][0] == f'<body id="{id(hr.tag)}">hello</body>'
+    assert f'<body id="{id(hr.tag)}">hello</body>' in str(hr)
 
 
 def test_placeholder_mod_guess():

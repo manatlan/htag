@@ -97,14 +97,14 @@ def test_render_a_tag_with_interaction():
     t=r.tag
     assert t.tag == "body" # tag is now a body tag (coz main tag of renderer)
 
-    assert ">Loading...<" in str(r) # first rendering is the loader
+    # assert ">Loading...<" in str(r) # first rendering is the loader
 
-    # START
-    resp = asyncio.run( r.interact( 0, None, None, None) )
-    assert 0 in resp["update"]
-    assert "SCRIPT1" in resp["post"]
-    assert "SCRIPT2" not in resp["post"]    # action not executed ... S2 not present
-    assert t["class"] == "my"
+    # # START
+    # resp = asyncio.run( r.interact( 0, None, None, None) )
+    # assert 0 in resp["update"]
+    # assert "SCRIPT1" in resp["post"]
+    # assert "SCRIPT2" not in resp["post"]    # action not executed ... S2 not present
+    # assert t["class"] == "my"
 
     # # 1st interaction
     resp = asyncio.run( r.interact( id(t), "action", [], {}) )
@@ -148,12 +148,12 @@ def test_render_a_tag_with_child_interactions():
     t=r.tag
     assert str(r).count("<script>my</script>") == 1 # it's the same static, ensure just one !
 
-    # START
-    resp = asyncio.run( r.interact( 0, None, None, None) )
-    assert 0 in resp["update"]
-    assert "SCRIPT1" in resp["post"]
-    assert "INITA" in resp["post"]
-    assert "INITB" in resp["post"]
+    # # START
+    # resp = asyncio.run( r.interact( 0, None, None, None) )
+    # assert 0 in resp["update"]
+    # assert "SCRIPT1" in resp["post"]
+    # assert "INITA" in resp["post"]
+    # assert "INITB" in resp["post"]
 
     resp = asyncio.run( r.interact( id(t), "action", (), {}) )
     assert "update" not in resp
@@ -192,10 +192,11 @@ def test_render_yield_with_scripts():
     assert t.exit() == "ok", "tag.exit() doesn't work !?"
 
     async def testGenerator(method):
-        resp = await r.interact( 0, None, None, None)
-        assert 0 in resp["update"]
-        assert "SCRIPT0" in resp["post"]
-        assert "next" not in resp
+        # resp = await r.interact( 0, None, None, None)
+        # assert 0 in resp["update"]
+        assert "SCRIPT0" in str(r)
+        # assert "SCRIPT0" in resp["post"]
+        # assert "next" not in resp
 
         resp = await r.interact( id(t), method, [],{})
         assert "update" not in resp         # NO RENDERING
@@ -236,8 +237,8 @@ def test_interact_error():
     assert t.exit() == "ok", "tag.exit() doesn't work !?"
 
     async def testGenerator(method):
-        resp = await r.interact( 0, None, None, None)
-        assert 0 in resp["update"]
+        # resp = await r.interact( 0, None, None, None)
+        # assert 0 in resp["update"]
 
         resp = await r.interact( id(t), method, [],{})
         assert "err" in resp
@@ -423,12 +424,12 @@ def test_build_immediatly_vs_lately():
 #     assert str(h1) == str(h2)
 
 
-def test_discovering_js():
+def test_discovering_js():  #TODO: this one should be better (futurs bugs can be here)
     class O(Tag):
         js="/*JS1*/"
 
-    # dynamic js init not present (normal!)
-    assert "/*JS1*/" not in str(HRenderer( O, "//"))
+    # dynamic js init is present (THE BIGGEST CHANGE since the beginning of no_0_interaction)
+    assert "/*JS1*/" in str(HRenderer( O, "//"))
 
     class OOI(Tag): # immediate rendering
         def init(self):
@@ -447,9 +448,10 @@ def test_discovering_js():
             self.set( Tag.div(O()) )    # Tag in a TagBase
 
     async def test(r): # first call (init obj)
-        resp = await r.interact( 0, None, None, None)
-        assert 0 in resp["update"]
-        assert "/*JS1*/" in resp["post"]
+        # resp = await r.interact( r.tag, None, None, None)
+        # assert 0 in resp["update"]
+        # assert "/*JS1*/" in resp["post"]
+        assert "/*JS1*/" in str(r)
 
     r=HRenderer(OOI,"//js interact")
     asyncio.run(test(r))
@@ -457,11 +459,11 @@ def test_discovering_js():
     r=HRenderer(OOOI,"//js interact")
     asyncio.run(test(r))
 
-    r=HRenderer(OOL,"//js interact")
-    asyncio.run(test(r))
+    # r=HRenderer(OOL,"//js interact")
+    # asyncio.run(test(r))
 
-    r=HRenderer(OOOL,"//js interact")
-    asyncio.run(test(r))
+    # r=HRenderer(OOOL,"//js interact")
+    # asyncio.run(test(r))
 
 
 # this test is NON SENSE, til statics are imported in static (not dynamic anymore)
@@ -569,8 +571,8 @@ def test_new():
     assert str(hr).startswith("<!DOCTYPE html>")
 
     async def assertion(txt):
-        actions = await hr.interact( 0, None, None, None)
-        assert txt in actions["update"][0]
+        # actions = await hr.interact( 0, None, None, None)
+        assert txt in str(hr)
 
     # ensure first interaction produce the right thing
     asyncio.run( assertion(">==42==</body>") )
@@ -581,9 +583,10 @@ def test_new():
     hr=HRenderer( APP,"//", init=((43,),{}) )
     assert str(hr).startswith("<!DOCTYPE html>")
 
-    async def assertion(txt):
-        actions = await hr.interact( 0, None, None, None)
-        assert txt in actions["update"][0]
+    # async def assertion(txt):
+    #     # actions = await hr.interact( 0, None, None, None)
+    #     # assert txt in actions["update"][0]
+    #     assert txt in str(hr)
 
     # ensure first interaction produce the right thing
     asyncio.run( assertion(">==43==</body>") )
@@ -594,9 +597,11 @@ def test_new():
     hr=HRenderer( APP,"//", init=((),dict(val=44)) )
     assert str(hr).startswith("<!DOCTYPE html>")
 
-    async def assertion(txt):
-        actions = await hr.interact( 0, None, None, None)
-        assert txt in actions["update"][0]
+    # async def assertion(txt):
+    #     # actions = await hr.interact( 0, None, None, None)
+    #     # assert txt in actions["update"][0]
+    #     assert txt in str(hr)
+
 
     # ensure first interaction produce the right thing
     asyncio.run( assertion(">==44==</body>") )
@@ -607,9 +612,10 @@ def test_new():
     hr=HRenderer( APP,"//", init=((45,49),{}) )
     assert str(hr).startswith("<!DOCTYPE html>")
 
-    async def assertion(txt):
-        actions = await hr.interact( 0, None, None, None)
-        assert txt in actions["update"][0]
+    # async def assertion(txt):
+    #     # actions = await hr.interact( 0, None, None, None)
+    #     # assert txt in actions["update"][0]
+    #     assert txt in str(hr)
 
     # ensure first interaction produce the right thing
     asyncio.run( assertion(">==42==</body>") )
@@ -620,9 +626,10 @@ def test_new():
     hr=HRenderer( APP,"//", init=((),dict(myval=50)) )
     assert str(hr).startswith("<!DOCTYPE html>")
 
-    async def assertion(txt):
-        actions = await hr.interact( 0, None, None, None)
-        assert txt in actions["update"][0]
+    # async def assertion(txt):
+    #     # actions = await hr.interact( 0, None, None, None)
+    #     # assert txt in actions["update"][0]
+    #     assert txt in str(hr)
 
     # ensure first interaction produce the right thing
     asyncio.run( assertion(">==42==</body>") )

@@ -177,6 +177,8 @@ class HRenderer:
 
         logger.debug("HRenderer(), statics found : %s", [repr(i) for i in self._statics])
 
+        startjs="\n".join(tag._getAllJs() + self._interaction_scripts)
+
         js_base="""
 function start() { %s }
 
@@ -289,7 +291,7 @@ function jevent (e) {
 }
 
 %s
-""" % (BaseCaller( None ), js)
+""" % ( startjs , js)
 
         self._statics.append( Tag.script( js_base ))
 
@@ -305,68 +307,61 @@ function jevent (e) {
             ## self._interaction_scripts=[] # reset the list
             next_js_call=None
 
-            if oid==0:
-                # start (not a real interaction, just produce the first rendering of the main tag (will be a body))
-                logger.info("INTERACT INITIAL: %s",repr(self.tag))
-                rep = self._mkReponse( [self.tag] )
-                rep["update"]={0: list(rep["update"].values())[0]}  #INPERSONNATE (for first interact on id#0)
+            state = Stater(self.tag)
+            obj = Tag.find_tag(oid)
+            if obj:
+                obj._event=event or {}
+
+                # call the method
+                method=getattr(obj,method_name)
+
+                logger.info(f"INTERACT with METHOD {fmtcaller(method_name,args,kargs)}, of %s", repr(obj) )
+
+                if asyncio.iscoroutinefunction( method ):
+                    r=await method(*args,**kargs)
+                else:
+                    r=method(*args,**kargs)
+
+                if isinstance(r, types.AsyncGeneratorType) or isinstance(r, types.GeneratorType):
+                    # save it, to avoid GC
+                    self._loop[id(r)] = dict(gen=r,tag=obj)
+
             else:
-
-                state = Stater(self.tag)
-                obj = Tag.find_tag(oid)
-                if obj:
-                    obj._event=event or {}
-
-                    # call the method
-                    method=getattr(obj,method_name)
-
-                    logger.info(f"INTERACT with METHOD {fmtcaller(method_name,args,kargs)}, of %s", repr(obj) )
-
-                    if asyncio.iscoroutinefunction( method ):
-                        r=await method(*args,**kargs)
-                    else:
-                        r=method(*args,**kargs)
-
-                    if isinstance(r, types.AsyncGeneratorType) or isinstance(r, types.GeneratorType):
-                        # save it, to avoid GC
-                        self._loop[id(r)] = dict(gen=r,tag=obj)
-
+                obj = self._loop.get(oid,None)
+                if obj: # it's a existing generator
+                    r, obj = obj["gen"], obj["tag"]
+                    logger.info("INTERACT with GENERATOR %s(...), of %s",r.__name__, repr(obj) )
                 else:
-                    obj = self._loop.get(oid,None)
-                    if obj: # it's a existing generator
-                        r, obj = obj["gen"], obj["tag"]
-                        logger.info("INTERACT with GENERATOR %s(...), of %s",r.__name__, repr(obj) )
-                    else:
-                        raise Exception(f"{oid} is not an existing Tag or generator (dead objects ?)?!")
+                    raise Exception(f"{oid} is not an existing Tag or generator (dead objects ?)?!")
 
+            ret=None
+            if isinstance(r, types.AsyncGeneratorType):
+                # it's a "async def yield"
+                try:
+                    ret = await r.__anext__()
+                    next_js_call = BaseCaller(r)
+                except StopAsyncIteration:
+                    del self._loop[ id(r) ]
+            elif isinstance(r, types.GeneratorType):
+                # it's a "def yield"
+                try:
+                    ret = r.__next__()
+                    next_js_call = BaseCaller(r)
+                except StopIteration:
+                    del self._loop[ id(r) ]
+            else:
+                # it's a simple method
+                assert r is None
                 ret=None
-                if isinstance(r, types.AsyncGeneratorType):
-                    # it's a "async def yield"
-                    try:
-                        ret = await r.__anext__()
-                        next_js_call = BaseCaller(r)
-                    except StopAsyncIteration:
-                        del self._loop[ id(r) ]
-                elif isinstance(r, types.GeneratorType):
-                    # it's a "def yield"
-                    try:
-                        ret = r.__next__()
-                        next_js_call = BaseCaller(r)
-                    except StopIteration:
-                        del self._loop[ id(r) ]
+
+            rep= self._mkReponse(state.guess() )
+
+            if ret:
+                obj.add(ret) # add content in object
+                if not isinstance(ret,str) and hasattr(ret,"__iter__"):
+                    rep.setdefault("stream",{})[ id(obj) ] = "".join([str(i) for i in ret])
                 else:
-                    # it's a simple method
-                    assert r is None
-                    ret=None
-
-                rep= self._mkReponse(state.guess() )
-
-                if ret:
-                    obj.add(ret) # add content in object
-                    if not isinstance(ret,str) and hasattr(ret,"__iter__"):
-                        rep.setdefault("stream",{})[ id(obj) ] = "".join([str(i) for i in ret])
-                    else:
-                        rep.setdefault("stream",{})[ id(obj) ] = str(ret)
+                    rep.setdefault("stream",{})[ id(obj) ] = str(ret)
 
 
             # --> rep
@@ -424,7 +419,7 @@ function jevent (e) {
             head.add(i,True)    # force reparenting
         head += Tag.title( self.title )   # set a default title
 
-        body=Tag.body( "Loading..." )
+        body=Tag.body( str(self.tag) )
         return "<!DOCTYPE html>"+str(Tag.html( head+body ))
 
     @property

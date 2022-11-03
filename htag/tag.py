@@ -136,8 +136,7 @@ class BaseCaller(NotBindedCaller):
         self.kargs = kargs
 
     def __str__(self) -> str:
-        interact=dict(id=0,method=self.mname,args=self.args,kargs=self.kargs,event=b"jevent(event)")
-        if self.instance is not None: interact["id"]=id(self.instance)
+        interact=dict(id=id(self.instance),method=self.mname,args=self.args,kargs=self.kargs,event=b"jevent(event)")
         gen = lambda ll: (";".join(ll))+";" if ll else ""
         return f"""try{{{gen(self._befores)}interact( {stringify(interact)} );{gen(self._afters)}}} catch(e) {{_error(e,"JS")}}"""
 

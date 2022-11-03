@@ -34,20 +34,20 @@ class Simu:
         assert self.tag._hr == self.hr          # the tag has received its "_hr" !
         assert self.tag.tag == "body"           # tag converted to body
 
-        self._1stInteraction = False
+        # self._1stInteraction = False
 
-    async def init(self):
-        """ do the 1st interaction, and control that it update '0' only ! """
-        logger.debug("first interaction/init phase")
-        r = await self.hr.interact( 0,None,None,None )
-        assert len(r["update"])==1              # only one render (the main)
-        assert r["update"][0]                   # first is 0 ;-)
-        assert r["update"][0]==str(self.tag)    # it's the str(hr.tag) !
-        self._1stInteraction = True
-        return r
+    # async def init(self):
+    #     """ do the 1st interaction, and control that it update '0' only ! """
+    #     logger.debug("first interaction/init phase")
+    #     r = await self.hr.interact( 0,None,None,None )
+    #     assert len(r["update"])==1              # only one render (the main)
+    #     assert r["update"][0]                   # first is 0 ;-)
+    #     assert r["update"][0]==str(self.tag)    # it's the str(hr.tag) !
+    #     self._1stInteraction = True
+    #     return r
 
     def interact(self,o: Tag = None):
-        assert self._1stInteraction, "First interaction not done !"
+        # assert self._1stInteraction, "First interaction not done !"
         if o is None: o = self.tag
         assert isinstance(o,Tag)
 
@@ -81,7 +81,7 @@ async def test_empty():
         pass
     ########################################################
     s=Simu( Object )
-    await s.init() # it controls the basics
+    # await s.init() # it controls the basics
 
 @pytest.mark.asyncio
 async def test_js_at_init1():
@@ -90,9 +90,9 @@ async def test_js_at_init1():
             self("interaction_js();")
     ########################################################
     s=Simu( Object )
-    r=await s.init() # it controls the basics
-    assert "interaction_js();" in r["post"]
-    assert r["post"].count("function(tag)")==1
+    # r=await s.init() # it controls the basics
+    assert "interaction_js();" in str(s.hr)
+    # assert r["post"].count("function(tag)")==1
 
 @pytest.mark.asyncio
 async def test_js_at_init2():
@@ -100,9 +100,10 @@ async def test_js_at_init2():
         js = "static_js();"
     ########################################################
     s=Simu( Object )
-    r=await s.init() # it controls the basics
-    assert "static_js();" in r["post"]
-    assert r["post"].count("function(tag)")==1
+    # r=await s.init() # it controls the basics
+    assert "static_js();" in str(s.hr)
+
+    # assert r["post"].count("function(tag)")==1
 
 @pytest.mark.asyncio
 async def test_js_at_init3():
@@ -112,10 +113,10 @@ async def test_js_at_init3():
             self("interaction_js();")
     ########################################################
     s=Simu( Object )
-    r=await s.init() # it controls the basics
-    assert "interaction_js();" in r["post"]
-    assert "static_js();" in r["post"]
-    assert r["post"].count("function(tag)")==2
+    # r=await s.init() # it controls the basics
+    assert "interaction_js();" in str(s.hr)
+    assert "static_js();" in str(s.hr)
+    # assert r["post"].count("function(tag)")==2
 
 @pytest.mark.asyncio
 async def test_simplest():
@@ -139,7 +140,7 @@ async def test_simplest():
     ########################################################
     s=Simu( Object )
 
-    await s.init() # it controls the basics
+    # await s.init() # it controls the basics
     assert s.tag["nb"]==0
 
     r=await s.interact().changeContent()
@@ -230,7 +231,7 @@ async def test_rendering(): #TODO: redefine coz norender is gone, so this test i
     hr=Simu( P )
     o=hr.tag
 
-    r=await hr.init()
+    # r=await hr.init()
 
     # will interact on "o1", by calling main (o's) methods
     r=await hr.interact( o ).testModO1_1()
@@ -278,7 +279,7 @@ async def test_simplest_async(): #TODO: redefine coz norender is gone, so this t
     hr=Simu(Object)
     o=hr.tag
 
-    r=await hr.init()
+    # r=await hr.init()
 
     r=await hr.interact(o).inc()
     assert "update" in r
@@ -301,7 +302,7 @@ async def test_yield():
     hr=Simu(Object)
     o=hr.tag
 
-    r=await hr.init()
+    # r=await hr.init()
 
     assert o.childs==()
 
@@ -356,11 +357,12 @@ async def test_bug_0_8_5():
 
     assert len(App()._getAllJs()) == 1
 
-    # first interaction
-    r=await hr.interact(0,None,None,None,None)
+    # # first interaction
+    # r=await hr.interact(hr.tag,None,None,None,None)
 
-    # I should just find 1 YOLO (1 js) ... (but in 0.8.5 -> 4 ;-( )
-    assert r["post"].count("YOLO") == 1
+    # # I should just find 1 YOLO (1 js) ... (but in 0.8.5 -> 4 ;-( )
+    assert str(hr).count("YOLO") == 1
+    # print(r)
 
 
 
@@ -372,7 +374,7 @@ if __name__=="__main__":
 
     # asyncio.run( test_empty() )
     # asyncio.run( test_js_at_init1() )
-    # asyncio.run( test_js_at_init2() )
+    asyncio.run( test_js_at_init2() )
     # asyncio.run( test_js_at_init3() )
     # asyncio.run( test_simplest() )
-    asyncio.run( test_bug_0_8_5() )
+    # asyncio.run( test_bug_0_8_5() )
