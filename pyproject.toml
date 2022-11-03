@@ -26,7 +26,6 @@ pytest-asyncio="^0.19"
 uvicorn = "^0.18"
 starlette = "^0.20"
 tornado ="^6.2"
-#kivy = "*"
 pywebview = "^3.6"
 fake-winreg = "^1.6"
 
