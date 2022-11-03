@@ -42,7 +42,7 @@ interact=async function(o) {
                 window.document.head.appendChild(tag)
 
         # install the first object in body
-        window.document.body.outerHTML=str(Tag.body( _id=0 ))
+        window.document.body.outerHTML=str(self.hr)
 
         # and start the process
         window.start()
