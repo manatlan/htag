@@ -21,7 +21,7 @@ def data_source():
         "PyWebView",
         #"ChromeApp", # need Chrome installed ;-(
         #"WinApp", # need Chrome installed ;-(
-        "AndroidApp",
+        # "AndroidApp", # avoid KIVY !!!
         "BrowserTornadoHTTP",
         "PyScript",
     ]:
