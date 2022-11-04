@@ -424,26 +424,26 @@ def test_build_immediatly_vs_lately():
 #     assert str(h1) == str(h2)
 
 
-def test_discovering_js():  #TODO: this one should be better (futurs bugs can be here)
-    class O(Tag):
+def test_discovering_js(): 
+    class O(Tag.div):
         js="/*JS1*/"
 
     # dynamic js init is present (THE BIGGEST CHANGE since the beginning of no_0_interaction)
     assert "/*JS1*/" in str(HRenderer( O, "//"))
 
-    class OOI(Tag): # immediate rendering
+    class OOI(Tag.div): # immediate rendering
         def init(self):
             self.set( O() )             # Tag directly in Tag
 
-    class OOOI(Tag):  # immediate rendering
+    class OOOI(Tag.div):  # immediate rendering
         def init(self):
             self.set( Tag.div( O() ) )  # Tag in a TagBase
 
-    class OOL(Tag):   # lately rendering
+    class OOL(Tag.div):   # lately rendering
         def render(self):
             self.set( O() )             # Tag directly in Tag
 
-    class OOOL(Tag):  # lately rendering
+    class OOOL(Tag.div):  # lately rendering
         def render(self):
             self.set( Tag.div(O()) )    # Tag in a TagBase
 
@@ -459,11 +459,11 @@ def test_discovering_js():  #TODO: this one should be better (futurs bugs can be
     r=HRenderer(OOOI,"//js interact")
     asyncio.run(test(r))
 
-    # r=HRenderer(OOL,"//js interact")
-    # asyncio.run(test(r))
+    r=HRenderer(OOL,"//js interact")
+    asyncio.run(test(r))
 
-    # r=HRenderer(OOOL,"//js interact")
-    # asyncio.run(test(r))
+    r=HRenderer(OOOL,"//js interact")
+    asyncio.run(test(r))
 
 
 # this test is NON SENSE, til statics are imported in static (not dynamic anymore)
