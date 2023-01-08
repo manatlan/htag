@@ -106,6 +106,8 @@ def test_attrs():
     div["id"] = "mydiv"
     div.add(Tag.h1("world"))
 
+
+
 def test_childs():
     t = Tag.ul()
     t <= Tag.li()
@@ -641,6 +643,52 @@ def test_autoset_private_properties():
 
     # but "js" is the only private property auto-set'able
     Tag.div(js="yo")
+
+
+def test_autodeclare_props():
+    my=Tag.div( hello="world" )
+    assert my.hello == "world"
+    #------------------------------------
+    my=Tag( hello="world" )
+    assert my.hello == "world"
+    #------------------------------------
+    class MyTag(Tag.div):
+        def init(self,**a): # need to be open (can receive **args)
+            pass
+
+    my=MyTag(hello="world")
+    assert my.hello == "world"
+    #------------------------------------
+    class MyTag2(Tag.div):      # with htag's init constructor
+        def init(self,**a): # need to be open (can receive **args)
+            self.hello = "world2"
+
+    my=MyTag2(hello="world")
+    assert my.hello == "world"  # the param override those in init()
+    #------------------------------------
+    class MyTag3(Tag.div):      # with real python constructor
+        def __init__(self,**a): # need to be open (can receive **args)
+            Tag.div.__init__(self,**a)
+            self.hello = "world2"
+
+    my=MyTag3(hello="world")
+    assert my.hello == "world2"  # the __init__ won ;-)
+    #------------------------------------
+    class MyTag4(Tag.div):      # with real python constructor
+        def __init__(self,**a): # need to be open (can receive **args)
+            self.hello = "world2"
+            Tag.div.__init__(self,**a)
+
+    with pytest.raises(HTagException):
+        my=MyTag4(hello="world")    # raise a protection
+    #------------------------------------
+    class MyTag5(Tag.div):      # with real python constructor
+        def __init__(self,**a): # need to be open (can receive **args)
+            self.hello = "world2"
+            Tag.div.__init__(self)
+
+    my=MyTag5(hello="world")
+    assert my.hello == "world2" # the param is forgotton/non used at all
 
 
 if __name__=="__main__":
