@@ -177,7 +177,10 @@ class HRenderer:
 
         logger.debug("HRenderer(), statics found : %s", [repr(i) for i in self._statics])
 
+        self.body=str(self.tag)
+
         startjs="\n".join(tag._getAllJs() + self._interaction_scripts)
+        self._interaction_scripts=[]    # reset the list !
 
         js_base="""
 function start() { %s }
@@ -419,8 +422,7 @@ function jevent (e) {
             head.add(i,True)    # force reparenting
         head += Tag.title( self.title )   # set a default title
 
-        body=Tag.body( str(self.tag) )
-        return "<!DOCTYPE html>"+str(Tag.html( head+body ))
+        return "<!DOCTYPE html>"+str(Tag.html( head+self.body ))
 
     @property
     def title(self) -> str:
