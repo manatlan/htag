@@ -658,6 +658,24 @@ def test_just_4_coverage():
     assert hr.tag.tag=="body"
 
 
+def test_avoid_tagcreation_in_render():
+    class Good(Tag.div):
+        def render(self):
+            self += "yo"
+    class Bad(Tag.div):
+        def render(self):
+            self += Tag.div("yo")
+
+    t=Good()
+    print(t)
+
+    t=Bad()
+    print(t)
+
+    # TODO: Bad should provide a warning (or an exception in STRICT_MODE) .. no ?
+    # TODO: Bad should provide a warning (or an exception in STRICT_MODE) .. no ?
+    # TODO: Bad should provide a warning (or an exception in STRICT_MODE) .. no ?
+    # TODO: Bad should provide a warning (or an exception in STRICT_MODE) .. no ?
 
 if __name__=="__main__":
     # test_ko_try_render_a_tagbase()
@@ -684,4 +702,5 @@ if __name__=="__main__":
     # test_render_a_tag_with_interaction()
     # test_new_base()
     # test_intelligent_rendering2()
-    test_just_4_coverage()
+    # test_just_4_coverage()
+    test_avoid_tagcreation_in_render()
