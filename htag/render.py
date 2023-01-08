@@ -120,7 +120,6 @@ class HRenderer:
         ensureList=lambda x: list(x) if type(x) in [list,tuple] else [x]
 
         def feedStatics(tag): # tag can be an instance or a class
-            #TODO: this method is really complex, it could be simpler
 
             def detectStatics(c):
                 ll=[]

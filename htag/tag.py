@@ -480,7 +480,7 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
     #===============================================================================
     # privates methods
     #===============================================================================
-    def _getStateImage(self) -> str: #TODO: could disapear (can make something more inteligent here!)
+    def _getStateImage(self) -> str:
         """Return a str'image (state) of the object, for quick detection (see Stater())
            (btw child tags are represented by its id, to help Stater.guess for detection)
         """
