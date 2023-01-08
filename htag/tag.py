@@ -117,6 +117,10 @@ class Caller(NotBindedCaller):
         self.instance._callbacks_[self._assigned]=self   # save the Caller in _callbacks_ of self.instance
         return self
 
+
+    def __call__(self):
+        self.callback( self.instance )
+
     def __str__(self) -> str:
         if not self._assigned:
             raise HTagException("Caller can't be serizalized, it's not _assign'ed to an event !")
@@ -220,7 +224,7 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
 
 
     @property
-    def event(self):
+    def event(self) -> dict:
         return self._event
 
 
@@ -276,7 +280,6 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
                 self[ k[1:].replace("_","-") ] = v
             else:
                 raise HTagException(f"Can't set attributs without underscore ('{k}' should be '_{k}')") # for convention only ;-(
-
 
 
     #======================================================================

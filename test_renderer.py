@@ -424,7 +424,7 @@ def test_build_immediatly_vs_lately():
 #     assert str(h1) == str(h2)
 
 
-def test_discovering_js(): 
+def test_discovering_js():
     class O(Tag.div):
         js="/*JS1*/"
 
@@ -650,6 +650,15 @@ def test_new_base():
     hr=HRenderer(App,"")
     assert str(hr.tag).count("id=") == 2 # body & span
 
+
+
+def test_just_4_coverage():
+    """ will enter in the exception trapped, but will produce a body tag"""
+    hr=HRenderer(Tag.div,"",init=("kk",{None:None},42))
+    assert hr.tag.tag=="body"
+
+
+
 if __name__=="__main__":
     # test_ko_try_render_a_tagbase()
     # test_render_a_tag_with_interaction()
@@ -674,4 +683,5 @@ if __name__=="__main__":
     # test_render_a_tag_with_child_interactions()
     # test_render_a_tag_with_interaction()
     # test_new_base()
-    test_intelligent_rendering2()
+    # test_intelligent_rendering2()
+    test_just_4_coverage()
