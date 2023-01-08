@@ -256,7 +256,7 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
             init = getattr(self,"init")
             init = init if callable(init) else None
 
-            self.__simulateOldInit(None,**attrs)
+            self.__declareArgsKargs(None,**attrs)
 
             if init: init(*args,**kargs)
             self.__dict__.update(selfs)
@@ -264,7 +264,7 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
             # if no own 'init' method, declare default args (selfs) as attributs instance
             self.__dict__.update(selfs)
 
-            self.__simulateOldInit(*args, **attrs)    #TODO: useless ?????
+            self.__declareArgsKargs(*args, **attrs)
 
         # save the weakref to the tag, for Tag.find_tag(id) method
         Tag.__instances__[id(self)]=self
@@ -272,7 +272,7 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         # compute an hash at creation time (used in hrender to identify doubles)
         self._hash_ = md5( str(self._attrs.items())+str(self.childs) )
 
-    def __simulateOldInit(self, content:AnyTags=None,**_attrs):  #TODO: integrate in the real __init__ ;-)
+    def __declareArgsKargs(self, content:AnyTags=None,**_attrs):
         self.set(content)
 
         for k,v in _attrs.items():
