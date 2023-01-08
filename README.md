@@ -46,8 +46,9 @@ TODO: need to find a super demo ;-)
 and more technicals :
 - ~~better js try/catch to sort js/py error~~ + try/catch on http com error (for thoses which kill session webhttp/pye)
 - ~~getStateImage is non sense coz it's str'ing (why not returning the str ?!)~~
-- mix the Tag.__init__ with the old system (like this: it's unmaintable)
+- ~~mix the Tag.__init__ with the old system (like this: it's unmaintable)~~
 - ~~introduce a virtual tag/placeholder~~
+- DISPLAY a warning, when a render method use a "tag creation" (ex: Tag.div("hello")), because it will always be rendered !!!!!
 - ...
 
 ## History
