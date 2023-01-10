@@ -10,6 +10,7 @@ import html,json
 import hashlib
 import logging,types,asyncio
 import weakref
+import inspect
 from typing import Sequence,Union,Optional,Any,Callable,Type
 from .attrs import StrClass,StrStyle
 
@@ -232,6 +233,12 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
     # Constructor
     #======================================================================
     def __init__(self, *args,_hr_=None,**kargs):
+        #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+        parentCreator = inspect.stack()[1].frame.f_locals.get('self')
+        if parentCreator and hasattr(parentCreator,"_nbTagCreating"):
+            parentCreator._nbTagCreating+=1
+        #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+
         self._event={}       # NEW !!!!
         self._hr=_hr_
         self._parent=None
@@ -527,8 +534,20 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         if hasattr(self,"render"):
             render = getattr(self,"render")
             if callable(render):
-                return render
+                #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+                def contextrender():
+                    self._nbTagCreating = 0
+                    render()
+                    if self._nbTagCreating>0:
+                        if self.STRICT_MODE:
+                            raise HTagException(f"The tag {repr(self)} create Tags in its render method")
+                        else:
+                            logger.warning("The tag %s create Tags in its render method", repr(self))
+                            print(f"**************************************************************************")
+                            print(f"***WARNING*** The tag {repr(self)} create Tags in its render method")
+                            print(f"**************************************************************************")
+                #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 
-
+                return contextrender
 
 

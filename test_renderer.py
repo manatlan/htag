@@ -657,8 +657,14 @@ def test_just_4_coverage():
     hr=HRenderer(Tag.div,"",init=("kk",{None:None},42))
     assert hr.tag.tag=="body"
 
+import contextlib,io
 
 def test_avoid_tagcreation_in_render():
+    try:
+        Tag.STRICT_MODE = True
+    finally:
+        Tag.STRICT_MODE = False
+
     class Good(Tag.div):
         def render(self):
             self += "yo"
@@ -666,16 +672,41 @@ def test_avoid_tagcreation_in_render():
         def render(self):
             self += Tag.div("yo")
 
-    t=Good()
-    print(t)
+    # test the good practice
+    console=io.StringIO()
+    with contextlib.redirect_stdout(console):
+        t=Good()
+        print(t) # force rendering
+    assert "WARNING" not in console.getvalue()
 
-    t=Bad()
-    print(t)
+    # test the bad practice produce a warning
+    console=io.StringIO()
+    with contextlib.redirect_stdout(console):
+        t=Bad()
+        print(t) # force rendering
+    assert "WARNING" in console.getvalue()
 
-    # TODO: Bad should provide a warning (or an exception in STRICT_MODE) .. no ?
-    # TODO: Bad should provide a warning (or an exception in STRICT_MODE) .. no ?
-    # TODO: Bad should provide a warning (or an exception in STRICT_MODE) .. no ?
-    # TODO: Bad should provide a warning (or an exception in STRICT_MODE) .. no ?
+
+def test_avoid_tagcreation_in_render_STRICT_MODE():
+    try:
+        Tag.STRICT_MODE = True
+
+        class Good(Tag.div):
+            def render(self):
+                self += "yo"
+        class Bad(Tag.div):
+            def render(self):
+                self += Tag.div("yo")
+
+        # test the good practice
+        print( Good() )# force rendering
+
+        # test the bad practice produce an exception
+        with pytest.raises(HTagException):
+            print( Bad() ) # force rendering
+    finally:
+        Tag.STRICT_MODE = False
+
 
 if __name__=="__main__":
     # test_ko_try_render_a_tagbase()
