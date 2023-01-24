@@ -69,6 +69,13 @@ tag["onclick"]="alert(42)"
 ```
 
 easy, no ?
+
+### IRL
+
+An important thing to understand, is that a Tag renders differently when used in a runner (TODO LINK).
+AS you see before, the tags are rendered without attributs 'id'. But, IRL, when using in a htag runner context, all tags are rendered with an html id attribut (it's the main reason why you can't set an `_id` at runtime !). Htag's runner manage all the tags, with theirs ids: it's the core feature, to be able to keep states/rendering between the gui/client_side and the back/python ;-)
+
+
 ... TODO ...
 
 ## Inherit a Tag
