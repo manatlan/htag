@@ -227,7 +227,7 @@ It's very rare to use this feature. But can be usefull in complex components, to
 And of course, you can mix them
 
 
-# Others ways
+# Others ways (using js'Tag property)
 
 Each htag's Tag got a 'js' property. This js property can contain javascript to be executed at each Tag rendering.
 
@@ -248,7 +248,7 @@ class App(Tag.div):
         self+=Tag.input(_value="default" )
         self.js = "tag.childNodes[0].focus()"
 ```
-In this case, it's the App Tag which use its js property to set the focus on its child (in a js way)
+In this case, it's the App Tag which use its js property to set the focus on its child (in a js way) (`tag` is a special js var, in this context, to quickly access to the App/Tag.div)
 
 So, this js property can send back data from client_side/gui too.
 
