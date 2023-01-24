@@ -50,7 +50,15 @@ print( tag )
 Will generate `<span value="42">hello world</span>`, but the instance var (here `tag`) will contain 12 ( tag.value==12 ) !
 So `_value` is an html attribut ... whereas `value` is an instance property (on python side only). It's important to understand the difference.
 
-take break, and medit on that ;-)
+Take a break, and medit on that ;-)
+
+You can compose tags ...
+```python
+Tag.div( Tag.span("hello")+" "+Tag.b("world") )
+# or
+Tag.div( [Tag.span("hello")," ",Tag.b("world")] )
+```
+it's basically the same thing ^^
 
 ### post construction time
 
@@ -66,6 +74,22 @@ So you can do that:
 ```python
 tag = Tag.a("hello world")
 tag["onclick"]="alert(42)"
+```
+And you can compose them like that :
+
+```python
+div=Tag.div()
+div.add( Tag.span("hello") )
+div.add( " " )
+div.add( Tag.b("world") )
+```
+
+but there are operators (`+=` (prefer) or `<=` (brython style)), to simplify that :
+```python
+div = Tag.div()
+div += Tag.span("hello") )
+div += " "
+div += Tag.b("world")
 ```
 
 easy, no ?
