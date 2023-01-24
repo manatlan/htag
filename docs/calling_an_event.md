@@ -238,7 +238,7 @@ class App(Tag.div):
         self+=Tag.input(_value="default", js="tag.focus()")
 ```
 
-So, every time the Tag 'App' is rendered, it creates an input field, and take the focus (`tag` is a special js var, in this context, to quickly access to the input element) (BTW : it should be named 'self' to be more consistent, perhaps in a post 1.0.0 version).
+So, every time the Tag 'App' is rendered, it creates an input field, and take the focus (`tag` is a special js var, in this context, to quickly access to the input element) (BTW : it should be named 'self' to be more consistent, perhaps before 1.0.0 version).
 
 Another approach could be :
 
@@ -253,7 +253,8 @@ In this case, it's the App Tag which use its js property to set the focus on its
 So, this js property can send back data from client_side/gui too.
 
 Here is an example :
-```
+
+```python
 class App(Tag.body):
     def init(self):
         # self.js = self.bind( self.starting , b'window.innerWidth') # doesn't work currently
@@ -262,6 +263,29 @@ class App(Tag.body):
     def starting(self,width):
         print("innerWidth",width)
 ```
-Currently, only the "old form" works ;-( ... the newest `self.bind( <method>, *args, **kargs)` can't, But will try to fix that before 1.0.0. And it's the only main reason why the old form is still there ;-(
+Currently, only the "old form" works ;-( ... the newest `self.bind( <method>, *args, **kargs)` can't, but ,will try to fix that before 1.0.0. And it's the only main reason why the old form is still there ;-(
+
+# Others ways (using Tag.__call__ method)
+
+Each htag's Tag is callable ... to send an UNIQUE custom js statements during an interaction.
+
+It's a little weird here. But it's really important to understand the difference between `self.js="js_statement()"` and `self("js_statement()")`.
+ * `self.js="js_statement()" `: will execute the JS at each rendering of the object.
+ * `self("js_statement()")` : will execute the JS one time (when it's called)
+
+So, this thing will work as the previous one .. except ..
+
+```python
+class App(Tag.body):
+    def init(self):
+        self( self.bind.starting( b'window.innerWidth' ) )
+        
+    def starting(self,width):
+        print("innerWidth",width)
+```
+Except ... here, the js is sent only at construction time (in previous one : the js is sent at each rendering).
+The nuance is really subtil.
+
+Concerning the "old form" vs "the newest" : same remarks !
 
 ...TODO...
