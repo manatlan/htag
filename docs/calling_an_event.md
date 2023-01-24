@@ -270,8 +270,8 @@ Currently, only the "old form" works ;-( ... the newest `self.bind( <method>, *a
 Each htag's Tag is callable ... to send an UNIQUE custom js statements during an interaction.
 
 It's a little weird here. But it's really important to understand the difference between `self.js="js_statement()"` and `self("js_statement()")`.
- * `self.js="js_statement()" `: will execute the JS at each rendering of the object.
- * `self("js_statement()")` : will execute the JS one time (when it's called)
+ * `self.js="js_statement()" `: will execute the JS at each rendering of the object (ex: some html object (those from [materialize](https://materializecss.com/) need to be initialized with javascript statements, it's the perfect way to do that, in that place)
+ * `self("js_statement()")` : will execute the JS one time (when it's called) (ex: some html object need to change its aspect thru js call ... think : close a menu, etc ...)
 
 So, this thing will work as the previous one .. except ..
 
@@ -286,6 +286,6 @@ class App(Tag.body):
 Except ... here, the js is sent only at construction time (in previous one : the js is sent at each rendering).
 The nuance is really subtil.
 
-Concerning the "old form" vs "the newest" : same remarks !
+Concerning the use of the "old form" vs "the newest" : same remarks ! (only the old form currently ;-()
 
 ...TODO...
