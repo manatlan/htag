@@ -149,7 +149,7 @@ class App(Tag.body):
 
 ```
 
-# The old way
+## The old way
 
 There is another way to do things, it's historical, it comes from the old gtag. But sometimes it's usefull too. I hesitate to talk here, because it's clearly deprecated. And should be avoided ... but sometimes, it's handsfull !
 
@@ -227,7 +227,41 @@ It's very rare to use this feature. But can be usefull in complex components, to
 And of course, you can mix them
 
 
+# Others ways
 
+Each htag's Tag got a 'js' property. This js property can contain javascript to be executed at each Tag rendering.
 
+Here is a very classical use :
+```python
+class App(Tag.div):
+    def init(self):
+        self+=Tag.input(_value="default", js="tag.focus()")
+```
+
+So, every time the Tag 'App' is rendered, it creates an input field, and take the focus (`tag` is a special js var, in this context, to quickly access to the input element) (BTW : it should be named 'self' to be more consistent, perhaps in a post 1.0.0 version).
+
+Another approach could be :
+
+```python
+class App(Tag.div):
+    def init(self):
+        self+=Tag.input(_value="default" )
+        self.js = "tag.childNodes[0].focus()"
+```
+In this case, it's the App Tag which use its js property to set the focus on its child (in a js way)
+
+So, this js property can send back data from client_side/gui too.
+
+Here is an example :
+```
+class App(Tag.body):
+    def init(self):
+        # self.js = self.bind( self.starting , b'window.innerWidth') # doesn't work currently
+        self.js = self.bind.starting( b'window.innerWidth' )
+        
+    def starting(self,width):
+        print("innerWidth",width)
 ...
+Currently, only the "old form" works ;-( ... the newest `self.bind( <method>, *args, **kargs)` can't, But will try to fix that before 1.0.0. And it's the only main reason why the old form is still there ;-(
+
 
