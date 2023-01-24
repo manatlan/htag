@@ -227,7 +227,7 @@ It's very rare to use this feature. But can be usefull in complex components, to
 And of course, you can mix them
 
 
-# Others ways (using js'Tag property)
+## Others ways (using js'Tag property)
 
 Each htag's Tag got a 'js' property. This js property can contain javascript to be executed at each Tag rendering.
 
@@ -265,7 +265,7 @@ class App(Tag.body):
 ```
 Currently, only the "old form" works ;-( ... the newest `self.bind( <method>, *args, **kargs)` can't, but ,will try to fix that before 1.0.0. And it's the only main reason why the old form is still there ;-(
 
-# Others ways (using Tag.__call__ method)
+## Others ways (using Tag.__call__ method)
 
 Each htag's Tag is callable ... to send an UNIQUE custom js statements during an interaction.
 
@@ -287,5 +287,24 @@ Except ... here, the js is sent only at construction time (in previous one : the
 The nuance is really subtil.
 
 Concerning the use of the "old form" vs "the newest" : same remarks ! (only the old form currently ;-()
+
+## Using the `event` from js
+
+Some times, it can be usefull to get back the properties of the js event, when you want to get back the key pressed, or the x/y coordinates of a click, etc ...
+
+Theses properties are stocked in the "event" property of an HTag instance, as a dict.
+
+You can display them, like that:
+
+```python
+from htag import Tag
+
+class App(Tag.body):
+    def init(self):
+        self += Tag.button("click", _onclick=self.clicked)
+
+    def clicked(self, o):
+        print( o.event )
+```
 
 ...TODO...
