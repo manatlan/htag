@@ -2,7 +2,23 @@
 
 After months of use, and more than 100 htag apps later, here are my notes ;-)
 
+## First of all
+
+You should really understand than setting an onclick event, is just a javascript call. So this thing will work as expected, on client side :
+
+```python
+from htag import Tag
+
+class App(Tag.body):
+    def init(self):
+        self+=Tag.button("click",_onclick="alert(42)")
+```
+It will call a javascript statement `alert(42)`, which will display a js alert box. It's the base.
+But it's not a htag interaction ... just a js interaction.
+
 ## The simple way ...
+
+to call an htag interaction ... could be:
 
 ```python
 from htag import Tag
@@ -15,7 +31,7 @@ class App(Tag.body):
         print( object_which_has_emitted_the_event )
 ```
 
-The "_onclick" parameter decalres the callback on the "onclick" event of the button.
+The `_onclick` parameter declares the callback on the "onclick" event of the button.
 When you click the button, htag will emit an "interaction" between the GUI/client_side and the back/serverside/your_python_code.
 The first, and only argument, is the instance of the object which has emitted the event.
 
@@ -104,7 +120,7 @@ note that the event onkeyup is binded on the self (not on the button as previous
 
 This kind of approach is more component oriented, when you want to make beautiful component.
 
-# passing arguments (in "undirect calls"))
+## passing arguments (in "undirect calls"))
 
 Another regular approach, is to create a callback on the event : so the callback is called after the interaction.
 
@@ -174,8 +190,44 @@ The 'method' must be declared on self instance. It's a lot simpler, but a lot le
 
 By opposite, the `<instance>.bind( <method>, *args, **kargs)` return a Caller Object, which is rendered as a string (javascript statement). This second form is more versatile, because you can bind any python/callback method. And build better abstractions/components. **But sometimes, you'll need to bind a real binded method ... which is not possible in some cases with this second form (during construction phases)** (TODO: need to developp here)
 
-You should prefer/use this second form. Because the `self.bind.<method>(*args,**kargs)` is deprecated, and could disappear one day (but not sure at 100%).
+You should prefer/use this second form. Because the `self.bind.<method>(*args,**kargs)` is deprecated, and could disappear one day.
 In all cases, this old form will be in htag 1.0.0 !
+
+## The Caller object
+
+The Caller object (returned by the form `<instance>.bind( <method>, *args, **kargs)`) is v(ery) usefull. Because, you can chain events, and you can add customized javascript calls.
+
+Here is an example of an interaction AND a post javascript statement. 
+
+```python
+class App(Tag.body):
+    def init(self):
+        self+=Tag.button("right click",_oncontextmenu=self.bind( self.clicked )+"return false")
+
+    def clicked(self):
+        print( "right clicked" )
+```
+If you right click on the button, it will produce an htag interaction, and will stop the event (prevent to display the real/default contextmenu). In 99% of my cases, I use this, for my "oncontextmenu" events
+
+
+Here is an exemple of chaining events. 
+
+```python
+class App(Tag.body):
+    def init(self):
+        self+=Tag.button("click",_onclick=self.bind( self.clicked ).bind( self.clicked2))
+
+    def clicked(self):
+        print( "clicked" )
+    def clicked2(self):
+        print( "clicked2" )
+```
+It's very rare to use this feature. But can be usefull in complex components, to chain others treatments. BTW, it produces only one htag interaction (by opposite of the old form, where you could do the same, like `_onclick=self.bind.clicked()+";"+self.bind.clicked2();` ... but avoid that !)
+
+And of course, you can mix them
+
+
+
 
 ...
 
