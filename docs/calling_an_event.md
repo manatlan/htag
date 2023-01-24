@@ -47,6 +47,8 @@ It's a really good practice to adopt this kind of technics, for 95% of your even
 
 ## Pass arguments, using the "bind" (in 'direct' calls)
 
+You could do :
+
 ```python
 from htag import Tag
 
@@ -65,7 +67,7 @@ class App(Tag.body):
 ```
 Here, the argument is passed during the interaction, to the callback.
 
-It's not really a good practice, when you need to transfer _python values_ ... Prefer the previous method !
+It's not really a good practice, when you need to transfer _python values_ ... Prefer the previous method (It's more readable, and avoid to have bigger interactions) !
 
 This kind of form is needed when you want to send back _javascript values_
 
@@ -83,5 +85,52 @@ class App(Tag.body):
     def changed(self, object_which_has_emitted_the_event, own_value):
         print( own_value )
 ```
+It's the "only way" (not really ... but the proper way, for sure), to get back a information from the client_side/javascript.
+
+Another regular use of this form is :
+
+```python
+class App(Tag.body):
+    def init(self):
+        self+=Tag.input(_value="",_onkeyup=self.bind( self.changed, b"this.value" ))
+
+    def changed(self, own_value):
+        print( own_value )
+```
+
+note that the event onkeyup is binded on the self (not on the button as previously), so the object which send the event is 'self' ... and thus, the self is the object_which_has_emitted_the_event.
+
+This kind of approach is more component oriented, when you want to make beautiful component.
+
+# passing arguments (in "undirect calls"))
+
+Another regular approach, is to create a callback on the event : so the callback is called after the interaction.
+
+But in all theses "undirect calls" : you can't get back values from client_side/javascript ...
+
+``` python
+class App(Tag.body):
+    def init(self):
+        self += Tag.button("click", _onclick=lambda object_which_has_emitted_the_event: self.clicked("A"))
+        self += Tag.button("click", _onclick=lambda object_which_has_emitted_the_event: self.clicked("B"))
+
+    def clicked(self, my_val):
+        print( my_val )
+```
+
+or better :
+
+```python
+class App(Tag.body):
+    def init(self):
+        for i in "ABCDEF":
+            self += Tag.button(i, value=i, _onclick=lambda object_which_has_emitted_the_event: self.clicked( object_which_has_emitted_the_event.value ))
+
+    def clicked(self, my_val):
+        print( my_val )
+
+```
+todo
+
 ...
 
