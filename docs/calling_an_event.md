@@ -261,7 +261,7 @@ class App(Tag.body):
         
     def starting(self,width):
         print("innerWidth",width)
-...
+```
 Currently, only the "old form" works ;-( ... the newest `self.bind( <method>, *args, **kargs)` can't, But will try to fix that before 1.0.0. And it's the only main reason why the old form is still there ;-(
 
-
+...TODO...
