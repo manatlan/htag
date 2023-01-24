@@ -265,7 +265,7 @@ class App(Tag.body):
 ```
 Currently, only the "old form" works ;-( ... the newest `self.bind( <method>, *args, **kargs)` can't, but ,will try to fix that before 1.0.0. And it's the only main reason why the old form is still there ;-(
 
-## Others ways (using Tag.__call__ method)
+## Others ways (using `Tag.__call__` method)
 
 Each htag's Tag is callable ... to send an UNIQUE custom js statements during an interaction.
 
@@ -288,11 +288,11 @@ The nuance is really subtil.
 
 Concerning the use of the "old form" vs "the newest" : same remarks ! (only the old form currently ;-()
 
-## Using the `event` from js
+## Using the `event` properties from gui/js
 
 Some times, it can be usefull to get back the properties of the js event, when you want to get back the key pressed, or the x/y coordinates of a click, etc ...
 
-Theses properties are stocked in the "event" property of an HTag instance, as a dict.
+Theses properties are stocked in the "event" property of an HTag instance, as a dict (during an interaction).
 
 You can display them, like that:
 
