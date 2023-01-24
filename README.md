@@ -56,6 +56,10 @@ and more technicals :
         self.js = self.bind( self.starting , b'window.innerWidth') # doesn't work currently
         self.js = self.bind.starting( b'window.innerWidth' ) # work (only reason to keep the "old form")
         
+- perhaps `self( js_statement)` -> `self.call( js_statement )` ... less confusing !
+- thus, to avoid `self( self.bind( self.method, "arg1") )`   (currently only `self( self.bind.method("arg1") )`) could be `self.call.<method>( *args,**kargs )`, which is defnitivly better ;-) ... but could have the two options, to avoid to enforce to declare a self.method ....
+
+
 
 - tests, tests & tests !
 
