@@ -1,5 +1,7 @@
 # Creating a Tag : the complete guide
 
+if you come from [domonic](https://github.com/byteface/domonic) or brython
+
 ## the basics
 
 A Tag (htag's Tag) is a helper to let you build easily html representation of an object.
