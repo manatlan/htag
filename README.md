@@ -49,6 +49,14 @@ and more technicals :
 - ~~mix the Tag.__init__ with the old system (like this: it's unmaintable)~~
 - ~~introduce a virtual tag/placeholder~~
 - DISPLAY a warning (or exception in STRICT_MODE), when a render method use a "tag creation" (ex: Tag.div("hello")), because it will always be rendered !!!!! -> bad habits
+
+- rename "tag" to "self" for js statements (keep the twos, for compatibility reasons)
+- Make it possibles :
+
+        self.js = self.bind( self.starting , b'window.innerWidth') # doesn't work currently
+        self.js = self.bind.starting( b'window.innerWidth' ) # work (only reason to keep the "old form")
+        
+
 - tests, tests & tests !
 
 ## History
