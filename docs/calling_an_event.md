@@ -37,13 +37,13 @@ The first, and only argument, is the instance of the object which has emitted th
 
 This kind of interaction is called "direct" : the callback is directly called during the interaction.
 
-For your interest ... it exactly the same construction as
-```python
-    def init(self):
-        button=Tag.button("click")
-        button["onclick"]=button.bind( self.clicked ) # declare event, post button construction
-        self += button
-```
+!!! note "For your interest ... it exactly the same construction as"
+    ```python
+        def init(self):
+            button=Tag.button("click")
+            button["onclick"]=button.bind( self.clicked ) # declare event, post button construction
+            self += button
+    ```
 
 ## Pass arguments (in 'direct' calls)
 
