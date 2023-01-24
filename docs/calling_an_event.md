@@ -210,7 +210,7 @@ class App(Tag.body):
 If you right click on the button, it will produce an htag interaction, and will stop the event (prevent to display the real/default contextmenu). In 99% of my cases, I use this, for my "oncontextmenu" events
 
 
-Here is an exemple of chaining events. 
+Here is an example of chaining events. 
 
 ```python
 class App(Tag.body):
@@ -222,7 +222,7 @@ class App(Tag.body):
     def clicked2(self):
         print( "clicked2" )
 ```
-It's very rare to use this feature. But can be usefull in complex components, to chain others treatments. BTW, it produces only one htag interaction (by opposite of the old form, where you could do the same, like `_onclick=self.bind.clicked()+";"+self.bind.clicked2();` ... but avoid that !)
+It's very rare to use this feature. But can be usefull in complex components, to chain others treatments. BTW, it produces only one htag interaction (by opposite of the old form, where you could do the same, like `_onclick=self.bind.clicked()+";"+self.bind.clicked2()` ... but avoid that, it makes 2 htag interactions !)
 
 And of course, you can mix them
 
