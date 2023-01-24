@@ -1,5 +1,7 @@
 # Calling an event : the complete guide ;-)
 
+After months of use, and more than 100 htag apps later, here are my notes ;-)
+
 ## The simple way ...
 
 ```python
@@ -118,7 +120,7 @@ class App(Tag.body):
         print( my_val )
 ```
 
-or better :
+or better (setting arguments in instance itself:
 
 ```python
 class App(Tag.body):
@@ -130,7 +132,50 @@ class App(Tag.body):
         print( my_val )
 
 ```
-todo
+
+# The old way
+
+There is another way to do things, it's historical, it comes from the old gtag. But sometimes it's usefull too. I hesitate to talk here, because it's clearly deprecated. And should be avoided ... but sometimes, it's handsfull !
+
+In gtag, the way to bind an event was .... here in htag :
+
+```python
+class App(Tag.body):
+    def init(self):
+        self += Tag.button("click", _onclick=self.bind.clicked() )
+
+    def clicked(self):
+        print( "hello" )
+```
+
+and if you want to pass "python parameters" :
+
+```python
+class App(Tag.body):
+    def init(self):
+        self += Tag.button("click", _onclick=self.bind.clicked('hello') )
+
+    def clicked(self, txt):
+        print( txt )
+```
+
+and if you want to pass "javascript parameters" (using the `b'trick`)
+
+```python
+class App(Tag.body):
+    def init(self):
+        self += Tag.button("click", _onclick=self.bind.clicked(b'window.innerWidth') )
+
+    def clicked(self, txt):
+        print( txt )
+```
+The `self.bind.<method>(*args,**kargs)` return a string (a javascript statement to do an interaction).
+The 'method' must be declared on self instance. It's a lot simpler, but a lot less powerful.
+
+By opposite, the `<instance>.bind( <method>, *args, **kargs)` return a Caller Object, which is rendered as a string (javascript statement). This second form is more versatile, because you can bind any python/callback method. And build better abstractions/components. **But sometimes, you'll need to bind a real binded method ... which is not possible in some cases with this second form (during construction phases)** (TODO: need to developp here)
+
+You should prefer/use this second form. Because the `self.bind.<method>(*args,**kargs)` is deprecated, and could disappear one day (but not sure at 100%).
+In all cases, this old form will be in htag 1.0.0 !
 
 ...
 
