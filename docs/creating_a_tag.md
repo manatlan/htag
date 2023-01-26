@@ -145,13 +145,13 @@ class App(Tag.body):
         self += Div()
 ```
 
-Now, an important thing to understand : this component 'Div' is "closed", because you can't specialize it (with html attributs, or instance properties).
+Now, an important thing to understand : this component 'Div' is said "closed", because you can't specialize it (with html attributs, or instance properties) at construction time.
 You can't reuse it like that:
 
 ``` python
 class App(Tag.body):
     def init(self):
-        self += Div(_class="myclass")
+        self += Div(_class="myclass")   # will throw an exception (because it's closed)
 ```
 
 Because 'Div' doens't accept something in its constructor. So we say that it's "closed".
@@ -175,7 +175,7 @@ class Div(Tag.div):
 
 It's good practice, to create its components in a "opened" way (to be able to customized them later). But sometimes, it makes sense to refuse customization.
 
-BTW, keep in mind, that in all cases, you can customize them after creation.
+BTW, keep in mind, that in all cases ("opened" or "closed"), you can customize them after creation.
 ``` python
 class App(Tag.body):
     def init(self):
