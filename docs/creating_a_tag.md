@@ -2,10 +2,16 @@
 
 If you come from [domonic](https://github.com/byteface/domonic) or [brython](https://brython.info/static_doc/fr/create.html) : htag borrows the best ideas from them.
 
-## the basics
+## The basics
 
-### at construction time
+### At construction time
 A Tag (htag's Tag) is a helper to let you build easily html representation of an object.
+
+The signature of the helper could be: `Tag.<html>( <content_or_None>, **attrs ) -> htag instance`
+ * Where `<html>` can be "div","span","input", .. or whatever you want (it will be the html tag representation)
+ * Where `<content_or_None>` can be None or whatever which is str'able (list are accepted too)
+ * Where `attrs` can be any attributs to specialize the creation (see later)
+ 
 
 ```python
 from htag import Tag
@@ -60,12 +66,12 @@ Tag.div( [Tag.span("hello")," ",Tag.b("world")] )
 ```
 it's basically the same thing ^^
 
-### post construction time
+### Post construction time
 
 all this variables are usable/settable post construction time.
 ```python
 tag = Tag.span("hello world", value=12, _value=42 )
-assert tag["value"]=="42"
+assert tag["value"]==42
 assert tag.value==12
 ```
 html attributs are in the dictitem of the tag ! Whereas the instance properties are in the instance ;-)
@@ -99,7 +105,7 @@ easy, no ?
 An important thing to understand, is that a Tag renders differently when used in a runner (TODO LINK).
 AS you see before, the tags are rendered without attributs 'id'. But, IRL, when using in a htag runner context, all tags are rendered with an html id attribut (it's the main reason why you can't set an `_id` at runtime !). Htag's runner manage all the tags, with theirs ids: it's the core feature, to be able to keep states/rendering between the gui/client_side and the back/python ;-)
 
-When used in a Runner Context, some specials property are setted on a Tag.
+When used in a Runner Context, some specials properties are setted on a Tag.
  * `root` : Contains the instance of the main tag (AKA the one drived by the HTag's Runner)
  * `parent` : Contains the instance of the parent tag (AKA the one which had added it)
 
@@ -116,7 +122,7 @@ here is a simple div construction:
 Tag.div('hello',_style="background:red")
 ```
 
-Here is the same, using inheritance :
+Here is the same, using inheritance (to create a `Div` class) :
 
 ``` python
 class Div(Tag.div):
