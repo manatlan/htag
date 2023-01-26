@@ -88,6 +88,8 @@ if __name__=="__main__":
 
 It will produce the same html rendering.
 
+[More on Tag creations (the complete guide)](/htag/creating_a_tag/)
+
 [The tutorial to create an "input" component](/htag/tuto_create_an_input_component/)
 
 
