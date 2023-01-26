@@ -142,6 +142,9 @@ When you will click the button, the instance of the object will add "some conten
 
 From here, you have seen 95% of the features of **htag**.
 
+[More on interactions (the complete guide)](/htag/calling_an_event/)
+
+
 ## Include ressources
 
 **htag** provide a way to include some external ressources (think: css, js, favicon, ...). All theses ressources will be included in `<head>` tag, at construction time.
