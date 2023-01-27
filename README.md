@@ -50,7 +50,7 @@ and more technicals :
 - ~~introduce a virtual tag/placeholder~~
 - DISPLAY a warning (or exception in STRICT_MODE), when a render method use a "tag creation" (ex: Tag.div("hello")), because it will always be rendered !!!!! -> bad habits
 
-- rename "tag" to "self" for js statements (keep the twos, for compatibility reasons)
+- -~rename "tag" to "self" for js statements (keep the twos, for compatibility reasons)--
 - Make it possibles :
 
         self.js = self.bind( self.starting , b'window.innerWidth') # doesn't work currently
