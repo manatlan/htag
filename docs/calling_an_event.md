@@ -238,7 +238,9 @@ class App(Tag.div):
         self+=Tag.input(_value="default", js="tag.focus()")
 ```
 
-So, every time the Tag 'App' is rendered, it creates an input field, and take the focus (`tag` is a special js var, in this context, to quickly access to the input element) (BTW : it should be named 'self' to be more consistent, perhaps before 1.0.0 version).
+So, every time the Tag 'App' is rendered, it creates an input field, and take the focus (`tag` is a special js var, in this context, to quickly access to the input element)
+
+**For versions > 0.9.13** : `tag` is now deprecated in favor of `self`. You can use both, to refer to the js/nodeElement of the tag, but prefer to use `self` ;-)
 
 Another approach could be :
 
@@ -248,7 +250,7 @@ class App(Tag.div):
         self+=Tag.input(_value="default" )
         self.js = "tag.childNodes[0].focus()"
 ```
-In this case, it's the App Tag which use its js property to set the focus on its child (in a js way) (`tag` is a special js var, in this context, to quickly access to the App/Tag.div)
+In this case, it's the App Tag which use its js property to set the focus on its child (in a js way) (`tag` is a special js var, in this context, to quickly access to the App/Tag.div js/nodeElement)
 
 So, this js property can send back data from client_side/gui too.
 
