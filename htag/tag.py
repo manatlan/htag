@@ -528,7 +528,11 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         return ll
 
     def _genIIFEScript(self,js:str) -> str:
-        return f"(function(tag){{ {js}\n }})(document.getElementById('{id(self)}'));"
+        """ genereate an IIFE wicth script 'js' whereas tag(deprecated), or self(the newest), is the js/node of the current object.
+            (the goal is to have a quick reference to the node on js_side, ex: tag.js="self.focus()")
+            ('tag' is now deprecated in favor of 'self' on versions > 0.9.13)
+        """
+        return f"(function(self,tag=self){{ {js}\n }})(document.getElementById('{id(self)}'));"
 
     def _hasARenderMethod(self):
         if hasattr(self,"render"):
