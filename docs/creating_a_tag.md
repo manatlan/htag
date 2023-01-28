@@ -102,7 +102,7 @@ easy, no ?
 
 ### IRL (in A Runner Context)
 
-An important thing to understand, is that a Tag renders differently when used in a runner (TODO LINK).
+An important thing to understand, is that a Tag renders differently when used in a runner (TODO:LINK).
 AS you see before, the tags are rendered without attributs 'id'. But, IRL, when using in a htag runner context, all tags are rendered with an html id attribut (it's the main reason why you can't set an `_id` at runtime !). Htag's runner manage all the tags, with theirs ids: it's the core feature, to be able to keep states/rendering between the gui/client_side and the back/python ;-)
 
 When used in a Runner Context, some specials properties are setted on a Tag.
@@ -189,5 +189,25 @@ class App(Tag.body):
         div["class"]="myclass"  # <- like that
         self += div
 ```
+
+### Create a dynamic tag (using a `render(self)` method)
+
+TODO: say more ;-)
+
+See [example](https://htag.glitch.me/Test?app=c30)
+
+## Creating a "PlaceHolder" Tag
+
+A "placeholder" : is a Tag "without outerHTML" : It has no html representation
+
+TODO: say more ;-)
+
+## Creating a Tag generatior (yield'ing content)
+
+Sometimes, it can be usefull to render on-demand. Imagine that you want to populate a enormous list, it will be impossible (or very long). **HTag** provide a way to do that, to avoid to draw all the html in one interaction. It can render by fragment, using the `yield` statement.
+
+TODO: say more ;-)
+
+See [example](https://htag.glitch.me/Test?app=c90)
 
 ... TODO ...
