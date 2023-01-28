@@ -51,13 +51,13 @@ and more technicals :
 - DISPLAY a warning (or exception in STRICT_MODE), when a render method use a "tag creation" (ex: Tag.div("hello")), because it will always be rendered !!!!! -> bad habits
 
 - ~~rename "tag" to "self" for js statements (keep the twos, for compatibility reasons)~~
-- Make it possibles :
-
-        self.js = self.bind( self.starting , b'window.innerWidth') # doesn't work currently
-        self.js = self.bind.starting( b'window.innerWidth' ) # work (only reason to keep the "old form")
+- ~~Make it possibles -> NOT POSSIBLE currently ... abandonned ;-)~~
+    ~~self.js = self.bind( self.starting , b'window.innerWidth') # doesn't work currently~~
+    ~~self.js = self.bind.starting( b'window.innerWidth' ) # work (only reason to keep the "old form")~~
 
 - ~~perhaps `self( js_statement)` -> `self.call( js_statement )` ... less confusing !~~
-- thus, to avoid `self( self.bind( self.method, "arg1") )`   (currently only `self( self.bind.method("arg1") )`) could be `self.call.<method>( *args,**kargs )`, which is defnitivly better ;-) ... but could have the two options, to avoid to enforce to declare a self.method ....
+- ~~thus, to avoid `self( self.bind.method(*a,**k) )`, you can write `self.call.<method>( *a,**k )`~~
+- TESTS TESTS and more TESTS
 
 
 

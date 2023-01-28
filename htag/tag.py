@@ -157,6 +157,28 @@ class Binder:
         return Caller(self.__instance,callback,args,kargs)
 
 
+class InternalCall:
+    def __init__(self,btag_instance):
+        self.__instance=btag_instance
+
+    def __getattr__(self,method:str):
+        m=hasattr(self.__instance,method) and getattr(self.__instance,method)
+        if m and callable( m ):
+            def _(*args,**kargs) -> None:
+                self.__call__( getattr(self.__instance.bind, method )(*args,**kargs) )
+            return _
+        else:
+            raise HTagException("Unknown method '%s' in '%s'"%(method,self.__instance.__class__.__name__))
+
+    def __call__(self,js:str) -> None:
+        """ Send "js to execute" (post js) now """
+        if self.__instance.root is None or self.__instance.root._hr is None:
+            logger.error("call js is not possible, %s is not tied to a parent/HRenderer !", repr(self.__instance))
+        else:
+            self.__instance.root._hr._addInteractionScript( self.__instance._genIIFEScript(js) )
+
+
+
 class TagCreator(type):
     def __getattr__(self,name:str) -> Type:
         return type('Tag%s' % name.capitalize(), (Tag,), {**Tag.__dict__,"tag":name})
@@ -191,6 +213,19 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
             raise HTagException("This tag is a placeholder, it can't manage html attributs")
 
         return Binder(self)
+
+
+    @property
+    def call(self):
+        """ to easyly call an own (self.) method
+        TO AVOID : self.call( self.bind.mymethod(*a,**k) ) -> self.call.method(*a,**k)
+        """
+
+        if self.tag is None:
+            raise HTagException("This tag is a placeholder, it can't call own methods directly ")
+
+        return InternalCall(self)
+
 
     @property
     def childs(self) -> tuple:
@@ -229,14 +264,8 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
     # Constructor
     #======================================================================
     def __init__(self, *args,_hr_=None,**kargs):
-        # #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-        # parentCreator = inspect.stack()[1].frame.f_locals.get('self')
-        # if parentCreator and hasattr(parentCreator,"_nbTagCreating"):
-        #     parentCreator._nbTagCreating+=1
-        # #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-
         self._event={}       # NEW !!!!
-        self._hr=_hr_
+        self._hr=_hr_           # the hrenderer instance
         self._parent=None
         self._callbacks_={}
         self._childs=Elements()
@@ -282,8 +311,7 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
             if k.startswith("_"):
                 self[ k[1:].replace("_","-") ] = v
             else:
-                raise HTagException(f"Can't set attributs without underscore ('{k}' should be '_{k}')") # for convention only ;-(
-
+                raise HTagException(f"Can't set attributs without underscore ('{k}' should be '_{k}')") # for convention only ;-( (not possible to get it)
 
     #======================================================================
     # public methods
@@ -331,13 +359,6 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
                     self.add( i )
             else:
                 self._childs.__add__(elt)
-
-    def call(self, js:str):
-        """ Send "js to execute" (post js) now """
-        if self.root is None or self.root._hr is None:
-            logger.error("call js is not possible, %s is not tied to a parent/HRenderer !", repr(self))
-        else:
-            self.root._hr._addInteractionScript( self._genIIFEScript(js) )
 
     #===============================================================================
     # Overriden methods
@@ -528,24 +549,9 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         """
         return f"(function(self,tag=self){{ {js}\n }})(document.getElementById('{id(self)}'));"
 
-    def _hasARenderMethod(self):
+    def _hasARenderMethod(self) -> Union[ None, Callable]:
         if hasattr(self,"render"):
             render = getattr(self,"render")
             if callable(render):
-                # #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-                # def contextrender():
-                #     self._nbTagCreating = 0
-                #     render()
-                #     if self._nbTagCreating>0:
-                #         if self.STRICT_MODE:
-                #             raise HTagException(f"The tag {repr(self)} create Tags in its render method")
-                #         else:
-                #             logger.warning("The tag %s create Tags in its render method", repr(self))
-                #             print(f"**************************************************************************")
-                #             print(f"***WARNING*** The tag {repr(self)} create Tags in its render method")
-                #             print(f"**************************************************************************")
-                # #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-
-                # return contextrender
                 return render
 

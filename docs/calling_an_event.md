@@ -149,9 +149,9 @@ class App(Tag.body):
 
 ```
 
-## The old way
+## The old/historic way
 
-There is another way to do things, it's historical, it comes from the old gtag. But sometimes it's usefull too. I hesitate to talk here, because it's clearly deprecated. And should be avoided ... but sometimes, it's handsfull !
+There is another way to do things, it's historical, it comes from the old gtag. But sometimes it's usefull too.
 
 In gtag, the way to bind an event was .... here in htag :
 
@@ -188,14 +188,17 @@ class App(Tag.body):
 The `self.bind.<method>(*args,**kargs)` return a string (a javascript statement to do an interaction).
 The 'method' must be declared on self instance. It's a lot simpler, but a lot less powerful.
 
-By opposite, the `<instance>.bind( <method>, *args, **kargs)` return a Caller Object, which is rendered as a string (javascript statement). This second form is more versatile, because you can bind any python/callback method. And build better abstractions/components. **But sometimes, you'll need to bind a real binded method ... which is not possible in some cases with this second form (during construction phases)** (TODO: need to developp here)
+By opposite, the `<instance>.bind( <method>, *args, **kargs)` return a Caller Object, which is rendered as a string (javascript statement). This second form is more versatile, because you can bind any python/callback method. And build better abstractions/components. **But sometimes, you'll need to bind a real binded method ... which is not possible in some cases with this second form (during construction phases)**
 
 You should prefer/use this second form. Because the `self.bind.<method>(*args,**kargs)` is deprecated, and could disappear one day.
 In all cases, this old form will be in htag 1.0.0 !
 
+But if you are in construction phase (`init(self)` or `__init__(self)`). New mechanisms (`<instance>.bind( <method>, *args, **kargs)`) can't work, because we don't know the parent/root ;-(
+(will try to make it work, but not possible currently)
+
 ## The Caller object
 
-The Caller object (returned by the form `<instance>.bind( <method>, *args, **kargs)`) is v(ery) usefull. Because, you can chain events, and you can add customized javascript calls.
+The Caller object (returned by the form `<instance>.bind( <method>, *args, **kargs)`) is (very) usefull. Because, you can chain events, and you can add customized javascript calls.
 
 Here is an example of an interaction AND a post javascript statement.
 
@@ -229,16 +232,16 @@ And of course, you can mix them
 
 ## Others ways (using `Tag.js` property)
 
-Each htag's Tag got a 'js' property. This js property can contain javascript to be executed at each Tag rendering.
+Each htag's Tag instance got a 'js' property. This js property can contain javascript to be executed at each Tag rendering.
 
 Here is a very classical use :
 ```python
 class App(Tag.div):
     def init(self):
-        self+=Tag.input(_value="default", js="tag.focus()")
+        self+=Tag.input(_value="default", js="self.focus()") # here the .js is for the input.
 ```
 
-So, every time the Tag 'App' is rendered, it creates an input field, and take the focus (`tag` is a special js var, in this context, to quickly access to the input element)
+So, every time the Tag 'App' is rendered, it creates an input field, and take the focus (`self` is a special js var, in this context, to quickly access to the input element)
 
 **For versions > 0.9.13** : `tag` is now deprecated in favor of `self`. You can use both, to refer to the js/nodeElement of the tag, but prefer to use `self` ;-)
 
@@ -248,9 +251,9 @@ Another approach could be :
 class App(Tag.div):
     def init(self):
         self+=Tag.input(_value="default" )
-        self.js = "tag.childNodes[0].focus()"
+        self.js = "self.childNodes[0].focus()"
 ```
-In this case, it's the App Tag which use its js property to set the focus on its child (in a js way) (`tag` is a special js var, in this context, to quickly access to the App/Tag.div js/nodeElement)
+In this case, it's the App Tag which use its js property to set the focus on its child (in a js way) (`self` is a special js var, in this context, to quickly access to the App/Tag.div js/nodeElement)
 
 So, this js property can send back data from client_side/gui too.
 
@@ -269,7 +272,7 @@ Currently, only the "old form" works ;-( ... the newest `self.bind( <method>, *a
 
 ## Others ways (using `Tag.call` method)
 
-Each htag's Tag got a a `call(js)` method to send an UNIQUE custom js statements during an interaction.
+Each htag's Tag instance got a a `call(js)` method to send an UNIQUE custom js statements during an interaction.
 
 It's a little weird here. But it's really important to understand the difference between `self.js="js_statement()"` and `self.call("js_statement()")`.
  * `self.js="js_statement()" `: will execute the JS at each rendering of the object (ex: some html object (those from [materialize](https://materializecss.com/) need to be initialized with javascript statements, it's the perfect way to do that, in that place)
@@ -287,6 +290,16 @@ class App(Tag.body):
 ```
 Except ... here, the js is sent only at construction time (in previous one : the js is sent at each rendering).
 The nuance is really subtil.
+
+BTW, you can use a simple form (versions >= 0.9.14), which does exactly the same thing ^^:
+```python
+class App(Tag.body):
+    def init(self):
+        self.call.starting( b'window.innerWidth' )
+
+    def starting(self,width):
+        print("innerWidth",width)
+```
 
 Concerning the use of the "old form" vs "the newest" : same remarks ! (only the old form currently ;-()
 

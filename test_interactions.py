@@ -95,6 +95,22 @@ async def test_js_at_init1():
     # assert r["post"].count("function(tag)")==1
 
 @pytest.mark.asyncio
+async def test_js_at_init_new_InternalCall():
+    class Object(Tag.div):
+        def init(self):
+            self.call.mymethod("hello") # same as self.call( self.bind.mymethod('hello') )
+        def mymethod(self,msg):
+            assert msg=="hello"
+    ########################################################
+    s=Simu( Object )
+    # r=await s.init() # it controls the basics
+
+    assert "function(self,tag=self){ try{interact(" in str(s.hr)
+    # assert r["post"].count("function(tag)")==1
+
+
+
+@pytest.mark.asyncio
 async def test_js_at_init2():
     class Object(Tag.div):
         js = "static_js();"
@@ -374,7 +390,8 @@ if __name__=="__main__":
 
     # asyncio.run( test_empty() )
     # asyncio.run( test_js_at_init1() )
-    asyncio.run( test_js_at_init2() )
+    # asyncio.run( test_js_at_init2() )
     # asyncio.run( test_js_at_init3() )
     # asyncio.run( test_simplest() )
     # asyncio.run( test_bug_0_8_5() )
+    asyncio.run( test_js_at_init_new_InternalCall() )
