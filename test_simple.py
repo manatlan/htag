@@ -502,7 +502,7 @@ def test_js_call_at_init():
     class TEST(Tag.div):
         js="/*JS2*/"
         def init(self):
-            self("/*JS1*/") # <= only in interaction, for now
+            self.call("/*JS1*/") # <= only in interaction, for now
 
     # It doesn't crash now !
     # (but the interaction script is forgotten)

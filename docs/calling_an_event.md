@@ -75,7 +75,7 @@ class App(Tag.body):
         button1=Tag.button("click")
         button1["onclick"]=button1.bind( self.clicked, "A" )
         self += button1
-        
+
         button2=Tag.button("click")
         button2["onclick"]=button2.bind( self.clicked, "B" )
         self += button2
@@ -197,7 +197,7 @@ In all cases, this old form will be in htag 1.0.0 !
 
 The Caller object (returned by the form `<instance>.bind( <method>, *args, **kargs)`) is v(ery) usefull. Because, you can chain events, and you can add customized javascript calls.
 
-Here is an example of an interaction AND a post javascript statement. 
+Here is an example of an interaction AND a post javascript statement.
 
 ```python
 class App(Tag.body):
@@ -210,7 +210,7 @@ class App(Tag.body):
 If you right click on the button, it will produce an htag interaction, and will stop the event (prevent to display the real/default contextmenu). In 99% of my cases, I use this, for my "oncontextmenu" events
 
 
-Here is an example of chaining events. 
+Here is an example of chaining events.
 
 ```python
 class App(Tag.body):
@@ -261,7 +261,7 @@ class App(Tag.body):
     def init(self):
         # self.js = self.bind( self.starting , b'window.innerWidth') # doesn't work currently
         self.js = self.bind.starting( b'window.innerWidth' )
-        
+
     def starting(self,width):
         print("innerWidth",width)
 ```
@@ -271,17 +271,17 @@ Currently, only the "old form" works ;-( ... the newest `self.bind( <method>, *a
 
 Each htag's Tag is callable ... to send an UNIQUE custom js statements during an interaction.
 
-It's a little weird here. But it's really important to understand the difference between `self.js="js_statement()"` and `self("js_statement()")`.
+It's a little weird here. But it's really important to understand the difference between `self.js="js_statement()"` and `self.call("js_statement()")`.
  * `self.js="js_statement()" `: will execute the JS at each rendering of the object (ex: some html object (those from [materialize](https://materializecss.com/) need to be initialized with javascript statements, it's the perfect way to do that, in that place)
- * `self("js_statement()")` : will execute the JS one time (when it's called) (ex: some html object need to change its aspect thru js call ... think : close a menu, etc ...)
+ * `self.call("js_statement()")` : will execute the JS one time (when it's called) (ex: some html object need to change its aspect thru js call ... think : close a menu, etc ...)
 
 So, this thing will work as the previous one .. except ..
 
 ```python
 class App(Tag.body):
     def init(self):
-        self( self.bind.starting( b'window.innerWidth' ) )
-        
+        self.call( self.bind.starting( b'window.innerWidth' ) )
+
     def starting(self,width):
         print("innerWidth",width)
 ```

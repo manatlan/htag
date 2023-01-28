@@ -4,10 +4,10 @@
 Here are the concepts, for 1.0 version. (but all is here since 0.8.15)
 (For now, some concepts are presented in [tutorial](../tutorial). But here, it's my global plan to make a minimal doc ;-) )
 
-## Technically 
+## Technically
 **HTag** let you easily build UI elements/widgets (using HTML technologies under the hood), and display them in any things which can render HTML (thru [runners](../runners)).
 
-In fact, it will render it as a SPA, and will manage all interactions for you (between the UI and the python code), without much knowledgement in html/js/css techs. 
+In fact, it will render it as a SPA, and will manage all interactions for you (between the UI and the python code), without much knowledgement in html/js/css techs.
 
 Everything is done in 3 layers :
 
@@ -23,7 +23,7 @@ But the main concept is here: you can developp an **Htag App** which will work a
 
 It can be seen as a "VueJs|Angular|React" framework on python side; a statefull instance which manage/render htag's components (states changes are handled by the interactions between the front and the back)
 
-## Tag construction 
+## Tag construction
 
 `htag.Tag` is a metaclass helper to build an html tag.
 
@@ -47,16 +47,16 @@ Tag.what_you_want("hello")            # --> <what-you-want>hello</what-you-want>
 . . .
 
 TODO: (and inherit open/closed (the `**a` trick))
-TODO: (placeholder) 
+TODO: (placeholder)
 
-## Tag properties : parent and root 
-TODO: (warn root in init !) 
+## Tag properties : parent and root
+TODO: (warn root in init !)
 TODO: (strict mode)
 
 ## Run javascript
-TODO: self.js vs self( Js ) (and tag js var)
+TODO: self.js vs self.call( Js ) (and tag js var)
 
-## Bind events 
+## Bind events
 TODO: (four ways, chaining bind, chaining Js before/after)
 TODO: (use b'' for javascript)
 
@@ -64,14 +64,14 @@ TODO: (use b'' for javascript)
 TODO: sync/async and yield
 TODO: and stream (adding tag with yield)
 
-## Include statics 
+## Include statics
 TODO: howto, and shortcuts for js/style
 TODO: and imports trick
 
 ## rendering lately vs dynamic
 TODO: main.tag setted as body
-TODO: in render : avoid tag construction -> coz redraw all) 
-TODO: ... And hrenderer/runners (and url queryparams) 
+TODO: in render : avoid tag construction -> coz redraw all)
+TODO: ... And hrenderer/runners (and url queryparams)
 
 ## Runners
 TODO: (and using asgi) (and state management)

@@ -81,7 +81,7 @@ class Page(Tag.body):
 
     def testSYield(self):
         for i in list("ABCDEF"):
-            self(f"console.log('{i}')")
+            self.call(f"console.log('{i}')")
             time.sleep(0.5)
             print(i)
             self.add( i )
@@ -89,7 +89,7 @@ class Page(Tag.body):
 
     async def testAYield(self):
         for i in list("ABCDEF"):
-            self(f"console.log('{i}')")
+            self.call(f"console.log('{i}')")
             await asyncio.sleep(0.5)
             print(i)
             self.add( i )
@@ -106,7 +106,7 @@ class Page(Tag.body):
         a=12/0
         yield
     def bugjs(self,txt=""):
-        self("fgdsgfd()")
+        self.call("fgdsgfd()")
 
 
 # exemple for instanciating the logging before ...

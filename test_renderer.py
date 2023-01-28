@@ -79,7 +79,7 @@ def test_render_a_tag_with_interaction():
 
         def action(self):
             self["class"]="my2"
-            self("SCRIPT2")
+            self.call("SCRIPT2")
 
     t=MyDiv()
     assert t.tag == "div" # the default one
@@ -125,7 +125,7 @@ def test_render_a_tag_with_child_interactions():
             self.js = "INIT%s"%self.name
 
         def action(self):
-            self("ACTION%s"%self.name)
+            self.call("ACTION%s"%self.name)
 
 
     class MyDiv(Tag):
@@ -140,7 +140,7 @@ def test_render_a_tag_with_child_interactions():
             self <= self.b  # NEEDED
 
         async def action(self):
-            self("SCRIPT2")
+            self.call("SCRIPT2")
             self.a.action()
             self.b.action()
 
@@ -173,18 +173,18 @@ def test_render_yield_with_scripts():
             pass
 
         def action(self):
-            self("SCRIPT1")
+            self.call("SCRIPT1")
             yield
-            self("SCRIPT2")
+            self.call("SCRIPT2")
             yield
-            self("SCRIPT3")
+            self.call("SCRIPT3")
 
         async def as_action(self):
-            self("SCRIPT1")
+            self.call("SCRIPT1")
             yield
-            self("SCRIPT2")
+            self.call("SCRIPT2")
             yield
-            self("SCRIPT3")
+            self.call("SCRIPT3")
 
     r=HRenderer(MyDiv,"function interact() {}; start(); // the starter", lambda: "ok")
     t=r.tag

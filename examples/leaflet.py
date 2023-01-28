@@ -26,7 +26,7 @@ class App(Tag.body):
         self <= LeafLet(51.505, -0.09)          #london, uk
         self <= LeafLet(42.35,-71.08)           #Boston, usa
 
-        self(   """navigator.geolocation.getCurrentPosition((position)=>{%s});"""
+        self.call(   """navigator.geolocation.getCurrentPosition((position)=>{%s});"""
                 % self.bind.add_me(b"position.coords.latitude",b"position.coords.longitude")
         )
 

@@ -153,26 +153,26 @@ class HRenderer:
             # so, try to import statics according "imports" attrs on tags
             logger.info("Include statics from Tag's imports attibut")
             feedStatics(tagClass)
-            def rec( tagc ):
+            def rec1( tagc ):
                 if hasattr(tagc, "imports") and tagc.imports is not None:
                     imports = ensureList(tagc.imports)
                     if not all([isinstance(c,type) and issubclass(c,Tag) for c in imports]):
                         raise HTagException("imports can contains only Tag classes %s" % imports)
                     for c in imports:
                         feedStatics(c)
-                        rec(c)
+                        rec1(c)
 
-            rec( tagClass )
+            rec1( tagClass )
         else:
             # there is no "imports" attribut
             # so try to imports statics using Tag subclasses
             logger.info("Include statics from Tag's subclasses")
-            def rec( cls ):
+            def rec2( cls ):
                 for c in cls.__subclasses__():
                     feedStatics(c)
-                    rec(c)
+                    rec2(c)
 
-            rec(Tag)
+            rec2(Tag)
 
         logger.debug("HRenderer(), statics found : %s", [repr(i) for i in self._statics])
 

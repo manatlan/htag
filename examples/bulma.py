@@ -255,7 +255,7 @@ class Toaster(TagBulma.div):
         o.add( Button(_class="delete", _onclick=jsclose))
         o.add( content )
 
-        self("""setTimeout(function() {%s;},%s);""" % (jsclose,delay))
+        self.call("""setTimeout(function() {%s;},%s);""" % (jsclose,delay))
 
         self <= o
 
@@ -447,8 +447,8 @@ class Nav(TagBulma.nav):
         self <= divMenu
 
     def evtSelectEntry(self, name):
-        self("document.querySelector('.navbar-menu').classList.remove('is-active')")
-        self("document.querySelector('.navbar-burger').classList.remove('is-active')")
+        self.call("document.querySelector('.navbar-menu').classList.remove('is-active')")
+        self.call("document.querySelector('.navbar-burger').classList.remove('is-active')")
         entries = {**self._entries_first,**self._entries_end}
         callback = entries[name]
         callback()

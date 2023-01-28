@@ -87,7 +87,7 @@ async def test_empty():
 async def test_js_at_init1():
     class Object(Tag.div):
         def init(self):
-            self("interaction_js();")
+            self.call("interaction_js();")
     ########################################################
     s=Simu( Object )
     # r=await s.init() # it controls the basics
@@ -110,7 +110,7 @@ async def test_js_at_init3():
     class Object(Tag.div):
         js = "static_js();"
         def init(self):
-            self("interaction_js();")
+            self.call("interaction_js();")
     ########################################################
     s=Simu( Object )
     # r=await s.init() # it controls the basics

@@ -19,7 +19,7 @@ class View(Tag.div):
         """ Set object 'o' in the View, and navigate to it """
         if anchor is None: anchor=str(id(o))
         self._refs['#'+anchor] = o
-        self( "document.location='#"+anchor+"';")
+        self.call( "document.location='#"+anchor+"';")
 #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 
 class Page1(Tag.span):

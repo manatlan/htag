@@ -77,10 +77,6 @@ class NotBindedCaller:
         self._befores.append(js)
         return self
 
-    # def add(self,js):
-    #     self.__add__(js)
-    #     return self
-
     def bind(self,callback:Callable,*args,**kargs): #-> Caller
         c = Caller(self.__instance,callback,args,kargs)
         c.assignEventOnTag( self, self.__event  )
@@ -376,7 +372,6 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         r=self._attrs.get(attr,None)
         if r is None:
             if attr.startswith("on"):
-                # self._attrs["class"]=StrClass()
                 r = NotBindedCaller(self,attr)
             elif attr == "style":
                 self._attrs["style"]=StrStyle()
@@ -428,19 +423,19 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         else:
             return f"<{self.__class__.__name__}'{self.tag} {id(self)} (childs:{len(self._childs)})>"
 
+    # DEPRECATED
     def __call__(self, js:str):
-        """ Send "js to execute" (post js) now """
-        if self._hr:
-            current = self
-        else:
-            current = self._parent
-            while current is not None and current.parent is not None:
-                current = current.parent
+        msg = f"self( js ) is DEPRECATED, use self.call( js ) on {repr(self)}"
+        logger.warning(msg)
+        print("WARNING",msg)
+        self.call(js)
 
-        if current is None or current._hr is None:
+    def call(self, js:str):
+        """ Send "js to execute" (post js) now """
+        if self.root is None or self.root._hr is None:
             logger.error("call js is not possible, %s is not tied to a parent/HRenderer !", repr(self))
         else:
-            current._hr._addInteractionScript( self._genIIFEScript(js) )
+            self.root._hr._addInteractionScript( self._genIIFEScript(js) )
 
     def __str__(self):
         render = self._hasARenderMethod()
@@ -528,7 +523,7 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         return ll
 
     def _genIIFEScript(self,js:str) -> str:
-        """ genereate an IIFE wicth script 'js' whereas tag(deprecated), or self(the newest), is the js/node of the current object.
+        """ genereate an IIFE wicth script 'js' whereas tag (deprecated), or self (the newest), is the js/node of the current object.
             (the goal is to have a quick reference to the node on js_side, ex: tag.js="self.focus()")
             ('tag' is now deprecated in favor of 'self' on versions > 0.9.13)
         """
