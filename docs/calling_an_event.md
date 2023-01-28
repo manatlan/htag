@@ -284,7 +284,7 @@ So, this thing will work as the previous one .. except ..
 ```python
 class App(Tag.body):
     def init(self):
-        self.call( self.bind.starting( b'window.innerWidth' ) ) # BAD EXAMPLE (TODO:FIX)
+        self.call( self.bind.starting( b'window.innerWidth' ) )
 
     def starting(self,width):
         print("innerWidth",width)
@@ -296,13 +296,16 @@ BTW, you can use a simple form (versions >= 0.9.14), which does exactly the same
 ```python
 class App(Tag.body):
     def init(self):
-        self.call.starting( b'window.innerWidth' ) # BAD EXAMPLE (TODO:FIX)
+        self.call.starting( b'window.innerWidth' )
 
     def starting(self,width):
         print("innerWidth",width)
 ```
 
 Concerning the use of the "old form" vs "the newest" : same remarks ! (only the old form currently ;-()
+
+**IMPORTANT** : 
+The last 2 examples are BAD PRACTICE, because the `self.call` (during construction phase) can only work when it's in the main tag (which is managed by the Runner (TODO:link)). If it was in an `init` from a component : it can't work (because we don't know the parent/root at this time). The good practice is DON'T USE `self.call` IN A CONSTRUCTOR (prefer `self.js`)
 
 ## Using the `event` properties from gui/js
 
