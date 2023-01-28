@@ -192,22 +192,40 @@ class App(Tag.body):
 
 ### Create a dynamic tag (using a `render(self)` method)
 
-TODO: say more ;-)
+You can create a component which will auto render itself on changes. This kind of component is neat for small component. This kind of component are named "dynamic" component, and to be a dynamic component : it must implement a `render(self) -> None`, which will redraw all its content.
 
-See [example](https://htag.glitch.me/Test?app=c30)
+A simple example:
+```python
+class Starrer(Tag.div):
+    def init(self,value=0):
+        self.value=value
+        
+        def inc(v):
+            self.value+=v
+        
+        self.bless = Tag.Button( "-", _onclick = lambda o: inc(-1) )
+        self.bmore = Tag.Button( "+", _onclick = lambda o: inc(+1) )
+        
+    def render(self):
+        self += self.bless + self.bmore + ("⭐"*self.value)
+```
+
+**IMPORTANT**: AVOID USING `Tag.<html>(content,**kargs)` IN A render() METHOD !!!!!!! (avoid creating new tag instance, because it will create new instance (new ids), and force rendering at each interaction)
+
+See [Example c30](https://htag.glitch.me)
 
 ## Creating a "PlaceHolder" Tag
 
-A "placeholder" : is a Tag "without outerHTML" : It has no html representation
+A placeholder tag : is a Tag "without outerHTML", It has no html representation from itself. And its rendering depends on its childs.
 
 TODO: say more ;-)
 
 ## Creating a Tag generatior (yield'ing content)
 
-Sometimes, it can be usefull to render on-demand. Imagine that you want to populate a enormous list, it will be impossible (or very long). **HTag** provide a way to do that, to avoid to draw all the html in one interaction. It can render by fragment, using the `yield` statement.
+Sometimes, it can be usefull to render on-demand. Imagine that you want to populate a big list, it will be impossible (or very long). **HTag** provide a way to do that, to avoid to draw all the html in one interaction. It can render by fragment, using the `yield` statement.
 
 TODO: say more ;-)
 
-See [example](https://htag.glitch.me/Test?app=c90)
+See [Example c90](https://htag.glitch.me)
 
 ... TODO ...
