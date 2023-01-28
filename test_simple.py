@@ -691,6 +691,41 @@ def test_autodeclare_props():
     assert my.hello == "world2" # the param is forgotton/non used at all
 
 
+def test_autoset_error():
+    with pytest.raises(HTagException):
+        Tag.div(render="x")    # can't autoset a known method
+
+    with pytest.raises(HTagException):
+        Tag.div(clear="x")    # can't autoset a known method
+
+    with pytest.raises(HTagException):
+        Tag.div(clear="x")    # can't autoset a known method
+
+    with pytest.raises(HTagException):
+        Tag.div(set="x")    # can't autoset a known method
+    with pytest.raises(HTagException):
+        Tag.div(add="x")    # can't autoset a known method
+    with pytest.raises(HTagException):
+        Tag.div(remove="x")    # can't autoset a known method
+
+    with pytest.raises(HTagException):
+        Tag.div(root="x")    # can't autoset a known property
+    with pytest.raises(HTagException):
+        Tag.div(parent="x")    # can't autoset a known property
+    with pytest.raises(HTagException):
+        Tag.div(event="x")    # can't autoset a known property
+    with pytest.raises(HTagException):
+        Tag.div(innerHTML="x")    # can't autoset a known property
+    with pytest.raises(HTagException):
+        Tag.div(attrs="x")    # can't autoset a known property
+    with pytest.raises(HTagException):
+        Tag.div(childs="x")    # can't autoset a known property
+    with pytest.raises(HTagException):
+        Tag.div(bind="x")    # can't autoset a known property
+    with pytest.raises(HTagException):
+        Tag.div(tag="x")    # can't autoset a known property
+
+
 if __name__=="__main__":
 
     import logging

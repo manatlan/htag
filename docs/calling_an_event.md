@@ -227,7 +227,7 @@ It's very rare to use this feature. But can be usefull in complex components, to
 And of course, you can mix them
 
 
-## Others ways (using js'Tag property)
+## Others ways (using `Tag.js` property)
 
 Each htag's Tag got a 'js' property. This js property can contain javascript to be executed at each Tag rendering.
 
@@ -267,9 +267,9 @@ class App(Tag.body):
 ```
 Currently, only the "old form" works ;-( ... the newest `self.bind( <method>, *args, **kargs)` can't, but ,will try to fix that before 1.0.0. And it's the only main reason why the old form is still there ;-(
 
-## Others ways (using `Tag.__call__` method)
+## Others ways (using `Tag.call` method)
 
-Each htag's Tag is callable ... to send an UNIQUE custom js statements during an interaction.
+Each htag's Tag got a a `call(js)` method to send an UNIQUE custom js statements during an interaction.
 
 It's a little weird here. But it's really important to understand the difference between `self.js="js_statement()"` and `self.call("js_statement()")`.
  * `self.js="js_statement()" `: will execute the JS at each rendering of the object (ex: some html object (those from [materialize](https://materializecss.com/) need to be initialized with javascript statements, it's the perfect way to do that, in that place)

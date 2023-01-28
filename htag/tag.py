@@ -250,7 +250,7 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
             if k.startswith("_"):
                 attrs[k]=v
             else:
-                if k!="js" and k in dir(self):
+                if k!="js" and k in dir(self)+["render"]:
                     raise HTagException(f"Can't autoset property '{k}' in '{repr(self)}', private property !")
                 selfs[k]=v
 
@@ -332,6 +332,12 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
             else:
                 self._childs.__add__(elt)
 
+    def call(self, js:str):
+        """ Send "js to execute" (post js) now """
+        if self.root is None or self.root._hr is None:
+            logger.error("call js is not possible, %s is not tied to a parent/HRenderer !", repr(self))
+        else:
+            self.root._hr._addInteractionScript( self._genIIFEScript(js) )
 
     #===============================================================================
     # Overriden methods
@@ -429,13 +435,6 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         logger.warning(msg)
         print("WARNING",msg)
         self.call(js)
-
-    def call(self, js:str):
-        """ Send "js to execute" (post js) now """
-        if self.root is None or self.root._hr is None:
-            logger.error("call js is not possible, %s is not tied to a parent/HRenderer !", repr(self))
-        else:
-            self.root._hr._addInteractionScript( self._genIIFEScript(js) )
 
     def __str__(self):
         render = self._hasARenderMethod()
