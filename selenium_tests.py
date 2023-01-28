@@ -9,13 +9,14 @@ from htag import Tag # the only thing you'll need ;-)
 from htag.runners import *
 
 class APP1:
+    """ the basic """
 
     class App(Tag.body):
         def init(self):
-            self+= Tag.button("click",_onclick = self.affiche)
-            self+= Tag.button("exit",_onclick = lambda o: self.exit())
-        def affiche(self,o):
-            self+=Tag.li("hello")
+            def say_hello(o):
+                self <= Tag.li("hello")
+            self<= Tag.button("click",_onclick = say_hello)
+            self<= Tag.button("exit",_onclick = lambda o: self.exit())
 
     @staticmethod
     def tests(driver):
@@ -49,10 +50,10 @@ def test(driver,app):
 
 
 if __name__ == "__main__":
-    browsers = [webdriver.Chrome,webdriver.Firefox]
     # browsers = [webdriver.Chrome]
-    runners = [BrowserStarletteHTTP,BrowserStarletteWS,BrowserHTTP,BrowserTornadoHTTP]
     # runners = [BrowserStarletteHTTP]
+    browsers = [webdriver.Chrome,webdriver.Firefox]
+    runners = [BrowserStarletteHTTP,BrowserStarletteWS,BrowserHTTP,BrowserTornadoHTTP]
     apps=[APP1]
     for app in apps:
         for driver in browsers:
