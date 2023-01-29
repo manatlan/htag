@@ -49,18 +49,19 @@ class APP1:
         return True
 
 ########################################################################################################
-from multiprocessing import Process
+#from multiprocessing import Process
+import threading
 
-def run(runner,app):
+def run(runner,App):
     print("="*79)
     print("RUN",runner.__name__)
     print("="*79)
+    runner( App ).run(openBrowser=False)
 
-    app=runner( app.App )
-    app.run(openBrowser=False)
 
 app=APP1
-Process(target=run, args=(BrowserHTTP,app,)).start()
+#Process(target=run, args=(BrowserHTTP,app.App,)).start()
+threading.Thread(target=run, args=(BrowserHTTP,app.App,)).start()
 
 driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
 driver.get('http://localhost:8000')
