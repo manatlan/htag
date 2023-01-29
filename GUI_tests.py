@@ -21,7 +21,48 @@ options = [
 for option in options:
     chrome_options.add_argument(option)
 
-driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
+########################################################################################################
+from htag import Tag
+from htag.runners import *
 
-driver.get('http://nytimes.com')
-print(driver.title)
+class APP1:
+    """ the basic """
+
+    class App(Tag.body):
+        def init(self):
+            def say_hello(o):
+                self <= Tag.li("hello")
+            self<= Tag.button("click",_onclick = say_hello)
+            self<= Tag.button("exit",_onclick = lambda o: self.exit())
+
+    @staticmethod
+    def tests(driver):
+        assert "App" in driver.title
+
+        driver.find_element(By.XPATH, '//button[text()="click"]').click()
+        driver.find_element(By.XPATH, '//button[text()="click"]').click()
+        driver.find_element(By.XPATH, '//button[text()="click"]').click()
+
+        assert len(driver.find_elements(By.XPATH, '//li'))==3
+
+        driver.find_element(By.XPATH, '//button[text()="exit"]').click()
+        return True
+
+########################################################################################################
+from multiprocessing import Process
+
+def run(runner,app):
+    print("="*79)
+    print("RUN",runner.__name__)
+    print("="*79)
+
+    app=runner( app.App )
+    app.run(openBrowser=False)
+
+app=APP1
+Process(target=run, args=(BrowserHTTP,app,)).start()
+
+driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
+driver.get('http://localhost:8000')
+assert app.tests(driver)
+driver.quit()
