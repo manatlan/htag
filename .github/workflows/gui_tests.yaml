@@ -22,5 +22,5 @@ jobs:
         run: sudo apt install -y chromium-browser
       - name: Install all necessary packages
         run: pip install webdriver-manager selenium
-      - name: Run the scraping script
+      - name: Run the GUI selenium tests
         run: python GUI_tests.py
