@@ -1,3 +1,4 @@
+# taken from https://github.com/jsoma/selenium-github-actions
 name: GUI Tests
 on:
   workflow_dispatch:
