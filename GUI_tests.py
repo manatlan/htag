@@ -61,7 +61,7 @@ def run(runner,App):
 
 app=APP1
 #Process(target=run, args=(BrowserHTTP,app.App,)).start()
-threading.Thread(target=run, args=(BrowserHTTP,app.App,)).start()
+threading.Thread(target=run, args=(BrowserStarletteHTTP,app.App,)).start()
 
 driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
 driver.get('http://localhost:8000')

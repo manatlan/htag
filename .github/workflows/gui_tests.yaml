@@ -21,6 +21,6 @@ jobs:
       - name: Install a new Chromium
         run: sudo apt install -y chromium-browser
       - name: Install all necessary packages
-        run: pip install webdriver-manager selenium
+        run: pip install webdriver-manager selenium starlette uvicorn
       - name: Run the GUI selenium tests
         run: python GUI_tests.py
