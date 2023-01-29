@@ -1,4 +1,4 @@
-name: scrape
+name: GUI Tests
 on:
   workflow_dispatch:
 jobs:
