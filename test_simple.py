@@ -504,9 +504,9 @@ def test_js_call_at_init():
         def init(self):
             self.call("/*JS1*/") # <= only in interaction, for now
 
-    # It doesn't crash now !
-    # (but the interaction script is forgotten)
-    TEST()
+    # It crashs now !
+    with pytest.raises(HTagException):
+        TEST()
 
     # NOW WORKS !!!!
     myhr=HRSimu()

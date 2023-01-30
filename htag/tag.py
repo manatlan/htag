@@ -173,7 +173,7 @@ class InternalCall:
     def __call__(self,js:str) -> None:
         """ Send "js to execute" (post js) now """
         if self.__instance.root is None or self.__instance.root._hr is None:
-            logger.error("call js is not possible, %s is not tied to a parent/HRenderer !", repr(self.__instance))
+            raise HTagException("call js is not possible, %s is not tied to a parent/HRenderer !", repr(self.__instance))
         else:
             self.__instance.root._hr._addInteractionScript( self.__instance._genIIFEScript(js) )
 
