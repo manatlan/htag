@@ -18,11 +18,11 @@ def tests(driver):
     assert "App" in driver.title
 
     driver.find_element(By.XPATH, '//button[text()="click"]').click()
-    driver.implicitly_wait(0.5) # seconds
+    driver.implicitly_wait(1) # seconds
     driver.find_element(By.XPATH, '//button[text()="click"]').click()
-    driver.implicitly_wait(0.5) # seconds
+    driver.implicitly_wait(1) # seconds
     driver.find_element(By.XPATH, '//button[text()="click"]').click()
-    driver.implicitly_wait(0.5) # seconds
+    driver.implicitly_wait(1) # seconds
 
     assert len(driver.find_elements(By.XPATH, '//li'))==3
 
