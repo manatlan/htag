@@ -1,4 +1,5 @@
-#################################################################################"
+import sys,os; sys.path.insert(0,os.path.join( os.path.dirname(__file__),".."))
+#################################################################################
 from htag import Tag
 
 class App(Tag.div):
@@ -70,7 +71,7 @@ class App(Tag.div):
         assert v2=="content"
         self <= Tag.button("exit",_onclick = lambda o: self.exit())
 
-#################################################################################"
+#################################################################################
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 
