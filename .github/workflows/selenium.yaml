@@ -42,3 +42,8 @@ jobs:
         run: |
           python selenium/app.py AndroidApp &
           python selenium/tests.py 12458
+      - name: Run Tests WebHTTP
+        run: |
+          python selenium/app.py WebHTTP &
+          python selenium/tests.py 8000
+          killall python

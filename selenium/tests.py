@@ -25,10 +25,11 @@ for option in options:
     chrome_options.add_argument(option)
 
 port = sys.argv[1]
+import time
 
 driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
 driver.get('http://localhost:'+port)
-
+time.sleep(1)
 assert "App" in driver.title
 
 driver.find_element(By.XPATH, '//button[text()="click"]').click()
