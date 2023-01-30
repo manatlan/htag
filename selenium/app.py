@@ -11,7 +11,7 @@ class App(Tag.body):
         self<= Tag.button("exit",_onclick = lambda o: self.exit())
 
 #######################################################
-from htag.runners import BrowserHTTP
-app=BrowserHTTP(App)
-if __name__=="__main__":
-    app.run( openBrowser=False )
+import htag.runners
+runner = getattr( htag.runners, sys.argv[1])
+app=runner(App)
+app.run( openBrowser=False )
