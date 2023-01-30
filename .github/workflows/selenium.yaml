@@ -24,26 +24,26 @@ jobs:
         run: pip install webdriver-manager selenium uvicorn starlette tornado
       - name: Run Tests BrowserHTTP
         run: |
-          python selenium/app.py BrowserHTTP &
+          python selenium/run.py BrowserHTTP &
           python selenium/tests.py 8000
       - name: Run Tests BrowserStarletteHTTP
         run: |
-          python selenium/app.py BrowserStarletteHTTP &
+          python selenium/run.py BrowserStarletteHTTP &
           python selenium/tests.py 8000
       - name: Run Tests BrowserStarletteWS
         run: |
-          python selenium/app.py BrowserStarletteWS &
+          python selenium/run.py BrowserStarletteWS &
           python selenium/tests.py 8000
       - name: Run Tests BrowserTornadoHTTP
         run: |
-          python selenium/app.py BrowserTornadoHTTP &
+          python selenium/run.py BrowserTornadoHTTP &
           python selenium/tests.py 8000
       #- name: Run Tests AndroidApp (the http side)
       #  run: |
-      #    python selenium/app.py AndroidApp &
+      #    python selenium/run.py AndroidApp &
       #    python selenium/tests.py 12458
       - name: Run Tests WebHTTP (can't exit itself)
         run: |
-          python selenium/app.py WebHTTP &
+          python selenium/run.py WebHTTP &
           python selenium/tests.py 8000
           killall python

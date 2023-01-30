@@ -6,8 +6,6 @@ from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.core.utils import ChromeType
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
 
 chrome_service = Service(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install())
 
@@ -28,16 +26,11 @@ port = sys.argv[1]
 
 driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
 driver.get('http://localhost:'+port)
-driver.implicitly_wait(2) # seconds
-assert "App" in driver.title
 
-driver.find_element(By.XPATH, '//button[text()="click"]').click()
-driver.find_element(By.XPATH, '//button[text()="click"]').click()
-driver.find_element(By.XPATH, '//button[text()="click"]').click()
-
-assert len(driver.find_elements(By.XPATH, '//li'))==3
-
-driver.find_element(By.XPATH, '//button[text()="exit"]').click()
+#######################################################
+from app1 import tests
+#######################################################
+x=tests(driver)
 
 driver.quit()
-print("ok")
+print(x and "ok" or "ko")
