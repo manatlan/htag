@@ -23,6 +23,6 @@ jobs:
       - name: Install all necessary packages
         run: pip install webdriver-manager selenium
       - name: Run an htag app
-        run: python selenium/app.py
+        run: python selenium/app.py &
       - name: Run tests
         run: python selenium/tests.py
