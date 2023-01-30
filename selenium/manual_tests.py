@@ -10,7 +10,6 @@ Just for me ;-)
 
 """
 
-from htag.runners import *
 
 
 def run(runner,klass):
@@ -30,6 +29,11 @@ def test(driver,app):
     return x
 
 import app1 as app
+from htag.runners import *
+
+# a=DevApp( app.App )
+# if __name__ == "__main__":
+#     a.run(); quit()
 
 if __name__ == "__main__":
     # browsers = [webdriver.Chrome,webdriver.Firefox]
@@ -37,11 +41,9 @@ if __name__ == "__main__":
     browsers = [webdriver.Chrome]
     runners = [BrowserStarletteHTTP]
 
-
     for driver in browsers:
         for runner in runners:
             Process(target=run, args=(runner,app.App,)).start()
             x=test(driver,app)
             print("-->",x and "OK" or "KO")
 
-    # BrowserStarletteWS( app.App ).run()
