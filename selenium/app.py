@@ -11,4 +11,4 @@ class App(Tag.body):
         self<= Tag.button("click",_onclick = say_hello)
         self<= Tag.button("exit",_onclick = lambda o: self.exit())
 
-BrowserHTTP.run( openBrowser=False )
+BrowserHTTP(App).run( openBrowser=False )

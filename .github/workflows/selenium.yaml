@@ -1,9 +1,9 @@
 # taken from https://github.com/jsoma/selenium-github-actions
-name: GUI Tests
+name: Selenium Tests
 on:
   workflow_dispatch:
 jobs:
-  scrape:
+  selenium:
     runs-on: ubuntu-latest
     steps:
       - name: Check out this repo
