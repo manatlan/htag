@@ -1,3 +1,6 @@
+import sys
+sys.path.insert(0,"..")
+#######################################################
 from htag import Tag
 from htag.runners import *
 
