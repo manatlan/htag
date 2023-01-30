@@ -38,10 +38,10 @@ if __name__ == "__main__":
     runners = [BrowserStarletteHTTP]
 
 
-    # for driver in browsers:
-    #     for runner in runners:
-    #         Process(target=run, args=(runner,app.App,)).start()
-    #         x=test(driver,app)
-    #         print("-->",x and "OK" or "KO")
+    for driver in browsers:
+        for runner in runners:
+            Process(target=run, args=(runner,app.App,)).start()
+            x=test(driver,app)
+            print("-->",x and "OK" or "KO")
 
-    BrowserStarletteWS( app.App ).run()
+    # BrowserStarletteWS( app.App ).run()

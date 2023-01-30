@@ -12,17 +12,16 @@ class App(Tag.body):
 #################################################################################
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 def tests(driver):
     driver.implicitly_wait(1) # seconds
     assert "App" in driver.title
 
     driver.find_element(By.XPATH, '//button[text()="click"]').click()
-    driver.implicitly_wait(2) # seconds
     driver.find_element(By.XPATH, '//button[text()="click"]').click()
-    driver.implicitly_wait(2) # seconds
     driver.find_element(By.XPATH, '//button[text()="click"]').click()
-    driver.implicitly_wait(2) # seconds
 
     assert len(driver.find_elements(By.XPATH, '//li'))==3
 
