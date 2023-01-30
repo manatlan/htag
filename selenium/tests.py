@@ -1,5 +1,6 @@
 # taken from https://github.com/jsoma/selenium-github-actions
 
+import sys
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.core.utils import ChromeType
@@ -23,9 +24,10 @@ options = [
 for option in options:
     chrome_options.add_argument(option)
 
+port = sys.argv[1]
 
 driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
-driver.get('http://localhost:8000')
+driver.get('http://localhost:'+port)
 
 assert "App" in driver.title
 

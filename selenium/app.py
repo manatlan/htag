@@ -14,4 +14,7 @@ class App(Tag.body):
 import htag.runners
 runner = getattr( htag.runners, sys.argv[1])
 app=runner(App)
-app.run( openBrowser=False )
+if runner in [AndroidApp,]:
+    app.run()
+else:
+    app.run( openBrowser=False )

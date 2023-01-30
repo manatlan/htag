@@ -25,16 +25,20 @@ jobs:
       - name: Run Tests BrowserHTTP
         run: |
           python selenium/app.py BrowserHTTP &
-          python selenium/tests.py
+          python selenium/tests.py 8000
       - name: Run Tests BrowserStarletteHTTP
         run: |
           python selenium/app.py BrowserStarletteHTTP &
-          python selenium/tests.py
+          python selenium/tests.py 8000
       - name: Run Tests BrowserStarletteWS
         run: |
           python selenium/app.py BrowserStarletteWS &
-          python selenium/tests.py
+          python selenium/tests.py 8000
       - name: Run Tests BrowserTornadoHTTP
         run: |
           python selenium/app.py BrowserTornadoHTTP &
-          python selenium/tests.py
+          python selenium/tests.py 8000
+      - name: Run Tests AndroidApp (the http side)
+        run: |
+          python selenium/app.py AndroidApp &
+          python selenium/tests.py 12458
