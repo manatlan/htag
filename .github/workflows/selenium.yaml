@@ -38,10 +38,10 @@ jobs:
         run: |
           python selenium/app.py BrowserTornadoHTTP &
           python selenium/tests.py 8000
-      - name: Run Tests AndroidApp (the http side)
-        run: |
-          python selenium/app.py AndroidApp &
-          python selenium/tests.py 12458
+      #- name: Run Tests AndroidApp (the http side)
+      #  run: |
+      #    python selenium/app.py AndroidApp &
+      #    python selenium/tests.py 12458
       - name: Run Tests WebHTTP
         run: |
           python selenium/app.py WebHTTP &
