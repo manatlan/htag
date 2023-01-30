@@ -28,7 +28,7 @@ driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
 driver.get('http://localhost:'+port)
 
 #######################################################
-from app1 import tests
+from app2 import tests
 #######################################################
 x=tests(driver)
 
