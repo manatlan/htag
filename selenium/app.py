@@ -1,8 +1,7 @@
-import sys
-sys.path.insert(0,"..")
+import sys,os
+sys.path.insert(0,os.path.join( os.path.dirname(__file__),".."))
 #######################################################
 from htag import Tag
-from htag.runners import *
 
 class App(Tag.body):
     def init(self):
@@ -11,4 +10,8 @@ class App(Tag.body):
         self<= Tag.button("click",_onclick = say_hello)
         self<= Tag.button("exit",_onclick = lambda o: self.exit())
 
-BrowserHTTP(App).run( openBrowser=False )
+#######################################################
+from htag.runners import BrowserHTTP
+app=BrowserHTTP(App)
+if __name__=="__main__":
+    app.run( openBrowser=False )

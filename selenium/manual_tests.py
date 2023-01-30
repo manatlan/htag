@@ -4,6 +4,13 @@ from selenium.webdriver.common.by import By
 import threading,sys,os
 from multiprocessing import Process
 
+"""
+Tests on my local dev machine ...
+Just for me ;-)
+
+"""
+
+
 from htag import Tag # the only thing you'll need ;-)
 # from htag.runners import BrowserHTTP as Runner
 from htag.runners import *
