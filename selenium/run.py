@@ -1,6 +1,6 @@
 import sys
 #######################################################
-from app2 import App
+from app1 import App
 #######################################################
 import htag.runners
 runner = getattr( htag.runners, sys.argv[1])
