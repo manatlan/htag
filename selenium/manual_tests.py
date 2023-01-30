@@ -29,7 +29,7 @@ def test(driver,app):
     driver.quit()
     return x
 
-import app2 as app
+import app1 as app
 
 if __name__ == "__main__":
     # browsers = [webdriver.Chrome,webdriver.Firefox]

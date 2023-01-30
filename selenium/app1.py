@@ -14,7 +14,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 
 def tests(driver):
-    driver.implicitly_wait(2) # seconds
+    driver.implicitly_wait(1) # seconds
     assert "App" in driver.title
 
     driver.find_element(By.XPATH, '//button[text()="click"]').click()
