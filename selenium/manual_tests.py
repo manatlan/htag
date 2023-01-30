@@ -20,15 +20,9 @@ def run(runner,klass):
     app=runner( klass )
     app.run(openBrowser=False)
 
-def test(driver,app):
-    print("Test",driver)
-    driver= driver()
-    driver.get("http://127.0.0.1:8000/")
-    x=app.tests(driver)
-    driver.quit()
-    return x
 
 import app1 as app
+from common import HClient
 from htag.runners import *
 
 # a=DevApp( app.App )
@@ -41,9 +35,12 @@ if __name__ == "__main__":
     browsers = [webdriver.Chrome]
     runners = [BrowserStarletteHTTP]
 
-    for driver in browsers:
+    for dbrowser in browsers:
         for runner in runners:
             Process(target=run, args=(runner,app.App,)).start()
-            x=test(driver,app)
-            print("-->",x and "OK" or "KO")
+
+            with dbrowser() as driver:
+                driver.get("http://127.0.0.1:8000/")
+                x=app.tests( HClient(driver) )
+                print("-->",x and "OK" or "KO")
 

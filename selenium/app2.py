@@ -1,4 +1,5 @@
 import sys,os; sys.path.insert(0,os.path.join( os.path.dirname(__file__),".."))
+from common import HClient
 #################################################################################
 from htag import Tag
 
@@ -75,10 +76,9 @@ class App(Tag.div):
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 
-def tests(driver):
-    driver.implicitly_wait(2) # seconds
-    assert "App" in driver.title
+def tests(client:HClient):
+    assert "App" in client.title
 
-    driver.find_element(By.XPATH, '//button[text()="exit"]').click()
+    client.click('//button[text()="exit"]')
     return True
 

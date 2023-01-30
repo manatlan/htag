@@ -1,11 +1,16 @@
 # taken from https://github.com/jsoma/selenium-github-actions
 
-import sys
+import sys,os,time
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.core.utils import ChromeType
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
+from common import HClient
+
+#######################################################
+import app1 as app
+#######################################################
 
 chrome_service = Service(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install())
 
@@ -24,13 +29,7 @@ for option in options:
 
 port = sys.argv[1]
 
-driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
-driver.get('http://localhost:'+port)
-
-#######################################################
-from app1 import tests
-#######################################################
-x=tests(driver)
-
-driver.quit()
-print(x and "ok" or "ko")
+with webdriver.Chrome(service=chrome_service, options=chrome_options) as driver:
+    driver.get('http://localhost:'+port)
+    x=app.tests(HClient(driver))
+    print(x and ">OK<" or ">KO<")

@@ -1,4 +1,5 @@
 import sys,os; sys.path.insert(0,os.path.join( os.path.dirname(__file__),".."))
+from common import HClient
 #################################################################################
 from htag import Tag
 
@@ -10,23 +11,15 @@ class App(Tag.body):
         self<= Tag.button("exit",_onclick = lambda o: self.exit())
 
 #################################################################################
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-import time
-def tests(driver):
-    driver.implicitly_wait(1) # seconds
-    assert "App" in driver.title
 
-    driver.find_element(By.XPATH, '//button[text()="click"]').click()
-    time.sleep(1)
-    driver.find_element(By.XPATH, '//button[text()="click"]').click()
-    time.sleep(1)
-    driver.find_element(By.XPATH, '//button[text()="click"]').click()
-    time.sleep(1)
+def tests(client:HClient):
+    assert "App" in client.title
 
-    assert len(driver.find_elements(By.XPATH, '//li'))==3
+    client.click('//button[text()="click"]')
+    client.click('//button[text()="click"]')
+    client.click('//button[text()="click"]')
 
-    driver.find_element(By.XPATH, '//button[text()="exit"]').click()
+    assert len(client.find('//li'))==3
+
+    client.click('//button[text()="exit"]')
     return True
