@@ -4,6 +4,7 @@ from common import HClient
 from htag import Tag
 
 class App(Tag.body):
+    """ the base """
     def init(self):
         def say_hello(o):
             self <= Tag.li("hello")

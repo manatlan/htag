@@ -4,17 +4,16 @@ from common import HClient
 from htag import Tag
 
 class App(Tag.div):
-    """ Yield UI """
+    """ Stream UI """
 
     imports=[]
 
     def init(self):
-        self.call.drawui()
+        self.call.streamui()
 
-    def drawui(self):
+    def streamui(self):
         for i in range(3):
-            yield
-            self <= Tag.my_tag(f"content{i}")
+            yield Tag.my_tag(f"content{i}")
             self.call.check( b"self.innerHTML" )
         yield
         self.clear()
@@ -30,4 +29,6 @@ def tests(client:HClient):
     client.wait(2)
     client.click('//button[text()="exit"]')
     return True
+
+
 

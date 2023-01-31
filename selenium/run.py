@@ -1,6 +1,8 @@
 import sys
 #######################################################
-from app1 import App
+import importlib
+App=importlib.import_module(sys.argv[2]).App
+#from app1 import App
 #######################################################
 import htag.runners
 runner = getattr( htag.runners, sys.argv[1])

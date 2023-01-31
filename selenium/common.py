@@ -22,3 +22,6 @@ class HClient:
     def find(self,xp:str) -> list:
         print("FIND:",xp)
         return self.driver.find_elements(By.XPATH, xp)
+
+    def wait(self,nbs):
+        time.sleep(nbs)

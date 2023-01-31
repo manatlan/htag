@@ -9,7 +9,10 @@ from selenium.webdriver.chrome.service import Service
 from common import HClient
 
 #######################################################
-import app1 as app
+# import app1 as app
+import importlib
+tests=importlib.import_module(sys.argv[2]).tests
+
 #######################################################
 
 chrome_service = Service(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install())
@@ -31,5 +34,5 @@ port = sys.argv[1]
 
 with webdriver.Chrome(service=chrome_service, options=chrome_options) as driver:
     driver.get('http://localhost:'+port)
-    x=app.tests(HClient(driver))
+    x=tests(HClient(driver))
     print(x and ">OK<" or ">KO<")
