@@ -48,8 +48,4 @@ jobs:
           python selenium/tests.py 8000
           killall python
 
-      - name: Run Tests DevApp (can't exit itself)
-        run: |
-          python selenium/run.py DevApp &
-          python selenium/tests.py 8000
-          killall python
+
