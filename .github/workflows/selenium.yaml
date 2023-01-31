@@ -3,7 +3,7 @@ name: Selenium Tests
 on:
   workflow_dispatch:
 jobs:
-  install_selenium:
+  selenium:
     runs-on: ubuntu-latest
     steps:
       - name: Check out this repo
@@ -22,11 +22,6 @@ jobs:
         run: sudo apt install -y chromium-browser
       - name: Install all necessary packages
         run: pip install webdriver-manager selenium uvicorn starlette tornado
-
-  selenium:
-    needs: install_selenium
-    runs-on: ubuntu-latest
-    steps:
       - name: Run Tests BrowserHTTP
         run: |
           python selenium/run.py BrowserHTTP &
