@@ -5,6 +5,9 @@ on:
 jobs:
   selenium:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app: [app1, app2, app3]
     steps:
       - name: Check out this repo
         uses: actions/checkout@v2
@@ -22,30 +25,30 @@ jobs:
         run: sudo apt install -y chromium-browser
       - name: Install all necessary packages
         run: pip install webdriver-manager selenium uvicorn starlette tornado
-      - name: Run Tests BrowserHTTP
+      - name: Run Tests BrowserHTTP ${{ app.version }}
         run: |
-          python selenium/run.py BrowserHTTP app1 &
-          python selenium/tests.py 8000 app1
-      - name: Run Tests BrowserStarletteHTTP
+          python selenium/run.py BrowserHTTP ${{ app.version }} &
+          python selenium/tests.py 8000 ${{ app.version }}
+      - name: Run Tests BrowserStarletteHTTP ${{ app.version }}
         run: |
-          python selenium/run.py BrowserStarletteHTTP app1 &
-          python selenium/tests.py 8000 app1
-      - name: Run Tests BrowserStarletteWS
+          python selenium/run.py BrowserStarletteHTTP ${{ app.version }} &
+          python selenium/tests.py 8000 ${{ app.version }}
+      - name: Run Tests BrowserStarletteWS ${{ app.version }}
         run: |
-          python selenium/run.py BrowserStarletteWS app1 &
-          python selenium/tests.py 8000 app1
-      - name: Run Tests BrowserTornadoHTTP
+          python selenium/run.py BrowserStarletteWS ${{ app.version }} &
+          python selenium/tests.py 8000 ${{ app.version }}
+      - name: Run Tests BrowserTornadoHTTP ${{ app.version }}
         run: |
-          python selenium/run.py BrowserTornadoHTTP app1 &
-          python selenium/tests.py 8000 app1
+          python selenium/run.py BrowserTornadoHTTP ${{ app.version }} &
+          python selenium/tests.py 8000 ${{ app.version }}
       #- name: Run Tests AndroidApp (the http side)
       #  run: |
       #    python selenium/run.py AndroidApp &
       #    python selenium/tests.py 12458
-      - name: Run Tests WebHTTP (can't exit itself)
+      - name: Run Tests WebHTTP (can't exit itself) ${{ app.version }}
         run: |
-          python selenium/run.py WebHTTP app1 &
-          python selenium/tests.py 8000 app1
+          python selenium/run.py WebHTTP ${{ app.version }} &
+          python selenium/tests.py 8000 ${{ app.version }}
           killall python
 
 
