@@ -158,7 +158,7 @@ ws.onmessage = function(e) {
         if openBrowser:
             webbrowser.open_new_tab(url)
 
-        uvicorn.run(fileapp,host=host,port=port,reload=True,debug=True)
+        uvicorn.run(fileapp,host=host,port=port,reload=True)
 
         # config = uvicorn.Config(self,host=host,port=port,reload=True,debug=True)
         # server = uvicorn.Server(config=config)
