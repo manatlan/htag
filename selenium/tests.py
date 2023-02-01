@@ -36,4 +36,10 @@ for option in options:
 with webdriver.Chrome(service=chrome_service, options=chrome_options) as driver:
     driver.get('http://localhost:'+port)
     x=hclient.testDriver(driver,tests)
-    print(x and ">OK<" or ">KO<")
+
+if x:
+    print("----> OK")
+    sys.exit(0)
+else:
+    print("----> KO")
+    sys.exit(-1)
