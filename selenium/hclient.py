@@ -32,7 +32,7 @@ class HClient:
     def wait(self,nbs):
         time.sleep(nbs)
 
-def run(App,runner:str,openBrowser=True):
+def run(App,runner:str,openBrowser=True,port=8000):
     print("App runned in",runner)
 
     if runner=="PyScript":
@@ -86,13 +86,12 @@ PyScript( App  ).run( window )
             with open("index.html","w+") as fid:
                 fid.write(content % src)
 
-            PORT = 8000
             Handler = http.server.SimpleHTTPRequestHandler
             try:
-                with socketserver.TCPServer(("", PORT), Handler) as httpd:
-                    print("serving at port", PORT)
+                with socketserver.TCPServer(("", port), Handler) as httpd:
+                    print("serving at port", port)
                     if openBrowser:
-                        webbrowser.open_new_tab(f"http://localhost:{PORT}")
+                        webbrowser.open_new_tab(f"http://localhost:{port}")
                     httpd.serve_forever()
             except Exception as e:
                 print("can't start httpd server",e)
@@ -101,10 +100,10 @@ PyScript( App  ).run( window )
             os.unlink("index.html")
     elif runner == "WebHTTP":
         from htag.runners import WebHTTP
-        WebHTTP(App).run()
+        WebHTTP(App).run(port=port)
     else:
         import htag.runners
-        getattr(htag.runners,runner)(App).run(openBrowser=openBrowser)
+        getattr(htag.runners,runner)(App).run(openBrowser=openBrowser,port=port)
 
 def test(App,runner:str, tests):
     """ for test on a local machine only """
