@@ -28,36 +28,36 @@ jobs:
       - name: Build WHL for pyscript tests
         run: poetry build
 
-      # - name: Run Tests PyScript (can't exit itself) ${{ matrix.app }}
-      #   run: |
-      #     python selenium/run.py PyScript ${{ matrix.app }} &
-      #     python selenium/tests.py 8000 ${{ matrix.app }}
-      #     killall python
-
-      - name: Run Tests BrowserHTTP ${{ matrix.app }}
+      - name: Run Tests PyScript (can't exit itself) ${{ matrix.app }}
         run: |
-          python selenium/run.py BrowserHTTP ${{ matrix.app }} &
-          python selenium/tests.py 8000 ${{ matrix.app }}
-      - name: Run Tests BrowserStarletteHTTP ${{ matrix.app }}
-        run: |
-          python selenium/run.py BrowserStarletteHTTP ${{ matrix.app }} &
-          python selenium/tests.py 8000 ${{ matrix.app }}
-      - name: Run Tests BrowserStarletteWS ${{ matrix.app }}
-        run: |
-          python selenium/run.py BrowserStarletteWS ${{ matrix.app }} &
-          python selenium/tests.py 8000 ${{ matrix.app }}
-      - name: Run Tests BrowserTornadoHTTP ${{ matrix.app }}
-        run: |
-          python selenium/run.py BrowserTornadoHTTP ${{ matrix.app }} &
-          python selenium/tests.py 8000 ${{ matrix.app }}
-      #- name: Run Tests AndroidApp (the http side)
-      #  run: |
-      #    python selenium/run.py AndroidApp &
-      #    python selenium/tests.py 12458
-      - name: Run Tests WebHTTP (can't exit itself) ${{ matrix.app }}
-        run: |
-          python selenium/run.py WebHTTP ${{ matrix.app }} &
+          python selenium/run.py PyScript ${{ matrix.app }} &
           python selenium/tests.py 8000 ${{ matrix.app }}
           killall python
+
+      # - name: Run Tests BrowserHTTP ${{ matrix.app }}
+      #   run: |
+      #     python selenium/run.py BrowserHTTP ${{ matrix.app }} &
+      #     python selenium/tests.py 8000 ${{ matrix.app }}
+
+      # - name: Run Tests BrowserStarletteHTTP ${{ matrix.app }}
+      #   run: |
+      #     python selenium/run.py BrowserStarletteHTTP ${{ matrix.app }} &
+      #     python selenium/tests.py 8000 ${{ matrix.app }}
+
+      # - name: Run Tests BrowserStarletteWS ${{ matrix.app }}
+      #   run: |
+      #     python selenium/run.py BrowserStarletteWS ${{ matrix.app }} &
+      #     python selenium/tests.py 8000 ${{ matrix.app }}
+
+      # - name: Run Tests BrowserTornadoHTTP ${{ matrix.app }}
+      #   run: |
+      #     python selenium/run.py BrowserTornadoHTTP ${{ matrix.app }} &
+      #     python selenium/tests.py 8000 ${{ matrix.app }}
+
+      # - name: Run Tests WebHTTP (can't exit itself) ${{ matrix.app }}
+      #   run: |
+      #     python selenium/run.py WebHTTP ${{ matrix.app }} &
+      #     python selenium/tests.py 8000 ${{ matrix.app }}
+      #     killall python
 
 
