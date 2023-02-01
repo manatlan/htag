@@ -37,7 +37,8 @@ Well tested:
 
 ## To have a look
 
-TODO: need to find a super demo ;-)
+Try the [https://htag.glitch.me/](DEMO), which is a real Htag App (on glitch.com), which demoing reals Htag Components (example) in live.
+
 
 ## ROADMAP to 1.0.0
 
