@@ -30,6 +30,11 @@ But yes … the promise is here : **it's a GUI toolkit for building "beautiful" 
 
 [Announcement on reddit (22/07/14)](https://www.reddit.com/r/Python/comments/vysnci/htag_a_new_gui_tookit_for_webdesktopandroid_from/)
 
+
+Well tested:
+ - Pytests on core at 99%
+ - Real [Selenium TESTS in github CI/CD](https://github.com/manatlan/htag/actions/workflows/selenium.yaml)
+
 ## To have a look
 
 TODO: need to find a super demo ;-)
@@ -60,8 +65,6 @@ and more technicals :
 - TESTS TESTS and more TESTS
 
 
-
-- tests, tests & tests !
 
 ## History
 
