@@ -27,6 +27,13 @@ jobs:
         run: pip install webdriver-manager selenium uvicorn starlette tornado poetry
       - name: Build WHL for pyscript tests
         run: poetry build
+
+      - name: Run Tests PyScript (can't exit itself) ${{ matrix.app }}
+        run: |
+          python selenium/run.py PyScript ${{ matrix.app }} &
+          python selenium/tests.py 8000 ${{ matrix.app }}
+          killall python
+
       - name: Run Tests BrowserHTTP ${{ matrix.app }}
         run: |
           python selenium/run.py BrowserHTTP ${{ matrix.app }} &
@@ -53,9 +60,4 @@ jobs:
           python selenium/tests.py 8000 ${{ matrix.app }}
           killall python
 
-      - name: Run Tests PyScript (can't exit itself) ${{ matrix.app }}
-        run: |
-          python selenium/run.py PyScript ${{ matrix.app }} &
-          python selenium/tests.py 8000 ${{ matrix.app }}
-          killall python
 
