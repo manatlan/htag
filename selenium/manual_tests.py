@@ -21,7 +21,7 @@ def run(runner,klass):
     app.run(openBrowser=False)
 
 
-import app2 as app
+import app4 as app
 from common import HClient
 from htag.runners import *
 
