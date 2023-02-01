@@ -39,6 +39,7 @@ Well tested:
 
 Try the [https://htag.glitch.me/](DEMO), which is a real Htag App (on glitch.com), which demoing reals Htag Components (example) in live.
 
+Since **htag** works in **pyscript** ... You don't need python, just HTML ;-) [see here](https://github.com/manatlan/htag/blob/main/examples/README.md).
 
 ## ROADMAP to 1.0.0
 
