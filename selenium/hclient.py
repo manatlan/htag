@@ -1,5 +1,13 @@
+##################################################################################################
+## the common framework between the github action : .github/workflows/selenium.yaml and IRL
+##################################################################################################
+
 import time
 
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+from multiprocessing import Process
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 
@@ -30,13 +38,8 @@ def run(App,runner:str,openBrowser=True):
     import htag.runners
     getattr(htag.runners,runner)(App).run(openBrowser=openBrowser)
 
-
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
-from multiprocessing import Process
-
 def test(App,runner:str, tests):
+    """ for test on a local machine only """
     Process(target=run, args=(App, runner, False)).start()
     with webdriver.Chrome() as driver:
         driver.get("http://127.0.0.1:8000/")

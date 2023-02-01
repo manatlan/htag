@@ -1,4 +1,7 @@
-# taken from https://github.com/jsoma/selenium-github-actions
+##################################################################################################
+## Run the selenium test on port 'sys.argv[1]' with the App 'sys.argv[2]'
+## used by github action : .github/workflows/selenium.yaml
+##################################################################################################
 
 import sys,os,time
 from selenium import webdriver
@@ -8,9 +11,10 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 import hclient
 
+
+import importlib
 #######################################################
 port = sys.argv[1]
-import importlib
 tests=importlib.import_module(sys.argv[2]).tests
 #######################################################
 
