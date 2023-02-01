@@ -216,15 +216,16 @@ Run your `App` (htag.Tag class), in a HTML file, like this :
 <!DOCTYPE html>
 <html>
 <head>
-    <style>py-script,py-env {display: none}</style>
-    <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <py-env>
-        - htag
-    </py-env>
+    <py-config>
+    packages = ["htag"]
+    </py-config>    
 </head>
 <body> loading pyscript ;-)
 <py-script>
+###############################################################################
 from htag import Tag
 
 class App(Tag.body):
