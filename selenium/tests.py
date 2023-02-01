@@ -6,13 +6,12 @@ from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.core.utils import ChromeType
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
-from common import HClient
+import hclient
 
 #######################################################
-# import app1 as app
+port = sys.argv[1]
 import importlib
 tests=importlib.import_module(sys.argv[2]).tests
-
 #######################################################
 
 chrome_service = Service(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install())
@@ -30,9 +29,7 @@ options = [
 for option in options:
     chrome_options.add_argument(option)
 
-port = sys.argv[1]
-
 with webdriver.Chrome(service=chrome_service, options=chrome_options) as driver:
     driver.get('http://localhost:'+port)
-    x=tests(HClient(driver))
+    x=tests(hclient.HClient(driver))
     print(x and ">OK<" or ">KO<")

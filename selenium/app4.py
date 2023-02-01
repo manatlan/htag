@@ -1,5 +1,5 @@
 import sys,os; sys.path.insert(0,os.path.join( os.path.dirname(__file__),".."))
-from common import HClient
+import hclient
 #################################################################################
 from htag import Tag
 
@@ -48,7 +48,7 @@ class App(Tag.div): # it's a component ;-)
 
 #################################################################################
 
-def tests(client:HClient):
+def tests(client:hclient.HClient):
     assert "App" in client.title
     client.click('//button[text()="a+"]')
     client.click('//button[text()="a+"]')
@@ -76,5 +76,7 @@ def tests(client:HClient):
 
     return True
 
-
+if __name__=="__main__":
+    hclient.run( App, "BrowserHTTP")
+    # hclient.test( App, "BrowserHTTP", tests)
 

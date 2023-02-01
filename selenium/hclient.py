@@ -25,3 +25,24 @@ class HClient:
 
     def wait(self,nbs):
         time.sleep(nbs)
+
+def run(App,runner:str,openBrowser=True):
+    import htag.runners
+    getattr(htag.runners,runner)(App).run(openBrowser=openBrowser)
+
+
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+from multiprocessing import Process
+
+def test(App,runner:str, tests):
+    Process(target=run, args=(App, runner, False)).start()
+    with webdriver.Chrome() as driver:
+        driver.get("http://127.0.0.1:8000/")
+        x=tests( HClient(driver) )
+        print("-->",x and "OK" or "KO")
+
+
+
+
