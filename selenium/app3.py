@@ -1,6 +1,7 @@
 import sys,os; sys.path.insert(0,os.path.join( os.path.dirname(__file__),".."))
 import hclient
 #################################################################################
+#<code>
 from htag import Tag
 
 class App(Tag.div):
@@ -22,7 +23,8 @@ class App(Tag.div):
     def check(self,innerhtml):
         assert self.innerHTML == innerhtml
 
-#################################################################################
+#</code>
+# #################################################################################
 
 def tests(client:hclient.HClient):
     assert "App" in client.title
@@ -32,5 +34,7 @@ def tests(client:hclient.HClient):
 
 
 if __name__=="__main__":
+    # hclient.run( App, "PyScript")
     # hclient.run( App, "BrowserHTTP")
-    hclient.test( App, "BrowserHTTP", tests)
+    # hclient.test( App, "BrowserHTTP", tests)
+    hclient.test( App, "PyScript", tests)

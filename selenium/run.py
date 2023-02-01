@@ -8,11 +8,5 @@ import sys,importlib
 runner = sys.argv[1]
 App=importlib.import_module(sys.argv[2]).App
 #######################################################
-import htag.runners
-
-runner = getattr( htag.runners, runner)
-app=runner(App)
-if runner in [htag.runners.AndroidApp,htag.runners.WebHTTP,]:
-    app.run()
-else:
-    app.run( openBrowser=False )
+import hclient
+hclient.run( App, runner, openBrowser=False)

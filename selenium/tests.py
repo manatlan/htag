@@ -35,5 +35,5 @@ for option in options:
 
 with webdriver.Chrome(service=chrome_service, options=chrome_options) as driver:
     driver.get('http://localhost:'+port)
-    x=tests(hclient.HClient(driver))
+    x=hclient.testDriver(driver,tests)
     print(x and ">OK<" or ">KO<")

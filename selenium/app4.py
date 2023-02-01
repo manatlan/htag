@@ -1,7 +1,10 @@
 import sys,os; sys.path.insert(0,os.path.join( os.path.dirname(__file__),".."))
 import hclient
 #################################################################################
+#<code>
 from htag import Tag
+
+STAR = "&#9734;"
 
 class Stars(Tag.span): # it's a component ;-)
     def init(self,name,value=0):
@@ -14,7 +17,7 @@ class Stars(Tag.span): # it's a component ;-)
     def inc(self,v):
         self.value+=v
     def render(self):
-        self += self.bless + self.bmore + ("⭐"*self.value)
+        self += self.bless + self.bmore + (STAR*self.value)
 #------------------------------------------------------------
 
 class App(Tag.div): # it's a component ;-)
@@ -28,7 +31,7 @@ class App(Tag.div): # it's a component ;-)
         self.s2= Stars("b",2)
         self.s3= Stars("c",4)
         self.reset= Tag.Button( "Reset", _onclick = self.clickreset )
-        self.show = Tag.div()
+        self.show = Tag.div(_class="show")
         self.exiter = Tag.button("exit",_onclick = lambda o: self.exit())
 
 
@@ -45,7 +48,7 @@ class App(Tag.div): # it's a component ;-)
         self.s2.value=0
         self.s3.value=0
 
-
+#</code>
 #################################################################################
 
 def tests(client:hclient.HClient):
@@ -57,26 +60,27 @@ def tests(client:hclient.HClient):
     client.click('//button[text()="b+"]')
     client.click('//button[text()="b+"]')
 
-    values=client.find('//div')[0]
-
+    values=client.find("//div[@class='show']")[0]
     assert values.text == "Values: 4,4,4"
-    assert client.find("//span[@class='a']")[0].text.count("⭐")==4
-    assert client.find("//span[@class='b']")[0].text.count("⭐")==4
-    assert client.find("//span[@class='c']")[0].text.count("⭐")==4
+    assert client.find("//span[@class='a']")[0].text.count("☆")==4
+    assert client.find("//span[@class='b']")[0].text.count("☆")==4
+    assert client.find("//span[@class='c']")[0].text.count("☆")==4
 
     client.click('//button[text()="Reset"]')
 
-    values=client.find('//div')[0]
+    values=client.find("//div[@class='show']")[0]
     assert values.text == "Values: 0,0,0"
-    assert client.find("//span[@class='a']")[0].text.count("⭐")==0
-    assert client.find("//span[@class='b']")[0].text.count("⭐")==0
-    assert client.find("//span[@class='c']")[0].text.count("⭐")==0
+    assert client.find("//span[@class='a']")[0].text.count("☆")==0
+    assert client.find("//span[@class='b']")[0].text.count("☆")==0
+    assert client.find("//span[@class='c']")[0].text.count("☆")==0
 
     client.click('//button[text()="exit"]')
 
     return True
 
 if __name__=="__main__":
-    hclient.run( App, "BrowserHTTP")
+    # hclient.run( App, "PyScript")
+    #hclient.run( App, "BrowserHTTP")
+    hclient.test( App, "PyScript", tests)
     # hclient.test( App, "BrowserHTTP", tests)
 

@@ -1,6 +1,7 @@
 import sys,os; sys.path.insert(0,os.path.join( os.path.dirname(__file__),".."))
 import hclient
 #################################################################################
+#<code>
 from htag import Tag
 
 class App(Tag.body):
@@ -11,6 +12,7 @@ class App(Tag.body):
         self<= Tag.button("click",_onclick = say_hello)
         self<= Tag.button("exit",_onclick = lambda o: self.exit())
 
+#</code>
 #################################################################################
 
 def tests(client:hclient.HClient):
@@ -26,5 +28,6 @@ def tests(client:hclient.HClient):
     return True
 
 if __name__=="__main__":
-    # hclient.run( App, "BrowserHTTP")
-    hclient.test( App, "BrowserHTTP", tests)
+    # hclient.run( App, "PyScript")
+    # hclient.test( App, "BrowserHTTP", tests)
+    hclient.test( App, "PyScript", tests)
