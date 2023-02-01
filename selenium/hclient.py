@@ -8,8 +8,6 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from multiprocessing import Process
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
 
 class HClient:
     def __init__(self,driver):
