@@ -89,7 +89,7 @@ class PyEditor(Tag.body):
         self <= Tag.div(self.ed+self.iframe,_style="display:flex;height:100vh")
         
     def preview(self,o):
-        code = o.value
+        code = o.value.strip()
         self.iframe["src"]= dataurl( PYS % code )
     
 ###############################################################################
