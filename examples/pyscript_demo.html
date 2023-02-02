@@ -54,7 +54,8 @@ self.ed.commands.addCommand({
         self.value = value
         if self.onchange: self.onchange(self)
 
-SRC="""from htag import Tag
+SRC="""
+from htag import Tag
 
 class App(Tag.body):
     def init(self):
