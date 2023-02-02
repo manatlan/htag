@@ -72,7 +72,7 @@ assert isinstance(PYS,str)
 DOC="""<p><b>Press CTRL+S to save/preview !!</b></p>
 <p><i> The main HTag's Tag should be named <b>App</b></i></p>"""
 
-dataurl = lambda html: "data:text/html,"+urllib.parse.quote(html)
+dataurl = lambda html: "data:text/html,"+urllib.parse.quote( "\n".join( [i.rstrip('\r\n') for i in html.splitlines()] ) )
 
 class PyEditor(Tag.body):
     statics = [
