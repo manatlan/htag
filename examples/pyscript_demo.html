@@ -91,7 +91,7 @@ class PyEditor(Tag.body):
     def preview(self,o):
         code = o.value.strip()
         ### self.iframe["src"]= dataurl( PYS % code )
-        self.call( "alert(`%s`)" % (PYS % code) )
+        self.call( "alert(`%s`)" % PYS )
     
 ###############################################################################
 from htag.runners import PyScript
