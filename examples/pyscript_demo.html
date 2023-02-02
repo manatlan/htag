@@ -17,11 +17,11 @@ import urllib.parse
 class Ed(Tag.div):
     """ A class which embed the ace editor (python syntax) """
     statics = [
-        Tag.script(_src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ace.js"),
-        Tag.script(_src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/mode-python.js"),
-        Tag.script(_src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/theme-cobalt.js"),
-        Tag.script(_src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ext-searchbox.js"),
-        Tag.script(_src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ext-language_tools.js"),
+        Tag.script(_src="//cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ace.js"),
+        Tag.script(_src="//cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/mode-python.js"),
+        Tag.script(_src="//cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/theme-cobalt.js"),
+        Tag.script(_src="//cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ext-searchbox.js"),
+        Tag.script(_src="//cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ext-language_tools.js"),
     ]
         
     def __init__(self,value,width="100%",height="100%",mode="python",onchange=None):
@@ -33,24 +33,24 @@ class Ed(Tag.div):
         self.onchange=onchange
     
         self.js = """
-tag.ed=ace.edit( "%s" );
-tag.ed.setTheme("ace/theme/cobalt");
-tag.ed.session.setMode("ace/mode/%s");
-tag.ed.session.setUseWrapMode(false);
-tag.ed.setOptions({"fontSize": "12pt"});
-tag.ed.setBehavioursEnabled(false);
-tag.ed.session.setUseWorker(false);
-tag.ed.getSession().setUseSoftTabs(true);
+self.ed=ace.edit( "%s" );
+self.ed.setTheme("ace/theme/cobalt");
+self.ed.session.setMode("ace/mode/%s");
+self.ed.session.setUseWrapMode(false);
+self.ed.setOptions({"fontSize": "11pt"});
+self.ed.setBehavioursEnabled(false);
+self.ed.session.setUseWorker(false);
+self.ed.getSession().setUseSoftTabs(true);
 
 function commandSave () {%s}
 
-tag.ed.commands.addCommand({
+self.ed.commands.addCommand({
     name: "commandSave",
     bindKey: {"win": "Ctrl-S",  "mac": "Command-S"},
     readOnly: "True",
     exec: commandSave,
 })
-""" % (id(oed),mode, self.bind._save( b"tag.ed.getValue()"))
+""" % (id(oed),mode, self.bind._save( b"self.ed.getValue()"))
 
     def _save(self,value):
         self.value = value
