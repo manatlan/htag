@@ -5,6 +5,11 @@
     <script defer src="https://pyscript.net/latest/pyscript.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <py-config>packages = ["htag==0.9.22"]</py-config>    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ace.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/mode-python.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/theme-cobalt.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ext-searchbox.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ext-language_tools.js"></script>
 </head>
 
 <body> Loading DEMO ;-)
@@ -69,11 +74,6 @@ dataurl = lambda html: "data:text/html,"+urllib.parse.quote(html)
 class PyEditor(Tag.body):
     statics = [
         Tag.style("html, body {width:100%;height:100%;margin:0px}"),
-        Tag.script(_src="//cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ace.js"),
-        Tag.script(_src="//cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/mode-python.js"),
-        Tag.script(_src="//cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/theme-cobalt.js"),
-        Tag.script(_src="//cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ext-searchbox.js"),
-        Tag.script(_src="//cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ext-language_tools.js"),
     ]
     
     def init(self):
