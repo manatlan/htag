@@ -46,6 +46,20 @@ This kind of interaction is called "direct" : the callback is directly called du
     ```
     The method `<instance>.bind( method, **args, **kargs )` is the natural way to bind an "event", in all cases. 
 
+BTW, I think it's a good practice to not poluate the inner namespaces of the instance, by declaring methods which has only one client. Here we could do:
+(as is, you keep your code more consistant, and less confusing)
+```python
+from htag import Tag
+
+class App(Tag.body):
+    def init(self):
+    
+        def clicked(object_which_has_emitted_the_event):
+            print( object_which_has_emitted_the_event )
+            
+        self += Tag.button("click", _onclick=clicked)
+```
+
 ## Pass arguments (in 'direct' calls)
 
 If you want to pass arguments : a really good practice is to set them on the instance of the object, and get back in the callback.
@@ -94,7 +108,7 @@ This kind of form is needed when you want to send back _javascript values_
 
 Example : if you want to get back an input value in real time
 
-using the _b'trick_, to ask **htag** to get a javascript statement.
+using the _b'trick_, to ask **htag** to get a javascript statement. This trick let you declare statements (as byte string) which will be interpreted as a "javascript statement". It's really handy to interact easily, in bind methods only.
 
 ```python
 class App(Tag.body):
@@ -193,7 +207,7 @@ The 'method' must be declared on self instance. It's a lot simpler, but a lot le
 
 By opposite, the `<instance>.bind( <method>, *args, **kargs)` return a Caller Object, which is rendered as a string (javascript statement). This second form is more versatile, because you can bind any python/callback method. And build better abstractions/components. **But sometimes, you'll need to bind a real binded method ... which is not possible in some cases with this second form (during construction phases)**
 
-**BE AWARE** : if you are in a construction phase (`init(self)` or `__init__(self)`). New mechanisms (`<instance>.bind( <method>, *args, **kargs)`) can't work, because, at this time, we don't know the parent/root of the instance ;-()
+**BE AWARE** : if you are in a construction phase (`init(self)` or `__init__(self)`). New mechanisms (`<instance>.bind( <method>, *args, **kargs)`) can't work, because, at this time, in many cases, we don't know the parent/root of the instance ;-()
 
 In that cases, the `<instance>.bind.<method>(*args,**kargs)` give better results.
 
