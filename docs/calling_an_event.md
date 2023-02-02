@@ -33,7 +33,7 @@ class App(Tag.body):
 
 The `_onclick` parameter declares the callback on the "onclick" event of the button.
 When you click the button, htag will emit an "interaction" between the GUI/client_side and the back/serverside/your_python_code.
-The first, and only argument, is the instance of the object which has emitted the event.
+In the callback : the first, and only argument, is the instance of the object which has emitted the event.
 
 This kind of interaction is called "direct" : the callback is directly called during the interaction.
 
@@ -44,6 +44,7 @@ This kind of interaction is called "direct" : the callback is directly called du
             button["onclick"]=button.bind( self.clicked ) # declare event, post button construction
             self += button
     ```
+    The method `<instance>.bind( method, **args, **kargs )` is the natural way to bind an "event", in all cases. 
 
 ## Pass arguments (in 'direct' calls)
 
@@ -64,6 +65,8 @@ class App(Tag.body):
 It's a really good practice to adopt this kind of technics, for 95% of your events, and you keep your code simple and conscise.
 
 ## Pass arguments, using the "bind" (in 'direct' calls)
+
+As seen before, the method `<instance>.bind( method, **args, **kargs )` can make a lot for you.
 
 You could do :
 
@@ -185,16 +188,14 @@ class App(Tag.body):
     def clicked(self, txt):
         print( txt )
 ```
-The `self.bind.<method>(*args,**kargs)` return a string (a javascript statement to do an interaction).
+The `<instance>.bind.<method>(*args,**kargs)` return a string (a javascript statement to do an interaction).
 The 'method' must be declared on self instance. It's a lot simpler, but a lot less powerful.
 
 By opposite, the `<instance>.bind( <method>, *args, **kargs)` return a Caller Object, which is rendered as a string (javascript statement). This second form is more versatile, because you can bind any python/callback method. And build better abstractions/components. **But sometimes, you'll need to bind a real binded method ... which is not possible in some cases with this second form (during construction phases)**
 
-You should prefer/use this second form. Because the `self.bind.<method>(*args,**kargs)` is deprecated, and could disappear one day.
-In all cases, this old form will be in htag 1.0.0 !
+**BE AWARE** : if you are in a construction phase (`init(self)` or `__init__(self)`). New mechanisms (`<instance>.bind( <method>, *args, **kargs)`) can't work, because, at this time, we don't know the parent/root of the instance ;-()
 
-But if you are in construction phase (`init(self)` or `__init__(self)`). New mechanisms (`<instance>.bind( <method>, *args, **kargs)`) can't work, because we don't know the parent/root ;-(
-(will try to make it work, but not possible currently)
+In that cases, the `<instance>.bind.<method>(*args,**kargs)` give better results.
 
 ## The Caller object
 
@@ -243,7 +244,7 @@ class App(Tag.div):
 
 So, every time the Tag 'App' is rendered, it creates an input field, and take the focus (`self` is a special js var, in this context, to quickly access to the input element)
 
-**For versions > 0.9.13** : `tag` is now deprecated in favor of `self`. You can use both, to refer to the js/nodeElement of the tag, but prefer to use `self` ;-)
+**For versions <= 0.9.13** : the `self` was named `tag` (which works too, but is now deprecated in favor of `self`). You can use both, to refer to the js/nodeElement of the tag, but prefer to use `self` ;-)
 
 Another approach could be :
 
@@ -262,17 +263,16 @@ Here is an example :
 ```python
 class App(Tag.body):
     def init(self):
-        # self.js = self.bind( self.starting , b'window.innerWidth') # doesn't work currently
         self.js = self.bind.starting( b'window.innerWidth' )
 
     def starting(self,width):
         print("innerWidth",width)
 ```
-Currently, only the "old form" works ;-( ... the newest `self.bind( <method>, *args, **kargs)` can't, but ,will try to fix that before 1.0.0. And it's the only main reason why the old form is still there ;-(
+As seen before, the newest `<instance>.bind( <method>, *args, **kargs)` couldn't be used for this purpose. Keep in mind, that this form should be used in binding events (because it needs to be "attached" in the dom tree)
 
 ## Others ways (using `Tag.call` method)
 
-Each htag's Tag instance got a a `call(js)` method to send an UNIQUE custom js statements during an interaction.
+Each htag's Tag instance got a a `<instance>.call(js)` method to send an UNIQUE custom js statements during an interaction.
 
 It's a little weird here. But it's really important to understand the difference between `self.js="js_statement()"` and `self.call("js_statement()")`.
 
@@ -301,8 +301,7 @@ class App(Tag.body):
     def starting(self,width):
         print("innerWidth",width)
 ```
-
-Concerning the use of the "old form" vs "the newest" : same remarks ! (only the old form currently ;-()
+Here : `self.call.starting( b'window.innerWidth' )` is the short form for `self.call( self.bind.starting( b'window.innerWidth' ) )`, it's exactly the same !
 
 **IMPORTANT** : 
 The last 2 examples are BAD PRACTICE, because the `self.call` (during construction phase) can only work when it's in the main tag (which is managed by the Runner (TODO:link)). If it was in an `init` from a component : it can't work (because we don't know the parent/root at this time). The good practice is DON'T USE `self.call` IN A CONSTRUCTOR (prefer `self.js`)
