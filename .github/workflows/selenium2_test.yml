@@ -1,5 +1,5 @@
 # taken from https://github.com/jsoma/selenium-github-actions
-name: Selenium GUI Tests
+name: Selenium GUI Tests2
 on:
   workflow_dispatch:
 jobs:
