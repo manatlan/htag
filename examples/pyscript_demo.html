@@ -72,7 +72,7 @@ DOC="""<p><b>Press CTRL+S to save/preview !!</b></p>
 <p><i> The main HTag's Tag should be named <b>App</b></i></p>"""
 
 dataurl = lambda html: "data:text/html,"+urllib.parse.quote( html )
-
+clean=lambda t: "\n".join( [i.strip("\r\n") for i in t.splitlines()] )
 class PyEditor(Tag.body):
     statics = [
         Tag.style("html, body {width:100%;height:100%;margin:0px}"),
@@ -91,7 +91,7 @@ class PyEditor(Tag.body):
     def preview(self,o):
         code = o.value.strip()
         ### self.iframe["src"]= dataurl( PYS % code )
-        self.call( "alert(`%s`)" % PYS )
+        self.call( "alert(`%s`)" % clean(PYS) )
     
 ###############################################################################
 from htag.runners import PyScript
