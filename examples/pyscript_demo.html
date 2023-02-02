@@ -86,15 +86,13 @@ class PyEditor(Tag.body):
             _style="width:100%;height:100%",
         )
         
-        self.iframe=Tag.pre()
-
         # draw ui
         self <= Tag.div(self.ed+self.iframe,_style="display:flex;height:100vh")
         
     def preview(self,o):
         code = o.value.strip()
         #self.iframe["src"]= dataurl( PYS % code )
-        self.iframe.set( PYS % code )
+        self.call( "alert(`%s`)" % (PYS % code) )
     
 ###############################################################################
 from htag.runners import PyScript
