@@ -41,6 +41,8 @@ Try the [https://htag.glitch.me/](DEMO), which is a real Htag App (on glitch.com
 
 Since **htag** works in **pyscript** ... You don't need python, just HTML ;-) [see here](https://github.com/manatlan/htag/blob/main/examples/README.md).
 
+And here is a [Htag/Pyscript DEMO](https://raw.githack.com/manatlan/htag/main/examples/pyscript_demo.html), where you can try/code a htag's app, and try/run it in a pyscript context ! (It's a simple html file, nor server or python is involved here ! Just HTML)
+
 ## ROADMAP to 1.0.0
 
  * rock solid (need more tests)
