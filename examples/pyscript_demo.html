@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <py-config>
+    packages = ["htag==0.9.22"]
+    </py-config>    
+</head>
+
+<body> Loading DEMO ;-)
+
+<py-script>
+###############################################################################
+from htag import Tag
+import urllib.parse
+
+class Ed(Tag.div):
+    """ A class which embed the ace editor (python syntax) """
+    statics = [
+        Tag.script(_src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ace.js"),
+        Tag.script(_src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/mode-python.js"),
+        Tag.script(_src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/theme-cobalt.js"),
+        Tag.script(_src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ext-searchbox.js"),
+        Tag.script(_src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ext-language_tools.js"),
+    ]
+        
+    def __init__(self,value,width="100%",height="100%",mode="python",onchange=None):
+        self.value = value
+        super().__init__(_style="width:%s;height:%s;" % (width,height))
+        
+        oed=Tag.div(self.value,_style="width:100%;height:100%;min-height:20px;")
+        self <= oed
+        self.onchange=onchange
+    
+        self.js = """
+tag.ed=ace.edit( "%s" );
+tag.ed.setTheme("ace/theme/cobalt");
+tag.ed.session.setMode("ace/mode/%s");
+tag.ed.session.setUseWrapMode(false);
+tag.ed.setOptions({"fontSize": "12pt"});
+tag.ed.setBehavioursEnabled(false);
+tag.ed.session.setUseWorker(false);
+tag.ed.getSession().setUseSoftTabs(true);
+
+function commandSave () {%s}
+
+tag.ed.commands.addCommand({
+    name: "commandSave",
+    bindKey: {"win": "Ctrl-S",  "mac": "Command-S"},
+    readOnly: "True",
+    exec: commandSave,
+})
+""" % (id(oed),mode, self.bind._save( b"tag.ed.getValue()"))
+
+    def _save(self,value):
+        self.value = value
+        if self.onchange: self.onchange(self)
+
+SRC="""from htag import Tag
+
+class App(Tag.body):
+    def init(self):
+        def say_hello(o):
+            self <= Tag.li("hello")
+        self <= Tag.button("click",_onclick = say_hello)
+        
+"""
+
+PYS="""
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <py-config>
+    packages = ["htag==0.9.22"]
+    </py-config>    
+</head>
+
+<body>
+<py-script>
+###############################################################################
+%s
+###############################################################################
+from htag.runners import PyScript
+from js import window
+
+PyScript( App  ).run( window )
+
+</py-script>
+</body>
+</html>
+"""
+
+DOC="""<p><b>Press CTRL+S to save/preview</b></p>
+<p><i> The main HTag's Tag should be named <b>App</b></i></p>"""
+
+dataurl = lambda html: "data:text/html,"+urllib.parse.quote(html)
+
+class App(Tag.body):
+    statics="html, body {width:100%;height:100%;margin:0px}"
+    
+    imports=Ed
+
+    def init(self):
+        self.ed = Ed(SRC, onchange=self.preview)
+        self.iframe = Tag.iframe(
+            _src=dataurl(DOC),
+            _style="width:100%;height:100%",
+        )
+        
+        # draw ui
+        self <= Tag.div(self.ed+self.iframe,_style="display:flex;height:100vh")
+        
+    def preview(self,o):
+        code = o.value
+        self.iframe["src"]= dataurl( PYS % code )
+    
+###############################################################################
+from htag.runners import PyScript
+from js import window
+
+PyScript( App ).run( window )
+
+</py-script>
+</body>
+</html>
