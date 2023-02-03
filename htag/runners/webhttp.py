@@ -84,7 +84,7 @@ class WebHTTP(Starlette):
             assert type(init[1])==dict
 
         hr = self.instanciate(htuid, klass, init , renew)
-        
+
         r = HTMLResponse( str(hr) )
         r.set_cookie("htuid",htuid,path="/")
         return r
@@ -110,12 +110,12 @@ class WebHTTP(Starlette):
 
                 window.addEventListener('DOMContentLoaded', start );
             """ % sesid
-            
-            # create a session property on the future main tag instance
-            klass.session = self.sessions.get_ses(htuid)["session"]
-            
+
+
             hr=HRenderer(klass, js, init=init ) # NO EXIT !!
 
+            # create a session property on the future main tag instance
+            hr.tag.session = self.sessions.get_ses(htuid)["session"]
 
         # update session info
         self.sessions.set_hr( sesid, hr)
