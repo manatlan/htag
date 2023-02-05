@@ -52,11 +52,11 @@ class HRSessions:
 
     def del_hr(self,fqn:str) -> bool:
         """ delete the fqn """
-        try:
-            hr=self.get_hr(fqn)
-            hr.tag.session.clear()
-        except:
-            pass
+        #try:
+        #    hr=self.get_hr(fqn)
+        #    hr.tag.session.clear()
+        #except:
+        #    pass
         try:
             del self._data[ fqn ]
             return True
