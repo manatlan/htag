@@ -1,4 +1,4 @@
-import pytest
+import pytest,time
 import importlib
 from htag import Tag
 
@@ -68,40 +68,27 @@ def test_url2ak():
     assert commons.url2ak("http://jojo.com/?1%202&kiki&a=3&b=5&b=6#yolo") == (('1 2', 'kiki'), {'a': '3', 'b': '6'})
 
 
-def test_session():
-    s=commons.Sessions()
-    # assert in all case, it returns a dict {apps,session}
-    x=s.get_ses("guid1")
-    assert x["apps"]=={}        # its running apps
-    assert x["session"]=={}     # its session dict
+def test_webhttp_session_hr():
+    s=commons.HRSessions()
+    assert len(s._data)==0
 
-    # test base concept of session
-    x["session"]["my_var"]="hello"
+    fqn1="fqn1"
 
-    x=s.get_ses("guid2")
-    assert x["session"]=={}
+    s.set_hr( fqn1, "hr1" )
+    assert s.get_hr(fqn1) == "hr1"
+    assert s.del_hr( fqn1)
+    assert not s.del_hr( fqn1)
+    assert s.get_hr(fqn1) == None
 
-    x=s.get_ses("guid1")
-    assert "my_var" in x["session"]
+    assert len(s._data)==0
 
-def test_session_apps():
-    s=commons.Sessions()
+    s.set_hr( fqn1, "hr1" )
+    assert s.purge(1)==0
+    time.sleep(2)
+    assert s.purge(1)==1
+    assert len(s._data)==0
 
-    s.set_hr( "fqn1|guid", "hr1")
-
-    assert s.htuids == ["guid"]
-    assert s.sesids == ["fqn1|guid"]
-
-    s.set_hr( "fqn2|guid", "hr2")
-
-    assert s.htuids == ["guid"]
-    assert s.sesids == ["fqn1|guid","fqn2|guid"]
-
-    assert s.del_hr( "fqn?|guid")==False
-    assert s.del_hr( "fqn2|guid")==True
-
-    assert s.htuids == ["guid"]
-    assert s.sesids == ["fqn1|guid"]
 
 if __name__=="__main__":
-    test_default()
+    #test_default()
+    test_webhttp_session_hr()

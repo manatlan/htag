@@ -88,12 +88,10 @@ class WebHTTP(Starlette):
 
     def instanciate(self, request, klass, init, renew) -> HRenderer:
         """ get|create an instance of `klass` for user session """
-        hrsessions:commons.HRSessions = request.session.get("HRSessions", commons.HRSessions())
-
         fqn = QN(klass)
 
         logger.info("intanciate : renew=%s",renew)
-        hr=hrsessions.get_hr( fqn )
+        hr=self.sessions.get_hr( fqn )
         if renew==False and hr and hr.init == init:
             # same url (same klass/params), same htuid -> same instance
             logger.info("intanciate : Reuse Renderer %s ",fqn)
@@ -114,10 +112,7 @@ class WebHTTP(Starlette):
             hr.tag.session = request.session
 
         # update session info
-        hrsessions.set_hr( fqn, hr)
-
-        # set back the hrsession in real session
-        request.session["HRSessions"]=hrsessions
+        self.sessions.set_hr( fqn, hr)
 
         return hr
 
@@ -125,7 +120,7 @@ class WebHTTP(Starlette):
     async def POST(self,request) -> Response:
         fqn=request.path_params.get('fqn',None)
 
-        hr=request.session["HRSessions"].get_hr(fqn)
+        hr=self.sessions.get_hr(fqn)
         if hr:
             logger.info("INTERACT WITH %s",fqn)
             data=await request.json()
