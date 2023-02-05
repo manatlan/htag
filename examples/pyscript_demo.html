@@ -78,8 +78,8 @@ class PyEditor(Tag.body):
         Tag.style("html, body {width:100%;height:100%;margin:0px}"),
     ]
     
-    def init(self):
-        self.ed = Ed(SRC, onchange=self.preview)
+    def init(self,code:str=""):
+        self.ed = Ed(code or SRC, onchange=self.preview)
         self.iframe = Tag.iframe(
             _src=dataurl(DOC),
             _style="width:100%;height:100%",
