@@ -40,7 +40,7 @@ class App(Tag.body):
 
 from htag import Tag
 from htag.render import HRenderer
-from htag.runners import common
+from htag.runners import commons
 
 import os
 
@@ -93,7 +93,7 @@ class SecretApp(Starlette):
         ])
 
     def instanciate(self,url:str):
-        init = common.url2ak(url)
+        init = commons.url2ak(url)
         if self.hrenderer and self.hrenderer.init == init:
             return self.hrenderer
 

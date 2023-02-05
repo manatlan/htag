@@ -9,7 +9,7 @@
 
 from .. import Tag
 from ..render import HRenderer
-from . import common
+from . import commons
 
 import os,json,sys,asyncio
 from starlette.applications import Starlette
@@ -123,7 +123,7 @@ ws.onmessage = function(e) {
         if init is None:
             # no init params
             # so we take thoses from the url
-            init = common.url2ak( str(request.url) )
+            init = commons.url2ak( str(request.url) )
         else:
             assert type(init)==tuple
             assert type(init[0])==tuple

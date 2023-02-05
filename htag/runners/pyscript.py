@@ -9,7 +9,7 @@
 
 from .. import Tag
 from ..render import HRenderer
-from . import common
+from . import commons
 
 import json
 
@@ -25,7 +25,7 @@ class PyScript:
 interact=async function(o) {
  action( await window.interactions( JSON.stringify(o) ) );
 }"""
-        self.hr = HRenderer(self.tagClass, js, init=common.url2ak( window.document.location.href ))
+        self.hr = HRenderer(self.tagClass, js, init=commons.url2ak( window.document.location.href ))
 
         window.interactions = self.interactions
         assert window.document.head, "No <head> in <html>"

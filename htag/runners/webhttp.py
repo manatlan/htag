@@ -9,15 +9,15 @@
 
 from .. import Tag
 from ..render import HRenderer
-from . import common
+from . import commons
 
 
 
 """ REAL WEB http,
 - .exit() has no effect ;-)
-- can handle multiple client (with htuid cookie)
+- can handle multiple client (with request.session/starlette (see commons.htagsession))
 - can handle multiple "tag class", and brings query_params as "query_params:dict" when instanciate tag
-- the session are purged automatically after timeout/5m of inactivity
+- the hr session are purged automatically after timeout/5m of inactivity
 - "http get query_params" are passed at Tag'init, if it accepts a query_params:dict param. (needed for https://htag.glitch.me)
 - the main root is setable with path parameter (default: "/")
 - add renew (bool) parametter on .serve() (and instanciate), to force renewal in all cases.
@@ -43,15 +43,16 @@ class WebHTTP(Starlette):
     """
     def __init__(self,tagClass:type=None, timeout=5*60):
         if tagClass: assert issubclass(tagClass,Tag)
-        self.sessions=common.Sessions()
+        self.sessions=commons.HRSessions()
         self.tagClass=tagClass
         self.timeout=timeout
 
-        routes=[ Route('/{sesid}',   self.POST,  methods=["POST"]) ]
+        routes=[ Route('/{fqn}',   self.POST,  methods=["POST"]) ]
         if tagClass:
             routes.append( Route("/",   self.GET,   methods=["GET"]) )
 
         Starlette.__init__(self,debug=True, routes=routes, on_startup=[self._purgeSessions])
+        Starlette.add_middleware(self,commons.HtagSession)
 
     async def _purgeSessions(self):
 
@@ -72,63 +73,61 @@ class WebHTTP(Starlette):
 
         return an htmlresponse (htag init page to start all)
         """
-        htuid = request.cookies.get('htuid') or str(uuid.uuid4())
-
         if init is None:
             # no init params
             # so we take thoses from the url
-            init = common.url2ak( str(request.url) )
+            init = commons.url2ak( str(request.url) )
         else:
             assert type(init)==tuple
             assert type(init[0])==tuple
             assert type(init[1])==dict
 
-        hr = self.instanciate(htuid, klass, init , renew)
+        hr = self.instanciate(request, klass, init , renew)
 
-        r = HTMLResponse( str(hr) )
-        r.set_cookie("htuid",htuid,path="/")
-        return r
+        return HTMLResponse( str(hr) )
 
-    def instanciate(self, htuid, klass, init, renew) -> HRenderer:
-        """ get|create an instance of `klass` for user session `htuid`
-        (get|save it into self.sessions)
-        """
-        sesid = f"{QN(klass)}|{htuid}"   # there can be only one instance of klass, at a time !
+    def instanciate(self, request, klass, init, renew) -> HRenderer:
+        """ get|create an instance of `klass` for user session """
+        hrsessions:commons.HRSessions = request.session.get("HRSessions", commons.HRSessions())
+
+        fqn = QN(klass)
 
         logger.info("intanciate : renew=%s",renew)
-        hr=self.sessions.get_hr( sesid )
+        hr=hrsessions.get_hr( fqn )
         if renew==False and hr and hr.init == init:
             # same url (same klass/params), same htuid -> same instance
-            logger.info("intanciate : Reuse Renderer %s for %s",QN(klass),sesid)
+            logger.info("intanciate : Reuse Renderer %s ",fqn)
         else:
             # url has changed ... recreate an instance
-            logger.info("intanciate : Create Renderer %s for %s",QN(klass),sesid)
+            logger.info("intanciate : Create Renderer %s",fqn)
             js = """
                 async function interact( o ) {
                     action( await (await window.fetch("/%s",{method:"POST", body:JSON.stringify(o)})).text() )
                 }
 
                 window.addEventListener('DOMContentLoaded', start );
-            """ % sesid
-
+            """ % fqn
 
             hr=HRenderer(klass, js, init=init ) # NO EXIT !!
 
             # create a session property on the future main tag instance
-            hr.tag.session = self.sessions.get_ses(htuid)["session"]
+            hr.tag.session = request.session
 
         # update session info
-        self.sessions.set_hr( sesid, hr)
+        hrsessions.set_hr( fqn, hr)
+
+        # set back the hrsession in real session
+        request.session["HRSessions"]=hrsessions
 
         return hr
 
 
     async def POST(self,request) -> Response:
-        sesid=request.path_params.get('sesid',None)
+        fqn=request.path_params.get('fqn',None)
 
-        hr=self.sessions.get_hr(sesid)
+        hr=request.session["HRSessions"].get_hr(fqn)
         if hr:
-            logger.info("INTERACT WITH SESSION %s",sesid)
+            logger.info("INTERACT WITH %s",fqn)
             data=await request.json()
             actions = await hr.interact(data["id"],data["method"],data["args"],data["kargs"],data["event"])
             return JSONResponse(actions)

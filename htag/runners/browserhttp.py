@@ -9,7 +9,7 @@
 
 from .. import Tag
 from ..render import HRenderer
-from . import common
+from . import commons
 
 import asyncio
 import socket
@@ -31,7 +31,7 @@ class BrowserHTTP:
         self.tagClass=tagClass
 
     def instanciate(self,url:str):
-        init = common.url2ak(url)
+        init = commons.url2ak(url)
         if self.hrenderer and self.hrenderer.init == init:
             return self.hrenderer
 

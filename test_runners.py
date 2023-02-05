@@ -39,37 +39,37 @@ def test_a_runner( my_runner ):
         print("can't test %s" % my_runner)
 
 
-from htag.runners import common
+from htag.runners import commons
 
 
 def test_url2ak():
-    assert common.url2ak("") == ( (),{} )
-    assert common.url2ak("http://jojo.com/") == ( (),{} )
-    assert common.url2ak("http://jojo.com/?") == ( (),{} )
-    assert common.url2ak("http://jojo.com/???") == ( ("??",),{} )
+    assert commons.url2ak("") == ( (),{} )
+    assert commons.url2ak("http://jojo.com/") == ( (),{} )
+    assert commons.url2ak("http://jojo.com/?") == ( (),{} )
+    assert commons.url2ak("http://jojo.com/???") == ( ("??",),{} )
 
-    assert common.url2ak("http://jojo.com/?kiki") == ( ("kiki",),{} )
-    assert common.url2ak("http://jojo.com/?kiki&koko") == ( ("kiki","koko"),{} )
-    assert common.url2ak("http://jojo.com/?kiki&&&") == ( ("kiki",),{} )
-    assert common.url2ak("http://jojo.com/?kiki???") == ( ("kiki???",),{} )
+    assert commons.url2ak("http://jojo.com/?kiki") == ( ("kiki",),{} )
+    assert commons.url2ak("http://jojo.com/?kiki&koko") == ( ("kiki","koko"),{} )
+    assert commons.url2ak("http://jojo.com/?kiki&&&") == ( ("kiki",),{} )
+    assert commons.url2ak("http://jojo.com/?kiki???") == ( ("kiki???",),{} )
 
-    assert common.url2ak("http://jojo.com/?1%202&kiki&a=3&b=5") == (('1 2', 'kiki'), {'a': '3', 'b': '5'})
+    assert commons.url2ak("http://jojo.com/?1%202&kiki&a=3&b=5") == (('1 2', 'kiki'), {'a': '3', 'b': '5'})
 
     # test a karg not valued
-    assert common.url2ak("http://jojo.com/?1%202&kiki&a=3&b=") == (('1 2', 'kiki'), {'a': '3', 'b': None})
+    assert commons.url2ak("http://jojo.com/?1%202&kiki&a=3&b=") == (('1 2', 'kiki'), {'a': '3', 'b': None})
 
     # test an arg after kargs
-    assert common.url2ak("http://jojo.com/?1%202&kiki&a=3&b") == (('1 2', 'kiki', 'b'), {'a': '3'})
+    assert commons.url2ak("http://jojo.com/?1%202&kiki&a=3&b") == (('1 2', 'kiki', 'b'), {'a': '3'})
 
     # test double kargs, the latest is the one
-    assert common.url2ak("http://jojo.com/?1%202&kiki&a=3&b=5&b=6") == (('1 2', 'kiki'), {'a': '3', 'b': '6'})
+    assert commons.url2ak("http://jojo.com/?1%202&kiki&a=3&b=5&b=6") == (('1 2', 'kiki'), {'a': '3', 'b': '6'})
 
     # test same ^^ url with anchor
-    assert common.url2ak("http://jojo.com/?1%202&kiki&a=3&b=5&b=6#yolo") == (('1 2', 'kiki'), {'a': '3', 'b': '6'})
+    assert commons.url2ak("http://jojo.com/?1%202&kiki&a=3&b=5&b=6#yolo") == (('1 2', 'kiki'), {'a': '3', 'b': '6'})
 
 
 def test_session():
-    s=common.Sessions()
+    s=commons.Sessions()
     # assert in all case, it returns a dict {apps,session}
     x=s.get_ses("guid1")
     assert x["apps"]=={}        # its running apps
@@ -85,7 +85,7 @@ def test_session():
     assert "my_var" in x["session"]
 
 def test_session_apps():
-    s=common.Sessions()
+    s=commons.Sessions()
 
     s.set_hr( "fqn1|guid", "hr1")
 
@@ -96,7 +96,7 @@ def test_session_apps():
 
     assert s.htuids == ["guid"]
     assert s.sesids == ["fqn1|guid","fqn2|guid"]
-    
+
     assert s.del_hr( "fqn?|guid")==False
     assert s.del_hr( "fqn2|guid")==True
 

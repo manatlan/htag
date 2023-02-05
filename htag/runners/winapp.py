@@ -9,7 +9,7 @@
 
 from .. import Tag
 from ..render import HRenderer
-from . import common
+from . import commons
 from .chromeapp import _ChromeApp
 
 import traceback,sys
@@ -42,7 +42,7 @@ class WinApp:
     def run(self, host="127.0.0.1", port=8000 , size=(800,600)):   # localhost, by default !!
 
         def instanciate(url:str):
-            init = common.url2ak(url)
+            init = commons.url2ak(url)
             if self.hrenderer and self.hrenderer.init == init:
                 return self.hrenderer
 

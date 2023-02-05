@@ -10,7 +10,7 @@
 
 from htag import Tag
 from htag.render import HRenderer
-from . import common
+from . import commons
 
 import os,json,asyncio
 
@@ -60,7 +60,7 @@ class AndroidApp:
         self.tagClass=tagClass
 
     def instanciate(self,url:str):
-        init = common.url2ak(url)
+        init = commons.url2ak(url)
         if self.renderer and self.renderer.init == init:
             return self.renderer
 
