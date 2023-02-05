@@ -6,6 +6,7 @@ from htag import Tag # the only thing you'll need ;-)
 class Page(Tag.body):
     def init(self):
         self.call.redraw()
+        print(self.session)
 
     def clir(self,o):
         self.session.clear()

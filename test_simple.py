@@ -4,6 +4,7 @@ from unittest.util import strclass
 import pytest
 
 from htag import Tag,HTagException
+from htag.render import HRenderer
 
 ################################################################################################################
 def test_base():
@@ -496,6 +497,7 @@ def test_add():
 def test_js_call_at_init():
 
     class HRSimu():
+        session=None
         def _addInteractionScript(self,js):
             self.ijs=js
 
@@ -524,8 +526,9 @@ def test_init_hr():
             self <= A()
             self <= A()+A()+"hello"
 
-    t=TEST( _hr_="FAKE_HR" ) # simulate the hr which is setted by HRenderer IRL
-    assert t._hr=="FAKE_HR"
+    hr=HRenderer(A,"//")
+    t=TEST( _hr_=hr ) # simulate the hr which is setted by HRenderer IRL
+    assert t._hr==hr
     assert t.parent==None
     assert len(t.childs) == 4
     assert len([i for i in t.childs if isinstance(i,Tag)]) == 3

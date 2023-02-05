@@ -106,10 +106,7 @@ class WebHTTP(Starlette):
                 window.addEventListener('DOMContentLoaded', start );
             """ % fqn
 
-            hr=HRenderer(klass, js, init=init ) # NO EXIT !!
-
-            # create a session property on the future main tag instance
-            hr.tag.session = request.session
+            hr=HRenderer(klass, js, init=init, session=request.session ) # NO EXIT !!
 
         # update session info
         self.sessions.set_hr( fqn, hr)
