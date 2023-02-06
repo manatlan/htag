@@ -87,6 +87,7 @@ class WebHTTP(Starlette):
             assert type(init[1])==dict
 
         hr = self.instanciate(request, klass, init , renew)
+        request.session["lastaccess"]=time.time()
 
         return HTMLResponse( str(hr) )
 
@@ -123,6 +124,7 @@ class WebHTTP(Starlette):
 
         hr=request.session["HRSessions"].get_hr( fqn )
         if hr:
+            request.session["lastaccess"]=time.time()
             logger.info("INTERACT WITH %s",fqn)
             data=await request.json()
             actions = await hr.interact(data["id"],data["method"],data["args"],data["kargs"],data["event"])
