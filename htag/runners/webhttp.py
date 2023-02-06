@@ -7,11 +7,9 @@
 # https://github.com/manatlan/htag
 # #############################################################################
 
-from requests import session
 from .. import Tag
 from ..render import HRenderer
 from . import commons
-
 
 
 """ REAL WEB http,
