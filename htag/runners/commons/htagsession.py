@@ -11,6 +11,7 @@ import json
 import sys
 import typing
 import uuid
+import time
 
 from starlette.datastructures import MutableHeaders
 from starlette.requests import HTTPConnection
@@ -63,6 +64,8 @@ class HtagSession:  # ASGI Middleware, for starlette
             self._sessions[htuid]={}
 
         scope["session"] = self._sessions.get(htuid,{})
+        scope["lastaccess"]=time.time()
+
 
         async def send_wrapper(message: Message) -> None:
             if message["type"] == "http.response.start":
@@ -80,3 +83,14 @@ class HtagSession:  # ASGI Middleware, for starlette
             await send(message)
 
         await self.app(scope, receive, send_wrapper)
+
+    def purge(self,timeout:float) -> int:
+        """ remove session from sessions whose are older than 'timeout' seconds"""
+        now=time.time()
+        to_remove=[]
+        for htuid,data in self._sessions.items():
+            if now - data["lastaccess"] > timeout:
+                to_remove.append( htuid )
+        for htuid in to_remove:
+            del self._sessions[htuid]
+        return len(to_remove)

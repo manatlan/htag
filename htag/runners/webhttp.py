@@ -43,7 +43,6 @@ class WebHTTP(Starlette):
     """
     def __init__(self,tagClass:type=None, timeout=5*60):
         if tagClass: assert issubclass(tagClass,Tag)
-        self.sessions=commons.HRSessions()
         self.tagClass=tagClass
         self.timeout=timeout
 
@@ -55,15 +54,19 @@ class WebHTTP(Starlette):
         Starlette.add_middleware(self,commons.HtagSession)
 
     async def _purgeSessions(self):
+        session=self.middleware_stack.app   # solid ? TODO: do better
+        logger.info(f"PURGE: started")
 
         async def purge():
             while True:
-                self.sessions.purge( self.timeout )
+                nb=session.purge( self.timeout )
+                logger.info(f"PURGE: remove %s session(s)",nb)
                 await asyncio.sleep(60) # check every 60s
 
         asyncio.ensure_future( purge() )
 
     async def GET(self,request) -> HTMLResponse:
+        request.session["HRSessions"] = commons.HRSessions()
         return self.serve(request, self.tagClass )
 
     def serve(self,request, klass, init=None, renew=False) -> HTMLResponse:
@@ -91,7 +94,7 @@ class WebHTTP(Starlette):
         fqn = QN(klass)
 
         logger.info("intanciate : renew=%s",renew)
-        hr=self.sessions.get_hr( fqn )
+        hr=request.session["HRSessions"].get_hr( fqn )
         if renew==False and hr and hr.init == init:
             # same url (same klass/params), same htuid -> same instance
             logger.info("intanciate : Reuse Renderer %s ",fqn)
@@ -109,15 +112,15 @@ class WebHTTP(Starlette):
             hr=HRenderer(klass, js, init=init, session=request.session ) # NO EXIT !!
 
         # update session info
-        self.sessions.set_hr( fqn, hr)
 
+        request.session["HRSessions"].set_hr( fqn,hr )
         return hr
 
 
     async def POST(self,request) -> Response:
         fqn=request.path_params.get('fqn',None)
 
-        hr=self.sessions.get_hr(fqn)
+        hr=request.session["HRSessions"].get_hr( fqn )
         if hr:
             logger.info("INTERACT WITH %s",fqn)
             data=await request.json()

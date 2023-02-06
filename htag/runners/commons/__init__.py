@@ -50,27 +50,3 @@ class HRSessions:
             info["lastaccess"]=time.time()
             return info["hrenderer"]
 
-    def del_hr(self,fqn:str) -> bool:
-        """ delete the fqn """
-        #try:
-        #    hr=self.get_hr(fqn)
-        #    hr.tag.session.clear()
-        #except:
-        #    pass
-        try:
-            del self._data[ fqn ]
-            return True
-        except Exception as e:
-            print("del_hr",fqn,e)
-            return False
-
-    def purge(self,timeout:float) -> int:
-        """ remove apps from session whose are older than 'timeout' seconds"""
-        now=time.time()
-        to_remove=[]
-        for fqn,data in self._data.items():
-            if now - data["lastaccess"] > timeout:
-                to_remove.append( fqn )
-        for fqn in to_remove:
-            self.del_hr( fqn )
-        return len(to_remove)
