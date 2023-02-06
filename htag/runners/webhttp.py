@@ -66,7 +66,6 @@ class WebHTTP(Starlette):
         asyncio.ensure_future( purge() )
 
     async def GET(self,request) -> HTMLResponse:
-        request.session["HRSessions"] = commons.HRSessions()
         return self.serve(request, self.tagClass )
 
     def serve(self,request, klass, init=None, renew=False) -> HTMLResponse:
@@ -76,6 +75,8 @@ class WebHTTP(Starlette):
 
         return an htmlresponse (htag init page to start all)
         """
+        request.session["HRSessions"] = commons.HRSessions()
+
         if init is None:
             # no init params
             # so we take thoses from the url
