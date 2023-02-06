@@ -7,6 +7,7 @@
 # https://github.com/manatlan/htag
 # #############################################################################
 
+from requests import session
 from .. import Tag
 from ..render import HRenderer
 from . import commons
@@ -23,7 +24,6 @@ from . import commons
 - add renew (bool) parametter on .serve() (and instanciate), to force renewal in all cases.
 """
 
-import uuid
 import time
 import asyncio
 import logging
@@ -45,25 +45,41 @@ class WebHTTP(Starlette):
         if tagClass: assert issubclass(tagClass,Tag)
         self.tagClass=tagClass
         self.timeout=timeout
+        self.sessions={} # {htuid:session,}
 
-        routes=[ Route('/{fqn}',   self.POST,  methods=["POST"]) ]
+        routes=[ Route('/{fqn:str}-{hrid:int}',   self.POST,  methods=["POST"]) ]
         if tagClass:
             routes.append( Route("/",   self.GET,   methods=["GET"]) )
 
         Starlette.__init__(self,debug=True, routes=routes, on_startup=[self._purgeSessions])
-        Starlette.add_middleware(self,commons.HtagSession)
+        Starlette.add_middleware(self,commons.HtagSession, sessions=self.sessions )
+
+    def purger(self,timeout:float) -> int:
+        """ remove session from sessions whose are older than 'timeout' seconds"""
+        now=time.time()
+        to_remove=[]
+        for htuid,data in self.sessions.items():
+            if "lastaccess" in data:
+                if now - data["lastaccess"] > timeout:
+                    to_remove.append( htuid )
+            else:
+                # remove session which hasn'g got a lastaccess timestamp
+                to_remove.append( htuid )
+        for htuid in to_remove:
+            del self.sessions[htuid]
+        return len(to_remove)
 
     async def _purgeSessions(self):
         session=self.middleware_stack.app   # solid ? TODO: do better
         logger.info(f"PURGE: started")
 
-        async def purge():
+        async def loop():
             while True:
-                nb=session.purge( self.timeout )
+                nb=self.purger( self.timeout )
                 logger.info(f"PURGE: remove %s session(s)",nb)
                 await asyncio.sleep(60) # check every 60s
 
-        asyncio.ensure_future( purge() )
+        asyncio.ensure_future( loop() )
 
     async def GET(self,request) -> HTMLResponse:
         return self.serve(request, self.tagClass )
@@ -103,11 +119,15 @@ class WebHTTP(Starlette):
         else:
             # url has changed ... recreate an instance
             logger.info("intanciate : Create Renderer %s",fqn)
+
             js = """
                 async function interact( o ) {
-                    action( await (await window.fetch("/%s",{method:"POST", body:JSON.stringify(o)})).text() )
+                    let resp = await window.fetch("/%s-<<hrid>>",{method:"POST", body:JSON.stringify(o)});
+                    if(resp.status == 412)
+                        alert("Session has ended");
+                    else
+                        action( await resp.text() );
                 }
-
                 window.addEventListener('DOMContentLoaded', start );
             """ % fqn
 
@@ -121,14 +141,20 @@ class WebHTTP(Starlette):
 
     async def POST(self,request) -> Response:
         fqn=request.path_params.get('fqn',None)
+        hrid=request.path_params['hrid']
 
         hr=request.session["HRSessions"].get_hr( fqn )
         if hr:
-            request.session["lastaccess"]=time.time()
-            logger.info("INTERACT WITH %s",fqn)
-            data=await request.json()
-            actions = await hr.interact(data["id"],data["method"],data["args"],data["kargs"],data["event"])
-            return JSONResponse(actions)
+            if id(hr) == hrid:
+                # we are on the right current instance
+                request.session["lastaccess"]=time.time()
+                logger.info("INTERACT WITH %s",fqn)
+                data=await request.json()
+                actions = await hr.interact(data["id"],data["method"],data["args"],data["kargs"],data["event"])
+                return JSONResponse(actions)
+            else:
+                # Current instance has been renewed, and you talking to a dead objet !
+                return HTMLResponse( "412 DOESN'T MATCH CURRENT INSTANCE" , status_code=412 ) # 412 Precondition Failed
         else:
             # session expired or bad call
             return HTMLResponse( "400 BAD REQUEST" , status_code=400 )

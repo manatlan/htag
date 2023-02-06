@@ -294,7 +294,7 @@ function jevent (e) {
 }
 
 %s
-""" % ( startjs , js)
+""" % ( startjs , js.replace("<<hrid>>",str(id(self))))   # I DONT LIKE THAT !
 
         self._statics.append( Tag.script( js_base ))
 

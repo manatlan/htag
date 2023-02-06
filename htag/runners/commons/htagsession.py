@@ -33,6 +33,7 @@ class HtagSession:  # ASGI Middleware, for starlette
     def __init__(
         self,
         app: ASGIApp,
+        sessions: dict,
         session_cookie: str = "session",
         max_age: typing.Optional[int] = 0, #14 * 24 * 60 * 60,  # 14 days, in seconds
         path: str = "/",
@@ -40,7 +41,7 @@ class HtagSession:  # ASGI Middleware, for starlette
         https_only: bool = False,
     ) -> None:
         self.app = app
-        self._sessions={}
+        self._sessions=sessions or {}
         self.session_cookie = session_cookie
         self.max_age = max_age
         self.path = path
@@ -82,13 +83,3 @@ class HtagSession:  # ASGI Middleware, for starlette
 
         await self.app(scope, receive, send_wrapper)
 
-    def purge(self,timeout:float) -> int:
-        """ remove session from sessions whose are older than 'timeout' seconds"""
-        now=time.time()
-        to_remove=[]
-        for htuid,data in self._sessions.items():
-            if now - data["lastaccess"] > timeout:
-                to_remove.append( htuid )
-        for htuid in to_remove:
-            del self._sessions[htuid]
-        return len(to_remove)
