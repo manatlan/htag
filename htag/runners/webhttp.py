@@ -89,7 +89,7 @@ class WebHTTP(Starlette):
 
         return an htmlresponse (htag init page to start all)
         """
-        request.session["HRSessions"] = commons.HRSessions()
+        request.session["HRSessions"] = request.session.get( "HRSessions", commons.HRSessions() )
 
         if init is None:
             # no init params
