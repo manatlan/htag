@@ -41,7 +41,7 @@ class HtagSession:  # ASGI Middleware, for starlette
         https_only: bool = False,
     ) -> None:
         self.app = app
-        self._sessions=sessions or {}
+        self._sessions=sessions
         self.session_cookie = session_cookie
         self.max_age = max_age
         self.path = path
