@@ -342,6 +342,15 @@ BrowserTornadoHTTP( App ).run()
 Run a http server (using starlette/uvicorn), and serve the htag app to any browser.
 Because it's based on **Starlette**, this runner is an **ASGI HTag App**, which provide [a lot of features](../asgi/)
 
+As it's a webserver, and unlike others : you can have many clients, so it's a different beast ;-)
+It manages a http session (a cookie), and the session is available, per user, in `request.session`, or `<htag_instance>.session` (sessions are server-side). But, you can have only one instance of a htag Tag class, per user. (to avoid many instances (and memory overflow) at a time, per user, using F5/refresh). The newer replace the old one, so the memory stay "acceptable". And, of course, you can have many htag class managed by many endpoints. (TODO: give an example in docs)
+
+HTag wasn't designed (at start) to be served on a webserver (with many clients), But this solution is completly usable, with this kind of runner.
+
+Of course, the session is usable with starlette/authlib flow to identify a user with an oauth2 flow (ex: google login) (TODO: give an example).
+
+The session timeout is settable when you instanciate the "WebHTTP" runner. (ex: `WebHTTP( Klass , timeout=10*60)`, but by default it's 10 minutes). When the session expires, it clears all data on server side, for the user.
+
 Run your `App` (htag.Tag class) like this :
 
 ```python
