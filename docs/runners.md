@@ -9,6 +9,7 @@ For example :
  * [PyWebView](#pywebview) is the perfect solution, to deliver a gui python app, as a freezed exe (embbeding the pywebview/cef).
  * [ChromeApp](#chromeapp) is the perfect solution to deliver a gui python app, with minimal footprints, because it will reuse the installed chrome of the computer. (see [WinApp](#winapp) too)
  * [PyScript](#pyscript) is fun, if you only have a browser (no need of python ;-), just html !
+ * [WebHTTP](#webhttp) to make real web apps, for many users. Providing session instances
 
 But, in all cases, your **htag app** will run in all theses runners, in the same way !
 
