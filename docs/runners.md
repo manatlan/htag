@@ -343,7 +343,8 @@ Run a http server (using starlette/uvicorn), and serve the htag app to any brows
 Because it's based on **Starlette**, this runner is an **ASGI HTag App**, which provide [a lot of features](../asgi/)
 
 As it's a webserver, and unlike others : you can have many clients, so it's a different beast ;-)
-It manages a http session (a cookie), and the session is available, per user, in `request.session`, or `<htag_instance>.session` (sessions are server-side). But, you can have only one instance of a htag Tag class, per user. (to avoid many instances (and memory overflow) at a time, per user, using F5/refresh). The newer replace the old one, so the memory stay "acceptable". And, of course, you can have many htag class managed by many endpoints. (TODO: give an example in docs)
+
+It manages a http session (with a cookie), and the session is available, per user, in `request.session`, or `<htag_instance>.session` (sessions are server-side). But, you can have only one instance of a htag Tag class, per user. (and like others, if you hit F5/refresh, it will reuse the current instance (not recreate it!)). The re-creation of the instance is based on the url/path (you'll need to change query_params, for example), and so ; the newest will replace the old one, so the memory stay "acceptable". And, of course, you can have many htag class managed by many endpoints. (see: [asgi things](../asgi/))
 
 HTag wasn't designed (at start) to be served on a webserver (with many clients), But this solution is completly usable, with this kind of runner.
 
@@ -366,7 +367,7 @@ WebHTTP( App ).run()
  - the http server is (ultra) robust
  - debugging is simple (can see http exchanges in the browser dev tools)
  - [can use uvicorn reloader](https://github.com/manatlan/htag/blob/main/examples/autoreload.py), useful during dev process !
- - and [a lot of features](../asgi/), because it's astarlette/asgi.
+ - and [a lot of features](../asgi/), because it's starlette/asgi.
  - the app can't `self.exit()` (for security reasons)
  - Understand [query params from url](../query_params/) to instanciate the main htag class
 
