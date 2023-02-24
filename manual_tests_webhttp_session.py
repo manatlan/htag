@@ -6,6 +6,7 @@ from htag import Tag # the only thing you'll need ;-)
 class Page(Tag.body):
     def init(self):
         self.call.redraw()
+        self.nb=0
         print(self.session)
 
     def clir(self,o):
@@ -17,11 +18,15 @@ class Page(Tag.body):
         self <= Tag.button("add", _onclick=self.sett)
         self <= Tag.button("clir", _onclick=self.clir)
         self+=self.session.get("toto","?")
+        self <= Tag.hr() + Tag.button("add", _onclick=self.addd) + Tag.span(self.nb)
 
     def sett(self,o):
         self.session["toto"]=self.session.get("toto",0) + 1
         self.redraw()
 
+    def addd(self,o):
+        self.nb+=1
+        self.redraw()
 
 # and execute it in a pywebview instance
 from htag.runners import *

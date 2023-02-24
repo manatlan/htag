@@ -9,7 +9,6 @@
 
 import json
 import urllib.parse
-from .htagsession import HtagSession
 
 def url2ak(url:str):
     """ transform the querystring of 'url' to (*args,**kargs)"""

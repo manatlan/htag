@@ -10,6 +10,7 @@
 from .. import Tag
 from ..render import HRenderer
 from . import commons
+from .commons.htagsession import HtagSession
 
 
 """ REAL WEB http,
@@ -50,7 +51,7 @@ class WebHTTP(Starlette):
             routes.append( Route("/",   self.GET,   methods=["GET"]) )
 
         Starlette.__init__(self,debug=True, routes=routes, on_startup=[self._purgeSessions])
-        Starlette.add_middleware(self,commons.HtagSession, sessions=self.sessions )
+        Starlette.add_middleware(self,HtagSession, sessions=self.sessions )
 
     def purger(self,timeout:float) -> int:
         """ remove session from sessions whose are older than 'timeout' seconds"""
