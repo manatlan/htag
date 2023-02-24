@@ -117,7 +117,10 @@ def testDriver(driver,tests):
     #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- # pyscript specific
     time.sleep(1)
     hc=HClient(driver)
-    while "Starting" in hc.find("//body")[0].text:
+    while 1:
+        bodys=hc.find("//body")
+        if bodys and ("Starting" not in bodys[0].text):
+            break
         time.sleep(1)
     print("Start")
     #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
