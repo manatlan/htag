@@ -23,15 +23,47 @@ jobs:
         run: sudo apt purge chromium-browser
       - name: Install a new Chromium
         run: sudo apt install -y chromium-browser
-      - name: Install all necessary packages
-        run: pip install webdriver-manager selenium uvicorn starlette tornado poetry
-      - name: Build WHL for pyscript tests
-        run: poetry build
+      - name: Install selenium/poetry packages
+        run: pip install webdriver-manager selenium poetry
+        
 
+      #############################################################################
+      ## test Runners with only htag
+      #############################################################################
       - name: Run Tests BrowserHTTP ${{ matrix.app }}
         run: |
           python selenium/run.py BrowserHTTP ${{ matrix.app }} &
           python selenium/tests.py 8000 ${{ matrix.app }}
+
+      - name: Build WHL for pyscript tests
+        run: poetry build
+
+      - name: Run Tests PyScript (can't exit itself) ${{ matrix.app }}
+        run: |
+          python selenium/run.py PyScript ${{ matrix.app }} 8001 &
+          python selenium/tests.py 8001 ${{ matrix.app }}
+          killall python
+
+      #############################################################################
+      ## test Runner with Tornado
+      #############################################################################
+      - name: Install tornado
+        run: pip install tornado
+
+      - name: Run Tests BrowserTornadoHTTP ${{ matrix.app }}
+        run: |
+          python selenium/run.py BrowserTornadoHTTP ${{ matrix.app }} &
+          python selenium/tests.py 8000 ${{ matrix.app }}
+
+      - name: UnInstall tornado
+        run: pip uninstall uvicorn -y
+
+
+      #############################################################################
+      ## test Runner with Starlette/uvicorn
+      #############################################################################
+      - name: Install Starlette/uvicorn
+        run: pip install uvicorn starlette
 
       - name: Run Tests BrowserStarletteHTTP ${{ matrix.app }}
         run: |
@@ -43,20 +75,10 @@ jobs:
           python selenium/run.py BrowserStarletteWS ${{ matrix.app }} &
           python selenium/tests.py 8000 ${{ matrix.app }}
 
-      - name: Run Tests BrowserTornadoHTTP ${{ matrix.app }}
-        run: |
-          python selenium/run.py BrowserTornadoHTTP ${{ matrix.app }} &
-          python selenium/tests.py 8000 ${{ matrix.app }}
-
       - name: Run Tests WebHTTP (can't exit itself) ${{ matrix.app }}
         run: |
           python selenium/run.py WebHTTP ${{ matrix.app }} &
           python selenium/tests.py 8000 ${{ matrix.app }}
           killall python
 
-      - name: Run Tests PyScript (can't exit itself) ${{ matrix.app }}
-        run: |
-          python selenium/run.py PyScript ${{ matrix.app }} 8001 &
-          python selenium/tests.py 8001 ${{ matrix.app }}
-          killall python
 
