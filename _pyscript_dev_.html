@@ -1,15 +1,42 @@
-# -*- coding: utf-8 -*-
-# # #############################################################################
-# Copyright (C) 2022 manatlan manatlan[at]gmail(dot)com
-#
-# MIT licence
-#
-# https://github.com/manatlan/htag
-# #############################################################################
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <py-config>
+    packages = ["htag"]
+    </py-config>
+</head>
 
-from .. import Tag
-from ..render import HRenderer
-from . import commons
+<body> loading pyscript ;-)
+
+<py-script>
+
+from htag import Tag
+
+class QRCode(Tag.div):
+    statics=Tag.script(_src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js")
+
+    def init(self,txt,size=128):
+        self.js=f"""
+new QRCode( self, {{
+    text: `{txt}`,
+    width: {size},
+    height: {size},
+    colorDark : "#000000",
+    colorLight : "#ffffff",
+    correctLevel : QRCode.CorrectLevel.H
+}})"""
+
+class App(Tag.div):
+    imports=[QRCode]
+    def init(self):
+        self+=QRCode("https://my.netlib.re/htag/index/ed#/htag/QRCODE",256)
+
+###############################################################################
+from htag.render import HRenderer
+from htag.runners import commons
 
 import json
 
@@ -27,7 +54,7 @@ interact=async function(o) {
 }
 
 function pyscript_starter() {
-    if(document.querySelector("*[needToLoadBeforeStart]"))
+    if(document.querySelector("*[needToLoadIt]"))
         window.setTimeout( pyscript_starter, 100 )
     else
         window.start()
@@ -48,8 +75,8 @@ function pyscript_starter() {
                 for key,value in s.attrs.items():
                     setattr(tag, key, value)
                     if key in ["src","href"]:
-                        tag.setAttribute("needToLoadBeforeStart", True)
-                        tag.onload = lambda o: o.target.removeAttribute("needToLoadBeforeStart")
+                        tag.setAttribute("needToLoadIt", True)
+                        tag.onload = lambda o: o.target.removeAttribute("needToLoadIt")
 
                 window.document.head.appendChild(tag)
 
@@ -57,9 +84,19 @@ function pyscript_starter() {
         window.document.body.outerHTML=str(self.hr)
 
         # and start the process
-        window.pyscript_starter() # will run window.start, when dom ready
+        window.pyscript_starter()
 
     async def interactions(self, o):
         data=json.loads(o)
         actions = await self.hr.interact( data["id"], data["method"], data["args"], data["kargs"], data.get("event") )
         return json.dumps(actions)
+
+###############################################################################
+#from htag.runners import PyScript
+from js import window
+
+PyScript( App  ).run( window )
+
+</py-script>
+</body>
+</html>
