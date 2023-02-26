@@ -110,11 +110,6 @@ PyScript( App ).run( window )
 </body>
 </html>""" % (json.dumps( externals ),code)
   
-DOC="""<p><b>Press CTRL+S to save/preview !!</b></p>
-<p><i>The main HTag's Tag should be named <b>App</b></i></p>
-<p>NOW: You can import any python module, which is available on pypi (as a pure wheel) !</p>
-"""
-
 dataurl = lambda html: "data:text/html,"+urllib.parse.quote( html )
 clean=lambda t: "\n".join( [i.strip(" \t\r\n") for i in t.splitlines()] )
 class PyEditor(Tag.body):
@@ -125,7 +120,7 @@ class PyEditor(Tag.body):
     def init(self,code:str=""):
         self.ed = Ed(code or SRC, onchange=self.preview)
         self.iframe = Tag.iframe(
-            _src=dataurl(DOC),
+            _src="https://raw.githack.com/manatlan/htag/main/examples/_pyscript_demo_examples.html",
             _style="width:100%;height:100%",
         )
         
