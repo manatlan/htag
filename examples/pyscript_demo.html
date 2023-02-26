@@ -111,7 +111,9 @@ PyScript( App ).run( window )
 </html>""" % (json.dumps( externals ),code)
   
 DOC="""<p><b>Press CTRL+S to save/preview !!</b></p>
-<p><i> The main HTag's Tag should be named <b>App</b></i></p>"""
+<p><i>The main HTag's Tag should be named <b>App</b></i></p>
+<p>NOW: You can import any python module, which is available on pypi (as a pure wheel) !</p>
+"""
 
 dataurl = lambda html: "data:text/html,"+urllib.parse.quote( html )
 clean=lambda t: "\n".join( [i.strip(" \t\r\n") for i in t.splitlines()] )
