@@ -19,7 +19,7 @@
 ###############################################################################
 from htag import Tag
 import urllib.parse
-import base64
+import base64,ast,json,sys,time
 
 class Ed(Tag.div):
     """ A class which embed the ace editor (python syntax) """
@@ -65,12 +65,51 @@ class App(Tag.body):
         self <= Tag.button("click",_onclick = say_hello)
 """
 
-# pyscript doesn't like pyscript tag in multiple place, so needed to encode the html structure
-PYS=base64.b64decode(b'PCFET0NUWVBFIGh0bWw+CiAgPGh0bWw+CiAgPGhlYWQ+CiAgICAgIDxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4KICAgICAgPGxpbmsgcmVsPSJzdHlsZXNoZWV0IiBocmVmPSJodHRwczovL3B5c2NyaXB0Lm5ldC9sYXRlc3QvcHlzY3JpcHQuY3NzIiAvPgogICAgICA8c2NyaXB0IGRlZmVyIHNyYz0iaHR0cHM6Ly9weXNjcmlwdC5uZXQvbGF0ZXN0L3B5c2NyaXB0LmpzIj48L3NjcmlwdD4KICAgICAgPG1ldGEgbmFtZT0idmlld3BvcnQiIGNvbnRlbnQ9IndpZHRoPWRldmljZS13aWR0aCwgaW5pdGlhbC1zY2FsZT0xIj4KICAgICAgPHB5LWNvbmZpZz5wYWNrYWdlcyA9IFsiaHRhZz09MC45LjQxIl08L3B5LWNvbmZpZz4gICAgCiAgPC9oZWFkPgogIDxib2R5PgogIDxweS1zY3JpcHQ+CiAgIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwogICVzCiAgIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwogIGZyb20gaHRhZy5ydW5uZXJzIGltcG9ydCBQeVNjcmlwdAogIGZyb20ganMgaW1wb3J0IHdpbmRvdwogIFB5U2NyaXB0KCBBcHAgICkucnVuKCB3aW5kb3cgKQogIDwvcHktc2NyaXB0PgogIDwvYm9keT4KICA8L2h0bWw+CiAg').decode()
-            
-DOC="""<p><b>Press CTRL+S to save/preview !!</b></p>
-<p><i> The main HTag's Tag should be named <b>App</b></i></p>"""
+def get_external_modules(code) -> list:
+    # https://stackoverflow.com/questions/2572582/return-a-list-of-imported-python-modules-used-in-a-script
+    modules = set()
+    
+    def visit_Import(node):
+        for name in node.names:
+            modules.add(name.name.split(".")[0])
+    
+    def visit_ImportFrom(node):
+        # if node.module is missing it's a "from . import ..." statement
+        # if level > 0 it's a "from .submodule import ..." statement
+        if node.module is not None and node.level == 0:
+            modules.add(node.module.split(".")[0])
+    
+    node_iter = ast.NodeVisitor()
+    node_iter.visit_Import = visit_Import
+    node_iter.visit_ImportFrom = visit_ImportFrom
+    node_iter.visit(ast.parse(code))
+    return list(modules - set(sys.stdlib_module_names))
 
+def generate_pyscript(code:str) -> str:
+    externals = get_external_modules(code)
+
+    return """<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <py-config>packages = %s</py-config>    
+</head>
+<body>
+<py-script>
+###############################################################################
+%s
+###############################################################################
+from htag.runners import PyScript
+from js import window
+
+PyScript( App ).run( window )
+</py-script>
+</body>
+</html>""" % (json.dumps( externals ),code)
+  
 dataurl = lambda html: "data:text/html,"+urllib.parse.quote( html )
 clean=lambda t: "\n".join( [i.strip(" \t\r\n") for i in t.splitlines()] )
 class PyEditor(Tag.body):
@@ -81,7 +120,7 @@ class PyEditor(Tag.body):
     def init(self,code:str=""):
         self.ed = Ed(code or SRC, onchange=self.preview)
         self.iframe = Tag.iframe(
-            _src=dataurl(DOC),
+            _src="https://raw.githack.com/manatlan/htag/main/examples/_pyscript_demo_examples.html?"+str(time.time()),
             _style="width:100%;height:100%",
         )
         
@@ -90,7 +129,7 @@ class PyEditor(Tag.body):
         
     def preview(self,o):
         code = o.value.strip()
-        self.iframe["src"]= dataurl( clean(PYS) % code )
+        self.iframe["src"]= dataurl( generate_pyscript(code) )
     
 ###############################################################################
 from htag.runners import PyScript
