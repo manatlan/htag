@@ -12,23 +12,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <py-config>packages = ["htag==0.9.41"]</py-config>    
 </head>
+
 <body> Loading DEMO ;-)
+
 <py-script>
 ###############################################################################
 from htag import Tag
 import urllib.parse
-import base64,ast,json,sys,time
+import base64
 
 class Ed(Tag.div):
     """ A class which embed the ace editor (python syntax) """
     def __init__(self,value,width="100%",height="100%",mode="python",onchange=None):
         self.value = value
         super().__init__(_style="width:%s;height:%s;" % (width,height))
-
+        
         oed=Tag.div(self.value,_style="width:100%;height:100%;min-height:20px;")
         self <= oed
         self.onchange=onchange
-
+    
         self.js = """
 self.ed=ace.edit( "%s" );
 self.ed.setTheme("ace/theme/cobalt");
@@ -63,26 +65,11 @@ class App(Tag.body):
         self <= Tag.button("click",_onclick = say_hello)
 """
 
-def get_external_modules(code) -> list:
-    # https://stackoverflow.com/questions/2572582/return-a-list-of-imported-python-modules-used-in-a-script
-    modules = set()
-	@@ -91,12 +66,15 @@
-    return """<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8" />
-    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
-    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <py-config>packages = %s</py-config>    
-</head>
-<body>
-<py-script>
-###############################################################################
-	@@ -109,33 +87,153 @@
-</py-script>
-</body>
-</html>""" % (json.dumps( externals ),code)
+# pyscript doesn't like pyscript tag in multiple place, so needed to encode the html structure
+PYS=base64.b64decode(b'PCFET0NUWVBFIGh0bWw+CiAgPGh0bWw+CiAgPGhlYWQ+CiAgICAgIDxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4KICAgICAgPGxpbmsgcmVsPSJzdHlsZXNoZWV0IiBocmVmPSJodHRwczovL3B5c2NyaXB0Lm5ldC9sYXRlc3QvcHlzY3JpcHQuY3NzIiAvPgogICAgICA8c2NyaXB0IGRlZmVyIHNyYz0iaHR0cHM6Ly9weXNjcmlwdC5uZXQvbGF0ZXN0L3B5c2NyaXB0LmpzIj48L3NjcmlwdD4KICAgICAgPG1ldGEgbmFtZT0idmlld3BvcnQiIGNvbnRlbnQ9IndpZHRoPWRldmljZS13aWR0aCwgaW5pdGlhbC1zY2FsZT0xIj4KICAgICAgPHB5LWNvbmZpZz5wYWNrYWdlcyA9IFsiaHRhZz09MC45LjQxIl08L3B5LWNvbmZpZz4gICAgCiAgPC9oZWFkPgogIDxib2R5PgogIDxweS1zY3JpcHQ+CiAgIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwogICVzCiAgIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwogIGZyb20gaHRhZy5ydW5uZXJzIGltcG9ydCBQeVNjcmlwdAogIGZyb20ganMgaW1wb3J0IHdpbmRvdwogIFB5U2NyaXB0KCBBcHAgICkucnVuKCB3aW5kb3cgKQogIDwvcHktc2NyaXB0PgogIDwvYm9keT4KICA8L2h0bWw+CiAg').decode()
+            
+DOC="""<p><b>Press CTRL+S to save/preview !!</b></p>
+<p><i> The main HTag's Tag should be named <b>App</b></i></p>"""
 
 dataurl = lambda html: "data:text/html,"+urllib.parse.quote( html )
 clean=lambda t: "\n".join( [i.strip(" \t\r\n") for i in t.splitlines()] )
@@ -90,21 +77,21 @@ class PyEditor(Tag.body):
     statics = [
         Tag.style("html, body {width:100%;height:100%;margin:0px}"),
     ]
-
+    
     def init(self,code:str=""):
         self.ed = Ed(code or SRC, onchange=self.preview)
         self.iframe = Tag.iframe(
-            _src="https://raw.githack.com/manatlan/htag/main/examples/_pyscript_demo_examples.html?"+str(time.time()),
+            _src=dataurl(DOC),
             _style="width:100%;height:100%",
         )
-
+        
         # draw ui
         self <= Tag.div(self.ed+self.iframe,_style="display:flex;height:100vh")
-
+        
     def preview(self,o):
         code = o.value.strip()
-        self.iframe["src"]= dataurl( generate_pyscript(code) )
-
+        self.iframe["src"]= dataurl( clean(PYS) % code )
+    
 ###############################################################################
 from htag.runners import PyScript
 from js import window
@@ -113,3 +100,4 @@ PyScript( PyEditor ).run( window )
 
 </py-script>
 </body>
+</html>
