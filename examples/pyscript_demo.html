@@ -19,51 +19,26 @@
 ###############################################################################
 from htag import Tag
 import urllib.parse
-import base64,ast,json,sys,time
+import json,sys
+import ast,os
+import base64,zlib
 
-class Ed(Tag.div):
-    """ A class which embed the ace editor (python syntax) """
-    def __init__(self,value,width="100%",height="100%",mode="python",onchange=None):
-        self.value = value
-        super().__init__(_style="width:%s;height:%s;" % (width,height))
-        
-        oed=Tag.div(self.value,_style="width:100%;height:100%;min-height:20px;")
-        self <= oed
-        self.onchange=onchange
-    
-        self.js = """
-self.ed=ace.edit( "%s" );
-self.ed.setTheme("ace/theme/cobalt");
-self.ed.session.setMode("ace/mode/%s");
-self.ed.session.setUseWrapMode(false);
-self.ed.setOptions({"fontSize": "11pt"});
-self.ed.setBehavioursEnabled(false);
-self.ed.session.setUseWorker(false);
-self.ed.getSession().setUseSoftTabs(true);
 
-function commandSave () {%s}
-
-self.ed.commands.addCommand({
-    name: "commandSave",
-    bindKey: {"win": "Ctrl-S",  "mac": "Command-S"},
-    readOnly: "True",
-    exec: commandSave,
-})
-""" % (id(oed),mode, self.bind._save( b"self.ed.getValue()"))
-
-    def _save(self,value):
-        self.value = value
-        if self.onchange: self.onchange(self)
-
-SRC="""
-from htag import Tag
+DEFAULT="""from htag import Tag
 
 class App(Tag.body):
     def init(self):
         def say_hello(o):
             self <= Tag.li("hello")
         self <= Tag.button("click",_onclick = say_hello)
+        
 """
+
+def zlibB64Encode(x:str) -> str:
+    return base64.urlsafe_b64encode( zlib.compress(x.encode()) ).decode()
+def b64ZlibDecode(x:str) -> str:
+    return zlib.decompress(base64.urlsafe_b64decode(x.encode())).decode()   
+
 
 def get_external_modules(code) -> list:
     # https://stackoverflow.com/questions/2572582/return-a-list-of-imported-python-modules-used-in-a-script
@@ -91,12 +66,15 @@ def generate_pyscript(code:str) -> str:
     return """<!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8">
     <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
     <script defer src="https://pyscript.net/latest/pyscript.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <py-config>packages = %s</py-config>    
+    <py-config>
+    packages = %s
+    </py-config>    
 </head>
+
 <body>
 <py-script>
 ###############################################################################
@@ -109,33 +87,153 @@ PyScript( App ).run( window )
 </py-script>
 </body>
 </html>""" % (json.dumps( externals ),code)
-  
-dataurl = lambda html: "data:text/html,"+urllib.parse.quote( html )
-clean=lambda t: "\n".join( [i.strip(" \t\r\n") for i in t.splitlines()] )
-class PyEditor(Tag.body):
+
+dataurl = lambda html: "data:text/html,"+urllib.parse.quote(html)
+
+
+class Ed(Tag.div):
+    """ A class which embed the ace editor (python syntax) """
     statics = [
-        Tag.style("html, body {width:100%;height:100%;margin:0px}"),
+        Tag.script(_src="//cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ace.js"),
+        Tag.script(_src="//cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/mode-python.js"),
+        Tag.script(_src="//cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/theme-cobalt.js"),
+        Tag.script(_src="//cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ext-searchbox.js"),
+        Tag.script(_src="//cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ext-language_tools.js"),
     ]
+        
+    def init(self,value,mode="python",onsave=None,**a):
+        self.value = value
+        
+        oed=Tag.div(self.value,_style="width:100%;height:100%;min-height:20px;")
+        self += oed
+        self.onsave=onsave
     
-    def init(self,code:str=""):
-        self.ed = Ed(code or SRC, onchange=self.preview)
-        self.iframe = Tag.iframe(
-            _src="https://raw.githack.com/manatlan/htag/main/examples/_pyscript_demo_examples.html?"+str(time.time()),
-            _style="width:100%;height:100%",
-        )
+        self.js = """
+self.ed=ace.edit( "%s" );
+self.ed.setTheme("ace/theme/cobalt");
+self.ed.session.setMode("ace/mode/%s");
+self.ed.session.setUseWrapMode(false);
+self.ed.setOptions({"fontSize": "11pt"});
+self.ed.setBehavioursEnabled(false);
+self.ed.session.setUseWorker(false);
+self.ed.getSession().setUseSoftTabs(true);
+
+self.ed.commandSave=function() {%s}
+
+self.ed.commands.addCommand({
+    name: "commandSave1",
+    bindKey: {"win": "Ctrl-S",  "mac": "Command-S"},
+    readOnly: "True",
+    exec: self.ed.commandSave,
+})
+self.ed.commands.addCommand({
+    name: "commandSave2",
+    bindKey: {"win": "Ctrl-Enter",  "mac": "Command-Enter"},
+    readOnly: "True",
+    exec: self.ed.commandSave,
+})
+""" % (id(oed),mode, self.bind._save( b"self.ed.getValue()"))
+
+    def _save(self,value):
+        self.value = value
+        if self.onsave: self.onsave(self)
+
+class Back(Tag.div):
+    def init(self,o):
+        # background = Tag.div( content=None,_style="z-index:1000000;position:absolute;top:0px;left:0px;right:0px;bottom:0px;background:#EEE;opacity:0.5;cursor:pointer;",_onclick=self.close )
+        background = Tag.div( content=None,_style="z-index:1000000;position:absolute;top:0px;left:0px;right:0px;bottom:0px;background:#FFF;cursor:pointer;",_onclick=self.close )
+        background += Tag.button("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Back&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",_onclick=self.close,_class="right red")
+       
+        inputs = Tag.div( o,_style="z-index:1000001;position:absolute;top:31px;left:0px;right:0px;bottom:0px;background:white;border:1px solid black" )
         
         # draw ui
-        self <= Tag.div(self.ed+self.iframe,_style="display:flex;height:100vh")
-        
-    def preview(self,o):
-        code = o.value.strip()
-        self.iframe["src"]= dataurl( generate_pyscript(code) )
+        self += background
+        self += inputs
+
+    def close(self,o=None):
+        self.remove()
+
+class HTDemo(Tag.body):
+    statics="""html, body {width:100%;height:100%;margin:0px;font-family:arial;}
+    * {box-sizing: border-box;}
+    .right {float:right}
     
+    button {
+      color: #ffffff;
+      text-decoration: none;
+      padding: 4px 14px 4px 14px;
+      border-radius: 4px;
+      display: inline-block;
+      border: none;
+      margin-left:2px;
+      margin-top:1px;
+      margin-bottom:1px;
+      cursor:pointer;
+      font-size:1.1em;
+    }    
+
+    button.green {background:#1A1;}
+    button.red   {background:#A11;}
+    button.blue  {background:#22C;}
+    
+    iframe {width:100%;height:100% }
+    """
+    
+    imports=Ed,Back
+
+    def init(self, code:str=""):
+        if code:
+            if code.startswith("Z:"):
+                code = b64ZlibDecode(code[2:])
+        else:
+            code=DEFAULT
+        self._back=None
+        self.ed = Ed(code, onsave=self.do_preview,_style="height:100%;flex:1 1 auto")
+        self.ui=Tag.div()
+        
+        # draw ui
+        self.top=Tag.div(_class="top")
+        self.top += Tag.button("Run",_onclick=lambda o: self.ed.call("self.ed.commandSave()"),_class="right green",_title="Run this (CTRL+Enter)")
+        self.top += Tag.button("Help",_onclick=self.do_help,_class="blue right",_title="Need help")
+        
+        self += Tag.div( self.top + self.ed,_style="display:flex;flex-flow:column;height:100%;width:100%;overflow:hidden")
+        self += self.ui
+        
+        self.call( """
+window.addEventListener("message", (event) => {
+    if(event && event.data && event.data.startsWith && event.data.startsWith("Z:"))
+        %s;
+})
+""" % self.bind.updateFromMessage( b"event.data.substr(2)" ) )
+
+    def updateFromMessage(self,zb64):
+        o = json.dumps( dict(code=b64ZlibDecode(zb64)) )
+        self.ed.call( f"""
+self.ed.setValue( {o}.code );
+self.ed.moveCursorToPosition( {{row:0,column:0}} );
+self.ed.scrollToLine( 0,true,true );
+self.ed.focus();
+        """)
+
+        if self._back:
+            self._back.close()
+            self._back=None
+
+        
+    def do_help(self,o):    
+        self._back = Back(Tag.iframe(_src="https://www.mlan.fr/htdemo"))
+        self.ui+= self._back
+    
+    def do_preview(self,o):
+        html = generate_pyscript(o.value)
+        self.ui+=Back(Tag.iframe(_src=dataurl(html)))
+    
+App=HTDemo
 ###############################################################################
 from htag.runners import PyScript
 from js import window
 
-PyScript( PyEditor ).run( window )
+PyScript( HTDemo ).run( window )
 
 </py-script>
 </body>
