@@ -133,10 +133,11 @@ self.ed.commands.addCommand({
         if self.onsave: self.onsave(self)
 
 class Back(Tag.div):
-    def init(self,o):
+    def init(self,o,actions=""):
         # background = Tag.div( content=None,_style="z-index:1000000;position:absolute;top:0px;left:0px;right:0px;bottom:0px;background:#EEE;opacity:0.5;cursor:pointer;",_onclick=self.close )
         background = Tag.div( content=None,_style="z-index:1000000;position:absolute;top:0px;left:0px;right:0px;bottom:0px;background:#FFF;cursor:pointer;",_onclick=self.close )
         background += Tag.button("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Back&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",_onclick=self.close,_class="right red")
+        background += actions
        
         inputs = Tag.div( o,_style="z-index:1000001;position:absolute;top:31px;left:0px;right:0px;bottom:0px;background:white;border:1px solid black" )
         
@@ -169,6 +170,7 @@ class HTDemo(Tag.body):
     button.green {background:#1A1;}
     button.red   {background:#A11;}
     button.blue  {background:#22C;}
+    button.white {background:#EEE;color:black}
     
     iframe {width:100%;height:100% }
     """
@@ -220,8 +222,20 @@ self.ed.focus();
     
     def do_preview(self,o):
         html = generate_pyscript(o.value)
-        self.ui+=Back(Tag.iframe(_src=dataurl(html)))
-    
+        test=Tag.button("download",_style="float:right",_onclick=self.download,_class="button white")
+        self.ui+=Back(Tag.iframe(_src=dataurl(html)),test)
+        
+    def download(self,o):
+        content = generate_pyscript(self.ed.value)
+        name="YourHtagApp.html"
+        self.call( f"""
+let a = document.createElement('a');
+a.href = `{dataurl(content)}`;
+a.target = '_blank';
+a.download = `{name}`;
+a.click();
+""")
+
 App=HTDemo
 ###############################################################################
 from htag.runners import PyScript
