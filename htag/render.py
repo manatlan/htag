@@ -231,65 +231,15 @@ function action( payload ) {
     if(o.hasOwnProperty("err")) _error( o["err"], "PYTHON")
 }
 
-function jevent (e) {
+function jevent(e) {
     let n={};
-    if(e===undefined || e==null) return n;
-
-    // pointerevent
-    n.isTrusted=e.isTrusted;
-    n.altKey=e.altKey;
-    n.altitudeAngle=e.altitudeAngle;
-    n.azimuthAngle=e.azimuthAngle;
-    n.bubbles=e.bubbles;
-    n.button=e.button;
-    n.buttons=e.buttons;
-    n.cancelBubble=e.cancelBubble;
-    n.cancelable=e.cancelable;
-    n.clientX=e.clientX;
-    n.clientY=e.clientY;
-    n.composed=e.composed;
-    n.ctrlKey=e.ctrlKey;
-    n.defaultPrevented=e.defaultPrevented;
-    n.detail=e.detail;
-    n.eventPhase=e.eventPhase;
-    n.height=e.height;
-    n.isPrimary=e.isPrimary;
-    n.layerX=e.layerX;
-    n.layerY=e.layerY;
-    n.metaKey=e.metaKey;
-    n.movementX=e.movementX;
-    n.movementY=e.movementY;
-    n.offsetX=e.offsetX;
-    n.offsetY=e.offsetY;
-    n.pageX=e.pageX;
-    n.pageY=e.pageY;
-    n.pointerId=e.pointerId;
-    n.pointerType=e.pointerType;
-    n.pressure=e.pressure;
-    n.returnValue=e.returnValue;
-    n.screenX=e.screenX;
-    n.screenY=e.screenY;
-    n.shiftKey=e.shiftKey;
-    n.tangentialPressure=e.tangentialPressure;
-    n.tiltX=e.tiltX;
-    n.tiltY=e.tiltY;
-    n.timeStamp=e.timeStamp;
-    n.twist=e.twist;
-    n.type=e.type;
-    n.which=e.which;
-    n.width=e.width;
-    n.x=e.x;
-    n.y=e.y;
-
-    // keyboardevent specific
-    n.charCode=e.charCode;
-    n.code=e.code;
-    n.isComposing=e.isComposing;
-    n.key=e.key;
-    n.keyCode=e.keyCode;
-    n.location=e.location;
-    n.repeat=e.repeat;
-
+    if(e!==undefined && e!=null && e)
+        for (let k in e) {
+            let v=e[k];
+            let t=typeof v;
+            if( k.toUpperCase()!=k && (t === "number" || t === "boolean" || t === "string") )
+                n[k] = v;
+        }
     return n;
 }
 
