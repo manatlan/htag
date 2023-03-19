@@ -92,7 +92,11 @@ PyScript( App ).run( window )
 </body>
 </html>""" % (json.dumps( externals ),code)
 
-dataurl = lambda html: "data:text/html,"+urllib.parse.quote(html)
+def dataurlh(data):
+    return 'data:text/html,'+urllib.parse.quote(data)
+def dataurlt(data):
+    data64 = base64.b64encode(data.encode())
+    return 'data:text/plain;base64,'+data64.decode()   
 
 
 class Ed(Tag.div):
@@ -235,17 +239,17 @@ self.ed.focus();
         html = generate_pyscript(o.value)
         test=Tag.button( Tag.img(_src=IMG,_width="18px")+"py",_style="float:right",_onclick=self.download_p,_class="button white",_title="Download as python file")
         test2=Tag.button(Tag.img(_src=IMG,_width="18px")+"demo",_style="float:right",_onclick=self.download_h,_class="button white",_title="Download as pyscript/html demo file")
-        self.ui+=Back(Tag.iframe(_src=dataurl(html)),test+test2)
+        self.ui+=Back(Tag.iframe(_src=dataurlh(html)),test+test2)
         
     def download_h(self,o):
-        self._download( generate_pyscript(self.ed.value),"YourHtagApp.html")
+        self._download( dataurlh(generate_pyscript(self.ed.value)),"YourHtagApp.html")
     def download_p(self,o):
-        self._download( generate_python(self.ed.value),"YourHtagApp.py")
+        self._download( dataurlt(generate_python(self.ed.value)),"YourHtagApp.py")
 
     def _download(self,content,name="file.txt"):
         self.call( f"""
 let a = document.createElement('a');
-a.href = `{dataurl(content)}`;
+a.href = `{content}`;
 a.target = '_blank';
 a.download = `{name}`;
 a.click();
