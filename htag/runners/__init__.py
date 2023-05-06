@@ -35,6 +35,13 @@ except Exception as err:
 
 try:
     # mono instance
+    from .webws import WebWS
+except Exception as err:
+    ERROR=err
+    class WebWS(_RunnerNotFunctionnal): pass
+
+try:
+    # mono instance
     from .devapp import DevApp                                      # special dev
 except Exception as err:
     ERROR=err

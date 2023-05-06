@@ -64,7 +64,7 @@ class HtagSession:  # ASGI Middleware, for starlette
             htuid=str(uuid.uuid4())
             self._sessions[htuid]={}
 
-        scope["session"] = self._sessions.get(htuid,{})
+        scope["session"] = self._sessions.get(htuid,{"id":htuid})   # provide id session (htuid)
 
         async def send_wrapper(message: Message) -> None:
             if message["type"] == "http.response.start":

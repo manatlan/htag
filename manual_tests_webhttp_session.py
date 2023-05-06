@@ -31,7 +31,7 @@ class Page(Tag.body):
 # and execute it in a pywebview instance
 from htag.runners import *
 
-app=WebHTTP( Page )
+app=WebWS( Page )
 if __name__ == "__main__":
     # BrowserTornadoHTTP( Page ).run()
 
