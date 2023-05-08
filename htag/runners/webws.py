@@ -37,6 +37,7 @@ from starlette.responses import HTMLResponse,JSONResponse,Response
 from starlette.routing import Route
 from starlette.routing import Route,WebSocketRoute
 from starlette.endpoints import WebSocketEndpoint
+from http.cookies import SimpleCookie
 
 logger = logging.getLogger(__name__)
 
@@ -48,8 +49,9 @@ class WebWS(Starlette):
 
         The instance is an ASGI htag app
     """
-    def __init__(self,tagClass:type=None, timeout=5*60):
+    def __init__(self,tagClass:type=None, timeout:int=5*60, wss:bool=False):
         if tagClass: assert issubclass(tagClass,Tag)
+        self.wss=wss
         self.tagClass=tagClass
         self.timeout=timeout
         self.sessions={} # {htuid:session,}
@@ -57,48 +59,28 @@ class WebWS(Starlette):
         class WsInteract(WebSocketEndpoint):
             encoding = "json"
 
-            #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            # working here
-            #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             async def on_receive(this, websocket, data):
-                fqn=websocket.query_params['fqn']   # osef
-                hrid=websocket.query_params['hrid']
+                try:
+                    cookie = SimpleCookie()
+                    cookie.load(websocket.headers.get("cookie"))
+                    htuid = cookie["session"].value # !!! depends on name set in HtagSession !!! TODO: make it better
+                    rsession = self.sessions[htuid]
+                    fqn=websocket.query_params['fqn']
+                except Exception as e:
+                    logger.error("WS can't find current session id")
+                    return
 
-                import ctypes
-                hr = ctypes.cast(int(hrid), ctypes.py_object).value # <- not that, please ;-)
-
-                # we are on the right current instance
-                logger.info("INTERACT WITH %s",fqn)
-                actions = await hr.interact(data["id"],data["method"],data["args"],data["kargs"],data.get("event"))
-                await websocket.send_text( json.dumps(actions) )
-                return
-
-                # rsession = self.sessions[htuid]
-
-                # hr=rsession["HRSessions"].get_hr( fqn )
+                hr=rsession["HRSessions"].get_hr( fqn )
                 if hr:
-                    if id(hr) == hrid:
-                        # we are on the right current instance
-                        rsession["lastaccess"]=time.time()
-                        logger.info("INTERACT WITH %s",fqn)
-                        actions = await hr.interact(data["id"],data["method"],data["args"],data["kargs"],data.get("event"))
-                        await websocket.send_text( json.dumps(actions) )
-                    else:
-                        # Current instance has been renewed, and you talking to a dead objet !
-                        # return HTMLResponse( "412 DOESN'T MATCH CURRENT INSTANCE" , status_code=412 ) # 412 Precondition Failed
-                        print("================",412)
-                        await websocket.send_text( "{}" )
+                    # we are on the right current instance
+                    rsession["lastaccess"]=time.time()
+                    logger.info("INTERACT WITH %s",fqn)
+                    actions = await hr.interact(data["id"],data["method"],data["args"],data["kargs"],data.get("event"))
+                    await websocket.send_text( json.dumps(actions) )
                 else:
                     # session expired or bad call
                     # return HTMLResponse( "400 BAD REQUEST" , status_code=400 )
-                    print("================",400)
-                    await websocket.send_text( "{}" )
-            #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    await websocket.send_text( json.dumps(dict(error="Session not present")) )
 
 
         # routes=[ Route('/{fqn:str}-{hrid:int}',   self.POST,  methods=["POST"]) ]
@@ -190,13 +172,18 @@ class WebWS(Starlette):
                     ws.send( JSON.stringify(o) );
                 }
 
-
-                var ws = new WebSocket("ws://"+document.location.host+"/ws?fqn=%s&hrid=<<hrid>>");
+                var ws = new WebSocket("%s://"+document.location.host+"/ws?fqn=%s");
                 ws.onopen = start;
                 ws.onmessage = function(e) {
-                    action( e.data );
+                    if(e.data.error)
+                        alert(e.data.error);
+                    else
+                        action( e.data );
                 };
-            """ % fqn
+            """ % (
+                "wss" if self.wss else "ws",
+                fqn,
+            )
 
             hr=HRenderer(klass, js, init=init, session=request.session ) # NO EXIT !!
 

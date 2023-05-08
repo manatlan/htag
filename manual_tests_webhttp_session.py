@@ -7,10 +7,9 @@ class Page(Tag.body):
     def init(self):
         self.call.redraw()
         self.nb=0
-        print(self.session)
 
     def clir(self,o):
-        self.session.clear()
+        self.session["toto"]=0
         self.redraw()
 
     def redraw(self):
