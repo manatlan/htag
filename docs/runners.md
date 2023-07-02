@@ -345,6 +345,8 @@ Because it's based on **Starlette**, this runner is an **ASGI HTag App**, which 
 
 As it's a webserver, and unlike others : you can have many clients, so it's a different beast ;-)
 
+**NEW** See [htagweb](https://github.com/manatlan/htagweb), for a better solution !
+
 It manages a http session (with a cookie), and the session is available, per user, in `request.session`, or `<htag_instance>.session` (sessions are server-side). But, you can have only one instance of a htag Tag class, per user. (and like others, if you hit F5/refresh, it will reuse the current instance (not recreate it!)). The re-creation of the instance is based on the url/path (you'll need to change query_params, for example), and so ; the newest will replace the old one, so the memory stay "acceptable". And, of course, you can have many htag class managed by many endpoints. (see: [asgi things](../asgi/))
 
 HTag wasn't designed (at start) to be served on a webserver (with many clients), But this solution is completly usable, with this kind of runner.
@@ -434,4 +436,6 @@ Htag provides somes [`runners`](https://github.com/manatlan/htag/runners) ootb. 
 
 **Example:**
 
-In my case, I've build my own, as a "htag application web server" : a process which can spawn/manage htag process, and communicate with a front https/wss server, thru unix socket. The "htag web app" communicate with the front https/wss server using websocket if available, or fallback to http. It's pretty solid, and works like a charm. If I reach to make it more generic, I will add another runner for this concept later.
+In my case, I've build my own, as a "htag application web server" : a process which can spawn/manage htag process, and communicate with a front https/wss server, thru unix socket. The "htag web app" communicate with the front https/wss server ~~using websocket if available, or fallback to http~~. It's pretty solid, and works like a charm. ~~If I reach to make it more generic, I will add another runner for this concept later~~.
+
+Now, it's real, it's [htagweb](https://github.com/manatlan/htagweb) !
