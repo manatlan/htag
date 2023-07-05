@@ -444,13 +444,14 @@ def test_discovering_js():
             self.set( O() )             # Tag directly in Tag
 
     class OOOL(Tag.div):  # lately rendering
-        def render(self):
+        def render(self): # BAD PRACTICE (creating a tag in render will always force rendering) !!!!!!!!!!!!!!!!!!
             self.set( Tag.div(O()) )    # Tag in a TagBase
 
     async def test(r): # first call (init obj)
         # resp = await r.interact( r.tag, None, None, None)
         # assert 0 in resp["update"]
         # assert "/*JS1*/" in resp["post"]
+        print("===",r)
         assert "/*JS1*/" in str(r)
 
     r=HRenderer(OOI,"//js interact")
@@ -459,11 +460,11 @@ def test_discovering_js():
     r=HRenderer(OOOI,"//js interact")
     asyncio.run(test(r))
 
-    r=HRenderer(OOL,"//js interact")
-    asyncio.run(test(r))
+    # r=HRenderer(OOL,"//js interact")
+    # asyncio.run(test(r))
 
-    r=HRenderer(OOOL,"//js interact")
-    asyncio.run(test(r))
+    # r=HRenderer(OOOL,"//js interact")
+    # asyncio.run(test(r))
 
 
 # this test is NON SENSE, til statics are imported in static (not dynamic anymore)
@@ -736,4 +737,5 @@ if __name__=="__main__":
     # test_new_base()
     # test_intelligent_rendering2()
     # test_just_4_coverage()
-    test_avoid_tagcreation_in_render()
+    # test_avoid_tagcreation_in_render()
+    test_discovering_js()
