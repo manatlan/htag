@@ -18,6 +18,10 @@ from starlette.responses import HTMLResponse
 from starlette.routing import Route,WebSocketRoute
 from starlette.endpoints import WebSocketEndpoint
 
+import logging
+logger = logging.getLogger(__name__)
+
+
 class BrowserStarletteWS(Starlette):
     """ Simple ASync Web Server (with starlette) with WebSocket interactions with HTag.
         Open the rendering in a browser tab.
@@ -29,12 +33,32 @@ class BrowserStarletteWS(Starlette):
         self.hrenderer = None
         self.tagClass = tagClass
 
+        async def _sendactions(ws, actions:dict) -> bool:
+            try:
+                await ws.send_text( json.dumps(actions) )
+                return True
+            except Exception as e:
+                logger.error("Can't send to socket, error: %s",e)
+                return False
+
+
         class WsInteract(WebSocketEndpoint):
             encoding = "json"
 
+            #=========================================================
+            async def on_connect(this, websocket):
+
+                # accept cnx
+                await websocket.accept()
+
+                # declare hr.sendactions (async method)
+                self.hrenderer.sendactions = lambda actions: _sendactions(websocket,actions)
+
+            #=========================================================
+
             async def on_receive(this, websocket, data):
                 actions = await self.hrenderer.interact(data["id"],data["method"],data["args"],data["kargs"],data.get("event"))
-                await websocket.send_text( json.dumps(actions) )
+                await _sendactions( websocket, actions )
 
         Starlette.__init__(self,debug=True, routes=[
             Route('/', self.GET, methods=["GET"]),

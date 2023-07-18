@@ -96,6 +96,8 @@ class HRenderer:
         self._interaction_scripts=[]
         self.init = tuple( [tuple(init[0]),dict(init[1])] ) # save args/kargs whose initialized the instance
         self.session=session
+        
+        self.sendactions=None   # method async sendactions(actions:dict) -> bool
 
         try:
             try:
@@ -360,6 +362,16 @@ function jevent(e) {
             rep["post"]="\n".join( scripts )
 
         return rep
+        
+    async def update(self,tag:Tag):
+        """ return True if hrenderer can update the component (ex: runner with ws)"""
+        if self.sendactions is None:
+            logger.error("This runner can't update a component")
+        else:
+            actions=dict(update={ id(tag): str(tag)})
+            #TODO: scripts ?
+            return await self.sendactions( actions )
+        return False
 
     def __str__(self) -> str:
         head=Tag.head()

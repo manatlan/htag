@@ -19,10 +19,21 @@ from starlette.endpoints import WebSocketEndpoint
 
 import socket
 
+import logging
+logger = logging.getLogger(__name__)
+
 def isFree(ip, port):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.settimeout(1)
     return not (s.connect_ex((ip,port)) == 0)
+
+async def _sendactions(ws, actions:dict) -> bool:
+    try:
+        await ws.send_text( json.dumps(actions) )
+        return True
+    except Exception as e:
+        logger.error("Can't send to socket, error: %s",e)
+        return False
 
 class DevApp(Starlette):
     """ DEV APP, Runner specialized for development process. Features :
@@ -43,13 +54,25 @@ class DevApp(Starlette):
         self.hrenderers={}
         self.tagClass=tagClass
 
+        self._ws=None
+
         class WsInteract(WebSocketEndpoint):
             encoding = "json"
+
+            #=========================================================
+            async def on_connect(this, websocket):
+
+                # accept cnx
+                await websocket.accept()
+
+                # declare websocket
+                self._ws=websocket
+            #=========================================================
 
             async def on_receive(this, websocket, data):
                 className = data["class"]
                 actions = await self.hrenderers[className].interact(data["id"],data["method"],data["args"],data["kargs"],data["event"])
-                await websocket.send_text( json.dumps(actions) )
+                await _sendactions( websocket, actions )
 
         Starlette.__init__(self,debug=True, routes=[
             Route('/', self.GET, methods=["GET"]),
@@ -107,6 +130,8 @@ ws.onmessage = function(e) {
 };
 """ % className
         self.hrenderers[className]=HRenderer(tagClass, js, self.killme, fullerror=True, statics=[template,], init=init)
+        self.hrenderers[className].sendactions = lambda actions: _sendactions(self._ws,actions)
+
         return self.hrenderers[className]
 
 

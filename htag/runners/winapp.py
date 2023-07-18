@@ -18,6 +18,10 @@ import tornado.ioloop
 import tornado.web
 import tornado.websocket
 
+
+import logging
+logger = logging.getLogger(__name__)
+
 class WinApp:
 
     """ This a "Chrome App Runner" : it runs the front in a "Chrome App mode" by re-using
@@ -72,11 +76,23 @@ ws.onclose = function(e) {
                 self.hrenderer = instanciate( str(this.request.uri) )
                 this.write( str(self.hrenderer) )
 
+        async def _sendactions(ws, actions:dict) -> bool:
+            try:
+                await ws.write_message( json.dumps(actions) )
+                return True
+            except Exception as e:
+                logger.error("Can't send to socket, error: %s",e)
+                return False
+
         class SocketHandler(tornado.websocket.WebSocketHandler):
+            def open(this):
+                # declare hr.sendactions (async method)
+                self.hrenderer.sendactions = lambda actions: _sendactions(this,actions)
+
             async def on_message(this, data):
                 data=json.loads(data)
                 actions = await self.hrenderer.interact(data["id"],data["method"],data["args"],data["kargs"],data.get("event"))
-                this.write_message(json.dumps(actions))
+                await _sendactions( this, actions )
 
             def on_close(this):
                 print("!!! exit on socket.close !!!")
