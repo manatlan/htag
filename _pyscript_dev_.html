@@ -5,7 +5,14 @@
     <script defer src="https://pyscript.net/latest/pyscript.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <py-config>
-    packages = ["htag"]
+    # packages = ["htag"]                                    # runned as local file (using pypi htag latest lib)
+    packages = ["./dist/htag-0.0.0-py3-none-any.whl"]        # runned thru a webserver(*) (using local whl from webserver)
+
+
+    # (*) This thing is complex to test/develop (need to use a local wheel, thru a webserver), you'll need to do :
+    # - poetry build                                              # to produce dist/htag-0.0.0-py3-none-any.whl
+    # - python3 -m http.server 8001
+    # - chrome http://localhost:8001/manual_pyscript.html
     </py-config>
 </head>
 
@@ -14,26 +21,32 @@
 <py-script>
 
 from htag import Tag
+import asyncio,time
 
-class QRCode(Tag.div):
-    statics=Tag.script(_src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js")
+class App(Tag.body):
+    statics="body {background:#EEE;}"
 
-    def init(self,txt,size=128):
-        self.js=f"""
-new QRCode( self, {{
-    text: `{txt}`,
-    width: {size},
-    height: {size},
-    colorDark : "#000000",
-    colorLight : "#ffffff",
-    correctLevel : QRCode.CorrectLevel.H
-}})"""
-
-class App(Tag.div):
-    imports=[QRCode]
     def init(self):
-        self+=QRCode("https://my.netlib.re/htag/index/ed#/htag/QRCODE",256)
+        self.place = Tag.div()
 
+        asyncio.ensure_future( self.loop_timer() )
+
+        self += "Hello World" + self.place
+        self+= Tag.button("yo",_onclick=self.doit)
+
+    async def doit(self,o):
+        self+="x"
+
+    async def loop_timer(self):
+        while self.place:
+            self.place.set(time.time() )
+            await self.place.update()       # !!! update component (with tag.update() ) !!!
+            await asyncio.sleep(0.5)
+
+
+###############################################################################
+## here is the htag.runner.pyscript file (easier to modify in place)
+## should be the same as "htag.runner.pyscript.py"
 ###############################################################################
 from htag.render import HRenderer
 from htag.runners import commons
@@ -47,6 +60,7 @@ class PyScript:
         self.tagClass=tagClass
 
     def run(self,window): # window: "pyscript js.window"
+        self.window=window
 
         js = """
 interact=async function(o) {
@@ -54,13 +68,14 @@ interact=async function(o) {
 }
 
 function pyscript_starter() {
-    if(document.querySelector("*[needToLoadIt]"))
+    if(document.querySelector("*[needToLoadBeforeStart]"))
         window.setTimeout( pyscript_starter, 100 )
     else
         window.start()
 }
 """
         self.hr = HRenderer(self.tagClass, js, init=commons.url2ak( window.document.location.href ))
+        self.hr.sendactions=self.updateactions
 
         window.interactions = self.interactions
         assert window.document.head, "No <head> in <html>"
@@ -75,8 +90,8 @@ function pyscript_starter() {
                 for key,value in s.attrs.items():
                     setattr(tag, key, value)
                     if key in ["src","href"]:
-                        tag.setAttribute("needToLoadIt", True)
-                        tag.onload = lambda o: o.target.removeAttribute("needToLoadIt")
+                        tag.setAttribute("needToLoadBeforeStart", True)
+                        tag.onload = lambda o: o.target.removeAttribute("needToLoadBeforeStart")
 
                 window.document.head.appendChild(tag)
 
@@ -84,13 +99,18 @@ function pyscript_starter() {
         window.document.body.outerHTML=str(self.hr)
 
         # and start the process
-        window.pyscript_starter()
+        window.pyscript_starter() # will run window.start, when dom ready
 
     async def interactions(self, o):
         data=json.loads(o)
         actions = await self.hr.interact( data["id"], data["method"], data["args"], data["kargs"], data.get("event") )
         return json.dumps(actions)
 
+    async def updateactions(self, actions:dict):
+        self.window.action( json.dumps(actions) )   # send actions as json (not a js(py) object) ;-(
+
+###############################################################################
+# the runner part
 ###############################################################################
 #from htag.runners import PyScript
 from js import window

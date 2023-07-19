@@ -15,7 +15,7 @@ class _RunnerNotFunctionnal:
 # mono instance
 from .browserhttp import BrowserHTTP
 
-# multi instances
+# multi instances                                                   !!! CAN UPDATE !!!
 from .pyscript import PyScript
 
 
