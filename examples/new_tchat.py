@@ -7,6 +7,19 @@ import asyncio,sys,time
 from htag import Tag
 
 class TagConvShared(Tag.div):
+    """
+    This is very special component. It has 2 goals:
+    - manage an unique representation of the conversation (tchat exchanges)
+    - redraw the representation on each client/instance, in live (with tag.update())
+
+    This component can only work in some runners :
+    - the runner should handle many client (think 'web' .. another web-session should open another htag instance)
+    - the instances should be shared in the same process (only webws do this)
+
+    The ONLY runner which can run this correctly is **WebWS**.
+    (WebHTTP doesn't support tag.update() (http is not bi-directionnal))
+    (others runners, with websockets, are "mono instance" (manage only one user/web-session))
+    """
     ll=[]           # \_ class properties (shared with instances)
     instances={}    # /
 
@@ -49,12 +62,8 @@ class App(Tag.body):
         await self.oconv.add_entry( txt )
 
 
-#================================================================================= with update capacity
+#================================================================================= runner with update capacity
 from htag.runners import WebWS as Runner                    #<= the only one which will work (coz multi instance/session)
-# from htag.runners import BrowserStarletteWS as Runner
-# from htag.runners import ChromeApp as Runner
-# from htag.runners import WinApp as Runner
-# from htag.runners import DevApp as Runner
 #=================================================================================
 
 app=Runner(App)
