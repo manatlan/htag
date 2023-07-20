@@ -16,7 +16,7 @@ Runners compatibles are :
  - [WinApp](runners#WinApp), because based on websocket!
  - [PyScript](runners#PyScript), because internal calls!
  - [WebWS](runners#WebWS), because based on websocket!
- - [htagweb.WebServerWS](https://github.com/manatlan/htagweb), because based on websocket!
+ - ~~[htagweb.WebServerWS](https://github.com/manatlan/htagweb), because based on websocket!~~
 
 All others are not compatibles, because they mainly use `http` between front and back. And
 [PyWebView](runners#PyWebView) is not compatible too, because [pywebview](https://pywebview.flowrl.com) doesn't support async things.
