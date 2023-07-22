@@ -39,6 +39,7 @@ class Page2(Tag.body): # define a <body>, but the renderer will force it to <bod
         self+=Tag.a("remover",_href="/p")
 
 
+App=Page
 
 # and execute it in a pywebview instance
 from htag.runners import *

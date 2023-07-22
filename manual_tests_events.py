@@ -75,7 +75,7 @@ class Page(Tag.body):
         yield ["c","d"]
         yield MyTag("kiki", nimp)
 
-
+App=Page
 from htag.runners import DevApp as Runner
 app=Runner( Page )
 if __name__ == "__main__":

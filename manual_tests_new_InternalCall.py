@@ -11,6 +11,7 @@ class Page(Tag.body):
     def doit(self,msg):
         self+=msg
 
+App=Page
 # and execute it in a pywebview instance
 from htag.runners import *
 # PyWebWiew( Page ).run()

@@ -11,6 +11,8 @@ class Page(Tag.body):
     def print(self,o):
         print(o.event)
 
+App=Page
+
 # and execute it in a pywebview instance
 from htag.runners import *
 # PyWebWiew( Page ).run()

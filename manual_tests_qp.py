@@ -7,8 +7,9 @@ class App(Tag.body):
     def init(self,param="nada"):
         self["style"]="background:#EEE;"
         self <= Tag.h3("param = "+param)
-        self <= Tag.a("test '/' ?",_href="/",_style="display:block")
-        self <= Tag.a("test '/?param=yo'",_href="/?param=yo",_style="display:block")
+        self <= Tag.a("test '?' ?",_href="?",_style="display:block")
+        self <= Tag.a("test '?param=A1'",_href="?param=A1",_style="display:block")
+        self <= Tag.a("test '?param=A2'",_href="?param=A2",_style="display:block")
         self <= Tag.button("add content", _onclick=self.add_content)    # just to control interact
         self <= Tag.button("quit app", _onclick=lambda o: self.exit())    # just to test QUIT/EXIT app
         self <= Tag.hr()
