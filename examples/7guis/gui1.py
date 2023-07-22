@@ -14,9 +14,11 @@ class Gui1(Tag.body):
     def inc(self):
         self.value+=1
 
-# and execute it in a pywebview instance
-from htag.runners import *
-PyWebWiew( Gui1 ).run()
+App=Gui1
+if __name__=="__main__":
+    # and execute it in a pywebview instance
+    from htag.runners import *
+    PyWebWiew( Gui1 ).run()
 
-# here is another runner, in a simple browser (thru ajax calls)
-# BrowserHTTP( Page ).run()
+    # here is another runner, in a simple browser (thru ajax calls)
+    # BrowserHTTP( Page ).run()

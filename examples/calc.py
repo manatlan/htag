@@ -55,6 +55,8 @@ class Calc(Tag.div):
         self.txt=""
         self.aff.set("&nbsp;")
 
+App=Calc
+
 if __name__=="__main__":
     # import logging
     # logging.basicConfig(format='[%(levelname)-5s] %(name)s: %(message)s',level=logging.DEBUG)

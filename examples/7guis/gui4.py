@@ -42,9 +42,11 @@ class Gui4(Tag.body):
         self.gauge.value=v  # FOR TEST ONLY
 
 
-# and execute it in a pywebview instance
-from htag.runners import *
-PyWebWiew( Gui4 ).run()
+App=Gui4
+if __name__=="__main__":
+    # and execute it in a pywebview instance
+    from htag.runners import *
+    PyWebWiew( Gui4 ).run()
 
-# here is another runner, in a simple browser (thru ajax calls)
-# BrowserHTTP( Page ).run()
+    # here is another runner, in a simple browser (thru ajax calls)
+    # BrowserHTTP( Page ).run()

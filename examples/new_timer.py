@@ -23,10 +23,11 @@ class App(Tag.body):
         self+="x"
 
     async def loop_timer(self):
-        while self.place:
-            self.place.set(time.time() )
-            await self.place.update() # update component using current websocket
+        while 1:
             await asyncio.sleep(0.5)
+            self.place.set(time.time() )
+            if not await self.place.update(): # update component using current websocket
+                break
 
 
 

@@ -15,16 +15,18 @@ class Gui2(Tag.body):
     def changeC(self,v):
         self.valueC=float(v)
         self.valueF=(self.valueC*9/5) - 32
-        
+
     def changeF(self,v):
         self.valueF=float(v)
         self.valueC=(self.valueF-32) *(5/9)
-        
 
 
-# and execute it in a pywebview instance
-from htag.runners import *
-PyWebWiew( Gui2 ).run()
 
-# here is another runner, in a simple browser (thru ajax calls)
-# BrowserHTTP( Page ).run()
+App=Gui2
+if __name__=="__main__":
+    # and execute it in a pywebview instance
+    from htag.runners import *
+    PyWebWiew( Gui2 ).run()
+
+    # here is another runner, in a simple browser (thru ajax calls)
+    # BrowserHTTP( Page ).run()

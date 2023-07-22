@@ -30,7 +30,7 @@ class Page2(Tag.div):
     def init(self):
         self+="Page 2"
 
-class MyApp(Tag.body):
+class App(Tag.body):
     """ Example1: classic use (view is just a child of the body), at child level """
     def init(self):
         p0 = "welcome"  # default page
@@ -63,6 +63,6 @@ class MyApp(Tag.body):
 #======================================
 from htag.runners import DevApp as Runner
 
-app=Runner( MyApp )
+app=Runner( App )
 if __name__=="__main__":
     app.run()

@@ -120,14 +120,14 @@ from htag.runners import DevApp as Runner
 # from htag.runners import BrowserHTTP as Runner
 # from htag.runners import ChromeApp as Runner
 
-import logging
-logging.basicConfig(format='[%(levelname)-5s] %(name)s: %(message)s',level=logging.DEBUG)
-
-logging.getLogger("htag.tag").setLevel( logging.ERROR )
-logging.getLogger("htag.render").setLevel( logging.ERROR )
-logging.getLogger("uvicorn.error").setLevel( logging.ERROR )
-logging.getLogger("asyncio").setLevel( logging.ERROR )
 
 app=Runner(App)
 if __name__=="__main__":
+    import logging
+    logging.basicConfig(format='[%(levelname)-5s] %(name)s: %(message)s',level=logging.DEBUG)
+
+    logging.getLogger("htag.tag").setLevel( logging.ERROR )
+    logging.getLogger("htag.render").setLevel( logging.ERROR )
+    logging.getLogger("uvicorn.error").setLevel( logging.ERROR )
+    logging.getLogger("asyncio").setLevel( logging.ERROR )
     app.run()

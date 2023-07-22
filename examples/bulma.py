@@ -601,76 +601,77 @@ class Tabs(Tag.div): # New version (thad optimized)
 
 
 
+
+ALLTAGS = ["banana", "apple", "pear", "peach", "melon", "cherry", "plum"]
+
+
+class MyTabs(Tabs):  # inherit
+    def __init__(self,**a):
+        super().__init__(**a)
+        self.addTab("P1", "I'm the page1")
+        self.addTab("P2", "Currently, I am the page2 !")
+
+class Page(Tag.div):
+    js = "console.log('started')"
+    def init(self):
+        self.select=2
+        self.disabled=False
+        self.ll = [(i + 1, i + 1, i + 1, i + 1, i + 1) for i in range(33)]
+        self.mbox = MBox( self )
+        self.toast = Toaster( self )
+
+
+        group1=Tag.div()
+        group1<=VBox()
+        group1<=HBox( Button("hello"), Button("hello", _class="is-success") )
+        group1<=HBox( Button("hello"), Button("hello") )
+        group1<=Tags( ["pear","plum"], ALLTAGS)
+        group1<=Checkbox( False, "Just do it")
+        group1<=Button("aff modal",_onclick=self.bind.affmodal())
+        group1<=Button("aff toast",_onclick=self.bind.afftoast())
+        group1<=InputText("hello", onchange = self.onchange)
+        group1<=TextArea("world", onchange = self.onchange)
+
+
+        group2=Tag.div()
+        #=============== selectors
+        group2<=TabsHeader(self.select, [1, 2, 3], self.disabled )
+        group2<=RadioButtons(self.select, [1, 2, 3], self.disabled),
+        group2<=SelectButtons(self.select, [1, 2, 3], self.disabled),
+        group2<=Select(self.select, [1, 2, 3], self.disabled),
+        #===============
+
+
+        table = Table(self.ll, cols=list("abcde"), pageSize=10, pageIndex=0)
+        st=HSplit( group2, table , sizes=[30,70])
+
+        tab = Tabs()
+        tab.addTab("Tab1", group1)
+        tab.addTab("Tab2", st)
+        tab.addTab("Tab3", table)
+        tab.selected = "Tab2"
+
+        nav= Nav("HTag Demo")
+        nav.addEntry( "Page1", self.affmodal )
+        nav.addEntry( "exit", lambda: self.exit(), True )
+
+        self <= nav
+        self <= Section() <= tab
+
+    def affmodal(self):
+        self.mbox.show( MyTabs(_style="border:1px solid red") )
+
+    def afftoast(self):
+        self.toast.show( "Hello World", 1000 )
+
+    def onchange(self,v):
+        print("++++++++++++++++++++++",v)
+        self.toast.show( v, 1000 )
+
+
+App=Page
+
 if __name__=="__main__":
-
-    ALLTAGS = ["banana", "apple", "pear", "peach", "melon", "cherry", "plum"]
-
-
-    class MyTabs(Tabs):  # inherit
-        def __init__(self,**a):
-            super().__init__(**a)
-            self.addTab("P1", "I'm the page1")
-            self.addTab("P2", "Currently, I am the page2 !")
-
-    class Page(Tag.div):
-        js = "console.log('started')"
-        def init(self):
-            self.select=2
-            self.disabled=False
-            self.ll = [(i + 1, i + 1, i + 1, i + 1, i + 1) for i in range(33)]
-            self.mbox = MBox( self )
-            self.toast = Toaster( self )
-
-
-            group1=Tag.div()
-            group1<=VBox()
-            group1<=HBox( Button("hello"), Button("hello", _class="is-success") )
-            group1<=HBox( Button("hello"), Button("hello") )
-            group1<=Tags( ["pear","plum"], ALLTAGS)
-            group1<=Checkbox( False, "Just do it")
-            group1<=Button("aff modal",_onclick=self.bind.affmodal())
-            group1<=Button("aff toast",_onclick=self.bind.afftoast())
-            group1<=InputText("hello", onchange = self.onchange)
-            group1<=TextArea("world", onchange = self.onchange)
-
-
-            group2=Tag.div()
-            #=============== selectors
-            group2<=TabsHeader(self.select, [1, 2, 3], self.disabled )
-            group2<=RadioButtons(self.select, [1, 2, 3], self.disabled),
-            group2<=SelectButtons(self.select, [1, 2, 3], self.disabled),
-            group2<=Select(self.select, [1, 2, 3], self.disabled),
-            #===============
-
-
-            table = Table(self.ll, cols=list("abcde"), pageSize=10, pageIndex=0)
-            st=HSplit( group2, table , sizes=[30,70])
-
-            tab = Tabs()
-            tab.addTab("Tab1", group1)
-            tab.addTab("Tab2", st)
-            tab.addTab("Tab3", table)
-            tab.selected = "Tab2"
-
-            nav= Nav("HTag Demo")
-            nav.addEntry( "Page1", self.affmodal )
-            nav.addEntry( "exit", lambda: self.exit(), True )
-
-            self <= nav
-            self <= Section() <= tab
-
-        def affmodal(self):
-            self.mbox.show( MyTabs(_style="border:1px solid red") )
-
-        def afftoast(self):
-            self.toast.show( "Hello World", 1000 )
-
-        def onchange(self,v):
-            print("++++++++++++++++++++++",v)
-            self.toast.show( v, 1000 )
-
-
-
 
     import logging
     logging.basicConfig(format='[%(levelname)-5s] %(name)s: %(message)s',level=logging.DEBUG)

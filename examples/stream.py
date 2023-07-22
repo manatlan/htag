@@ -64,6 +64,7 @@ class Page(Tag.body):
         self <= Tag.button( "feed3", _onclick= self.view.bind( self.view.feed ) )
         self <= Tag.button( "feed4", _onclick= self.view.bind.feed() )
 
+App=Page
 if __name__=="__main__":
     # import logging
     # logging.basicConfig(format='[%(levelname)-5s] %(name)s: %(message)s',level=logging.DEBUG)
