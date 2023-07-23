@@ -96,7 +96,7 @@ class HRenderer:
         self._interaction_scripts=[]
         self.init = tuple( [tuple(init[0]),dict(init[1])] ) # save args/kargs whose initialized the instance
         self.session=session
-        
+
         self.sendactions=None   # method async sendactions(actions:dict) -> bool
 
         try:
@@ -341,7 +341,7 @@ function jevent(e) {
 
         return rep
 
-    def _mkReponse(self, tags) -> dict: # can't set a "script" key -> so named "post" (coz guy)
+    def _mkReponse(self, tags:list) -> dict: # can't set a "script" key -> so named "post" (coz guy)
         rep={}
 
         scripts = []
@@ -362,14 +362,25 @@ function jevent(e) {
             rep["post"]="\n".join( scripts )
 
         return rep
-        
+
     async def update(self,tag:Tag):
         """ return True if hrenderer can update the component (ex: runner with ws)"""
         if self.sendactions is None:
             logger.error("This runner can't update a component")
         else:
-            actions=dict(update={ id(tag): str(tag)})
-            #TODO: scripts ?
+            # generate actions (.js and update/rendering )
+            actions=self._mkReponse( [tag] )
+
+            # add eventuals interactions scripts (and reset them)
+            if self._interaction_scripts:
+                # some js scripts was generated during interactions
+                if "post" not in actions:
+                    actions["post"]=""
+                # add them
+                actions["post"] += "\n".join(self._interaction_scripts)
+
+                self._interaction_scripts=[]    # reset the list !
+
             return await self.sendactions( actions )
         return False
 

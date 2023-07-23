@@ -12,7 +12,7 @@ class App(Tag.body):
     statics="body {background:#EEE;}"
 
     def init(self):
-        self.place = Tag.div()
+        self.place = Tag.div(js="console.log('I update myself')")
 
         asyncio.ensure_future( self.loop_timer() )
 
@@ -27,6 +27,7 @@ class App(Tag.body):
             await asyncio.sleep(0.5)
             self.place.set(time.time() )
             if not await self.place.update(): # update component using current websocket
+                # break if can't (<- good practice to kill this asyncio/loop)
                 break
 
 
