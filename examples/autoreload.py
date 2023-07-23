@@ -17,7 +17,7 @@ class Demo(Tag.div):
             self <= Tag.button("Hi",_style=f"background:#{hex(c)[2:]}")
 
 #############################################################################################
-
+App=Demo
 from htag.runners import *
 
 app = BrowserStarletteHTTP( Demo )

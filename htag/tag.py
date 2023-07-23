@@ -317,6 +317,14 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
     #======================================================================
     # public methods
     #======================================================================
+    async def update(self) -> bool:
+        """ return True if component can update itself (ex: runner with ws)"""
+        if self.root and self.root._hr:
+            return await self.root._hr.update(self)
+        else:
+            logger.error("This component is not tied in a hrenderer")
+            return false
+            
     def clear(self):
         """ remove all childs """
         for t in self._childs:      # remove parenting

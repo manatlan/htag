@@ -20,6 +20,7 @@ class PyScript:
         self.tagClass=tagClass
 
     def run(self,window): # window: "pyscript js.window"
+        self.window=window
 
         js = """
 interact=async function(o) {
@@ -34,6 +35,7 @@ function pyscript_starter() {
 }
 """
         self.hr = HRenderer(self.tagClass, js, init=commons.url2ak( window.document.location.href ))
+        self.hr.sendactions=self.updateactions
 
         window.interactions = self.interactions
         assert window.document.head, "No <head> in <html>"
@@ -63,3 +65,6 @@ function pyscript_starter() {
         data=json.loads(o)
         actions = await self.hr.interact( data["id"], data["method"], data["args"], data["kargs"], data.get("event") )
         return json.dumps(actions)
+
+    async def updateactions(self, actions:dict):
+        self.window.action( json.dumps(actions) )   # send action as json (not a js(py) object) ;-(

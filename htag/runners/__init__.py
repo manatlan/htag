@@ -15,7 +15,7 @@ class _RunnerNotFunctionnal:
 # mono instance
 from .browserhttp import BrowserHTTP
 
-# multi instances
+# multi instances                                                   !!! CAN UPDATE !!!
 from .pyscript import PyScript
 
 
@@ -27,21 +27,21 @@ except Exception as err:
     class BrowserStarletteHTTP(_RunnerNotFunctionnal): pass
 
 try:
-    # mono instance
+    # mono instance # !                                             !! CAN UPDATE !!!
     from .browserstarlettews import BrowserStarletteWS
 except Exception as err:
     ERROR=err
     class BrowserStarletteWS(_RunnerNotFunctionnal): pass
 
 try:
-    # mono instance
+    # mono instance #                                               !!! CAN UPDATE !!!
     from .webws import WebWS
 except Exception as err:
     ERROR=err
     class WebWS(_RunnerNotFunctionnal): pass
 
 try:
-    # mono instance
+    # mono instance #                                               !!! CAN UPDATE !!!
     from .devapp import DevApp                                      # special dev
 except Exception as err:
     ERROR=err
@@ -62,7 +62,7 @@ except Exception as err:
     class PyWebWiew(_RunnerNotFunctionnal): pass
 
 try:
-    # mono instance (just one chrome app instance)
+    # mono instance (just one chrome app instance)                  !!! CAN UPDATE !!!
     from .chromeapp import ChromeApp
 except Exception as err:
     ERROR=err
@@ -70,7 +70,7 @@ except Exception as err:
 
 
 try:
-    # mono instance (just one chrome app instance)
+    # mono instance (just one chrome app instance)                  !!! CAN UPDATE !!!
     from .winapp import WinApp
 except Exception as err:
     ERROR=err

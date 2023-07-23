@@ -110,11 +110,6 @@ class Page(Tag.body):
 
 
 # exemple for instanciating the logging before ...
-import logging
-logging.basicConfig(format='[%(levelname)-5s] %(name)s: %(message)s',level=logging.DEBUG)
-# logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.DEBUG)
-
-logging.getLogger("htag.tag").setLevel( logging.WARNING )
 
 # from htag.runners import BrowserHTTP as Runner
 # from htag.runners import DevApp as Runner
@@ -126,8 +121,14 @@ logging.getLogger("htag.tag").setLevel( logging.WARNING )
 # from htag.runners import AndroidApp as Runner
 # from htag.runners import ChromeApp as Runner
 from htag.runners import WinApp as Runner
+App=Page
 
 r=Runner( Page )
 if __name__=="__main__":
+    import logging
+    logging.basicConfig(format='[%(levelname)-5s] %(name)s: %(message)s',level=logging.DEBUG)
+    # logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.DEBUG)
+
+    logging.getLogger("htag.tag").setLevel( logging.WARNING )
     r.run()
 

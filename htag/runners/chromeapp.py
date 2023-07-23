@@ -192,12 +192,30 @@ ws.onclose = function(e) {
     def run(self, host="127.0.0.1", port=8000 , size=(800,600)):   # localhost, by default !!
         self._chromeapp = _ChromeApp(f"http://{host}:{port}",size=size)
 
+        async def _sendactions(ws, actions:dict) -> bool:
+            try:
+                await ws.send_text( json.dumps(actions) )
+                return True
+            except Exception as e:
+                logger.error("Can't send to socket, error: %s",e)
+                return False
+
         class WsInteract(WebSocketEndpoint):
             encoding = "json"
 
+            #=========================================================
+            async def on_connect(this, websocket):
+
+                # accept cnx
+                await websocket.accept()
+
+                # declare hr.sendactions (async method)
+                self.hrenderer.sendactions = lambda actions: _sendactions(websocket,actions)
+
+            #=========================================================
             async def on_receive(this, websocket, data):
                 actions = await self.hrenderer.interact(data["id"],data["method"],data["args"],data["kargs"],data.get("event"))
-                await websocket.send_text( json.dumps(actions) )
+                await _sendactions( websocket, actions )
 
             async def on_disconnect(this, websocket, close_code):
                 print("!!! exit on socket.close !!!")

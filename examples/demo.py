@@ -77,11 +77,11 @@ class Page(Tag.body): # define a <body>, but the renderer will force it to <body
         for name,star in sorted( self.movies, key=lambda x: -x[1].nb ):
             self <= Tag.div( [name,star] )
 
+App=Page
+if __name__== "__main__":
+    # and execute it in a pywebview instance
+    from htag.runners import PyWebView
+    PyWebView( Page ).run()
 
-
-# and execute it in a pywebview instance
-from htag.runners import PyWebView
-PyWebView( Page ).run()
-
-# here is another runner, in a simple browser (thru ajax calls)
-# BrowserHTTP( Page ).run()
+    # here is another runner, in a simple browser (thru ajax calls)
+    # BrowserHTTP( Page ).run()

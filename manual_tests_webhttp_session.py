@@ -27,6 +27,7 @@ class Page(Tag.body):
         self.nb+=1
         self.redraw()
 
+App=Page
 # and execute it in a pywebview instance
 from htag.runners import *
 

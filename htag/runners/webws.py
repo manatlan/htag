@@ -14,18 +14,6 @@ from .commons.htagsession import HtagSession
 
 
 """ like WebHTTP (but use WS instead of HTTP)
-
-DON'T USE IT
-DON'T USE IT
-DON'T USE IT
-DON'T USE IT
-DON'T USE IT
-DON'T USE IT
-DON'T USE IT
-DON'T USE IT
-DON'T USE IT
-DON'T USE IT
-DON'T USE IT
 """
 
 import time
@@ -56,8 +44,39 @@ class WebWS(Starlette):
         self.timeout=timeout
         self.sessions={} # {htuid:session,}
 
+        async def _sendactions(ws, actions:dict) -> bool:
+            try:
+                await ws.send_text( json.dumps(actions) )
+                return True
+            except Exception as e:
+                logger.error("Can't send to socket, error: %s",e)
+                return False
+
+
         class WsInteract(WebSocketEndpoint):
             encoding = "json"
+
+            #=========================================================
+            async def on_connect(this, websocket):
+
+                ## get the hr instance
+                ######################################################
+                cookie = SimpleCookie()
+                cookie.load(websocket.headers.get("cookie"))
+                htuid = cookie["session"].value # !!! depends on name set in HtagSession !!! TODO: make it better
+                rsession = self.sessions[htuid]
+                fqn=websocket.query_params['fqn']
+
+                hr=rsession["HRSessions"].get_hr( fqn )
+                ######################################################
+
+                # accept cnx
+                await websocket.accept()
+
+                # declare hr.sendactions (async method)
+                hr.sendactions = lambda actions: _sendactions(websocket,actions)
+
+            #=========================================================
 
             async def on_receive(this, websocket, data):
                 try:
@@ -76,11 +95,11 @@ class WebWS(Starlette):
                     rsession["lastaccess"]=time.time()
                     logger.info("INTERACT WITH %s",fqn)
                     actions = await hr.interact(data["id"],data["method"],data["args"],data["kargs"],data.get("event"))
-                    await websocket.send_text( json.dumps(actions) )
+                    await _sendactions( websocket, actions )
                 else:
                     # session expired or bad call
                     # return HTMLResponse( "400 BAD REQUEST" , status_code=400 )
-                    await websocket.send_text( json.dumps(dict(error="Session not present")) )
+                    await _sendactions( websocket, dict(error="Session not present") )
 
 
         # routes=[ Route('/{fqn:str}-{hrid:int}',   self.POST,  methods=["POST"]) ]
