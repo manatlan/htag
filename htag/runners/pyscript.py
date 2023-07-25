@@ -68,3 +68,4 @@ function pyscript_starter() {
 
     async def updateactions(self, actions:dict):
         self.window.action( json.dumps(actions) )   # send action as json (not a js(py) object) ;-(
+        return True
