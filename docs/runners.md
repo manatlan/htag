@@ -380,6 +380,20 @@ WebHTTP( App ).run()
  - need external libs
 
 
+
+## WebWS
+See [WebHTTP](#webhttp). It's the same thing, but on websocket, instead of http.
+
+Run your `App` (htag.Tag class) like this :
+
+```python
+from htag.runners import WebWS
+WebWS( App ).run()
+```
+
+[source](https://github.com/manatlan/htag/blob/main/htag/runners/webws.py)
+
+
 ## WinApp
 Run a http server (using tornado), and open the default installed chrome, in [App Mode](https://technastic.com/open-websites-in-application-mode-google-chrome/), to render the HTag app.
 (See [ChromeApp](#chromeapp), another variant)
