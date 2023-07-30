@@ -16,3 +16,6 @@ There are several troubles:
 The current core works well ... and the HRenderer (which is not perfect) is great.
 
 But managing all theses runners is a big pain, to make them compatible between them. And sometimes, it's not possible at all. I feel that I need to resolve this "bronx", before a "1.0" ;-)
+
+The new "htagweb.HtagServer" is *really* top (all htag/web features, easy to maintain, robust) ... and could be better, as a simple middleware to manage htag lifespan, in a classical starlette/fastapi/django app (which could be a game changer).
+But it got some sever limitations, compared to its web brothers (htagweb.WebServer, htagweb.WebServerWS, htag.runners.webhttp, htag.runners.webws) 
