@@ -45,14 +45,14 @@ the futur could be :
 
 htag: (without dependancies) 
  - pyscript (should always come with htag module (to let htag be compatible with pyscript ootb))
- - browserhttp (futur devapp ? (but to support tag.update, need to implement websocket on my own ;-())
+ - browserhttp (futur devapp ? (but to support tag.update, need to implement websocket on my own ;-() ... and should implement ".serve", to handle multiple app)
 
 htagweb: (starlette foundations, runners with "session" per user, ability to serve multiple app)
  - webserver
  - webserverws
  - webhttp
  - webws
- - htagserver
+ - htagserver (doesn't expose the ".serve" method, like others ^^, because it can auto-serve on path)
 
 htagchrome: (new package?) 
  - chromeapp
