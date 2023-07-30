@@ -54,12 +54,12 @@ htagweb: (starlette foundations, runners with "session" per user, ability to ser
  - webws
  - htagserver (doesn't expose the ".serve" method, like others ^^, because it can auto-serve on path)
 
-htagchrome: (new package?) 
+htagchrome: (new package?) (one use starlette, the other tornado)
  - chromeapp
  - winapp
 
 htagcef: (new package?) 
  - pywebview
 
-htagandroid (new package?)
+htagandroid (new package?) (tornado based)
  - androidapp 
