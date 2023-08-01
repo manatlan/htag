@@ -62,4 +62,6 @@ htagcef: (new package?)
  - pywebview
 
 htagandroid (new package?) (tornado based)
- - androidapp 
+ - androidapp
+
+IN ALL CASES, I should write efficient docs on how-to-use the "HRenderer" ... which is clearly the main piece between htag.Tag and the runner. (perhaps "hrenderer2" for "tag.update" feature only ?!)
