@@ -1,13 +1,14 @@
 # HRenderer
 
-It's the class which handle an htag.Tag class, and make it lives in a runner context. It exposes methods for a runner.
+It's the class which handle an htag.Tag class, and make it lives in a runner context. It exposes methods for a [runner](runners.md).
 
 In general, you don't need to use this class on your own. In general, you will use a 'runner' which will do it for you. If you are
 here, you will to create your own runner, or see how it works.
 
 definitions:
-* hr : means the HRrenderer instance
-* runner : it's a high level class (which use a hrenderer under-the-hood) to make the magix.
+
+ * hr : means the HRrenderer instance
+ * runner : it's a high level class (which use a hrenderer under-the-hood) to make the magix.
 
 
 ## def __init__(self, tagClass: type, js:str, exit_callback:Optional[Callable]=None, init= ((),{}), fullerror=False, statics=[], session=None ):
