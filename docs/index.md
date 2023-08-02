@@ -4,7 +4,8 @@
 
 docs are coming ....
 
-meanwhile, you can learn a lot on [htag's demo](https://htag.glitch.me/) ;-)
+meanwhile, you can learn a lot on [htag's demo](https://htag.glitch.me/) ... or better [try/repl your self](https://raw.githack.com/manatlan/htag/main/examples/pyscript_demo.html)
+(it's an htag app, running with the runner pyscript, in a simple html page, which provide examples in a html editor) ;-)
 
 
 ## Concept
