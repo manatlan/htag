@@ -13,6 +13,7 @@ For example :
 
 But, in all cases, your **htag app** will run in all theses runners, in the same way !
 
+(under the hood, all theses runners use [hrenderer](hrenderer.md) (a low-level class))
 
 
 
