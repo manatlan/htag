@@ -11,7 +11,7 @@ definitions:
  * runner : it's a high level class (which use a hrenderer under-the-hood) to make the magix.
 
 
-## def __init__(self, tagClass: type, js:str, exit_callback:Optional[Callable]=None, init= ((),{}), fullerror=False, statics=[], session=None ):
+## `def __init__(self, tagClass: type, js:str, exit_callback:Optional[Callable]=None, init= ((),{}), fullerror=False, statics=[], session=None ):`
 
 It's the constructor of an instance ;-)
 
