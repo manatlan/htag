@@ -256,9 +256,18 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
 
 
     @property
+    def state(self):
+        # will replace "self.session"
+        return self._hr.session if self._hr else None
+
+    @property
+    def session(self):  # DEPRECATED
+        logger.warning(f"remove the use of this self.session on %s", repr(self))
+        return self.state
+
+    @property
     def event(self) -> dict:
         return self._event
-
 
     #======================================================================
     # Constructor
@@ -266,7 +275,6 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
     def __init__(self, *args,_hr_=None,**kargs):
         self._event={}       # NEW !!!!
         self._hr=_hr_           # the hrenderer instance
-        self.session = _hr_.session if _hr_ else None
         self._parent=None
         self._callbacks_={}
         self._childs=Elements()
@@ -324,7 +332,7 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         else:
             logger.error("This component is not tied in a hrenderer")
             return false
-            
+
     def clear(self):
         """ remove all childs """
         for t in self._childs:      # remove parenting

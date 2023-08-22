@@ -9,18 +9,18 @@ class Page(Tag.body):
         self.nb=0
 
     def clir(self,o):
-        self.session["toto"]=0
+        self.state["toto"]=0
         self.redraw()
 
     def redraw(self):
         self.clear()
         self <= Tag.button("add", _onclick=self.sett)
         self <= Tag.button("clir", _onclick=self.clir)
-        self+=self.session.get("toto","?")
+        self+=self.state.get("toto","?")
         self <= Tag.hr() + Tag.button("add", _onclick=self.addd) + Tag.span(self.nb)
 
     def sett(self,o):
-        self.session["toto"]=self.session.get("toto",0) + 1
+        self.state["toto"]=self.state.get("toto",0) + 1
         self.redraw()
 
     def addd(self,o):

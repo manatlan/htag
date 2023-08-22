@@ -46,7 +46,10 @@ class App(Tag.body):
     statics="body {background:#EEE;}"
 
     def init(self):
-        self.oconv=TagConvShared( identity=str(id(self)) )
+        if "me" not in self.state:
+            self.state["me"] = str(time.time())
+
+        self.oconv=TagConvShared( identity=self.state["me"] )
 
         of=Tag.form()
         of["onsubmit"] = self.bind.post(b"this.txt.value") + "return false"
