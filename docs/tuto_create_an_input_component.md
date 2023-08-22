@@ -160,7 +160,6 @@ Because only `self.result` (Tag.div) is modified ... only `self.result` will be 
 
 Now, you should really understand 95% of the core htag features
 
-!!! note "To go far far far further"
-    Currently working on htbulma's inputs (v2). [All theses](https://github.com/manatlan/htbulma/blob/main/htbulma/inputs2.py) are not availables in htbulma. But it's the future of htbulma's inputs, and they are all based on the same concept has explained here ! (the previous/current ones are broken by default, they use old htag features, which will disappear soon)
+
 
 

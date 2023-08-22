@@ -45,8 +45,8 @@ And here is a [Htag/Pyscript DEMO](https://raw.githack.com/manatlan/htag/main/ex
 
 ## ROADMAP to 1.0.0
 
- * rock solid (need more tests)
- * setup minimal docs ;-)
+ * the core is "rock solid", but there is the [RunnersBronx](RunnersBronx.md) to solve.
+ * setup minimal docs, with [that](https://realpython.com/python-project-documentation-with-mkdocs/) ;-)
  * ~~top level api could change (Tag() -> create a Tag, Tag.mytag() -> create a TagBase ... can be a little bit ambiguous)~~
  * ~~manage "query params" from url to initialize Tags/routes~~
  * ~~I don't really like the current way to generate js in interaction : need to found something more solid.~~

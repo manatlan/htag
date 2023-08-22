@@ -13,6 +13,7 @@ For example :
 
 But, in all cases, your **htag app** will run in all theses runners, in the same way !
 
+(under the hood, all theses runners use [hrenderer](hrenderer.md) (a low-level class))
 
 
 
@@ -31,7 +32,7 @@ AndroidApp( App ).run()
 **nb**
 
  - the app should (TODO: test it !) `self.exit()`
- - Understand [query params from url](../query_params/) to instanciate the main htag class
+ - Understand [query params from url](query_params.md) to instanciate the main htag class
 
 [source](https://github.com/manatlan/htag/blob/main/htag/runners/androidapp.py)
 
@@ -60,7 +61,7 @@ BrowserHTTP( App ).run()
  - Use only python included battery (no need of others libs)
  - debugging is simple (can see http exchanges in the browser dev tools)
  - the app can `self.exit()`
- - Understand [query params from url](../query_params/) to instanciate the main htag class
+ - Understand [query params from url](query_params.md) to instanciate the main htag class
 
 **Cons**
 
@@ -73,7 +74,7 @@ BrowserHTTP( App ).run()
 
 
 ## BrowserStarletteHTTP
-Run a http server (using starlette/uvicorn), and open the default browser to render the HTag app. Because it's based on **Starlette**, this runner is an **ASGI HTag App**, which provide [a lot of features](../asgi/)
+Run a http server (using starlette/uvicorn), and open the default browser to render the HTag app. Because it's based on **Starlette**, this runner is an **ASGI HTag App**, which provide [a lot of features](asgi.md)
 
 Run your `App` (htag.Tag class) like this :
 
@@ -91,7 +92,7 @@ BrowserStarletteHTTP( App ).run()
  - debugging is simple (can see http exchanges in the browser dev tools)
  - [can use uvicorn reloader](https://github.com/manatlan/htag/blob/main/examples/autoreload.py), useful during dev process !
  - the app can `self.exit()`
- - Understand [query params from url](../query_params/) to instanciate the main htag class
+ - Understand [query params from url](query_params.md) to instanciate the main htag class
 
 
 **Cons**
@@ -105,7 +106,7 @@ BrowserStarletteHTTP( App ).run()
 
 
 ## BrowserStarletteWS
-Run a WS server (using starlette/uvicorn), and open the default browser to render the HTag app. Because it's based on **Starlette**, this runner is an **ASGI HTag App**, which provide [a lot of features](../asgi/)
+Run a WS server (using starlette/uvicorn), and open the default browser to render the HTag app. Because it's based on **Starlette**, this runner is an **ASGI HTag App**, which provide [a lot of features](asgi.md)
 
 Run your `App` (htag.Tag class) like this :
 
@@ -120,9 +121,9 @@ BrowserStarletteWS( App ).run()
 
  - the WS server is (ultra) robust
  - [can use uvicorn reloader](https://github.com/manatlan/htag/blob/main/examples/autoreload.py), useful during dev process !
- - and [a lot of features](../asgi/), because it's astarlette/asgi.
+ - and [a lot of features](asgi.md), because it's astarlette/asgi.
  - the app can `self.exit()`
- - Understand [query params from url](../query_params/) to instanciate the main htag class
+ - Understand [query params from url](query_params.md) to instanciate the main htag class
 
 
 **Cons**
@@ -159,8 +160,8 @@ ChromeApp( App ).run()
  - the http server is (ultra) robust
  - looks like a cef/electron app, without cef (reuse installed chrome)
  - the app can `self.exit()`
- - and [a lot of features](../asgi/), because it's astarlette/asgi.
- - Understand [query params from url](../query_params/) to instanciate the main htag class
+ - and [a lot of features](asgi.md), because it's astarlette/asgi.
+ - Understand [query params from url](query_params.md) to instanciate the main htag class
  - you can define the size of the window (`.run( size=(1024,600) )`)
 
 **Cons**
@@ -175,7 +176,7 @@ ChromeApp( App ).run()
 
 
 ## DevApp
-This is the perfect runner for development process (internally, it runs a WS server (using starlette/uvicorn), and open the default browser to render the HTag app. Because it's based on **Starlette**, this runner is an **ASGI HTag App**, which provide [a lot of features](../asgi/))
+This is the perfect runner for development process (internally, it runs a WS server (using starlette/uvicorn), and open the default browser to render the HTag app. Because it's based on **Starlette**, this runner is an **ASGI HTag App**, which provide [a lot of features](asgi.md))
 
 But it provides features like :
 
@@ -183,8 +184,8 @@ But it provides features like :
  - js log (in devtools/console)
  - Display full python error (tracebacks)
  - but CAN'T use `self.exit()` (coz uvicorn/reloader is hard to quit, but in the future : it should be possible)
- - and [a lot of features](../asgi/), because it's astarlette/asgi.
- - Understand [query params from url](../query_params/) to instanciate the main htag class
+ - and [a lot of features](asgi.md), because it's astarlette/asgi.
+ - Understand [query params from url](query_params.md) to instanciate the main htag class
 
 Run your `App` (htag.Tag class) like this :
 
@@ -249,7 +250,7 @@ PyScript( App ).run( window )
  - you only need a browser ;-)
  - Interactions are INPROC.
  - no need of external libs
- - Understand [query params from url](../query_params/) to instanciate the main htag class
+ - Understand [query params from url](query_params.md) to instanciate the main htag class
 
 
 **Cons**
@@ -320,8 +321,8 @@ BrowserTornadoHTTP( App ).run()
  - the http server is robust
  - debugging is simple (can see http exchanges in the browser dev tools)
  - the app can `self.exit()`
- - and [a lot of features](../asgi/), because it's astarlette/asgi.
- - Understand [query params from url](../query_params/) to instanciate the main htag class
+ - and [a lot of features](asgi.md), because it's astarlette/asgi.
+ - Understand [query params from url](query_params.md) to instanciate the main htag class
 
 **Cons**
 
@@ -341,13 +342,13 @@ BrowserTornadoHTTP( App ).run()
 
 ## WebHTTP
 Run a http server (using starlette/uvicorn), and serve the htag app to any browser.
-Because it's based on **Starlette**, this runner is an **ASGI HTag App**, which provide [a lot of features](../asgi/)
+Because it's based on **Starlette**, this runner is an **ASGI HTag App**, which provide [a lot of features](asgi.md)
 
 As it's a webserver, and unlike others : you can have many clients, so it's a different beast ;-)
 
 **NEW** See [htagweb](https://github.com/manatlan/htagweb), for a better solution !
 
-It manages a http session (with a cookie), and the session is available, per user, in `request.session`, or `<htag_instance>.session` (sessions are server-side). But, you can have only one instance of a htag Tag class, per user. (and like others, if you hit F5/refresh, it will reuse the current instance (not recreate it!)). The re-creation of the instance is based on the url/path (you'll need to change query_params, for example), and so ; the newest will replace the old one, so the memory stay "acceptable". And, of course, you can have many htag class managed by many endpoints. (see: [asgi things](../asgi/))
+It manages a http session (with a cookie), and the session is available, per user, in `request.session`, or `<htag_instance>.session` (sessions are server-side). But, you can have only one instance of a htag Tag class, per user. (and like others, if you hit F5/refresh, it will reuse the current instance (not recreate it!)). The re-creation of the instance is based on the url/path (you'll need to change query_params, for example), and so ; the newest will replace the old one, so the memory stay "acceptable". And, of course, you can have many htag class managed by many endpoints. (see: [asgi things](asgi.md))
 
 HTag wasn't designed (at start) to be served on a webserver (with many clients), But this solution is completly usable, with this kind of runner.
 
@@ -370,14 +371,28 @@ WebHTTP( App ).run()
  - the http server is (ultra) robust
  - debugging is simple (can see http exchanges in the browser dev tools)
  - [can use uvicorn reloader](https://github.com/manatlan/htag/blob/main/examples/autoreload.py), useful during dev process !
- - and [a lot of features](../asgi/), because it's starlette/asgi.
+ - and [a lot of features](asgi.md), because it's starlette/asgi.
  - the app can't `self.exit()` (for security reasons)
- - Understand [query params from url](../query_params/) to instanciate the main htag class
+ - Understand [query params from url](query_params.md) to instanciate the main htag class
 
 
 **Cons**
 
  - need external libs
+
+
+
+## WebWS
+See [WebHTTP](#webhttp). It's the same thing, but on websocket, instead of http.
+
+Run your `App` (htag.Tag class) like this :
+
+```python
+from htag.runners import WebWS
+WebWS( App ).run()
+```
+
+[source](https://github.com/manatlan/htag/blob/main/htag/runners/webws.py)
 
 
 ## WinApp
@@ -402,7 +417,7 @@ WinApp( App ).run()
  - the http server is robust
  - looks like a cef/electron app, without cef (reuse installed chrome)
  - the app can `self.exit()`
- - Understand [query params from url](../query_params/) to instanciate the main htag class
+ - Understand [query params from url](query_params.md) to instanciate the main htag class
  - you can define the size of the window (`.run( size=(1024,600) )`)
 
 **Cons**
