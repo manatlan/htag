@@ -258,7 +258,7 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
     @property
     def state(self):
         # will replace "self.session"
-        return self._hr.session if self._hr else None
+        return self.root._hr.session if self.root._hr else None
 
     @property
     def session(self):  # DEPRECATED
