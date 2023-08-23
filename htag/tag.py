@@ -273,8 +273,9 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
     # Constructor
     #======================================================================
     def __init__(self, *args,_hr_=None,**kargs):
-        self._event={}       # NEW !!!!
         self._hr=_hr_           # the hrenderer instance
+
+        self._event={}
         self._parent=None
         self._callbacks_={}
         self._childs=Elements()
