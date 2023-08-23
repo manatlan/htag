@@ -331,7 +331,7 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
             return await self.root._hr.update(self)
         else:
             logger.error("This component is not tied in a hrenderer")
-            return false
+            return False
 
     def clear(self):
         """ remove all childs """
