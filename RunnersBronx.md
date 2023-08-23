@@ -27,6 +27,17 @@ a soluce could be, to stick on websocket exchange only (so tag.update() compat f
 
 the other option : continue to have all theses differents options. But really need simplifications ! (2 hrenderer ? and runners out of htag's lib ?!)
 
+-----
+
+2023/08/23 : idea = Split the runners in two categories, and doc them !
+- the current ones (all current runners) keeps the htag tag instance (historic way) ... named "TAG LIFE"
+- special runner, which will only keep the "tag.state" ... named "STATE LIFE"
+
+So a "TAG LIFE runner" is, de facto, a "STATE LIFE runner". But only some htag app could work in "STATE LIFE runner" : only those which base their states on tag.state.
+
+-----
+
+## Prob#2 Split runners packages ?
 my prefered runners (which should continue to exist, in all cases ;-) )
 
 - pyscript (which currently, supports all features) ... htag with only html is a pure joyce ;-)
