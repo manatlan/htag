@@ -95,7 +95,7 @@ class HRenderer:
         self.fullerror = fullerror
         self._interaction_scripts=[]
         self.init = tuple( [tuple(init[0]),dict(init[1])] ) # save args/kargs whose initialized the instance
-        self.session=session or {} # now available in all tags managed by a hrenderer (see tag.state)
+        self.session=session if session is not None else {} # now available in all tags managed by a hrenderer (see tag.state)
 
         self.sendactions=None   # method async sendactions(actions:dict) -> bool
 
