@@ -300,18 +300,23 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
 
         # own a simplified init() ?
         if hasattr(self,"init"):
+
+            try:
+                self.__declareArgsKargs(None,**attrs)
+            except TypeError:
+                raise TypeError(f"Bad tag creation, should be Tag.{self.tag}( content, arg=val, ... )")
+
             init = getattr(self,"init")
-            init = init if callable(init) else None
-
-            self.__declareArgsKargs(None,**attrs)
-
-            if init: init(*args,**kargs)
+            if callable(init): init(*args,**kargs)
             self.__dict__.update(selfs)
         else:
             # if no own 'init' method, declare default args (selfs) as attributs instance
             self.__dict__.update(selfs)
 
-            self.__declareArgsKargs(*args, **attrs)
+            try:
+                self.__declareArgsKargs(*args, **attrs)
+            except TypeError:
+                raise TypeError(f"Bad tag creation, should be Tag.{self.tag}( content, arg=val, ... )")
 
         # save the weakref to the tag, for Tag.find_tag(id) method
         Tag.__instances__[id(self)]=self

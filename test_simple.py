@@ -15,6 +15,10 @@ def test_base():
     assert str(Tag.div([1,2,3])) == "<div>123</div>"
     assert str(Tag.my_div("test")) == "<my-div>test</my-div>"
 
+def test_base_error():
+    with pytest.raises( TypeError ):
+        Tag.div("arg1","arg2") # TypeError: Bad tag creation, should be Tag.div( content, arg=val, ... )
+
 def test_base2():
     d=Tag.div("hello")
     assert str(d) == "<div>hello</div>"
