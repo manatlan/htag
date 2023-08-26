@@ -229,35 +229,40 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
 
     @property
     def childs(self) -> tuple:
+        """children of the tag"""
         return tuple(self._childs)
 
     @property
     def attrs(self) -> dict:
+        """a dict of html's attributs managed by the tag"""
 
-        if self.tag is None:
+        if self.tag is None: # it's a placeholder tag
             raise HTagException("This tag is a placeholder, it can't manage html attributs")
 
         return self._attrs
 
     @property
     def innerHTML(self) -> str:
+        """the innerHTML of the tag"""
         return "".join([str(i) for i in self._childs if i is not None])
 
     @property
     def root(self) -> "Tag":
+        """the root tag (which have no parent (the one managed by the hrenderer)) (self.root==self in all init phase)"""
         root= self
         while root.parent is not None:
             root = root.parent
         return root
 
     @property
-    def parent(self):
+    def parent(self) -> "Tag|None":
+        """its parent tag, if attached/added to a tag, else None (during init phase : always None)"""
         return self._parent
 
 
     @property
-    def state(self):
-        # will replace "self.session"
+    def state(self) -> "dict|None":
+        """the state's dict, managed by the hrenderer, else None (during child-component's init phase : always None)"""
         return self.root._hr.session if self.root._hr else None
 
     @property
@@ -273,7 +278,7 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
     # Constructor
     #======================================================================
     def __init__(self, *args,_hr_=None,**kargs):
-        self._hr=_hr_           # the hrenderer instance
+        self._hr=_hr_           # the hrenderer instance (only available in the root tag)
 
         self._event={}
         self._parent=None
