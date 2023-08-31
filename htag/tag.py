@@ -524,6 +524,10 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
             )
 
 
+    def __enter__(self): # so can use construction with 'with as:' statement
+        return self
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
 
 
 
