@@ -438,13 +438,24 @@ WinApp( App ).run()
 
 ## Summary
 
- | Features :                             | AndroidApp | BrowserHTTP | BrowserStarletteHTTP | BrowserStarletteWS | ChromeApp | DevApp | PyScript | PyWebView | BrowserTornadoHTTP | WebHTTP | WinApp  |
- |:---------------------------------------|:----------:|:-----------:|:--------------------:|:------------------:|:---------:|:------:|:--------:|:---------:|:------------------:|:-------:|:-------:|
- | Work without external libs             |            | yes         |                      |                    |           |        | yes      |           |                    |         |         |
- | Work on android                        | yes        |             |                      |                    |           |        | yes      |           |                    |         |         |
- | Is ASGI (with Starlette/uvicorn        |            |             | yes                  | yes                |           | yes    |          |           |                    | yes     |         |
- | Can `self.exit()`                      | (should)   | yes         | yes                  | yes                | yes       | no ;-( |          | yes       |  yes               | no!     |  yes    |
- | Can use url query params               | yes        | yes         | yes                  | yes                | yes       | yes    | yes      |           |  yes               | yes     |  yes    |
+| **Runners\Features**     | **Transport (between front/back)** | **tag.update()** |
+|--------------------------|------------------------------------|------------------|
+| **BrowserHTTP**          | http                               | no               |
+| **BrowserStarletteHTTP** | http                               | no               |
+| **BrowserStarletteWS**   | ws                                 | yes              |
+| **WebHTTP**              | http                               | no               |
+| **WebWS**                | ws                                 | yes              |
+| **DevApp**               | ws                                 | yes              |
+| **PyScript**             | internal                           | yes              |
+| **PyWebWiew**            | internal                           | no               |
+| **ChromeApp**            | ws                                 | yes              |
+| **WinApp**               | ws                                 | yes              |
+| **AndroidApp**           | http                               | no               |
+| **BrowserTornadoHTTP**   | http                               | no               |
+| **htagweb.WebServer**    | http                               | no               |
+| **htagweb.WebServerWS**  | ws                                 | no               |
+| **htagweb.HtagServer**   | ws                                 | yes              |
+| **htagweb.AppServer**    | ws                                 | yes              |
 
 
 Htag provides somes [`runners`](https://github.com/manatlan/htag/runners) ootb. But they are just here for the show. IRL: you should build your own, for your needs.
