@@ -11,12 +11,13 @@ This page is just here, for me, to try to expose troubles ;-)
 
 Futur is brighter ;-)
 
-But no decision at this time ...  But on web/server side, for multiple users ... I will certainly stick on htagweb.AppServer, which is the best of two worlds (others could web runners could disapper). I will be a lot simpler (for a lot of reasons (technically, maintenance, use cases, ...))
+But no decision at this time ...  But on web/server side, for multiple users ... I will certainly stick on htagweb.AppServer, which is the best of two worlds (others could web runners could disapper). It could be a lot simpler (for a lot of reasons (technically, maintenance, use cases, ...))
 
-On web side, could persist htagweb.AppServer & htagweb.HtagServer (which will reuse htagweb.AppServer ?!). All others will be removed (WebHTTP & co)
+On web side, could persist htagweb.AppServer & htagweb.HtagServer (which could reuse htagweb.AppServer ?!). All others would be removed (WebHTTP & co)
 
-On client side : (ChromeApp, ...) could stay
+On client side : (ChromeApp, BrowserHTTP, DevApp, AndroidApp ...) could stay as is
 
+The only down-side : explain that a same app could not work as-is on both sides. (on client side, instances are lives ... on web side : instances are destroyed/recreated at each F5, and states should be in `self.root.states` (perhaps there is a solution, to make it transparent on each sides ?!)
 ...
 
 
