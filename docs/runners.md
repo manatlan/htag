@@ -438,24 +438,28 @@ WinApp( App ).run()
 
 ## Summary
 
-| **Runners\Features**     | **Transport (between front/back)** | **tag.update()** |
-|--------------------------|------------------------------------|------------------|
-| **BrowserHTTP**          | http                               | no               |
-| **BrowserStarletteHTTP** | http                               | no               |
-| **BrowserStarletteWS**   | ws                                 | yes              |
-| **WebHTTP**              | http                               | no               |
-| **WebWS**                | ws                                 | yes              |
-| **DevApp**               | ws                                 | yes              |
-| **PyScript**             | internal                           | yes              |
-| **PyWebWiew**            | internal                           | no               |
-| **ChromeApp**            | ws                                 | yes              |
-| **WinApp**               | ws                                 | yes              |
-| **AndroidApp**           | http                               | no               |
-| **BrowserTornadoHTTP**   | http                               | no               |
-| **htagweb.WebServer**    | http                               | no               |
-| **htagweb.WebServerWS**  | ws                                 | no               |
-| **htagweb.HtagServer**   | ws                                 | yes              |
-| **htagweb.AppServer**    | ws                                 | yes              |
+| **Runners\Features**     | **Transport (between front/back)** | **tag.update()** | **external libs** |
+|--------------------------|------------------------------------|------------------|-------------------|
+| **BrowserHTTP**          | http                               | no               |                   |
+| **BrowserStarletteHTTP** | http                               | no               | starlette/uvicorn |
+| **BrowserStarletteWS**   | ws                                 | yes              | starlette/uvicorn |
+| **WebHTTP**              | http                               | no               | starlette/uvicorn |
+| **WebWS**                | ws                                 | yes              | starlette/uvicorn |
+| **DevApp**               | ws                                 | yes              | starlette/uvicorn |
+| **PyScript**             | internal                           | yes              |                   |
+| **PyWebWiew**            | internal                           | no               | pywebview         |
+| **ChromeApp**            | ws                                 | yes              | starlette/uvicorn |
+| **WinApp**               | ws                                 | yes              | starlette/uvicorn |
+| **AndroidApp**           | http                               | no               | kivy/tornado      |
+| **BrowserTornadoHTTP**   | http                               | no               | tornado           |
+|                          |                                    |                  |                   |
+| **WebHTTP**              | http                               | no               | starlette/uvicorn |
+| **WebWS**                | ws                                 | yes              | starlette/uvicorn |
+| **htagweb.WebServer**    | http                               | no               | htagweb           |
+| **htagweb.WebServerWS**  | ws                                 | no               | htagweb           |
+| **htagweb.HtagServer**   | ws                                 | yes              | htagweb           |
+| **htagweb.AppServer**    | ws                                 | yes              | htagweb           |
+
 
 
 Htag provides somes [`runners`](https://github.com/manatlan/htag/runners) ootb. But they are just here for the show. IRL: you should build your own, for your needs.
