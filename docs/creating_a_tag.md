@@ -100,6 +100,18 @@ div += Tag.b("world")
 
 easy, no ?
 
+BTW, you can use the `with/as` statement, like that (since htag>=0.13):
+
+```python
+with Tag.div() as t:
+    t += Tag.span("hello")
+    t += " "
+    t += Tag.b("world")
+    t["style"]="background:#EEE"
+```
+
+
+
 ### IRL (in A Runner Context)
 
 An important thing to understand, is that a Tag renders differently when used in a runner (TODO:LINK).
