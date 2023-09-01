@@ -7,6 +7,20 @@ And it bothers me ... because I can't find the way to follow ;-)
 This page is just here, for me, to try to expose troubles ;-)
 (it's a lot of notes)
 
+## update 2023/9/1
+
+Futur is brighter ;-)
+
+But no decision at this time ...  But on web/server side, for multiple users ... I will certainly stick on htagweb.AppServer, which is the best of two worlds (others could web runners could disapper). I will be a lot simpler (for a lot of reasons (technically, maintenance, use cases, ...))
+
+On web side, could persist htagweb.AppServer & htagweb.HtagServer (which will reuse htagweb.AppServer ?!). All others will be removed (WebHTTP & co)
+
+On client side : (ChromeApp, ...) could stay
+
+...
+
+
+## Prob#1 the bronx ?
 There are several troubles:
 
  1) continue to provide embbeded runners with htag module ? (or make them in separate libs (like htagweb for web))
