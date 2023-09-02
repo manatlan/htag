@@ -7,6 +7,19 @@ And it bothers me ... because I can't find the way to follow ;-)
 This page is just here, for me, to try to expose troubles ;-)
 (it's a lot of notes)
 
+## update 2023/9/2
+last thoughts ;-)
+
+Module "htag", could:
+- provides basic runners (but no web ones) ... only mono user
+- remove webhttp/webws .. (move them in htagweb ?!)
+
+Module "htagweb", could:
+- be the official way to serve htag'apps on the web
+- but require py3.8 (coz "shared memory dict" (needed for multiple workers)) ... which is not possible on rpi/glitch (py3.7!) ;-(
+- no WS on glitch ;-( ... so should provide at least an web/http one
+
+
 ## update 2023/9/1
 
 Futur is brighter ;-)
