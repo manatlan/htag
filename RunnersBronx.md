@@ -17,8 +17,10 @@ Module "htag", could:
 Module "htagweb", could:
 - be the official way to serve htag'apps on the web
 - but require py3.8 (coz "[shared memory dict](https://github.com/manatlan/shared-memory-dict-py37)" (needed for multiple workers)) ... which is not possible on rpi/glitch (py3.7!) ;-(
-- no WS on glitch ;-( ... so should provide at least an web/http one
+- no WS on glitch ;-( ... so should provide at least a web/http one
+- or develop my own "shared dict" (for 3.7) ... which will resolve all (and could clean on timeout)
 
+i like this "clean separation" ;-)
 
 ## update 2023/9/1
 
