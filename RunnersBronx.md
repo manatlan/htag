@@ -10,15 +10,14 @@ This page is just here, for me, to try to expose troubles ;-)
 ## update 2023/9/2
 last thoughts ;-)
 
-Module "htag", could: (TAG LIFE (so STATE LIFE included))
+Module "htag", could: (only TAG-LIFE (so STATE-LIFE included))
 - provides basic runners (but no web ones) ... only mono user
 - remove webhttp/webws .. (move them in htagweb ?!)
 
-Module "htagweb", could: (only STATE LIFE(*))
+Module "htagweb", could: (only STATE-LIFE)
 - be the official way to serve htag'apps on the web
 - htagweb2 (can use "shared memory dict", or defaults to files). So will work on py3.7 and more
-- webhttp could be the solution for glitch.com (coz no WS!) (... but TAG LIFE (*))
-- htagserver could reuse htagweb2 concepts (by defaultin to IndexApp when no klass is home)
+- htagserver could reuse htagweb2 concepts (by defaulting to IndexApp when no klass is home)
 - webserver* will be removed
 
 I like this "clean separation" ;-)
