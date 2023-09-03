@@ -14,13 +14,14 @@ Module "htag", could: (TAG LIFE (so STATE LIFE included))
 - provides basic runners (but no web ones) ... only mono user
 - remove webhttp/webws .. (move them in htagweb ?!)
 
-Module "htagweb", could: (only STATE LIFE)
+Module "htagweb", could: (only STATE LIFE(*))
 - be the official way to serve htag'apps on the web
-- but require py3.8 (coz "[shared memory dict](https://github.com/manatlan/shared-memory-dict-py37)" (needed for multiple workers)) ... which is not possible on rpi/glitch (py3.7!) ;-(
-- no WS on glitch ;-( ... so should provide at least a web/http one
-- or develop my own "shared dict" (for 3.7) ... which will resolve all (and could clean on timeout)
+- htagweb2 (can use "shared memory dict", or defaults to files). So will work on py3.7 and more
+- webhttp could be the solution for glitch.com (coz no WS!) (... but TAG LIFE (*))
+- htagserver could reuse htagweb2 concepts (by defaultin to IndexApp when no klass is home)
+- webserver* will be removed
 
-i like this "clean separation" ;-)
+I like this "clean separation" ;-)
 
 ## update 2023/9/1
 
