@@ -22,7 +22,9 @@ And the futur "htagweb" will provide many options to manage "sessions", and will
 (only one option will require py3.8 (shared memory dict)
 the news webrunners will only rely on WS transport (no more http), so tags will live only during a ws session (I don't try anymore to try to keep them in complex soft/ipc architectures). So full compatibility with **tag.update**, uvloop, gunicorn/uvicorn web workers, oauth flow, etc ... and so, they are pretty solids and simples to maintain.
 
-currently, i'm working on htagweb, and will release a new version soon ... after that, will release a htag without web runners, and will remove all deprecated ...
+Currently, the futur htagweb is here (0.8), but only for tests  !
+
+currently, i'm working on htagweb, and will release a new version (0.9, with bugfixes on 0.8) soon ... after that, will release a htag without web runners, and will remove all deprecated ...
 
 the "1.0" is coming soon (this year!). But everything on htag side is ok (no more big bang changes!)
 
