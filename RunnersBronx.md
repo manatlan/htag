@@ -7,6 +7,25 @@ And it bothers me ... because I can't find the way to follow ;-)
 This page is just here, for me, to try to expose troubles ;-)
 (it's a lot of notes)
 
+## update 2023/9/8
+it's going in the right direction ...
+
+Module **"htag"** will don't provide "web runners" anymore. So all provided runners will be only "TAG-LIFE".
+It make senses, because on desktop : there is only "one user".
+
+Module **"htagweb"** will provide exclusivly "web runners", which are "STATE-LIFE" only !
+(on the web, each user will have its own state(session) in server side)
+
+**side note:**
+
+And the futur "htagweb" will provide many options to manage "sessions", and will be compatible with py3.7 (for rpi/glitch.com).
+(only one option will require py3.8 (shared memory dict)
+the news webrunners will only rely on WS transport (no more http), so tags will live only during a ws session (I don't try anymore to try to keep them in complex soft/ipc architectures). So full compatibility with uvloop, gunicorn/uvicorn web workers, oauth flow, etc ... and so, they are pretty solids and simples to maintain.
+
+currently, i'm working on htagweb, and will release a new version soon ... after that, will release a htag without web runners, and will remove all deprecated ...
+
+the "1.0" is coming soon (this year!). But everything on htag side is ok (no more big bang changes!)
+
 ## update 2023/9/2
 last thoughts ;-)
 
