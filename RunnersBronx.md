@@ -20,7 +20,7 @@ Module **"htagweb"** will provide exclusivly "web runners", which are "STATE-LIF
 
 And the futur "htagweb" will provide many options to manage "sessions", and will be compatible with py3.7 (for rpi/glitch.com).
 (only one option will require py3.8 (shared memory dict)
-the news webrunners will only rely on WS transport (no more http), so tags will live only during a ws session (I don't try anymore to try to keep them in complex soft/ipc architectures). So full compatibility with uvloop, gunicorn/uvicorn web workers, oauth flow, etc ... and so, they are pretty solids and simples to maintain.
+the news webrunners will only rely on WS transport (no more http), so tags will live only during a ws session (I don't try anymore to try to keep them in complex soft/ipc architectures). So full compatibility with **tag.update**, uvloop, gunicorn/uvicorn web workers, oauth flow, etc ... and so, they are pretty solids and simples to maintain.
 
 currently, i'm working on htagweb, and will release a new version soon ... after that, will release a htag without web runners, and will remove all deprecated ...
 
