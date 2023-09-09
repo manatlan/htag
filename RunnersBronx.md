@@ -7,6 +7,10 @@ And it bothers me ... because I can't find the way to follow ;-)
 This page is just here, for me, to try to expose troubles ;-)
 (it's a lot of notes)
 
+## update 2023/9/9
+
+It's better .. now https://htag.glitch.me/ uses the real/latest [htagweb](https://github.com/manatlan/htagweb)
+
 ## update 2023/9/8
 it's going in the right direction ...
 
