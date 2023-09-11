@@ -14,9 +14,9 @@ Thoses can be a browser, a pywebview, an android/apk, or anything based on cef, 
 As it's based on html/js rendering: you can easily mix powerful JS libs with powerful PY3 libs : and make powerful python apps !
 
  * For a **desktop app** : You can use the [PyWebView runner](https://manatlan.github.io/htag/runners/#pywebwiew), which will run the UI in a pywebview container (or "ChromeApp runner", in a local chrome app mode). 
- * For a **web app** : You can use the [WebHTTP runner](https://manatlan.github.io/htag/runners/#webhttp), which will run the UI in a web server, and serve the UI on client side, in a browser. (see new [htagweb](https://github.com/manatlan/htagweb) for more robust/complete runner)
  * For a **android app** : You can use the [AndroidApp runner](https://manatlan.github.io/htag/runners/#androidapp), which will run the UI in a kiwi webview thru tornado webserver, and can be embedded in an apk ([recipes](https://github.com/manatlan/htagapk))
  * For a **pyscript app** : you can use the [PyScript runner](https://manatlan.github.io/htag/runners/#pyscript), which will run completly in client side
+ * For a **web app** : You can use the [htagweb](https://github.com/manatlan/htagweb).
 
 But yes … the promise is here : **it's a GUI toolkit for building "beautiful" applications for mobile, web, and desktop from a single codebase**.
 
@@ -45,7 +45,7 @@ And here is a [Htag/Pyscript DEMO](https://raw.githack.com/manatlan/htag/main/ex
 
 ## ROADMAP to 1.0.0
 
- * the core is "rock solid", but there is the [RunnersBronx](RunnersBronx.md) to solve.
+ * tests tests
  * setup minimal docs, with [that](https://realpython.com/python-project-documentation-with-mkdocs/) ;-)
  * ~~top level api could change (Tag() -> create a Tag, Tag.mytag() -> create a TagBase ... can be a little bit ambiguous)~~
  * ~~manage "query params" from url to initialize Tags/routes~~
@@ -66,7 +66,6 @@ and more technicals :
 
 - ~~perhaps `self( js_statement)` -> `self.call( js_statement )` ... less confusing !~~
 - ~~thus, to avoid `self( self.bind.method(*a,**k) )`, you can write `self.call.<method>( *a,**k )`~~
-- TESTS TESTS and more TESTS
 
 
 

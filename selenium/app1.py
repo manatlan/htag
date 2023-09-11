@@ -31,4 +31,3 @@ if __name__=="__main__":
     # hclient.run( App, "PyScript")
     # hclient.test( App, "BrowserHTTP", tests)
     hclient.test( App, "PyScript", tests) #NEED a "poetry build" before !!!!
-    # hclient.test( App, "WebHTTP", tests)

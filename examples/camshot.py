@@ -64,6 +64,5 @@ if __name__=="__main__":
     # r=BrowserStarletteWS( App )
     # r=BrowserHTTP( App )
     r=BrowserTornadoHTTP( App )
-    # r=WebHTTP( Page )
     r.run()
 

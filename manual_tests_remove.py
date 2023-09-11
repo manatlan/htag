@@ -48,8 +48,7 @@ from htag.runners import *
 # here is another runner, in a simple browser (thru ajax calls)
 # ChromeApp( Page ).run()
 # BrowserHTTP( Page ).run()
-# app=DevApp( Page )
-app=WebHTTP( Page2 )
+app=DevApp( Page )
 app.add_route("/p", lambda request: app.serve( request, Page ) )
 app.add_route("/b", lambda request: app.serve( request, Page2 ) )
 if __name__ == "__main__":

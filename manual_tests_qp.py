@@ -14,7 +14,7 @@ class App(Tag.body):
         self <= Tag.button("quit app", _onclick=lambda o: self.exit())    # just to test QUIT/EXIT app
         self <= Tag.hr()
 
-        self <= Tag.h3("Only if it handles tha '/other' route (WebHTTP/DevApp) :")
+        self <= Tag.h3("Only if it handles tha '/other' route (DevApp/htagweb) :")
         self <= Tag.a("test '/other'"      ,_href="/other",_style="display:block")
         self <= Tag.a("test '/other?pablo'",_href="/other?pablo",_style="display:block")
         self <= Tag.hr()
@@ -26,7 +26,6 @@ class App(Tag.body):
 #=================================================================================
 #---------------------------------------------------------------------------------
 from htag.runners import DevApp as Runner     # with .serve() and no QUIT
-# from htag.runners import WebHTTP as Runner    # with .serve() and no QUIT
 
 # from htag.runners import BrowserHTTP as Runner
 # from htag.runners import BrowserStarletteWS as Runner
@@ -39,7 +38,7 @@ from htag.runners import DevApp as Runner     # with .serve() and no QUIT
 
 app=Runner(App)
 
-if hasattr(app,"serve"): # only DevApp & WebHTTP
+if hasattr(app,"serve"): # only DevApp
 
     class AnotherApp(Tag.body):
 

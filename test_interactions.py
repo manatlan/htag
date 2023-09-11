@@ -105,7 +105,7 @@ async def test_js_at_init_new_InternalCall():
     s=Simu( Object )
     # r=await s.init() # it controls the basics
 
-    assert "function(self,tag=self){ try{interact(" in str(s.hr)
+    assert "function(self){ try{interact(" in str(s.hr)
     # assert r["post"].count("function(tag)")==1
 
 

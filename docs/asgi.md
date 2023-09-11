@@ -1,6 +1,6 @@
 # With an ASGI Runner
 
-Theses runners [BrowserStarletteHTTP](runners.md#browserstarlettehttp), [BrowserStarletteWS](runners.md#browserstarlettews) and [WebHTTP](runners.md#webhttp)
+Theses runners [BrowserStarletteHTTP](runners.md#browserstarlettehttp), [BrowserStarletteWS](runners.md#browserstarlettews) and [DevApp](runners.md#devapp)
 provides an [ASGI](https://asgi.readthedocs.io/en/latest/) HTag runner, which is basically an instance of a [Starlette](https://www.starlette.io/) class. So, you can use
 all asgi/starlette features OOTB.
 
@@ -69,11 +69,10 @@ app.add_route("/style.css", mymethod_to_return_style_css )
 
 ## You can serve multiple Tag via endpoints
 
-This feature is only available for [WebHTTP](runners.md#webhttp) (and DevApp).
-(in the past (<0.8.0), WebHTTP could natively serve multiples tags, but this feature was removed (for consistency), but can be handle with this trick)
+This feature is only available for [DevApp](runners.md#devapp) (and htagweb).
 
 ```python
-from htag.runners import WebHTTP as Runner
+from htag.runners import DevApp as Runner
 
 class Tag1(Tag.div):
     ...

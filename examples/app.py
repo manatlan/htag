@@ -117,7 +117,6 @@ class Page(Tag.body):
 # from htag.runners import BrowserStarletteHTTP as Runner
 # from htag.runners import BrowserStarletteWS as Runner
 # from htag.runners import BrowserTornadoHTTP as Runner
-# from htag.runners import WebHTTP as Runner
 # from htag.runners import AndroidApp as Runner
 # from htag.runners import ChromeApp as Runner
 from htag.runners import WinApp as Runner
