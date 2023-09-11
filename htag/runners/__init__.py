@@ -35,24 +35,10 @@ except Exception as err:
 
 try:
     # mono instance #                                               !!! CAN UPDATE !!!
-    from .webws import WebWS
-except Exception as err:
-    ERROR=err
-    class WebWS(_RunnerNotFunctionnal): pass
-
-try:
-    # mono instance #                                               !!! CAN UPDATE !!!
     from .devapp import DevApp                                      # special dev
 except Exception as err:
     ERROR=err
     class DevApp(_RunnerNotFunctionnal): pass
-
-try:
-    # multi instance
-    from .webhttp import WebHTTP
-except Exception as err:
-    ERROR=err
-    class WebHTTP(_RunnerNotFunctionnal): pass
 
 try:
     # mono instance (just one pywebview ;-)

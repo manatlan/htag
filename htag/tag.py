@@ -266,11 +266,6 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         return self.root._hr.session if self.root._hr else None
 
     @property
-    def session(self):  # DEPRECATED
-        logger.warning(f"remove the use of this self.session on %s", repr(self))
-        return self.state
-
-    @property
     def event(self) -> dict:
         return self._event
 
@@ -478,12 +473,6 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         else:
             return f"<{self.__class__.__name__}'{self.tag} {id(self)} (childs:{len(self._childs)})>"
 
-    # DEPRECATED
-    def __call__(self, js:str):
-        msg = f"self( js ) is DEPRECATED, use self.call( js ) on {repr(self)}"
-        logger.warning(msg)
-        print("WARNING",msg)
-        self.call(js)
 
     def __str__(self):
         render = self._hasARenderMethod()
@@ -575,11 +564,10 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         return ll
 
     def _genIIFEScript(self,js:str) -> str:
-        """ genereate an IIFE with script 'js' whereas tag (deprecated), or self (the newest), is the js/node of the current object.
+        """ genereate an IIFE with script 'js' whereas 'self' is the js/node of the current object.
             (the goal is to have a quick reference to the node on js_side, ex: tag.js="self.focus()")
-            ('tag' is now deprecated in favor of 'self' on versions > 0.9.13)
         """
-        return f"(function(self,tag=self){{ {js}\n }})(document.getElementById('{id(self)}'));"
+        return f"(function(self){{ {js}\n }})(document.getElementById('{id(self)}'));"
 
     def _hasARenderMethod(self) -> Union[ None, Callable]:
         if hasattr(self,"render"):

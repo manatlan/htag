@@ -33,7 +33,6 @@ class App(Tag.body):
 
 
 #================================================================================= with update capacity
-# from htag.runners import WebWS as Runner
 # from htag.runners import BrowserStarletteWS as Runner
 # from htag.runners import ChromeApp as Runner
 # from htag.runners import WinApp as Runner

@@ -44,7 +44,7 @@ This kind of interaction is called "direct" : the callback is directly called du
             button["onclick"]=button.bind( self.clicked ) # declare event, post button construction
             self += button
     ```
-    The method `<instance>.bind( method, **args, **kargs )` is the natural way to bind an "event", in all cases. 
+    The method `<instance>.bind( method, **args, **kargs )` is the natural way to bind an "event", in all cases.
 
 BTW, I think it's a good practice to not poluate the inner namespaces of the instance, by declaring methods which has only one client. Here we could do:
 (as is, you keep your code more consistant, and less confusing)
@@ -53,10 +53,10 @@ from htag import Tag
 
 class App(Tag.body):
     def init(self):
-    
+
         def clicked(object_which_has_emitted_the_event):
             print( object_which_has_emitted_the_event )
-            
+
         self += Tag.button("click", _onclick=clicked)
 ```
 
@@ -258,7 +258,10 @@ class App(Tag.div):
 
 So, every time the Tag 'App' is rendered, it creates an input field, and take the focus (`self` is a special js var, in this context, to quickly access to the input element)
 
-**For versions <= 0.9.13** : the `self` was named `tag` (which works too, but is now deprecated in favor of `self`). You can use both, to refer to the js/nodeElement of the tag, but prefer to use `self` ;-)
+**For versions <= 0.9.13** : the `self` was named `tag` (which worked too). You could use both, to refer to the js/nodeElement of the tag, but prefer to use `self` ;-)
+**For versions <= 0.13.0** : the `self`, and `tag` was accepted
+**For versions > 0.20.0** : only `self` ;-)
+
 
 Another approach could be :
 
@@ -317,7 +320,7 @@ class App(Tag.body):
 ```
 Here : `self.call.starting( b'window.innerWidth' )` is the short form for `self.call( self.bind.starting( b'window.innerWidth' ) )`, it's exactly the same !
 
-**IMPORTANT** : 
+**IMPORTANT** :
 The last 2 examples are BAD PRACTICE, because the `self.call` (during construction phase) can only work when it's in the main tag (which is managed by the Runner (TODO:link)). If it was in an `init` from a component : it can't work (because we don't know the parent/root at this time). The good practice is DON'T USE `self.call` IN A CONSTRUCTOR (prefer `self.js`)
 
 ## Using the `event` properties from gui/js

@@ -75,16 +75,16 @@ jobs:
           python selenium/run.py BrowserStarletteWS ${{ matrix.app }} &
           python selenium/tests.py 8000 ${{ matrix.app }}
 
-      - name: Run Tests WebHTTP (can't exit itself) ${{ matrix.app }}
-        run: |
-          python selenium/run.py WebHTTP ${{ matrix.app }} &
-          python selenium/tests.py 8000 ${{ matrix.app }}
-          killall python
+      # - name: Run Tests WebHTTP (can't exit itself) ${{ matrix.app }}
+      #   run: |
+      #     python selenium/run.py WebHTTP ${{ matrix.app }} &
+      #     python selenium/tests.py 8000 ${{ matrix.app }}
+      #     killall python
 
-      - name: Run Tests WebWS (can't exit itself) ${{ matrix.app }}
-        run: |
-          python selenium/run.py WebWS ${{ matrix.app }} &
-          python selenium/tests.py 8000 ${{ matrix.app }}
-          killall python
+      # - name: Run Tests WebWS (can't exit itself) ${{ matrix.app }}
+      #   run: |
+      #     python selenium/run.py WebWS ${{ matrix.app }} &
+      #     python selenium/tests.py 8000 ${{ matrix.app }}
+      #     killall python
 
 

@@ -98,12 +98,6 @@ PyScript( App  ).run( window )
                 sys.exit(-1)
         finally:
             os.unlink("index.html")
-    elif runner == "WebHTTP":
-        from htag.runners import WebHTTP
-        WebHTTP(App).run(port=port)
-    elif runner == "WebWS":
-        from htag.runners import WebWS
-        WebWS(App).run(port=port)
     else:
         import htag.runners
         getattr(htag.runners,runner)(App).run(openBrowser=openBrowser,port=port)

@@ -9,7 +9,6 @@ For example :
  * [PyWebView](#pywebview) is the perfect solution, to deliver a gui python app, as a freezed exe (embbeding the pywebview/cef).
  * [ChromeApp](#chromeapp) is the perfect solution to deliver a gui python app, with minimal footprints, because it will reuse the installed chrome of the computer. (see [WinApp](#winapp) too)
  * [PyScript](#pyscript) is fun, if you only have a browser (no need of python ;-), just html !
- * [WebHTTP](#webhttp) to make real web apps, for many users. Providing session instances
 
 But, in all cases, your **htag app** will run in all theses runners, in the same way !
 
@@ -223,7 +222,7 @@ Run your `App` (htag.Tag class), in a HTML file, like this :
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <py-config>
     packages = ["htag"]
-    </py-config>    
+    </py-config>
 </head>
 <body> loading pyscript ;-)
 <py-script>
@@ -340,61 +339,6 @@ BrowserTornadoHTTP( App ).run()
 
 
 
-## WebHTTP
-Run a http server (using starlette/uvicorn), and serve the htag app to any browser.
-Because it's based on **Starlette**, this runner is an **ASGI HTag App**, which provide [a lot of features](asgi.md)
-
-As it's a webserver, and unlike others : you can have many clients, so it's a different beast ;-)
-
-**NEW** See [htagweb](https://github.com/manatlan/htagweb), for a better solution !
-
-It manages a http session (with a cookie), and the session is available, per user, in `request.session`, or `<htag_instance>.session` (sessions are server-side). But, you can have only one instance of a htag Tag class, per user. (and like others, if you hit F5/refresh, it will reuse the current instance (not recreate it!)). The re-creation of the instance is based on the url/path (you'll need to change query_params, for example), and so ; the newest will replace the old one, so the memory stay "acceptable". And, of course, you can have many htag class managed by many endpoints. (see: [asgi things](asgi.md))
-
-HTag wasn't designed (at start) to be served on a webserver (with many clients), But this solution is completly usable, with this kind of runner.
-
-Of course, the session is usable with starlette/authlib flow to identify a user with an oauth2 flow (ex: google login) (TODO: give an example).
-
-The session timeout is settable when you instanciate the "WebHTTP" runner. (ex: `WebHTTP( Klass , timeout=10*60)`, but by default it's 10 minutes). When the session expires, it clears all data on server side, for the user.
-
-Run your `App` (htag.Tag class) like this :
-
-```python
-from htag.runners import WebHTTP
-WebHTTP( App ).run()
-```
-
-[source](https://github.com/manatlan/htag/blob/main/htag/runners/webhttp.py)
-
-**Pros**
-
- - can handle session (**multiple users**)
- - the http server is (ultra) robust
- - debugging is simple (can see http exchanges in the browser dev tools)
- - [can use uvicorn reloader](https://github.com/manatlan/htag/blob/main/examples/autoreload.py), useful during dev process !
- - and [a lot of features](asgi.md), because it's starlette/asgi.
- - the app can't `self.exit()` (for security reasons)
- - Understand [query params from url](query_params.md) to instanciate the main htag class
-
-
-**Cons**
-
- - need external libs
-
-
-
-## WebWS
-See [WebHTTP](#webhttp). It's the same thing, but on websocket, instead of http.
-
-Run your `App` (htag.Tag class) like this :
-
-```python
-from htag.runners import WebWS
-WebWS( App ).run()
-```
-
-[source](https://github.com/manatlan/htag/blob/main/htag/runners/webws.py)
-
-
 ## WinApp
 Run a http server (using tornado), and open the default installed chrome, in [App Mode](https://technastic.com/open-websites-in-application-mode-google-chrome/), to render the HTag app.
 (See [ChromeApp](#chromeapp), another variant)
@@ -443,8 +387,6 @@ WinApp( App ).run()
 | **BrowserHTTP**          | http                               | no               |                   |
 | **BrowserStarletteHTTP** | http                               | no               | starlette/uvicorn |
 | **BrowserStarletteWS**   | ws                                 | yes              | starlette/uvicorn |
-| **WebHTTP**              | http                               | no               | starlette/uvicorn |
-| **WebWS**                | ws                                 | yes              | starlette/uvicorn |
 | **DevApp**               | ws                                 | yes              | starlette/uvicorn |
 | **PyScript**             | internal                           | yes              |                   |
 | **PyWebWiew**            | internal                           | no               | pywebview         |
@@ -453,10 +395,6 @@ WinApp( App ).run()
 | **AndroidApp**           | http                               | no               | kivy/tornado      |
 | **BrowserTornadoHTTP**   | http                               | no               | tornado           |
 |                          |                                    |                  |                   |
-| **WebHTTP**              | http                               | no               | starlette/uvicorn |
-| **WebWS**                | ws                                 | yes              | starlette/uvicorn |
-| **htagweb.WebServer**    | http                               | no               | htagweb           |
-| **htagweb.WebServerWS**  | ws                                 | no               | htagweb           |
 | **htagweb.HtagServer**   | ws                                 | yes              | htagweb           |
 | **htagweb.AppServer**    | ws                                 | yes              | htagweb           |
 
