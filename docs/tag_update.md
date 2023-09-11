@@ -15,7 +15,7 @@ Runners compatibles are :
  - [ChromeApp](runners.md#ChromeApp), because based on websocket!
  - [WinApp](runners.md#WinApp), because based on websocket!
  - [PyScript](runners.md#PyScript), because internal calls!
- - [WebWS](runners.md#WebWS), because based on websocket!
+ - [htagweb.AppServer](https://github.com/manatlan/htagweb), because based on websocket!
  - [htagweb.HtagServer](https://github.com/manatlan/htagweb), because based on websocket!
 
 All others are not compatibles, because they mainly use `http` between front and back. And

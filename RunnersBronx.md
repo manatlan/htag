@@ -7,6 +7,10 @@ And it bothers me ... because I can't find the way to follow ;-)
 This page is just here, for me, to try to expose troubles ;-)
 (it's a lot of notes)
 
+## update 2023/9/11
+
+Now it's clear. The only bronx is in this page ;-)
+
 ## update 2023/9/9
 
 It's better .. now https://htag.glitch.me/ uses the real/latest [htagweb](https://github.com/manatlan/htagweb)
@@ -109,7 +113,7 @@ Perhaps should I leave all others ?!?
 
 the futur, with differents pypi libs, could be :
 
-htag: (without dependancies) 
+htag: (without dependancies)
  - pyscript (should always come with htag module (to let htag be compatible with pyscript ootb))
  - browserhttp (futur devapp ? (but to support tag.update, need to implement websocket on my own ;-() ... and should implement ".serve", to handle multiple app (like web runners (except htagserver)))
 
@@ -124,7 +128,7 @@ htagchrome: (new package?) (one use starlette, the other tornado)
  - chromeapp : (tag.update !)
  - winapp    : (tag.update !)
 
-htagcef: (new package?) 
+htagcef: (new package?)
  - pywebview (with explanation about current limitations in pywebview)
  - ?a real cef runner? (like in good old 'guy')
 
