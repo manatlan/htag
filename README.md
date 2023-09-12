@@ -45,7 +45,8 @@ And here is a [Htag/Pyscript DEMO](https://raw.githack.com/manatlan/htag/main/ex
 
 ## ROADMAP to 1.0.0
 
- * tests tests
+ * the "0.20.0" is the pre-version before 1.0.0 (htag core will not change anymore). I need to fix some runners before.
+ * tests tests (my two websites (full of htag'apps) use the 0.20 now ... need to fix all my desktop apps now)
  * setup minimal docs, with [that](https://realpython.com/python-project-documentation-with-mkdocs/) ;-)
  * ~~top level api could change (Tag() -> create a Tag, Tag.mytag() -> create a TagBase ... can be a little bit ambiguous)~~
  * ~~manage "query params" from url to initialize Tags/routes~~
