@@ -15,7 +15,7 @@ As it's based on html/js rendering: you can easily mix powerful JS libs with pow
 
  * For a **desktop app** : 
     * You can use the [PyWebView runner](https://manatlan.github.io/htag/runners/#pywebwiew), which will run the UI in a pywebview container 
-    * You can use the [ChromeApp runner](https://manatlan.github.io/htag/runners/#chromeapp), which will run the UI in a local chrome in "app mode". (reuse/eco friendly)
+    * You can use the [ChromeApp runner](https://manatlan.github.io/htag/runners/#chromeapp), which will run the UI in a local chrome in "app mode" (headless).
  * For a **android app** : You can use the [AndroidApp runner](https://manatlan.github.io/htag/runners/#androidapp), which will run the UI in a kiwi webview thru tornado webserver, and can be embedded in an apk ([recipes](https://github.com/manatlan/htagapk))
  * For a **pyscript app** : you can use the [PyScript runner](https://manatlan.github.io/htag/runners/#pyscript), which will run completly in client side
  * For a **web app** : You can use the [htagweb](https://github.com/manatlan/htagweb).
