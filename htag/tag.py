@@ -478,7 +478,7 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         render = self._hasARenderMethod()
         if render:
             logger.debug("Tag.__str__() : %s rendering itself with its render() method", repr(self))
-            self.clear()
+            # self.clear() # removed since for htag > 0.20.0
             render()
         else:
             logger.debug("Tag.__str__() : render str for %s", repr(self))
