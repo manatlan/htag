@@ -9,6 +9,7 @@ class Gui2(Tag.body):
         self.valueF=0
 
     def render(self):
+        self.clear()
         self <= Tag.div( Tag.Input( _value=self.valueC, _onchange=self.bind.changeC(b"this.value") ) +"C" )
         self <= Tag.div( Tag.Input( _value=self.valueF, _onchange=self.bind.changeF(b"this.value") ) +"F")
 

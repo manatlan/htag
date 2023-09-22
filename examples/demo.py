@@ -45,6 +45,7 @@ class Star(Tag.div): # it's a div tag
         # here, the representation is built lately
         # (during the __str__ rendering)
 
+        self.clear()
         # we add our buttons, binded to its py method
         self <= Button( "-", lambda: self.inc(-1) )
         self <= Button( "+", lambda: self.inc(1) )
@@ -68,6 +69,8 @@ class Page(Tag.body): # define a <body>, but the renderer will force it to <body
     def render(self):
         # here, the representation is built lately
         # (during the __str__ rendering)
+
+        self.clear()
 
         # we put a title
         self <= Tag.h1("Best movies ;-)")   # here is shortcut to create "<h1>Best movies ;-)</h1>"

@@ -24,6 +24,7 @@ class Gui4(Tag.body):
         self.gauge = Percent(20)
 
     def render(self):
+        self.clear()
         self <= self.gauge
 
         self <= Tag.input(

@@ -530,7 +530,7 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         render = self._hasARenderMethod()
         if render: # force a re-rendering (for builded lately)
             logger.debug("Tag._getStateImage() : %s rendering itself with its render() method", repr(self))
-            self.clear()
+            # self.clear() # removed since for htag > 0.20.0
             render()
 
         image=lambda x: "[%s]"%id(x) if isinstance(x,Tag) else str(x)

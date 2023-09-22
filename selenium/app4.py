@@ -17,6 +17,7 @@ class Stars(Tag.span): # it's a component ;-)
     def inc(self,v):
         self.value+=v
     def render(self):
+        self.clear()
         self += self.bless + self.bmore + (STAR*self.value)
 #------------------------------------------------------------
 
@@ -36,6 +37,8 @@ class App(Tag.div): # it's a component ;-)
 
 
     def render(self): # it's present -> it's used
+        self.clear()
+
         # so the rendering is managed by htag
         self <= self.s1+self.s2+self.s3+self.reset + self.show + self.exiter
 

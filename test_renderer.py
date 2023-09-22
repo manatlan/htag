@@ -321,6 +321,7 @@ def test_intelligent_rendering2():
             self.nb += 1
 
         def render(self):
+            self.clear()
             self <= self.nb
 
     # test that the base feature works ;-)
@@ -381,6 +382,7 @@ def test_build_immediatly_vs_lately():
             self.nb+=1
 
         def render(self):
+            self.clear()
             self["name"]=self.name
             self["nb"]=self.nb
             for i in range(self.nb):
@@ -441,10 +443,12 @@ def test_discovering_js():
 
     class OOL(Tag.div):   # lately rendering
         def render(self):
+            self.clear()
             self.set( O() )             # Tag directly in Tag
 
     class OOOL(Tag.div):  # lately rendering
         def render(self): # BAD PRACTICE (creating a tag in render will always force rendering) !!!!!!!!!!!!!!!!!!
+            self.clear()
             self.set( Tag.div(O()) )    # Tag in a TagBase
 
     async def test(r): # first call (init obj)

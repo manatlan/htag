@@ -14,6 +14,7 @@ class Star1(Tag.div): # it's a component ;-)
         self.value+=v
 
     def render(self): # <- ensure dynamic rendering
+        self.clear()
         self <= b.Button( "-", _onclick = lambda o: self.inc(-1), _class="is-small" )
         self <= b.Button( "+", _onclick = lambda o: self.inc(+1), _class="is-small" )
         self <= "⭐"*self.value

@@ -8,6 +8,7 @@ class Gui1(Tag.body):
         self.value=0
 
     def render(self):
+        self.clear()
         self <= Tag.Span( self.value )
         self <= Tag.Button( "+", _onclick=self.bind.inc() )
 

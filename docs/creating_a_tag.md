@@ -11,7 +11,7 @@ The signature of the helper could be: `Tag.<html>( <content_or_None>, **attrs ) 
  * Where `<html>` can be "div","span","input", .. or whatever you want (it will be the html tag representation)
  * Where `<content_or_None>` can be None or whatever which is str'able (list are accepted too)
  * Where `attrs` can be any attributs to specialize the creation (see later)
- 
+
 
 ```python
 from htag import Tag
@@ -150,9 +150,9 @@ Here, you will notice that it uses a special constructor (`init`) in place of th
 class Div(Tag.div):
     def __init__(self):
         super().__init__()
-        self += "Hello world" 
+        self += "Hello world"
         self["style"]="background:red"
-``` 
+```
 It produces exactly the same kind of result.
 
 Now, when you want to use your new component, it's as simple as always :
@@ -187,9 +187,9 @@ With classical python constructor it should be :
 class Div(Tag.div):
     def __init__(self, **a):  # notice the '**a' !
         super().__init__(**a) # notice the '**a' !
-        self += "Hello world" 
+        self += "Hello world"
         self["style"]="background:red"
-``` 
+```
 
 It's good practice, to create its components in a "opened" way (to be able to customized them later). But sometimes, it makes sense to refuse customization.
 
@@ -211,14 +211,15 @@ A simple example:
 class Starrer(Tag.div):
     def init(self,value=0):
         self.value=value
-        
+
         def inc(v):
             self.value+=v
-        
+
         self.bless = Tag.Button( "-", _onclick = lambda o: inc(-1) )
         self.bmore = Tag.Button( "+", _onclick = lambda o: inc(+1) )
-        
+
     def render(self):
+        self.clear()
         self += self.bless + self.bmore + ("⭐"*self.value)
 ```
 

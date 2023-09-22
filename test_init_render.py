@@ -36,6 +36,7 @@ def test_simplified_init():
 def test_own_render():
     class Toto(Tag.div):
         def render(self):
+            self.clear()
             self <= "own"
     assert str(Toto("hello")) == '<div>own</div>'
 
@@ -43,6 +44,7 @@ def test_own_render():
         def init(self,nb):
             self.nb=nb
         def render(self):
+            self.clear()
             self <= "*" * self.nb
     t=Toto(4)
     assert anon(t) == '<div>****</div>'

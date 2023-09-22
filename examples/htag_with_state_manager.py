@@ -68,6 +68,7 @@ class Basket(Tag.div):
     def render(self): # dynamic rendering (so it can react on store changes)
         liste = self.root.store["baskets"]
 
+        self.clear()
         if liste:
             somme=0
             for ref in liste:

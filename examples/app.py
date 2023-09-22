@@ -19,6 +19,7 @@ class CptWithStars(Tag.div):
         self.nb=value
 
     def render(self): # special method
+        self.clear()
         self.add( Tag.button( "-",_onclick=self.bind.onclick(-1) ))
         self.add( self.nb )
         self.add( Tag.button( "+",_onclick=self.bind.onclick(1) ))

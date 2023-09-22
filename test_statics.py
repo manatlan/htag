@@ -50,6 +50,7 @@ def test_build_lately():
     class OO1(Tag.div):
         imports = O
         def render(self):
+            self.clear()
             self <= O() # "O" is a direct child
 
     assert "/*S1*/" in str(HRenderer( OO1, "//"))
@@ -57,6 +58,7 @@ def test_build_lately():
     class OO2(Tag.div):
         imports = O
         def render(self):
+            self.clear()
             self <= Tag.div( O() ) # "O" is a non-direct child
 
     assert "/*S1*/" in str(HRenderer( OO2, "//"))
@@ -124,7 +126,7 @@ def test_inherit_bases():
 
     hr=HRenderer(B,"")
     styles=[i for i in hr._statics if i.tag=="style"]
-    assert len(styles)==2    
+    assert len(styles)==2
 
 
 if __name__=="__main__":

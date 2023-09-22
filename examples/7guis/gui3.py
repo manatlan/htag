@@ -10,6 +10,7 @@ class Gui3(Tag.body):
     def render(self):
         options = [Tag.option(i,_selected=(self.selected==i)) for i in ["One Way","Return Flight"]]
 
+        self.clear()
         self <= Tag.Select( options, _onchange=self.bind.setSelected(b"this.value") )
         self <= Tag.input(_type="date")
         self <= Tag.input(_type="date",_disabled=self.selected=="One Way")
