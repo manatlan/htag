@@ -13,7 +13,9 @@ A new python library to create UI (or UI toolkit), which render nativly in anyth
 Thoses can be a browser, a pywebview, an android/apk, or anything based on cef, depending on an [htag runner](https://manatlan.github.io/htag/runners/) !
 As it's based on html/js rendering: you can easily mix powerful JS libs with powerful PY3 libs : and make powerful python apps !
 
- * For a **desktop app** : You can use the [PyWebView runner](https://manatlan.github.io/htag/runners/#pywebwiew), which will run the UI in a pywebview container (or "ChromeApp runner", in a local chrome app mode). 
+ * For a **desktop app** : 
+    * You can use the [PyWebView runner](https://manatlan.github.io/htag/runners/#pywebwiew), which will run the UI in a pywebview container 
+    * You can use the [ChromeApp runner](https://manatlan.github.io/htag/runners/#chromeapp), which will run the UI in a local chrome in "app mode" (headless).
  * For a **android app** : You can use the [AndroidApp runner](https://manatlan.github.io/htag/runners/#androidapp), which will run the UI in a kiwi webview thru tornado webserver, and can be embedded in an apk ([recipes](https://github.com/manatlan/htagapk))
  * For a **pyscript app** : you can use the [PyScript runner](https://manatlan.github.io/htag/runners/#pyscript), which will run completly in client side
  * For a **web app** : You can use the [htagweb](https://github.com/manatlan/htagweb).
@@ -37,14 +39,12 @@ Well tested:
 
 ## To have a look
 
-Try the [https://htag.glitch.me/](DEMO), which is a real Htag App (on glitch.com), which demoing reals Htag Components (example) in live.
-
-Since **htag** works in **pyscript** ... You don't need python, just HTML ;-) [see here](https://github.com/manatlan/htag/blob/main/examples/README.md).
-
-And here is a [Htag/Pyscript DEMO](https://raw.githack.com/manatlan/htag/main/examples/pyscript_demo.html), where you can try/code a htag's app, and try/run it in a pyscript context ! (It's a simple html file, nor server or python is involved here ! Just HTML)
+ * [htag.glitch.me](https://htag.glitch.me/): A htag app, hosted on glitch.com, running with [htagweb](https://github.com/manatlan/htagweb). Many examples from simpler to complex ones, in tutorial spirit.
+ * [pyscript/demo](https://raw.githack.com/manatlan/htag/main/examples/pyscript_demo.html): A htag app in a simple html page, running with [pyscript runner](https://manatlan.github.io/htag/runners/#pyscript). Many examples in a REPL mode (you can try/edit/run them). (ONLY HTML needed)
 
 ## ROADMAP to 1.0.0
 
+ * the "0.20.0" is the pre-version before 1.0.0 (htag core will not change anymore). I need to fix some runners before.
  * tests tests
  * setup minimal docs, with [that](https://realpython.com/python-project-documentation-with-mkdocs/) ;-)
  * ~~top level api could change (Tag() -> create a Tag, Tag.mytag() -> create a TagBase ... can be a little bit ambiguous)~~
