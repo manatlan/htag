@@ -183,6 +183,10 @@ class TagCreator(type):
     def __getattr__(self,name:str) -> Type:
         return type('Tag%s' % name.capitalize(), (Tag,), {**Tag.__dict__,"tag":name})
 
+
+
+
+
 class Tag(metaclass=TagCreator): # custom tag (to inherit)
 
     #======================================================================
@@ -261,9 +265,16 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
 
 
     @property
-    def state(self) -> "dict|None":
-        """the state's dict, managed by the hrenderer, else None (during child-component's init phase : always None)"""
+    def session(self) -> "dict|None":
+        """the session's dict, managed by the hrenderer, else None (during child-component's init phase : always None)"""
         return self.root._hr.session if self.root._hr else None
+
+    @property
+    def state(self) -> "TagState|None":
+        """the state's dict (sub dict of session), else None (during child-component's init phase : always None)"""
+        if self.session is not None:
+            return TagState(self)
+
 
     @property
     def event(self) -> dict:
@@ -274,7 +285,6 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
     #======================================================================
     def __init__(self, *args,_hr_=None,**kargs):
         self._hr=_hr_           # the hrenderer instance (only available in the root tag)
-
         self._event={}
         self._parent=None
         self._callbacks_={}
@@ -318,6 +328,8 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
 
         # compute an hash at creation time (used in hrender to identify doubles)
         self._hash_ = md5( str(self._attrs.items())+str(self.childs) )
+
+        # self.state.save()
 
     def __declareArgsKargs(self, content:AnyTags=None,**_attrs):
         self.set(content)
@@ -575,3 +587,25 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
             if callable(render):
                 return render
 
+
+class TagState:
+    def __init__(self,tag:Tag):
+        self._tag=tag
+        self._d=self._tag.session.get(self._tag.__class__.__name__,{})
+
+    def get(self,k:str,default=None):
+        return self._d.get(k,default)
+
+    def __getitem__(self,k:str):
+        return self._d[k]
+
+    def __setitem__(self,k:str,v):
+        self._d[k]=v
+        self.save()
+
+    def save(self):
+        """force to save state in session"""
+        self._tag.session[self._tag.__class__.__name__]=self._d
+
+    def __repr__(self):
+        return f"<TagState {self._tag.__class__.__name__}: {self._d}>"

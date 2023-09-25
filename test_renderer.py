@@ -714,6 +714,24 @@ def test_avoid_tagcreation_in_render_STRICT_MODE():
 #     finally:
 #         Tag.STRICT_MODE = False
 
+def test_state_and_session():
+    class App(Tag.div):
+        def init(self):
+            self.state["hello"]=42
+            self <= Tag.span("hello")
+
+    # assert than bicoz it uses state, it can't be used simply
+    with pytest.raises(TypeError):
+        str( App() ) # TypeError: 'NoneType' object does not support item assignment
+
+    ses=dict(user="moi")
+
+    hr=HRenderer(App,"",session=ses)
+    assert str(hr.tag).count("id=") == 2 # body & span
+
+    assert hr.tag.state["hello"]==42
+    assert "App" in ses
+
 
 if __name__=="__main__":
     # test_ko_try_render_a_tagbase()
@@ -742,4 +760,5 @@ if __name__=="__main__":
     # test_intelligent_rendering2()
     # test_just_4_coverage()
     # test_avoid_tagcreation_in_render()
-    test_discovering_js()
+    # test_discovering_js()
+    test_state_and_session()

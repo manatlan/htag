@@ -339,6 +339,10 @@ function jevent(e) {
 
         logger.info("RETURN --> %s",json.dumps(rep,indent=4))
 
+        # force tagstate to be written in session
+        # at the end of an interaction
+        self.tag.state.save()
+
         return rep
 
     def _mkReponse(self, tags:list) -> dict: # can't set a "script" key -> so named "post" (coz guy)
