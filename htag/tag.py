@@ -591,7 +591,7 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
 class TagState:
     def __init__(self,tag:Tag):
         self._tag=tag
-        self._d=self._tag.session.get(self._tag.__class__.__name__,{})
+        self._d=self._tag.session.get(self._tag.__class__.__module__+"."+self._tag.__class__.__qualname__,{})
 
     def get(self,k:str,default=None):
         return self._d.get(k,default)
@@ -605,7 +605,10 @@ class TagState:
 
     def save(self):
         """force to save state in session"""
-        self._tag.session[self._tag.__class__.__name__]=self._d
+        self._tag.session[self._tag.__class__.__module__+"."+self._tag.__class__.__qualname__]=self._d
+
+    def items(self):
+        return self._d.items()
 
     def __repr__(self):
-        return f"<TagState {self._tag.__class__.__name__}: {self._d}>"
+        return f"<TagState {self._tag.__class__.__module__+'.'+self._tag.__class__.__qualname__}: {self._d}>"

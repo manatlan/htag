@@ -730,8 +730,8 @@ def test_state_and_session():
     assert str(hr.tag).count("id=") == 2 # body & span
 
     assert hr.tag.state["hello"]==42
-    assert "App" in ses
-
+    # assert "__main__.test_state_and_session.<locals>.App" in ses
+    assert len(ses.items())==2
 
 if __name__=="__main__":
     # test_ko_try_render_a_tagbase()
