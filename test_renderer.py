@@ -749,6 +749,10 @@ def test_state_and_session():
     assert len(ses)==2
     assert hr.tag.state["world"]==43
 
+    del hr.tag.state["world"]
+    assert not hr.tag.state
+    assert len(ses)==1
+
 if __name__=="__main__":
     # test_ko_try_render_a_tagbase()
     # test_render_a_tag_with_interaction()

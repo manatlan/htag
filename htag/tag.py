@@ -600,6 +600,11 @@ class TagState:
         self._d[k]=v
         self.save()
 
+    def __delitem__(self,k:str):
+        """ save state : delete a key"""
+        del self._d[k]
+        self.save()
+
     def clear(self):
         """ save state : clear tag state"""
         self._d.clear()
