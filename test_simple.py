@@ -501,7 +501,7 @@ def test_add():
 def test_js_call_at_init():
 
     class HRSimu():
-        session=None
+        session={}
         def _addInteractionScript(self,js):
             self.ijs=js
 
