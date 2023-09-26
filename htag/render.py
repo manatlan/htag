@@ -307,6 +307,10 @@ function jevent(e) {
                 assert r is None
                 ret=None
 
+            # force tagstate to be written in session
+            # at the end of an interaction (before guessing rendering changes)
+            self.tag.state.save()
+
             rep= self._mkReponse(state.guess() )
 
             if ret:
@@ -338,10 +342,6 @@ function jevent(e) {
             rep={"err": stacktrace if self.fullerror else str(e) }
 
         logger.info("RETURN --> %s",json.dumps(rep,indent=4))
-
-        # force tagstate to be written in session
-        # at the end of an interaction
-        self.tag.state.save()   #TODO: really needed ? (if yes -> UT !!!)
 
         return rep
 
