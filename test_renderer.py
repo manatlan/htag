@@ -729,9 +729,25 @@ def test_state_and_session():
     hr=HRenderer(App,"",session=ses)
     assert str(hr.tag).count("id=") == 2 # body & span
 
+    assert hr.tag.state
+    assert "hello" in hr.tag.state
+
     assert hr.tag.state["hello"]==42
     # assert "__main__.test_state_and_session.<locals>.App" in ses
-    assert len(ses.items())==2
+
+    assert hr.tag.state.export() == dict(hello=42)
+
+    assert len(ses)==2
+
+    hr.tag.state.clear()
+    assert not hr.tag.state
+
+    assert len(ses)==1
+
+    hr.tag.state.load( dict(world=43) )
+
+    assert len(ses)==2
+    assert hr.tag.state["world"]==43
 
 if __name__=="__main__":
     # test_ko_try_render_a_tagbase()

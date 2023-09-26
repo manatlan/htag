@@ -270,13 +270,6 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         return self.root._hr.session if self.root._hr else None
 
     @property
-    def state(self) -> "TagState|None":
-        """the state's dict (sub dict of session), else None (during child-component's init phase : always None)"""
-        if self.session is not None:
-            return TagState(self)
-
-
-    @property
     def event(self) -> dict:
         return self._event
 
@@ -291,6 +284,8 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         self._childs=Elements()
         self._attrs={}
         self._hash_=None
+
+        self.state = TagState(self) if self._hr else None
 
         # sorts kargs -> selfs/attrs
         attrs={}
@@ -591,7 +586,8 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
 class TagState:
     def __init__(self,tag:Tag):
         self._tag=tag
-        self._d=self._tag.session.get(self._tag.__class__.__module__+"."+self._tag.__class__.__qualname__,{})
+        self._fqn = self._tag.__class__.__module__+"."+self._tag.__class__.__qualname__
+        self._d=self._tag.session.get(self._fqn,{})
 
     def get(self,k:str,default=None):
         return self._d.get(k,default)
@@ -600,15 +596,39 @@ class TagState:
         return self._d[k]
 
     def __setitem__(self,k:str,v):
+        """ save state : set item"""
         self._d[k]=v
+        self.save()
+
+    def clear(self):
+        """ save state : clear tag state"""
+        self._d.clear()
+        self.save()
+
+    def load(self,d:dict):
+        """ save state : load d:dict into tag.state"""
+        self._d=d
         self.save()
 
     def save(self):
         """force to save state in session"""
-        self._tag.session[self._tag.__class__.__module__+"."+self._tag.__class__.__qualname__]=self._d
+        if len(self._d)>0:
+            self._tag.session[self._fqn]=self._d
+        else:
+            if self._fqn in self._tag.session:
+                del self._tag.session[self._fqn]
 
     def items(self):
         return self._d.items()
 
+    def __contains__(self,key):
+        return key in self._d.keys()
+
+    def __len__(self):
+        return len(self._d.keys())
+
+    def export(self) -> dict:
+        return dict( self._d )
+
     def __repr__(self):
-        return f"<TagState {self._tag.__class__.__module__+'.'+self._tag.__class__.__qualname__}: {self._d}>"
+        return f"<TagState {self._fqn}: {self._d}>"

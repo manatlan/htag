@@ -341,7 +341,7 @@ function jevent(e) {
 
         # force tagstate to be written in session
         # at the end of an interaction
-        self.tag.state.save()
+        self.tag.state.save()   #TODO: really needed ? (if yes -> UT !!!)
 
         return rep
 
