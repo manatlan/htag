@@ -583,57 +583,40 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
                 return render
 
 
-class TagState:
+from collections import UserDict
+class TagState(dict):
+    """ manage a 'sub dict' of 'session dict'"""
     def __init__(self,tag:Tag):
-        self._tag=tag
-        self._fqn = self._tag.__class__.__module__+"."+self._tag.__class__.__qualname__
-        self._d=self._tag.session.get(self._fqn,{})
-
-    def get(self,k:str,default=None):
-        return self._d.get(k,default)
-
-    def __getitem__(self,k:str):
-        return self._d[k]
-
-    def __setitem__(self,k:str,v):
-        """ save state : set item"""
-        self._d[k]=v
-        self.save()
+        self._session:dict = tag.session
+        self._fqn = tag.__class__.__module__+"."+tag.__class__.__qualname__
+        super().__init__( self._session.get(self._fqn,{}) )
 
     def __delitem__(self,k:str):
-        """ save state : delete a key"""
-        del self._d[k]
+        super().__delitem__(k)
+        self.save()
+
+    def __setitem__(self,k:str,v):
+        super().__setitem__(k,v)
         self.save()
 
     def clear(self):
-        """ save state : clear tag state"""
-        self._d.clear()
+        super().clear()
         self.save()
+
+    def export(self) -> dict:
+        return dict( self )
 
     def load(self,d:dict):
         """ save state : load d:dict into tag.state"""
-        self._d=d
+        super().clear()
+        super().update(d)
         self.save()
 
     def save(self):
         """force to save state in session"""
-        if len(self._d)>0:
-            self._tag.session[self._fqn]=self._d
+        if len(self)>0:
+            self._session[self._fqn]=dict(self)
         else:
-            if self._fqn in self._tag.session:
-                del self._tag.session[self._fqn]
+            if self._fqn in self._session:
+                del self._session[self._fqn]
 
-    def items(self):
-        return self._d.items()
-
-    def __contains__(self,key):
-        return key in self._d.keys()
-
-    def __len__(self):
-        return len(self._d.keys())
-
-    def export(self) -> dict:
-        return dict( self._d )
-
-    def __repr__(self):
-        return f"<TagState {self._fqn}: {self._d}>"
