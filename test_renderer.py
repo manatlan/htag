@@ -735,7 +735,6 @@ def test_state_and_session():
     assert "hello" in hr.tag.state
 
     assert hr.tag.state["hello"]==42
-    # assert "__main__.test_state_and_session.<locals>.App" in ses
 
     assert hr.tag.state.export() == dict(hello=42)
 
