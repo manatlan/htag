@@ -717,18 +717,19 @@ def test_avoid_tagcreation_in_render_STRICT_MODE():
 
 
 def test_state_and_session():
-    class App(Tag.div):
+    class LocalApp(Tag.div):
+        imports=[]
         def init(self):
             self.state["hello"]=42
             self <= Tag.span("hello")
 
     # assert than bicoz it uses state, it can't be used simply
     with pytest.raises(TypeError):
-        str( App() ) # TypeError: 'NoneType' object does not support item assignment
+        str( LocalApp() ) # TypeError: 'NoneType' object does not support item assignment
 
     ses=dict(user="moi")
 
-    hr=HRenderer(App,"",session=ses,fullerror=True)
+    hr=HRenderer(LocalApp,"",session=ses,fullerror=True)
     assert str(hr).count("id=") == 2 # body & span
 
     assert hr.tag.state
