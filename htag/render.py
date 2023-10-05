@@ -307,10 +307,6 @@ function jevent(e) {
                 assert r is None
                 ret=None
 
-            # force tagstate to be written in session
-            # at the end of an interaction (before guessing rendering changes)
-            self.tag.state.save()
-
             rep= self._mkReponse(state.guess() )
 
             if ret:

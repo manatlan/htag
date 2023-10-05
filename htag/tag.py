@@ -324,7 +324,6 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         # compute an hash at creation time (used in hrender to identify doubles)
         self._hash_ = md5( str(self._attrs.items())+str(self.childs) )
 
-        # self.state.save()
 
     def __declareArgsKargs(self, content:AnyTags=None,**_attrs):
         self.set(content)
@@ -593,26 +592,28 @@ class TagState(dict):
 
     def __delitem__(self,k:str):
         super().__delitem__(k)
-        self.save()
+        self._save()
 
     def __setitem__(self,k:str,v):
         super().__setitem__(k,v)
-        self.save()
+        self._save()
 
     def clear(self):
         super().clear()
-        self.save()
+        self._save()
+
+    def load(self,d:dict):
+        super().clear()
+        self.update(d)
+
+    def update(self,d:dict):
+        super().update(d)
+        self._save()
 
     def export(self) -> dict:
         return dict( self )
 
-    def load(self,d:dict):
-        """ save state : load d:dict into tag.state"""
-        super().clear()
-        super().update(d)
-        self.save()
-
-    def save(self):
+    def _save(self):
         """force to save state in session"""
         if len(self)>0:
             self._session[self._fqn]=dict(self)
