@@ -1,5 +1,6 @@
 #!/usr/bin/python3 -u
 # -*- coding: utf-8 -*-
+from collections import UserDict
 from dataclasses import replace
 import pytest
 import asyncio
@@ -714,6 +715,7 @@ def test_avoid_tagcreation_in_render_STRICT_MODE():
 #     finally:
 #         Tag.STRICT_MODE = False
 
+
 def test_state_and_session():
     class App(Tag.div):
         def init(self):
@@ -726,8 +728,8 @@ def test_state_and_session():
 
     ses=dict(user="moi")
 
-    hr=HRenderer(App,"",session=ses)
-    assert str(hr.tag).count("id=") == 2 # body & span
+    hr=HRenderer(App,"",session=ses,fullerror=True)
+    assert str(hr).count("id=") == 2 # body & span
 
     assert hr.tag.state
     assert "hello" in hr.tag.state

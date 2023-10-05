@@ -616,8 +616,11 @@ class TagState(dict):
     def _save(self):
         """force to save state in session"""
         if len(self)>0:
-            self._session[self._fqn].clear()
-            self._session[self._fqn].update(dict(self))
+            if self._fqn in self._session:
+                self._session[self._fqn].clear()
+                self._session[self._fqn].update(dict(self))
+            else:
+                self._session[self._fqn]=dict(self)
         else:
             if self._fqn in self._session:
                 del self._session[self._fqn]
