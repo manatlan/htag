@@ -582,46 +582,97 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
                 return render
 
 
-from collections import UserDict
-class TagState(dict):
-    """ manage a 'sub dict' of 'session dict'"""
-    def __init__(self,tag:Tag):
-        self._session:dict = tag.session
-        self._fqn = tag.__class__.__module__+"."+tag.__class__.__qualname__
-        super().__init__( self._session.get(self._fqn,{}) )
+# from collections import UserDict
+# class TagState(dict):
+#     """ manage a 'sub dict' of 'session dict'"""
+#     def __init__(self,tag:Tag):
+#         self._session:dict = tag.session
+#         self._fqn = tag.__class__.__module__+"."+tag.__class__.__qualname__
+#         super().__init__( self._session.get(self._fqn,{}) )
 
-    def __delitem__(self,k:str):
-        super().__delitem__(k)
-        self._save()
+#     def __delitem__(self,k:str):
+#         super().__delitem__(k)
+#         self._save()
+
+#     def __setitem__(self,k:str,v):
+#         super().__setitem__(k,v)
+#         self._save()
+
+#     def clear(self):
+#         super().clear()
+#         self._save()
+
+#     def load(self,d:dict):
+#         super().clear()
+#         self.update(d)
+
+#     def update(self,d:dict):
+#         super().update(d)
+#         self._save()
+
+#     def export(self) -> dict:
+#         return dict( self )
+
+#     def _save(self):
+#         """force to save state in session"""
+#         if len(self)>0:
+#             if self._fqn in self._session:
+#                 self._session[self._fqn].clear()
+#                 self._session[self._fqn].update(dict(self))
+#             else:
+#                 self._session[self._fqn]=dict(self)
+#         else:
+#             if self._fqn in self._session:
+#                 del self._session[self._fqn]
+
+class TagState:
+    def __init__(self,tag:Tag):
+        self._tag=tag
+        self._fqn = self._tag.__class__.__module__+"."+self._tag.__class__.__qualname__
+        self._d=self._tag.session.get(self._fqn,{})
+
+    def get(self,k:str,default=None):
+        return self._d.get(k,default)
+
+    def __getitem__(self,k:str):
+        return self._d[k]
 
     def __setitem__(self,k:str,v):
-        super().__setitem__(k,v)
-        self._save()
+        """ save state : set item"""
+        self._d[k]=v
+        self.save()
+
+    def __delitem__(self,k:str):
+        """ save state : delete a key"""
+        del self._d[k]
+        self.save()
 
     def clear(self):
-        super().clear()
-        self._save()
+        """ save state : clear tag state"""
+        self._d.clear()
+        self.save()
 
     def load(self,d:dict):
-        super().clear()
-        self.update(d)
+        """ save state : load d:dict into tag.state"""
+        self._d=d
+        self.save()
 
-    def update(self,d:dict):
-        super().update(d)
-        self._save()
+    def save(self):
+        """force to save state in session"""
+        if len(self._d)>0:
+            self._tag.session[self._fqn]=self._d
+        else:
+            if self._fqn in self._tag.session:
+                del self._tag.session[self._fqn]
+
+    def items(self):
+        return self._d.items()
+
+    def __contains__(self,key):
+        return key in self._d.keys()
+
+    def __len__(self):
+        return len(self._d.keys())
 
     def export(self) -> dict:
-        return dict( self )
-
-    def _save(self):
-        """force to save state in session"""
-        if len(self)>0:
-            if self._fqn in self._session:
-                self._session[self._fqn].clear()
-                self._session[self._fqn].update(dict(self))
-            else:
-                self._session[self._fqn]=dict(self)
-        else:
-            if self._fqn in self._session:
-                del self._session[self._fqn]
-
+        return dict( self._d )
