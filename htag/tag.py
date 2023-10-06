@@ -627,21 +627,22 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
 
 class TagState:
     def __init__(self,tag):
+        self._tag = tag
         self._fqn = tag.__class__.__module__+"."+tag.__class__.__qualname__
-        self._session = tag.session
 
     def _load(self):
-        return self._session.get(self._fqn,{})
+        return self._tag.session.get(self._fqn,{})
     
     def _save(self,d):
         """force to save state in session"""
         if len(d)>0:
-            self._session[self._fqn]=d
+            self._tag.session[self._fqn]=d
         else:
-            if self._fqn in self._session:
-                del self._session[self._fqn]
+            if self._fqn in self._tag.session:
+                del self._tag.session[self._fqn]
 
-
+    # read methods
+    #--------------------------------
     def get(self,k:str,default=None):
         d=self._load()
         return d.get(k,default)
@@ -650,6 +651,20 @@ class TagState:
         d=self._load()
         return d[k]
 
+    def items(self):
+        d=self._load()
+        return d.items()
+
+    def __contains__(self,key):
+        d=self._load()
+        return key in d.keys()
+
+    def __len__(self):
+        d=self._load()
+        return len(d.keys())
+        
+    # mutable/write methods
+    #--------------------------------
     def __setitem__(self,k:str,v):
         """ save state : set item"""
         d=self._load()
@@ -667,23 +682,12 @@ class TagState:
         d=self._load()
         d.clear()
         self._save(d)
-
-    def load(self,dd:dict):
-        """ save state : load d:dict into tag.state"""
-        self._save(dict(dd))
-
-    def items(self):
-        d=self._load()
-        return d.items()
-
-    def __contains__(self,key):
-        d=self._load()
-        return key in d.keys()
-
-    def __len__(self):
-        d=self._load()
-        return len(d.keys())
+        
+    # import / export methods
+    #--------------------------------
+    def load(self,nd:dict):
+        """ save state : import nd:dict into tag.state"""
+        self._save( dict(nd) )
 
     def export(self) -> dict:
-        d=self._load()
-        return dict( d )
+        return dict( self._load() )
