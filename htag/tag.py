@@ -626,53 +626,64 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
 #                 del self._session[self._fqn]
 
 class TagState:
-    def __init__(self,tag:Tag):
-        self._tag=tag
-        self._fqn = self._tag.__class__.__module__+"."+self._tag.__class__.__qualname__
-        self._d=self._tag.session.get(self._fqn,{})
+    def __init__(self,tag):
+        self._fqn = tag.__class__.__module__+"."+tag.__class__.__qualname__
+        self._session = tag.session
+
+    def _load(self):
+        return self._session.get(self._fqn,{})
+    
+    def _save(self,d):
+        """force to save state in session"""
+        if len(d)>0:
+            self._session[self._fqn]=d
+        else:
+            if self._fqn in self._session:
+                del self._session[self._fqn]
+
 
     def get(self,k:str,default=None):
-        return self._d.get(k,default)
+        d=self._load()
+        return d.get(k,default)
 
     def __getitem__(self,k:str):
-        return self._d[k]
+        d=self._load()
+        return d[k]
 
     def __setitem__(self,k:str,v):
         """ save state : set item"""
-        self._d[k]=v
-        self.save()
+        d=self._load()
+        d[k]=v
+        self._save(d)
 
     def __delitem__(self,k:str):
         """ save state : delete a key"""
-        del self._d[k]
-        self.save()
+        d=self._load()
+        del d[k]
+        self._save(d)
 
     def clear(self):
         """ save state : clear tag state"""
-        self._d.clear()
-        self.save()
+        d=self._load()
+        d.clear()
+        self._save(d)
 
-    def load(self,d:dict):
+    def load(self,dd:dict):
         """ save state : load d:dict into tag.state"""
-        self._d=d
-        self.save()
-
-    def save(self):
-        """force to save state in session"""
-        if len(self._d)>0:
-            self._tag.session[self._fqn]=self._d
-        else:
-            if self._fqn in self._tag.session:
-                del self._tag.session[self._fqn]
+        self._save(dict(dd))
 
     def items(self):
-        return self._d.items()
+        d=self._load()
+        return d.items()
 
     def __contains__(self,key):
-        return key in self._d.keys()
+        d=self._load()
+        return key in d.keys()
 
     def __len__(self):
-        return len(self._d.keys())
+        d=self._load()
+        return len(d.keys())
 
     def export(self) -> dict:
-        return dict( self._d )
+        d=self._load()
+        return dict( d )
