@@ -227,7 +227,7 @@ ws.onclose = function(e) {
             WebSocketRoute("/ws", WsInteract),
         ])
 
-        self._server = threading.Thread(name='ChromeAppServer', target=uvicorn.run,args=(asgi,),kwargs=dict(host=host, port=port))
+        self._server = threading.Thread(name='ChromeAppServer', target=uvicorn.run,args=(asgi,),kwargs=dict(host=host, port=port, log_level="critical"))
         self._server.start()
         self._chromeapp.wait()
         os._exit(0) # to force quit the thread/uvicorn server
