@@ -66,7 +66,7 @@ ws.onerror = function(e) {
     console.error("WS ERROR");
 };
 ws.onclose = function(e) {
-    console.error("WS CLOSED");
+    window.close();
 };
 """
             return HRenderer(self.tagClass, js, lambda: os._exit(0), init=init, fullerror=False)
