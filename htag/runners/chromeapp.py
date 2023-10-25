@@ -179,7 +179,7 @@ ws.onerror = function(e) {
     console.error("WS ERROR");
 };
 ws.onclose = function(e) {
-    console.error("WS CLOSED");
+    window.close()
 };
 """
         return HRenderer(self.tagClass, js, self._chromeapp.exit, init=init )
