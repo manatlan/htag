@@ -125,7 +125,7 @@ class _ChromeApp:
     def __del__(self): # really important !
         if self._p:
             self._p.kill()
-        if self.cacheFolderToRemove: shutil.rmtree(self.cacheFolderToRemove, ignore_errors=True)
+            if self.cacheFolderToRemove: shutil.rmtree(self.cacheFolderToRemove, ignore_errors=True)
 
     #~ def _com(self, payload: dict):
         #~ """ https://chromedevtools.github.io/devtools-protocol/tot/Browser/#method-close """
