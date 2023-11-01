@@ -44,7 +44,7 @@ Well tested:
 
 ## ROADMAP to 1.0.0
 
- * the "0.20.0" is the pre-version before 1.0.0 (htag core will not change anymore). I need to fix some runners before.
+ * the "0.60.x" is the pre-version before 1.0.0 (htag core will not change anymore). I need to fix some runners before.
  * tests tests
  * setup minimal docs, with [that](https://realpython.com/python-project-documentation-with-mkdocs/) ;-)
  * ~~top level api could change (Tag() -> create a Tag, Tag.mytag() -> create a TagBase ... can be a little bit ambiguous)~~

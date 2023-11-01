@@ -118,7 +118,7 @@ class _ChromeApp:
                     #~ except Exception as e:
                         #~ self._ws = None
 
-    def wait(self):
+    def wait(self,thread):
         if self._p:
             self._p.wait()
 
@@ -194,7 +194,17 @@ ws.onclose = function(e) {
         return HTMLResponse( str(self.hrenderer) )
 
     def run(self, host="127.0.0.1", port=8000 , size=(800,600)):   # localhost, by default !!
-        self._chromeapp = _ChromeApp(f"http://{host}:{port}",size=size)
+        try:
+            self._chromeapp = _ChromeApp(f"http://{host}:{port}",size=size)
+        except:
+            import webbrowser
+            webbrowser.open_new_tab(f"http://{host}:{port}")
+            class FakeChromeApp:
+                def wait(self,thread):
+                    thread.join()
+                def exit(self):
+                    pass
+            self._chromeapp = FakeChromeApp()
 
         async def _sendactions(ws, actions:dict) -> bool:
             try:
@@ -222,7 +232,6 @@ ws.onclose = function(e) {
                 await _sendactions( websocket, actions )
 
             async def on_disconnect(this, websocket, close_code):
-                print("!!! exit on socket.close !!!")
                 self._chromeapp.exit()
                 os._exit(0)
 
@@ -233,5 +242,5 @@ ws.onclose = function(e) {
 
         self._server = threading.Thread(name='ChromeAppServer', target=uvicorn.run,args=(asgi,),kwargs=dict(host=host, port=port, log_level="critical"))
         self._server.start()
-        self._chromeapp.wait()
+        self._chromeapp.wait( self._server )
         os._exit(0) # to force quit the thread/uvicorn server
