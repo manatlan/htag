@@ -39,7 +39,8 @@ CHROMECACHE=".cache"
 
 class _ChromeApp:
     def __init__(self, url, appname="driver",size=None,lockPort=None,chromeargs=[]):
-
+        self._p=None
+        
         def find_chrome_win():
             import winreg  # TODO: pip3 install winreg
 
@@ -118,10 +119,12 @@ class _ChromeApp:
                         #~ self._ws = None
 
     def wait(self):
-        self._p.wait()
+        if self._p:
+            self._p.wait()
 
     def __del__(self): # really important !
-        self._p.kill()
+        if self._p:
+            self._p.kill()
         if self.cacheFolderToRemove: shutil.rmtree(self.cacheFolderToRemove, ignore_errors=True)
 
     #~ def _com(self, payload: dict):
@@ -138,7 +141,8 @@ class _ChromeApp:
 
     def exit(self):
         #~ self._com(dict(method="Browser.close"))
-        self._p.kill()
+        if self._p:
+            self._p.kill()
 #="="="="="="="="="="="="="="="="="="="="="="="="="="="="="="="="="="="="="="="
 
 
