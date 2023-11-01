@@ -95,11 +95,20 @@ ws.onclose = function(e) {
                 await _sendactions( this, actions )
 
             def on_close(this):
-                print("!!! exit on socket.close !!!")
                 self.chromeapp.exit()
                 os._exit(0)
 
-        self.chromeapp = _ChromeApp(f"http://{host}:{port}",size=size)
+        try:
+            self.chromeapp = _ChromeApp(f"http://{host}:{port}",size=size)
+        except:
+            import webbrowser
+            webbrowser.open_new_tab(f"http://{host}:{port}")
+            class FakeChromeApp:
+                def wait(self,thread):
+                    pass
+                def exit(self):
+                    pass
+            self.chromeapp = FakeChromeApp()
         app = tornado.web.Application([(r"/", MainHandler),(r"/ws", SocketHandler)])
         app.listen(port)
         tornado.ioloop.IOLoop.current().start()
