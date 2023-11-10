@@ -40,7 +40,11 @@ class WebServer(Thread): # the webserver is ran on a separated thread
                 dico = await self.instance.renderer.interact(data["id"],data["method"],data["args"],data["kargs"],data.get("event"))
                 this.write(json.dumps(dico))
 
-        app = tornado.web.Application([(r"/", MainHandler),])
+        handlers=[(r"/", MainHandler),]
+        for path,handler in self.instance._routes:
+            handlers.append( ( path,handler ) )
+        app = tornado.web.Application( handlers )
+
         app.listen(self.port)
 
         self.loop=asyncio.get_event_loop()
@@ -58,6 +62,7 @@ class AndroidApp:
 
         self.renderer=None
         self.tagClass=tagClass
+        self._routes=[]
 
     def instanciate(self,url:str):
         init = commons.url2ak(url)
@@ -154,3 +159,5 @@ window.addEventListener('DOMContentLoaded', start );
         ServiceApp().run()
         #=================================================================
 
+    def add_handler(self, path:str, handler:tornado.web.RequestHandler):
+        self._routes.append( (path,handler) )

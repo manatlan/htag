@@ -27,6 +27,8 @@ class BrowserTornadoHTTP:
         self.hrenderer=None
         self.tagClass=tagClass
 
+        self._routes=[]
+
         try: # https://bugs.python.org/issue37373 FIX: tornado/py3.8 on windows
             if sys.platform == 'win32':
                 asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
@@ -63,6 +65,12 @@ window.addEventListener('DOMContentLoaded', start );
             import webbrowser
             webbrowser.open_new_tab(f"http://{host}:{port}")
 
-        app = tornado.web.Application([(r"/", MainHandler),])
+        handlers=[(r"/", MainHandler),]
+        for path,handler in self._routes:
+            handlers.append( ( path,handler ) )
+        app = tornado.web.Application( handlers )
         app.listen(port)
         tornado.ioloop.IOLoop.current().start()
+
+    def add_handler(self, path:str, handler:tornado.web.RequestHandler):
+        self._routes.append( (path,handler) )
