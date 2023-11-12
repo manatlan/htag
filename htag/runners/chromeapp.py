@@ -82,6 +82,7 @@ class _ChromeApp:
                 "--no-default-browser-check",
                 "--disable-notifications",
                 "--disable-features=TranslateUI",
+                "--autoplay-policy=no-user-gesture-required",
                 #~ "--no-proxy-server",
             ] + chromeargs
             if size:
