@@ -161,6 +161,8 @@ class ChromeApp:
         self.hrenderer = None
         self.tagClass = tagClass
 
+        self._routes=[]
+
 
     def instanciate(self,url:str):
         init = commons.url2ak(url)
@@ -240,7 +242,13 @@ ws.onclose = function(e) {
             WebSocketRoute("/ws", WsInteract),
         ])
 
+        for path,handler in self._routes:
+            asgi.add_route( path,handler )
+
         self._server = threading.Thread(name='ChromeAppServer', target=uvicorn.run,args=(asgi,),kwargs=dict(host=host, port=port, log_level="critical"))
         self._server.start()
         self._chromeapp.wait( self._server )
         os._exit(0) # to force quit the thread/uvicorn server
+
+    def add_route(self, path:str, handler):
+        self._routes.append( (path,handler) )

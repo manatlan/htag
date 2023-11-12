@@ -37,6 +37,8 @@ class WinApp:
         self.tagClass = tagClass
         self.hrenderer = None
 
+        self._routes=[]
+
         try: # https://bugs.python.org/issue37373 FIX: tornado/py3.8 on windows
             if sys.platform == 'win32':
                 asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
@@ -109,6 +111,12 @@ ws.onclose = function(e) {
                 def exit(self):
                     pass
             self.chromeapp = FakeChromeApp()
-        app = tornado.web.Application([(r"/", MainHandler),(r"/ws", SocketHandler)])
+        handlers=[(r"/", MainHandler),(r"/ws", SocketHandler)]
+        for path,handler in self._routes:
+            handlers.append( ( path,handler ) )
+        app = tornado.web.Application(handlers)
         app.listen(port)
         tornado.ioloop.IOLoop.current().start()
+
+    def add_handler(self, path:str, handler:tornado.web.RequestHandler):
+        self._routes.append( (path,handler) )
