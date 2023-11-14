@@ -48,7 +48,9 @@ class DevApp(Starlette):
 
         The instance is an ASGI htag app
     """
-    def __init__(self,tagClass:type):
+    def __init__(self,tagClass:type, file:"str|None"=None):
+        self._hr_session=commons.SessionFile(file) if file else None
+
         assert issubclass(tagClass,Tag)
 
         self.hrenderers={}
@@ -129,7 +131,7 @@ ws.onmessage = function(e) {
     action( e.data );
 };
 """ % className
-        self.hrenderers[className]=HRenderer(tagClass, js, self.killme, fullerror=True, statics=[template,], init=init)
+        self.hrenderers[className]=HRenderer(tagClass, js, self.killme, fullerror=True, statics=[template,], init=init,session=self._hr_session)
         self.hrenderers[className].sendactions = lambda actions: _sendactions(self._ws,actions)
 
         return self.hrenderers[className]
@@ -160,6 +162,7 @@ ws.onmessage = function(e) {
 
 
     def run(self, host="127.0.0.1", port=8000, openBrowser=True):   # localhost, by default !!
+
         import uvicorn,webbrowser
         import inspect,sys
         from pathlib import Path

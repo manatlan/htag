@@ -28,7 +28,8 @@ class BrowserStarletteWS(Starlette):
 
         The instance is an ASGI htag app
     """
-    def __init__(self,tagClass:type):
+    def __init__(self,tagClass:Tag,file:"str|None"=None):
+        self._hr_session=commons.SessionFile(file) if file else None
         assert issubclass(tagClass,Tag)
         self.hrenderer = None
         self.tagClass = tagClass
@@ -82,7 +83,7 @@ ws.onmessage = function(e) {
     action( e.data );
 };
 """
-        return HRenderer(self.tagClass, js, lambda: os._exit(0), init=init)
+        return HRenderer(self.tagClass, js, lambda: os._exit(0), init=init,session=self._hr_session)
 
     async def GET(self,request):
         self.hrenderer=self.instanciate( str(request.url) )

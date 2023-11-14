@@ -24,7 +24,8 @@ class BrowserStarletteHTTP(Starlette):
 
         The instance is an ASGI htag app
     """
-    def __init__(self,tagClass:type):
+    def __init__(self,tagClass:Tag,file:"str|None"=None):
+        self._hr_session=commons.SessionFile(file) if file else None
         assert issubclass(tagClass,Tag)
 
         self.hrenderer = None
@@ -48,7 +49,7 @@ async function interact( o ) {
 window.addEventListener('DOMContentLoaded', start );
 """
 
-        return HRenderer(self.tagClass, js, lambda: os._exit(0), init=init)
+        return HRenderer(self.tagClass, js, lambda: os._exit(0), init=init,session=self._hr_session)
 
     async def GET(self,request) -> HTMLResponse:
         self.hrenderer = self.instanciate( str(request.url) )

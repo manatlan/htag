@@ -24,8 +24,8 @@ class BrowserHTTP:
         But it's the perfect runner, to test/debug, coz interactions are easier !
     """
 
-    def __init__(self,tagClass:type):
-        assert issubclass(tagClass,Tag)
+    def __init__(self,tagClass:Tag,file:"str|None"=None):
+        self._hr_session=commons.SessionFile(file) if file else None
 
         self.hrenderer=None
         self.tagClass=tagClass
@@ -42,9 +42,10 @@ async function interact( o ) {
 
 window.addEventListener('DOMContentLoaded', start );
 """
-        return HRenderer(self.tagClass, js, lambda: os._exit(0), init=init)
+        return HRenderer(self.tagClass, js, lambda: os._exit(0), init=init, session=self._hr_session)
 
-    def run(self, host="127.0.0.1", port=8000, openBrowser=True ):   # localhost, by default !!
+    def run(self, host="127.0.0.1", port=8000, openBrowser=True):   # localhost, by default !!
+
         """
         ASyncio http server with stdlib ;-)
         Inspired from https://www.pythonsheets.com/notes/python-asyncio.html

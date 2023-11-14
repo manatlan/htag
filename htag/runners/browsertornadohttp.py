@@ -21,7 +21,8 @@ class BrowserTornadoHTTP:
     """ Simple ASync Web Server (with TORNADO) with HTTP interactions with htag.
         Open the rendering in a browser tab.
     """
-    def __init__(self,tagClass:type):
+    def __init__(self,tagClass:Tag,file:"str|None"=None):
+        self._hr_session=commons.SessionFile(file) if file else None
         assert issubclass(tagClass,Tag)
 
         self.hrenderer=None
@@ -47,10 +48,10 @@ async function interact( o ) {
 
 window.addEventListener('DOMContentLoaded', start );
 """
-        return HRenderer(self.tagClass, js, lambda: os._exit(0), init=init)
+        return HRenderer(self.tagClass, js, lambda: os._exit(0), init=init,session=self._hr_session)
 
 
-    def run(self, host="127.0.0.1", port=8000, openBrowser=True):   # localhost, by default !!
+    def run(self, host="127.0.0.1", port=8000 , openBrowser=True):   # localhost, by default !!
 
         class MainHandler(tornado.web.RequestHandler):
             async def get(this):

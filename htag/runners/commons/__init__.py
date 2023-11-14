@@ -32,20 +32,35 @@ def url2ak(url:str):
     return tuple(args), dict(kargs)
 
 #----------------------------------------------
-import time
+import json,os
+class SessionFile(dict):
+    def __init__(self,file):
+        self._file=file
 
-class HRSessions:
-    def __init__(self):
-        self._data={}
+        if os.path.isfile(self._file):
+            with open(self._file,"r+") as fid:
+                d=json.load(fid)
+        else:
+            d={}
 
-    def set_hr(self,fqn:str,hr:type):
-        """ save the hrenderer for fqn"""
-        self._data[fqn]=dict(lastaccess=time.time(),hrenderer=hr)
+        super().__init__( d )
 
-    def get_hr(self,fqn:str): # -> HRenderer
-        """ get the hrenderer for fqn or None"""
-        info=self._data.get(fqn)
-        if info:
-            info["lastaccess"]=time.time()
-            return info["hrenderer"]
+    def __delitem__(self,k:str):
+        super().__delitem__(k)
+        self._save()
 
+    def __setitem__(self,k:str,v):
+        super().__setitem__(k,v)
+        self._save()
+
+    def clear(self):
+        super().clear()
+        self._save()
+
+    def _save(self):
+        if len(self):
+            with open(self._file,"w+") as fid:
+                json.dump(dict(self),fid, indent=4)
+        else:
+            if os.path.isfile(self._file):
+                os.unlink(self._file)

@@ -32,7 +32,8 @@ class WinApp:
     - as it doesn't use uvicon, it's the perfect solution on windows (for .pyw files)
     """
 
-    def __init__(self,tagClass:type):
+    def __init__(self,tagClass:Tag,file:"str|None"=None):
+        self._hr_session=commons.SessionFile(file) if file else None
         assert issubclass(tagClass,Tag)
         self.tagClass = tagClass
         self.hrenderer = None
@@ -71,7 +72,7 @@ ws.onclose = function(e) {
     window.close();
 };
 """
-            return HRenderer(self.tagClass, js, lambda: os._exit(0), init=init, fullerror=False)
+            return HRenderer(self.tagClass, js, lambda: os._exit(0), init=init, fullerror=False, session=self._hr_session)
 
         class MainHandler(tornado.web.RequestHandler):
             async def get(this):

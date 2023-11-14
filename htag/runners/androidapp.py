@@ -62,7 +62,9 @@ class AndroidApp:
 
     BTW : it uses tornado/http
     """
-    def __init__(self,tagClass:type):
+    def __init__(self,tagClass:type,file:"str|None"=None):
+        self._hr_session=commons.SessionFile(file) if file else None
+
         assert issubclass(tagClass,Tag)
 
         self.renderer=None
@@ -82,7 +84,7 @@ async function interact( o ) {
 window.addEventListener('DOMContentLoaded', start );
 """
         self._exiter=None
-        hr=HRenderer(self.tagClass, js, self.go_exit, init=init)
+        hr=HRenderer(self.tagClass, js, self.go_exit, init=init, session=self._hr_session)
         self.renderer=hr
         return hr
 
@@ -92,7 +94,7 @@ window.addEventListener('DOMContentLoaded', start );
         else:
             self._exiter()
 
-    def run(self): # basically, the same code as guy.runAndroid()
+    def run(self):   
         host= "127.0.0.1"
         port = 12458
         while not isFree(host,port):

@@ -156,7 +156,8 @@ class ChromeApp:
 
     BTW : it uses Starlette/http as backend server
     """
-    def __init__(self,tagClass:type):
+    def __init__(self,tagClass:Tag,file:"str|None"=None):
+        self._hr_session=commons.SessionFile(file) if file else None
         assert issubclass(tagClass,Tag)
 
         self.hrenderer = None
@@ -189,7 +190,7 @@ ws.onclose = function(e) {
     window.close()
 };
 """
-        return HRenderer(self.tagClass, js, self._chromeapp.exit, init=init )
+        return HRenderer(self.tagClass, js, self._chromeapp.exit, init=init ,session=self._hr_session)
 
 
     async def GET(self,request) -> HTMLResponse:

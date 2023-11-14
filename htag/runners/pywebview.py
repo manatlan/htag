@@ -9,6 +9,7 @@
 
 from .. import Tag
 from ..render import HRenderer
+from . import commons
 
 
 import asyncio,os
@@ -31,7 +32,8 @@ class PyWebView:
     """ Open the rendering in a pywebview instance
         Interactions with builtin pywebview.api ;-)
     """
-    def __init__(self,tagClass:type):
+    def __init__(self,tagClass:Tag,file:"str|None"=None):
+        self._hr_session=commons.SessionFile(file) if file else None
         assert issubclass(tagClass,Tag)
 
         js = """
@@ -42,7 +44,7 @@ async function interact( o ) {
 window.addEventListener('pywebviewready', start );
 """
 
-        self.renderer=HRenderer(tagClass, js, lambda: os._exit(0))
+        self.renderer=HRenderer(tagClass, js, lambda: os._exit(0), session=self._hr_session)
 
     def run(self):
         class Api:

@@ -16,6 +16,7 @@ import json
 class PyScript:
 
     def __init__(self,tagClass:type):
+        #TODO: __init__ could accept a 'file' parameter based on localstorage to make persistent session !
         assert issubclass(tagClass,Tag)
         self.tagClass=tagClass
 
