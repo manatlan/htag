@@ -4,8 +4,10 @@ from htag import Tag # the only thing you'll need ;-)
 class Page(Tag.body):
     def init(self):
         self.session["previous"]=self.session.get("previous","") + "!"
+        self.state["previous2"]=self.state.get("previous2","") + "!"
 
-        self+=Tag.b( self.session["previous"] )
+        self+=Tag.div( self.session["previous"] )
+        self+=Tag.div( self.state["previous2"] )
 
 
 # from htag.runners import DevApp as Runner
