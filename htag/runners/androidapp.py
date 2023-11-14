@@ -12,13 +12,18 @@ from htag import Tag
 from htag.render import HRenderer
 from . import commons
 
-import os,json,asyncio
+import os,json,asyncio,socket
 
 import tornado.ioloop
 import tornado.web
 import tornado.platform.asyncio
 
 from threading import Thread
+
+def isFree(ip, port):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.settimeout(1)
+    return not (s.connect_ex((ip,port)) == 0)
 
 class WebServer(Thread): # the webserver is ran on a separated thread
 
@@ -88,7 +93,10 @@ window.addEventListener('DOMContentLoaded', start );
             self._exiter()
 
     def run(self): # basically, the same code as guy.runAndroid()
-        host,port= "127.0.0.1", 12458
+        host= "127.0.0.1"
+        port = 12458
+        while not isFree(host,port):
+            port+=1
         urlStartPage = f"http://{host}:{port}"
 
         self.server = WebServer(self,port)
@@ -146,8 +154,13 @@ window.addEventListener('DOMContentLoaded', start );
             @run_on_ui_thread
             def create_webview(self, *args):
                 webview = webView(activity)
-                webview.getSettings().setJavaScriptEnabled(True)
-                webview.getSettings().setDomStorageEnabled(True)
+                webSettings=webview.getSettings()
+                webSettings.setJavaScriptEnabled(True)
+                webSettings.setDomStorageEnabled(True)
+                try:
+                    webSettings.setMediaPlaybackRequiresUserGesture(False) # SDK_INT > 17
+                except:
+                    pass
                 webview.setWebViewClient(webViewClient())
                 activity.setContentView(webview)
                 webview.loadUrl(urlStartPage)               # !important
