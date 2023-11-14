@@ -148,7 +148,6 @@ window.addEventListener('DOMContentLoaded', start );
                 webview = webView(activity)
                 webview.getSettings().setJavaScriptEnabled(True)
                 webview.getSettings().setDomStorageEnabled(True)
-                webView.getSettings().setMediaPlaybackRequiresUserGesture(False);   # so can autoplay !
                 webview.setWebViewClient(webViewClient())
                 activity.setContentView(webview)
                 webview.loadUrl(urlStartPage)               # !important
