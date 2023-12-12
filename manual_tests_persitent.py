@@ -1,5 +1,13 @@
-import sys
+#!./venv/bin/python3
 from htag import Tag # the only thing you'll need ;-)
+
+class Nimp(Tag.div):
+    def init(self):
+        # !!! previous3 will not be saved in '/tmp/AEFFFF.json' !!!
+        # (it's not the main/managed tag (which is Page), so it's an inner dict)
+        self.state["previous3"]=self.state.get("previous3","") + "!"
+        self.set( self.state["previous3"] )
+
 
 class Page(Tag.body):
     def init(self):
@@ -8,6 +16,7 @@ class Page(Tag.body):
 
         self+=Tag.div( self.session["previous"] )
         self+=Tag.div( self.state["previous2"] )
+        self+=Nimp()
 
 
 # from htag.runners import DevApp as Runner

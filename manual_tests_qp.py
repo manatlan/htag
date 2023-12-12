@@ -1,3 +1,4 @@
+#!./venv/bin/python3
 # -*- coding: utf-8 -*-
 
 from htag import Tag

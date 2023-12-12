@@ -1,3 +1,4 @@
+#!./venv/bin/python3
 from htag import Tag
 import htbulma as b
 

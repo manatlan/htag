@@ -1,4 +1,4 @@
-import sys
+#!./venv/bin/python3
 from htag import Tag # the only thing you'll need ;-)
 
 

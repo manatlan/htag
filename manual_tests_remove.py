@@ -1,4 +1,5 @@
-import sys
+#!./venv/bin/python3
+# -*- coding: utf-8 -*-
 from htag import Tag # the only thing you'll need ;-)
 
 
