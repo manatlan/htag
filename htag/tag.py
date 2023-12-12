@@ -285,7 +285,8 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         self._attrs={}
         self._hash_=None
 
-        self.state = TagState(self) if self._hr else None
+        #self.state = TagState(self) if self._hr else None
+        self.state = TagState(self)
 
         # sorts kargs -> selfs/attrs
         attrs={}
@@ -630,16 +631,21 @@ class TagState:
         self._tag = tag
         self._fqn = tag.__class__.__module__+"."+tag.__class__.__qualname__
 
+        if self._tag.session:
+            self._data=self._tag.session
+        else:
+            self._data={}
+
     def _load(self):
-        return self._tag.session.get(self._fqn,{})
+        return self._data.get(self._fqn,{})
     
     def _save(self,d):
         """force to save state in session"""
         if len(d)>0:
-            self._tag.session[self._fqn]=d
+            self._data[self._fqn]=d
         else:
-            if self._fqn in self._tag.session:
-                del self._tag.session[self._fqn]
+            if self._fqn in self._data:
+                del self._data[self._fqn]
 
     # read methods
     #--------------------------------
