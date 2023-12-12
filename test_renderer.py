@@ -723,9 +723,8 @@ def test_state_and_session():
             self.state["hello"]=42
             self <= Tag.span("hello")
 
-    # assert than bicoz it uses state, it can't be used simply
-    with pytest.raises(TypeError):
-        str( LocalApp() ) # TypeError: 'NoneType' object does not support item assignment
+    # assert that the state works in all cases
+    str( LocalApp() ) # TypeError: 'NoneType' object does not support item assignment
 
     ses=dict(user="moi")
 
