@@ -186,8 +186,12 @@ class HRenderer:
 function start() { %s }
 
 function _error(txt,env) {
-    if(window.error)
-        error( env+" ERROR: "+txt );
+    if(window.error) {
+        if(txt===null && env=="COM")
+            error( null );
+        else
+            error( env+" ERROR: "+txt );
+    }
     else
         console.log( env+" ERROR:", txt );
     throw txt; // throw the js/py execption in the js console (and stop the process)
