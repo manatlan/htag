@@ -214,21 +214,26 @@ function action( payload ) {
     else // ensure compat with old system (PyWebView here!)
         o = payload;
 
-    if(o.hasOwnProperty("update"))
-        Object.keys(o["update"]).forEach(key => {
-            if(key==0)
-                document.body.outerHTML = o["update"][0];
-            else
-                document.getElementById( key ).outerHTML = o["update"][key];
-        });
-    if(o.hasOwnProperty("stream"))
-        Object.keys(o["stream"]).forEach(key => {
-            document.getElementById( key ).innerHTML += o["stream"][key];
-        });
+        
+    if(o === null)
+        _error( null, "COM")
+    else {
+        if(o.hasOwnProperty("update"))
+            Object.keys(o["update"]).forEach(key => {
+                if(key==0)
+                    document.body.outerHTML = o["update"][0];
+                else
+                    document.getElementById( key ).outerHTML = o["update"][key];
+            });
+        if(o.hasOwnProperty("stream"))
+            Object.keys(o["stream"]).forEach(key => {
+                document.getElementById( key ).innerHTML += o["stream"][key];
+            });
 
-    if(o.hasOwnProperty("post")) try_js(o["post"]);
-    if(o.hasOwnProperty("next")) try_js(o["next"]);
-    if(o.hasOwnProperty("err")) _error( o["err"], "PYTHON")
+        if(o.hasOwnProperty("post")) try_js(o["post"]);
+        if(o.hasOwnProperty("next")) try_js(o["next"]);
+        if(o.hasOwnProperty("err")) _error( o["err"], "PYTHON")
+    }
 }
 
 function jevent(e) {
