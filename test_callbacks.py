@@ -1,9 +1,11 @@
+#!./venv/bin/python3
 import pytest
 import re
 
-from htag import Tag,HTagException
+from htag import Tag,HTagException,expose
 from htag.render import HRenderer
 import asyncio
+from test_interactions import Simu
 
 from htag.tag import Caller
 
@@ -336,23 +338,29 @@ def test_on_event():
     assert asyncio.run( test(3) ) ==["hello"]
 
 
-# def test_try_to_bind_on_tagbase():
-#     class Jo(Tag.div):
-#         def init(self):
-#             self <= Tag.H.button("hello",_onclick=self.bind( self.action ) )
-#         def action(self,o):
-#             pass
+def test_auto_expose():
+    class Jo(Tag.div):
+        def init(self):
+            self <= Tag.button("hello",_onclick="self.action(42)" )
+        def action(self,val):
+            assert val == 42
 
-#     with pytest.raises(HTagException): # htag.tag.HTagException: Caller can't be serizalized, it's not _assign'ed to an event !
-#         str(Jo())
+    # assert no @expose, no auto declared
+    s=Simu(Jo)
+    assert "self.action = function(_)" not in str(s.hr)
 
-#     class Jo(Tag.div):
-#         def init(self):
-#             self <= Tag.H.button("hello",_onclick=self.action )
-#         def action(self,o):
-#             pass
+    class Jo(Tag.div):
+        def init(self):
+            self <= Tag.button("hello",_onclick="self.action(42)" )
+        @expose
+        def action(self,val):
+            assert val == 42
 
-#     assert 'button onclick="&lt;bound method' in str(Jo())
+    # assert with @expose, it's now autodeclared
+    s=Simu(Jo)
+    assert "self.action = function(_)" in str(s.hr)
+
+    #TODO: should test that the click do what it can do
 
 if __name__=="__main__":
     import logging
@@ -369,4 +377,5 @@ if __name__=="__main__":
     # test_on_event()
     # test_ko()
     # test_try_to_bind_on_tagbase()
-    test_binded_concatenate_strings()
+    # test_binded_concatenate_strings()
+    test_auto_expose()

@@ -25,6 +25,12 @@ class HTagException(Exception): pass
 
 #md5= lambda x: hashlib.md5(x.encode('utf-8')).hexdigest()
 
+def expose(method):
+    """Decorator to auto-expose python method on client-side (js), in the scope of 'self'"""
+    method._autoExposeClientSide_=True
+    return method
+
+
 def stringify(obj):
     def my(obj):
         if isinstance(obj,bytes): # trick to convert b'' -> pure javascript
@@ -570,6 +576,13 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
     def _getAllJs(self) -> list:
         """ get a list of IIFE js declared script of this tag and its children"""
         ll=[]
+
+        # auto-declare js methods for exposed's python methods
+        for method_name in set(dir(self)) - TAG_KEYWORDS:
+            if hasattr( getattr(self,method_name) ,"_autoExposeClientSide_"):
+                logger.debug("expose python method '%s' as js caller in %s",method_name,repr(self))
+                ll.append( "self.%s = function(_) {%s};" % (method_name,BaseCaller(self,method_name,[b"...arguments"],{})) )
+
         if self.js:
             logger.debug("Init Script (.js) found in %s --> '%s'",repr(self),self.js)
             ll.append( self._genIIFEScript( self.js ) ) #IIFE !
@@ -592,49 +605,6 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
             if callable(render):
                 return render
 
-
-# from collections import UserDict
-# class TagState(dict):
-#     """ manage a 'sub dict' of 'session dict'"""
-#     def __init__(self,tag:Tag):
-#         self._session:dict = tag.session
-#         self._fqn = tag.__class__.__module__+"."+tag.__class__.__qualname__
-#         super().__init__( self._session.get(self._fqn,{}) )
-
-#     def __delitem__(self,k:str):
-#         super().__delitem__(k)
-#         self._save()
-
-#     def __setitem__(self,k:str,v):
-#         super().__setitem__(k,v)
-#         self._save()
-
-#     def clear(self):
-#         super().clear()
-#         self._save()
-
-#     def load(self,d:dict):
-#         super().clear()
-#         self.update(d)
-
-#     def update(self,d:dict):
-#         super().update(d)
-#         self._save()
-
-#     def export(self) -> dict:
-#         return dict( self )
-
-#     def _save(self):
-#         """force to save state in session"""
-#         if len(self)>0:
-#             if self._fqn in self._session:
-#                 self._session[self._fqn].clear()
-#                 self._session[self._fqn].update(dict(self))
-#             else:
-#                 self._session[self._fqn]=dict(self)
-#         else:
-#             if self._fqn in self._session:
-#                 del self._session[self._fqn]
 
 class TagState:
     def __init__(self,tag):
@@ -707,3 +677,6 @@ class TagState:
 
     def export(self) -> dict:
         return dict( self._load() )
+
+# declare a var that contains the list (set) of all reserved tag's keywords
+TAG_KEYWORDS = set( ["init"] + dir(Tag()) )
