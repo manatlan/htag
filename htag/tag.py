@@ -578,10 +578,14 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         ll=[]
 
         # auto-declare js methods for exposed's python methods
+        autodeclares=[]
         for method_name in set(dir(self)) - TAG_KEYWORDS:
             if hasattr( getattr(self,method_name) ,"_autoExposeClientSide_"):
                 logger.debug("expose python method '%s' as js caller in %s",method_name,repr(self))
-                ll.append( "self.%s = function(_) {%s};" % (method_name,BaseCaller(self,method_name,[b"...arguments"],{})) )
+                autodeclares.append( "self.%s = function(_) {%s}" % (method_name,BaseCaller(self,method_name,[b"...arguments"],{})) )
+                
+        if autodeclares:
+            ll.append( self._genIIFEScript( ";".join(autodeclares) ) ) #IIFE !
 
         if self.js:
             logger.debug("Init Script (.js) found in %s --> '%s'",repr(self),self.js)
