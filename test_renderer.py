@@ -683,13 +683,12 @@ def test_STRICT_MODE_in_render():
         with pytest.raises(HTagException):
             print( Bad() )
 
-        #--------------------------------- a bad case
-        class Bad2(Tag.div):
+        #--------------------------------- a good case
+        class Good2(Tag.div):
             def render(self):
-                self += "simple text is enough"
+                self += "simple text is not enough !!!"
 
-        with pytest.raises(HTagException):
-            print( Bad2() )
+        print( Good2() )
 
     finally:
         Tag.STRICT_MODE = False

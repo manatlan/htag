@@ -495,9 +495,9 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
 
             if self.root.STRICT_MODE:   # added  at htag > 0.72.0
                 # in STRICT_MODE: will control that the render method is not called at each interaction
-                current_children = [id(i) for i in self._childs]
+                current_children = [id(i) for i in self._childs if isinstance(i,Tag)]
                 render()
-                if current_children != [id(i) for i in self._childs]:
+                if current_children != [id(i) for i in self._childs if isinstance(i,Tag)]:
                     # the rendering is done at each interaction (bad practice)
                     raise HTagException(f"[STRICT_MODE] In {repr(self)}, the render() method has changed its children!")
             else:
