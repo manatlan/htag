@@ -1,25 +1,31 @@
 # -*- coding: utf-8 -*-
 import os,sys; sys.path.insert(0,os.path.dirname(os.path.dirname(__file__)))
 
-from htag import Tag
+from htag import Tag,expose
 
 #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 # an htag Tag, to use hashchange events
 #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 class View(Tag.div):
-    def __init__(self,o=None,**a):  # use complex constructor to do complex things ;-)
-        super().__init__(o,**a)
-        self._refs={None:o}
-        self.js = "window.addEventListener('hashchange',() => {%s;});" % self.bind._hashchange(b"document.location.hash")
+    def __init__(self,tag=None,**a):  # use complex constructor to do complex things ;-)
+        super().__init__(tag,**a)    
+        self.default = tag
+        self._refs={}
+        self.js = """
+if(!window._hashchange_listener) {
+    window.addEventListener('hashchange',() => {self._hashchange(document.location.hash);});
+    window._hashchange_listener=true;
+}
+"""
+    @expose
+    def _hashchange(self,hash):
+        self.set( self._refs.get(hash, self.default) )
 
-    def _hashchange(self,hash=None):
-        self.set( self._refs.get(hash or None,"???") )
-
-    def go(self,o,anchor=None):
-        """ Set object 'o' in the View, and navigate to it """
-        if anchor is None: anchor=str(id(o))
-        self._refs['#'+anchor] = o
-        self.call( "document.location='#"+anchor+"';")
+    def go(self,tag,anchor=None):
+        """ Set object 'tag' in the View, and navigate to it """
+        anchor=anchor or str(id(tag))
+        self._refs[f'#{anchor}'] = tag
+        self.call( f"document.location=`#{anchor}`")
 #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 
 class Page1(Tag.span):
