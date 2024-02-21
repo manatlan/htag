@@ -44,6 +44,7 @@ Well tested:
 
 ## ROADMAP to 1.0.0
 
+ * *IMPORTANT* : The **AndroidApp runner** could/would disappear from the main htag package (so nested dependancies kivy & co, too). Because there is another/clever/better way to make an androidapp, using buildozer/p4a with its 'webview' bootstrap (but need to clarify that everywhere where htag/android is involved ;-( )
  * the "0.60.x" is the pre-version before 1.0.0 (htag core will not change anymore). I need to fix some runners before.
  * tests tests
  * setup minimal docs, with [that](https://realpython.com/python-project-documentation-with-mkdocs/) ;-)
