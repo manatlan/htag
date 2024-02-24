@@ -32,6 +32,32 @@ def url2ak(url:str):
     return tuple(args), dict(kargs)
 
 #----------------------------------------------
+import re
+def match(mpath,path):
+    "return a dict of declared vars from mpath if found in path"
+    mode={
+        "str":  r"[^/]+",    # default
+        "int":  r"\\d+",
+        "path": r".+",
+    }
+    
+    #TODO: float, uuid ... like https://www.starlette.io/routing/#path-parameters
+    
+    patterns=[
+        (re.sub( r"{(\w[\w\d_]+)}" , r"(?P<\1>%s)" % mode["str"], mpath), lambda x: x),
+        (re.sub( r"{(\w[\w\d_]+):str}" , r"(?P<\1>%s)" % mode["str"], mpath), lambda x: x),
+        (re.sub( r"{(\w[\w\d_]+):int}" , r"(?P<\1>%s)" % mode["int"], mpath), lambda x: int(x)),
+        (re.sub( r"{(\w[\w\d_]+):path}" , r"(?P<\1>%s)" % mode["path"], mpath), lambda x: x),
+    ]
+    
+    dico={}
+    for pattern,cast in patterns:
+        g=re.match(pattern,path)
+        if g:
+            dico.update( {k:cast(v) for k,v in g.groupdict().items()} )
+    return dico
+
+#----------------------------------------------
 import json,os
 class SessionFile(dict):
     def __init__(self,file):

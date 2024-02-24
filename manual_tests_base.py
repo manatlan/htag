@@ -25,7 +25,7 @@ if __name__ == "__main__":
     # BrowserTornadoHTTP( Page ).run()
 
     import logging
-    logging.basicConfig(format='[%(levelname)-5s] %(name)s: %(message)s',level=logging.DEBUG)
+    logging.basicConfig(format='[%(levelname)-5s] %(name)s: %(message)s',level=logging.INFO)
     logging.getLogger("htag.tag").setLevel( logging.INFO )
 
 

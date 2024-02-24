@@ -67,7 +67,21 @@ def test_url2ak():
     assert commons.url2ak("http://jojo.com/?1%202&kiki&a=3&b=5&b=6#yolo") == (('1 2', 'kiki'), {'a': '3', 'b': '6'})
 
 
+def test_route_match():
+    assert commons.match( "/{val}","/jo" ) == {"val":"jo"}
+    assert commons.match( "/{val:str}","/jo" ) == {"val":"jo"}
+    assert commons.match( "/{v1}","/jo" ) == {"v1":"jo"}
 
+    assert commons.match( "/item/{idx}","/item/1" ) == {"idx":"1"}
+    assert commons.match( "/item/{idx:int}","/item/1" ) == {"idx":1}
+
+    assert commons.match( "/download/{rest_of_path:path}","/download/pub/image.png" ) == {"rest_of_path":"pub/image.png"}
+
+
+    assert not commons.match( "/xxx","/ppp" )
+    assert not commons.match( "/item/{idx}","/" )
+    assert not commons.match( "/item/{idx}","/item" )
+    assert not commons.match( "/item/{idx}","/item/" )
 
 if __name__=="__main__":
     test_default()
