@@ -1,5 +1,7 @@
 # Runners
 
+** 2024/02/24 BIG CHANGES before 1.0 : all runners (for desktop/android) would be removed : there will be only one, which would provide all features in pure python (no dependancies!) ... there will be only 3 ("pyscript", "pywebview" and the __new one__ (which will work for android, desktop and/or chrome app mode)) : it will be a lot simpler (so this page will be completly recreate)**
+
 The 'Runners' is the htag denomination, for some classes provided with htag, to help you to run a **Htag App** in a context. Here are the current provided runners, and could give you ideas of what you want ;-)
 
 For example :
