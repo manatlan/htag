@@ -357,5 +357,6 @@ class Runner:
     
         return self.server.doGet( path, tagClass, init )
 
-        
+    def __str__(self):
+        return f"<Runner dev:{self._dev} reload:{self._reload} routes:{self._routes}>"
         

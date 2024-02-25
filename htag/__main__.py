@@ -41,6 +41,7 @@ if __name__=="__main__":
         htagfile=os.path.realpath(sys.argv[1])
 
         try:
+            from htag.runners import Runner
             import importlib.util
             module_name=os.path.basename(htagfile)[:-3]
             spec = importlib.util.spec_from_file_location(module_name, htagfile)
@@ -48,12 +49,22 @@ if __name__=="__main__":
             sys.modules[module_name] = module
             spec.loader.exec_module(module)
 
+            if hasattr(module,"app"):
+                app=getattr(module,"app")
+                if isinstance(app,Runner):
+                    print("Found 'app' (new Runner), will run it")
+                    print(app)
+                    # run part (like defined in file, and open a tab/browser)
+                    app.run()
+                    sys.exit(0)
+
             if hasattr(module,"App"):
+                print("Found 'App' (tag class), will run it")
                 tagClass=getattr(module,"App")
 
-                # run part (here FULL DEV)
-                from htag.runners import Runner
+                # run part (here FULL DEV, and open a tab/browser)
                 app=Runner(tagClass,reload=True,dev=True)
+                print(app)
                 app.run()
             else:
                 print("ERROR",htagfile,"doesn't contain 'App' (tag class)")
