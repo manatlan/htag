@@ -14,7 +14,7 @@ class App(Tag.body):
         self <= Tag.a("test '?param=A2'",_href="?param=A2",_style="display:block")
         self <= Tag.button("error", _onclick=lambda o: fdsgdfgfdsgfds())
         self <= Tag.button("add content", _onclick=self.add_content)    # just to control interact
-        self <= Tag.button("quit app", _onclick=lambda o: self.exit())    # just to test QUIT/EXIT app
+        self <= Tag.button("EXIT app", _onclick=lambda o: self.exit())    # just to test QUIT/EXIT app
         self <= Tag.hr()
 
         self <= Tag.h3("Only if it handles tha '/other' route (DevApp/htagweb) :")

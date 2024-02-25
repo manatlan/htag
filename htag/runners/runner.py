@@ -303,9 +303,11 @@ class Runner:
         self._routes.append( (path, handler) )
         
 
-    def run(self, host="127.0.0.1", port=8000, openBrowser=True, size=(800,600)):   # localhost, by default !!
-        # self.server = ServerHTTP(host,port,self.session, routes=self._routes, reload=self._reload, dev=self._dev, exit_callback=self.stop)
-        self.server = ServerWS(host,port,self.session, routes=self._routes, reload=self._reload, dev=self._dev, exit_callback=self.stop)
+    def run(self, host="127.0.0.1", port=8000, openBrowser=True, size=(800,600), http_only:bool=False):   # localhost, by default !!
+        if http_only:
+            self.server = ServerHTTP(host,port,self.session, routes=self._routes, reload=self._reload, dev=self._dev, exit_callback=self.stop)
+        else:
+            self.server = ServerWS(host,port,self.session, routes=self._routes, reload=self._reload, dev=self._dev, exit_callback=self.stop)
 
         loop = asyncio.get_event_loop()
         server = loop.run_until_complete( self.server.run() )

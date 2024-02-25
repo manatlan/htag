@@ -7,27 +7,9 @@
 # https://github.com/manatlan/htag
 # #############################################################################
 
-import os,stat
+import os,sys
 
-try:
-    import pip
-
-    # install uvicorn if not present (for DevApp mode)
-    try:
-        import uvicorn
-    except ImportError as e:
-        pip.main(['install', 'uvicorn[standard]'])
-
-    # install starlette if not present (for DevApp mode)
-    try:
-        import starlette
-    except ImportError as e:
-        pip.main(['install', 'starlette'])
-
-    devappmode = True
-except:
-    devappmode = False
-
+devappmode=False
 
 code = """
 # -*- coding: utf-8 -*-
@@ -51,12 +33,42 @@ if __name__=="__main__":
     app.run()
 """ % (devappmode and "from htag.runners import DevApp as Runner" or "from htag.runners import BrowserHTTP as Runner")
 
-newfile = "main.py"
+if __name__=="__main__":
+    if len(sys.argv)>1:
+        ##########################################################################
+        ## run mode
+        ##########################################################################
+        htagfile=os.path.realpath(sys.argv[1])
 
-if not os.path.isfile(newfile):
-    with open(newfile,"w+") as fid:
-        fid.write(code)
+        try:
+            import importlib.util
+            module_name=os.path.basename(htagfile)[:-3]
+            spec = importlib.util.spec_from_file_location(module_name, htagfile)
+            module = importlib.util.module_from_spec(spec)
+            sys.modules[module_name] = module
+            spec.loader.exec_module(module)
 
-    print("HTag App file created --> main.py")
-else:
-    print(f"It seems that you've already got a {newfile} file")
+            if hasattr(module,"App"):
+                tagClass=getattr(module,"App")
+
+                # run part (here FULL DEV)
+                from htag.runners import Runner
+                app=Runner(tagClass,reload=True,dev=True)
+                app.run()
+            else:
+                print("ERROR",htagfile,"doesn't contain 'App' (tag class)")
+        except Exception as e:
+            print("ERROR",e)
+    else:
+        ##########################################################################
+        ## create mode
+        ##########################################################################
+        newfile = "main.py"
+
+        if not os.path.isfile(newfile):
+            with open(newfile,"w+") as fid:
+                fid.write(code)
+
+            print("HTag App file created --> main.py")
+        else:
+            print(f"It seems that you've already got a {newfile} file")
