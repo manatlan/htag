@@ -18,7 +18,7 @@ from .chromeapp import _ChromeApp
 the new runner features :
     - PURE python (no external dependancies)
     - hot reload (init param: reload)
-    - dev mode (init param: dev)
+    - debug mode (init param: debug)
     - persistent session (init param: file)
     - auto open browser (default) (run param: openBrowser=1|True)
     - "chrome app mode", with fallback to default browser if not possible (run param: openBrowser=2 & size=(width, height))
@@ -33,6 +33,7 @@ the new runner features :
     - better code & better maintability, with logger (in one place!)
     - can use first free port (and launch in any cases), if port is already used
 
+    in fact, it exposes all features from all different runners in ONE place ... to be able to simulate each current runner ;-)
 """
 import sys
 import asyncio
