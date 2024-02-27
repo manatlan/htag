@@ -289,10 +289,21 @@ window.addEventListener('DOMContentLoaded', start );
 
 class Runner:
 
-    def __init__(self,tagClass,file:"str|None"=None, reload=False, dev=False):
+    def __init__(self,tagClass,file:"str|None"=None, 
+                host:str="127.0.0.1",
+                port:int=8000,
+                interface=1,    # 1|True -> browser (quit on exit), (width,height) -> chromeapp (fallback to browser) (quit on exit), 0|False|None -> serve forever
+                reload:bool=False, 
+                debug:bool=False,
+                http_only:bool=False,
+        ):
         self.session=commons.SessionFile(file) if file else None
-        self._dev=dev
-        self._reload=reload
+        self.host=host
+        self.port=port
+        self.debug=debug
+        self.reload=reload
+        self.http_only=http_only
+        self.interface=interface
         self._routes=[]
         
         if tagClass:
@@ -303,34 +314,38 @@ class Runner:
         self._routes.append( (path, handler) )
         
 
-    def run(self, host="127.0.0.1", port=8000, openBrowser=True, size=(800,600), http_only:bool=False):   # localhost, by default !!
-        if http_only:
-            self.server = ServerHTTP(host,port,self.session, routes=self._routes, reload=self._reload, dev=self._dev, exit_callback=self.stop)
+    def run(self): 
+        if self.http_only:
+            self.server = ServerHTTP(self.host,self.port,self.session, routes=self._routes, reload=self.reload, dev=self.debug, exit_callback=self.stop)
         else:
-            self.server = ServerWS(host,port,self.session, routes=self._routes, reload=self._reload, dev=self._dev, exit_callback=self.stop)
+            self.server = ServerWS(self.host,self.port,self.session, routes=self._routes, reload=self.reload, dev=self.debug, exit_callback=self.stop)
 
         loop = asyncio.get_event_loop()
         server = loop.run_until_complete( self.server.run() )
 
         self.chromeapp=None
-        if openBrowser in [1,True]:
-            webbrowser.open_new_tab(f"http://{host}:{port}")
-        elif openBrowser == 2:
-            self.chromeapp = runChromeApp(host,port,size)
+        if self.interface:
+            if self.interface in [1,True]:
+                webbrowser.open_new_tab(f"http://{self.host}:{self.port}")
+            elif isinstance(self.interface,tuple) and len(self.interface)==2:
+                self.chromeapp = runChromeApp(self.host,self.port,self.interface)
+            else:
+                raise Exception("Not a good 'interface' !")
 
-        if openBrowser:
-            async def watchdog():
-                nb=3
-                while 1:
-                    await asyncio.sleep(0.5)
-                    if self.server.connected==0:
-                        nb-=1
-                        if nb<1: self.stop()
-                    else:
-                        nb=3
-
-            loop.create_task( watchdog())
-
+            if not self.http_only:
+                # kill server if 'interface' is closed (only ServerWS!)
+                async def watchdog():
+                    nb=3
+                    while 1:
+                        await asyncio.sleep(0.5)
+                        if self.server.connected==0:
+                            nb-=1
+                            if nb<1: self.stop()
+                        else:
+                            nb=3
+                loop.create_task( watchdog())
+            else:
+                print("***WARNING*** the server won't autoquit when interface is closed")
 
         try:
             loop.run_forever()
@@ -358,5 +373,5 @@ class Runner:
         return self.server.doGet( path, tagClass, init )
 
     def __str__(self):
-        return f"<Runner dev:{self._dev} reload:{self._reload} routes:{self._routes}>"
+        return f"<Runner {self.host}:{self.port} debug:{self.debug} reload:{self.reload} routes:{self._routes}>"
         
