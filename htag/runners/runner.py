@@ -31,6 +31,7 @@ the new runner features :
     - [HTTP-WS only] in browser, can quit when tab is closed 
     - [HTTP-WS only] unlike good old chromeapp/winapp : works with multiple tags (in the past: only one, which maintain cnx with socket). No it exits when no more active socket 
     - better code & better maintability, with logger (in one place!)
+    - can use first free port (and launch in any cases), if port is already used
 
 """
 import sys
@@ -40,7 +41,7 @@ import webbrowser,os,json
 import urllib.parse
 import logging
 import traceback
-import importlib,inspect
+import importlib,inspect,socket
 
 logger = logging.getLogger(__name__)
 
@@ -59,6 +60,10 @@ def reload( tagClass ):
         logger.debug("Can't reload %s (%s)", tagClass,e)
         return tagClass
 
+def isFree(ip, port):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.settimeout(1)
+    return not (s.connect_ex((ip,port)) == 0)
 
 
 def runChromeApp(host:str,port:int,size:tuple):
@@ -296,6 +301,7 @@ class Runner:
                 reload:bool=False, 
                 debug:bool=False,
                 http_only:bool=False,
+                use_first_free_port:bool=False,
         ):
         self.session=commons.SessionFile(file) if file else None
         self.host=host
@@ -304,6 +310,7 @@ class Runner:
         self.reload=reload
         self.http_only=http_only
         self.interface=interface
+        self.use_first_free_port=use_first_free_port
         self._routes=[]
         
         if tagClass:
@@ -315,6 +322,10 @@ class Runner:
         
 
     def run(self): 
+        if self.use_first_free_port:
+            while not isFree(self.host,self.port):
+                self.port+=1
+
         if self.http_only:
             self.server = ServerHTTP(self.host,self.port,self.session, routes=self._routes, reload=self.reload, dev=self.debug, exit_callback=self.stop)
         else:

@@ -55,7 +55,7 @@ class App(Tag.body):
 # from htag.runners import PyWebView as Runner  # just the "add content" will work (no query params / no other route)
 
 from htag.runners import Runner,HTTPResponse
-app=Runner(App,reload=False,debug=True,interface=(400,400))
+app=Runner(App,reload=False,debug=True,interface=(400,400),use_first_free_port=True)
 
 class AnotherApp(Tag.body):
 
