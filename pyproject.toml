@@ -24,6 +24,7 @@ pytest = "^6"
 pytest-cov = "^3"
 pytest-asyncio="^0.19"
 pywebview = "^3.6"
+selenium = "^4"
 fake-winreg = "^1.6"
 
 [build-system]
