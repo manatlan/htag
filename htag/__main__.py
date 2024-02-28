@@ -53,8 +53,8 @@ if __name__=="__main__":
                 app=getattr(module,"app")
                 if isinstance(app,Runner):
                     print("Found 'app' (new Runner), will run it")
-                    print(app)
-                    # run part (like defined in file, and open a tab/browser)
+                    print(app,"Serving")
+                    # run part (like defined in file)
                     app.run()
                     sys.exit(0)
 
@@ -63,8 +63,8 @@ if __name__=="__main__":
                 tagClass=getattr(module,"App")
 
                 # run part (here FULL DEV, and open a tab/browser)
-                app=Runner(tagClass,reload=True,dev=True)
-                print(app)
+                app=Runner(tagClass,reload=True,debug=True)
+                print(app,"Serving")
                 app.run()
             else:
                 print("ERROR",htagfile,"doesn't contain 'App' (tag class)")
