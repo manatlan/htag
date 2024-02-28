@@ -12,11 +12,12 @@ from . import commons
 
 from .server import start_server,HTTPResponse
 
-from .chromeapp import _ChromeApp
+from .chromeappmode import ChromeApp
 
 """
 the new runner features :
     - PURE python (no external dependancies)
+    - ultra fast start (compared to uvicorn/starlette)
     - hot reload (init param: reload)
     - debug mode (init param: debug)
     - persistent session (init param: file)
@@ -33,7 +34,7 @@ the new runner features :
     - better code & better maintability, with logger (in one place!)
     - can use first free port (and launch in any cases), if port is already used
 
-    in fact, it exposes all features from all different runners in ONE place ... to be able to simulate each current runner ;-)
+    in fact, it exposes all features from all different runners in ONE and UNIQUE place ... to be able to simulate each current runner ;-)
 """
 import sys
 import asyncio
@@ -70,7 +71,7 @@ def isFree(ip, port):
 def runChromeApp(host:str,port:int,size:tuple):
     """run a 'chrome in app mode', or a browser tab if it can't"""
     try:
-        return _ChromeApp(f"http://{host}:{port}",size=size)
+        return ChromeApp(f"http://{host}:{port}",size=size)
     except:
         import webbrowser
         webbrowser.open_new_tab(f"http://{host}:{port}")
@@ -345,11 +346,13 @@ class Runner:
                 raise Exception("Not a good 'interface' !")
 
             if not self.http_only:
+                logger.debug("watchdog will control socket connexions")
                 # kill server if 'interface' is closed (only ServerWS!)
                 async def watchdog():
                     nb=3
                     while 1:
                         await asyncio.sleep(0.5)
+                        #print(self.server.connected,flush=True)
                         if self.server.connected==0:
                             nb-=1
                             if nb<1: self.stop()
@@ -357,7 +360,7 @@ class Runner:
                             nb=3
                 loop.create_task( watchdog())
             else:
-                print("***WARNING*** the server won't autoquit when interface is closed")
+                print("***WARNING*** the server won't autoquit when interface is closed",flush=True)
 
         try:
             loop.run_forever()

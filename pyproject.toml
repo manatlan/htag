@@ -23,10 +23,8 @@ python = "^3.7"
 pytest = "^6"
 pytest-cov = "^3"
 pytest-asyncio="^0.19"
-uvicorn = "^0.18"
-starlette = "^0.20"
-tornado ="^6.2"
 pywebview = "^3.6"
+selenium = "^4.18.1"
 fake-winreg = "^1.6"
 
 [build-system]
