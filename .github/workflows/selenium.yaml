@@ -25,6 +25,8 @@ jobs:
         run: sudo apt install -y chromium-browser
       - name: Install selenium/poetry packages
         run: pip install webdriver-manager selenium poetry
+      - name: pip list
+        run: pip list
 
 
       #############################################################################
