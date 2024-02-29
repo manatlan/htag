@@ -9,8 +9,6 @@
 
 import os,sys
 
-devappmode=False
-
 code = """
 # -*- coding: utf-8 -*-
 # the simplest htag'app, in the best env to start development (hot reload/refresh)
@@ -24,14 +22,11 @@ class App(Tag.body):
         self += "Hello World"
 
 #=================================================================================
-%s
-# from htag.runners import BrowserHTTP as Runner
-# from htag.runners import ChromeApp as Runner
+from htag.runners import Runner
 
-app=Runner(App)
 if __name__=="__main__":
-    app.run()
-""" % (devappmode and "from htag.runners import DevApp as Runner" or "from htag.runners import BrowserHTTP as Runner")
+    Runner(App).run()
+"""
 
 if __name__=="__main__":
     if len(sys.argv)>1:
