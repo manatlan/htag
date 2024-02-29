@@ -4,7 +4,13 @@
 
 The 'Runners' is the htag denomination, for some classes provided with htag, to help you to run a **Htag App** in a context. Here are the current provided runners, and could give you ideas of what you want ;-)
 
-For example :
+**htag** provides 3 runners, with standard:
+
+ - Runner : the base one, for desktop app
+ - PyScript : the special to be runned in pure html side
+ - PyWebView : a specific for desktop using a CEF ui (using pywebview) ... (it could be in another htag module soon)
+
+For example (old ones): (now (>0.90) they are all simulated using Runner)
 
  * [BrowserHTTP](#browserhttp) is really adapted to run your htag app with just pure python.
  * [DevApp](#devapp) is the perfect runner during developpement process, because it autoreloads (and autorefreshs UI) on file changes, and it's easy to follow http interactions in devtools/console of your browser.
