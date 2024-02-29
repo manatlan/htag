@@ -18,8 +18,8 @@ class Test(Tag.body):
 # the runner side
 ###############################################################################    
 if __name__=="__main__":
-    from htag.runners import BrowserHTTP
-    BrowserHTTP(Test).run()
+    from htag.runners import Runner
+    Runner(Test).run()
 
 ```
 

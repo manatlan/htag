@@ -15,8 +15,8 @@ class App(Tag.div): #<= define the html tag container of the app
         self <= "Hello world"   # shortcut for self.add("Hello world")
 
 if __name__=="__main__":
-    from htag.runners import BrowserHTTP
-    BrowserHTTP( App ).run()    # <= this is the runner
+    from htag.runners import Runner
+    Runner( App ).run()    # <= this is the runner
 
 ```
 
@@ -50,8 +50,8 @@ class App(Tag.body):
         self <= MyText("World",_style="background:green")
 
 if __name__=="__main__":
-    from htag.runners import BrowserHTTP
-    BrowserHTTP( App ).run()    # <= this is the runner
+    from htag.runners import Runner
+    Runner( App ).run()    # <= this is the runner
 ```
 
 This will produce something like :
@@ -81,8 +81,8 @@ class App(Tag.body):
         self <= MyText("World","green")
 
 if __name__=="__main__":
-    from htag.runners import BrowserHTTP
-    BrowserHTTP( App ).run()    # <= this is the runner
+    from htag.runners import Runner
+    Runner( App ).run()    # <= this is the runner
 
 ```
 
@@ -105,8 +105,8 @@ class App(Tag.body):
         self <= Tag.button("Click me",_onclick="alert(42)")
 
 if __name__=="__main__":
-    from htag.runners import BrowserHTTP
-    BrowserHTTP( App ).run()    # <= this is the runner
+    from htag.runners import Runner
+    Runner( App ).run()    # <= this is the runner
 ```
 
 But, notice that the string which is setted in `_onclick` is just a javascript statement !
@@ -125,8 +125,8 @@ class App(Tag.body):
         self <= object.innerHTML
 
 if __name__=="__main__":
-    from htag.runners import BrowserHTTP
-    BrowserHTTP( App ).run()    # <= this is the runner
+    from htag.runners import Runner
+    Runner( App ).run()    # <= this is the runner
 ```
 
 When you will click the button, the instance of the object will add "some content" to itself (you can verify, by refreshing the page (f5))
@@ -162,8 +162,8 @@ class App(Tag.body):
         self <= "hello world"
 
 if __name__=="__main__":
-    from htag.runners import BrowserHTTP
-    BrowserHTTP( App ).run(port=9999)    # <= this is the runner
+    from htag.runners import Runner
+    Runner( App, port=9999).run()    # <= this is the runner
 ```
 
 `statics` can be a Tag'instance or a list of Tag'instance.

@@ -33,7 +33,7 @@ Currently, all are faked/simulated and use the new `Runner` instead (thus, a run
 
 TODO: say more, because it's the new masterpiece ;-)
 
-This runner can simulate all older runners. All specialized features, that were in some runners only, are all available now. This runner is a pure python server (holding Websocket/HTTP connexions). Things like uvicorn/starlette/tornado ware overbloated for a server which can handle one client.
+This runner can simulate all old runners. All specialized features, that were in some runners only, are all available now. This runner is a pure python server (holding Websocket/HTTP connexions). Things like uvicorn/starlette/tornado were overbloated for a server which can handle one client ;-)
 
 
 ## Runner 'PyScript'

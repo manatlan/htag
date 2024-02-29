@@ -63,8 +63,8 @@ class MyApp(Tag.div):
         self <= aa("?to12&p=12")
         self <= aa("?tot3&_style=background:red")
 
-from htag.runners import BrowserHTTP
-BrowserHTTP(MyApp).run()
+from htag.runners import Runner
+Runner(MyApp).run()
 ```
 
 Currently, this feature works in all htag.runners except PyWebView ;-(
