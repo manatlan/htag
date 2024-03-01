@@ -2,15 +2,15 @@
 
 <img src="htag.png" width="100" height="100" style="float:right">
 
-docs are coming ....
+... Docs are coming (2024/03/1) ... ;-)
 
-meanwhile, you can learn a lot on [htag's demo](https://htag.glitch.me/) ... or better [try/repl your self](https://raw.githack.com/manatlan/htag/main/examples/pyscript_demo.html)
+Meanwhile, you can learn a lot on [htag's demo](https://htag.glitch.me/) ... or better [try/repl your self](https://raw.githack.com/manatlan/htag/main/examples/pyscript_demo.html)
 (it's an htag app, running with the runner PyScript, in a simple html page, which provide examples in a html editor) ;-)
 
 
 ## Quick start
 
-Just pip the **htag** lib
+Just pip the **htag** lib, from [pypi.org](https://pypi.org/project/htag/)
 
 ```bash
 $ pyhon3 -m pip install htag -U
@@ -59,6 +59,8 @@ Note :
 Now, you can continue on [tutorial](tutorial.md) ;-)
 
 ## Concept
+
+You can see it like a python way to create apps, which can use the best of python world, and the best of html/javascript world. And best of all, you can **easily** create apps that will work in desktop, android & web world (same codebase!).
 
 The concept is simple : you create UI python classes, which inherits from `htag.Tag.<html_tag>` (which nativly render html/js/css, and provides minimal dom manipulation api). You can craft components, by reusing other components. Your main component is called the **htag app**.
 
