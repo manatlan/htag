@@ -51,7 +51,12 @@ values:
 #### use_first_free_port:bool = False
 
 
-## add_route(self,path,handler) -> None
+## `add_route(self,path:str,handler) -> None`
 
+This method let you create a a new route to be able to serve:
+- another Tag Class
+- another http ressource
 
-## serve()
+## `serve(self, request, tagClass ) -> HTTPResponse`
+
+will soon be named `handle` !
