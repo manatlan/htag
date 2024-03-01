@@ -8,8 +8,10 @@ class MyApp(Tag.div):
 
 
 def test_default():
-    from htag.runners import BrowserHTTP
-    BrowserHTTP( MyApp )
+    from htag.runners import Runner
+    app=Runner( MyApp )
+    #TODO: test app.add_route( )
+    #TODO: test app.handle( )
 
 def data_source():
     for i in  [
