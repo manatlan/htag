@@ -11,7 +11,6 @@ import os,sys
 
 code = """
 # -*- coding: utf-8 -*-
-# the simplest htag'app, in the best env to start development (hot reload/refresh)
 
 from htag import Tag
 
@@ -28,7 +27,7 @@ class App(Tag.body):
 #=================================================================================
 from htag.runners import Runner
 
-if __name__=="__main__":
+if __name__ == "__main__":
     Runner(App).run()
 """
 
@@ -79,6 +78,6 @@ if __name__=="__main__":
             with open(newfile,"w+") as fid:
                 fid.write(code)
 
-            print("HTag App file created --> main.py")
+            print("HTag App file created -->", newfile)
         else:
-            print(f"It seems that you've already got a {newfile} file")
+            print(f"It seems that you've already got a '{newfile}' file")
