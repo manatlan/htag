@@ -342,4 +342,7 @@ class App(Tag.body):
         print( o.event )
 ```
 
+## Using the `@expose` decorator 
+See [@expose](js_bidirectionnal.md) !
+
 ...TODO...
