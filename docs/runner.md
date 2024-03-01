@@ -2,7 +2,9 @@
 
 
 
-## init( self, tagClass, file, ...properties... )
+## `__init__( self, tagClass, file, ...properties... )`
+
+It's the Runner constructor
 
 ### tagClass:Tag|None = None
 
