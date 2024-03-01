@@ -5,7 +5,7 @@
 ... Docs are coming (2024/03/1) ... ;-)
 
 Meanwhile, you can learn a lot on [htag's demo](https://htag.glitch.me/) ... or better [try/repl your self](https://raw.githack.com/manatlan/htag/main/examples/pyscript_demo.html)
-(it's an htag app, running with the runner PyScript, in a simple html page, which provide examples in a html editor) ;-)
+(it's an htag app, running with the runner PyScript, in a simple html page, which provide examples in an html editor) ;-)
 
 
 ## Quick start
@@ -21,7 +21,7 @@ Create a starter app ;-)
 ```bash
 $ pyhon3 -m htag
 ```
-(it will create a "main.py" basic app)
+(it will create a "main.py" basic htag app)
 
 Start the app :
 
