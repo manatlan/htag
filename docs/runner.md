@@ -8,7 +8,7 @@ It's the Runner constructor
 
 ### tagClass:Tag|None = None
 
-It's the tag class you want to be served at "/" path. It's the class which will create the first instance when you run your app.
+It's the tag class you want to be served at "/" path. It's the class which will be used to create the first instance when you run your app.
 
 A common pattern is :
 ```python
