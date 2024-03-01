@@ -118,11 +118,13 @@ if __name__ == "__main__":
 ```
 
 Note that `request` have 2 dict property :
-- `path_params` : to expose path parameters, when defined in routes (as starlette.add_route does)
-- `query_params` : to expose query parameters (ex: https://example.com/item/42?a=42&b=toto -> {"a":"42","b":"toto"})
+
+ - `path_params` : to expose path parameters, when defined in routes (as starlette.add_route does)
+ - `query_params` : to expose query parameters (ex: https://example.com/item/42?a=42&b=toto -> {"a":"42","b":"toto"})
 
 
 Note that path params can be :
+
  - "/item/{idx}" : idx will be str.
  - "/item/{idx:str}" : idx will be str.
  - "/item/{idx:int}" : idx will be int.
