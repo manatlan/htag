@@ -54,6 +54,7 @@ TODO: (warn root in init !)
 TODO: (strict mode)
 
 ## Run javascript
+TODO: @expose
 TODO: self.js vs self.call( Js ) (and tag js var)
 
 ## Bind events
@@ -74,5 +75,5 @@ TODO: in render : avoid tag construction -> coz redraw all)
 TODO: ... And hrenderer/runners (and url queryparams)
 
 ## Runners
-TODO: (and using asgi) (and state management)
+TODO: (and state management)
 For now, [See runners](../runners)
