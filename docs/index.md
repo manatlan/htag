@@ -60,7 +60,7 @@ Now, you can continue on [tutorial](tutorial.md) ;-)
 
 ## Concept
 
-You can see it like a python way to create apps, which can use the best of python world, and the best of html/javascript world. And best of all, you can **easily** create apps that will work in desktop, android & web world (same codebase!).
+You can see it like a python way to create apps, which can use the best of python world, and the best of html/javascript world. And best of all, you can **easily** create apps (same codebase!) that will work in desktop, android & web world (& html only too (thansk to [PyScript](https://manatlan.github.io/htag/runners/#pyscript) )) .
 
 The concept is simple : you create UI python classes, which inherits from `htag.Tag.<html_tag>` (which nativly render html/js/css, and provides minimal dom manipulation api). You can craft components, by reusing other components. Your main component is called the **htag app**.
 
