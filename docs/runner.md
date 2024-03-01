@@ -77,7 +77,8 @@ It's a mechanism which will override the javascript `window.error = function() {
 #### http_only:bool = False
 
 Can be used to force the exchange to be HTTP only (no websocket!) ... (interest ?)
-When it's HTTP ONLY ... note that the "tag.update" feature won't work.
+
+When it's HTTP ONLY : the [tag.update](tag_update.md) feature can't work.
 
 #### use_first_free_port:bool = False
 
@@ -89,7 +90,7 @@ This method let you create a a new route to be able to serve:
 - another Tag Class (using `self.handle(request, tagClass) -> HTTPResponse`, see below)
 - another http ressource (ex: a jpg, png, html, js ...)
 
-To server another Tag Class, a common pattern is :
+### To serve another Tag Class, a common pattern is :
 ```python
 from htag import Tag
 
@@ -108,7 +109,9 @@ if __name__ == "__main__":
     app.run()
 ```
 
-To server an http ressource, a common pattern is :
+When serving a Tag Class, you can't set "path parameters" (things like '/item/{idc}') in the route ! But you can get the [query parameters](query_params.md) of the url, to initialize your init constructor of your Tag class. Note that "query parameters" are also available for your default home route ("/").
+
+### To serve an http ressource, a common pattern is :
 ```python
 from htag import Tag
 
@@ -116,7 +119,7 @@ class App(Tag.body):
     ...
 
 if __name__ == "__main__":
-    from htag.runners import Runner
+    from htag.runners import Runner, HTTPResponse
     app=Runner(App)
     
     async def handlerItem( request ):

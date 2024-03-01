@@ -46,34 +46,35 @@ Tag.what_you_want("hello")            # --> <what-you-want>hello</what-you-want>
 ```
 . . .
 
-TODO: (and inherit open/closed (the `**a` trick))
-TODO: (placeholder)
+- TODO: (and inherit open/closed (the `**a` trick))
+- TODO: (placeholder)
 
 ## Tag properties : parent and root
-TODO: (warn root in init !)
-TODO: (strict mode)
+- TODO: (warn root in init !)
+- TODO: (strict mode)
 
 ## Run javascript
-TODO: @expose
-TODO: self.js vs self.call( Js ) (and tag js var)
+- TODO: [@expose decorator](js_bidirectionnal.md)
+- TODO: self.js vs self.call( Js ) (and tag js var)
 
 ## Bind events
-TODO: (four ways, chaining bind, chaining Js before/after)
-TODO: (use b'' for javascript)
+- TODO: (four ways, chaining bind, chaining Js before/after)
+- TODO: (use b'' for javascript)
 
 ## Events (in python side)
-TODO: sync/async and yield
-TODO: and stream (adding tag with yield)
+- TODO: sync/async and yield
+- TODO: and stream (adding tag with yield)
 
 ## Include statics
-TODO: howto, and shortcuts for js/style
-TODO: and imports trick
+- TODO: howto, and shortcuts for js/style
+- TODO: and imports trick
 
 ## rendering lately vs dynamic
-TODO: main.tag setted as body
-TODO: in render : avoid tag construction -> coz redraw all)
-TODO: ... And hrenderer/runners (and url queryparams)
+- TODO: main.tag setted as body
+- TODO: in render : avoid tag construction -> coz redraw all (now protected in STRICT_MODE)
+- TODO: ... And hrenderer/runners (and url queryparams)
 
 ## Runners
-TODO: (and state management)
-For now, [See runners](../runners)
+[url and instanciations](query_params.md)
+- TODO: (and state management)
+- For now, [See runners](../runners)

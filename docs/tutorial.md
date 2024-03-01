@@ -142,7 +142,7 @@ When you will click the button, the instance of the object will add "some conten
 
 From here, you have seen 95% of the features of **htag**.
 
-[More on interactions (the complete guide)](/htag/calling_an_event/)
+[More on interactions (the complete guide)](calling_an_event.md)
 
 
 ## Include ressources
@@ -175,5 +175,7 @@ if __name__=="__main__":
 ## Execute JS statements on client side
 
 Sometimes, it can be useful to start a js statement ...
+
+or make a js interaction with [@expose decorator](js_bidirectionnal.md)
 
 **`** NEXT SOON **`**
