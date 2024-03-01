@@ -50,8 +50,8 @@ from htag.runners import *
 # ChromeApp( Page ).run()
 # BrowserHTTP( Page ).run()
 app=DevApp( Page )
-app.add_route("/p", lambda request: app.serve( request, Page ) )
-app.add_route("/b", lambda request: app.serve( request, Page2 ) )
+app.add_route("/p", lambda request: app.handle( request, Page ) )
+app.add_route("/b", lambda request: app.handle( request, Page2 ) )
 if __name__ == "__main__":
     # BrowserTornadoHTTP( Page ).run()
     app.run()

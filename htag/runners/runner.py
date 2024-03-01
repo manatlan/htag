@@ -296,7 +296,9 @@ window.addEventListener('DOMContentLoaded', start );
 
 class Runner:
 
-    def __init__(self,tagClass,file:"str|None"=None, 
+    def __init__(self,
+                tagClass:"type|None"=None,
+                file:"str|None"=None, 
                 host:str="127.0.0.1",
                 port:int=8000,
                 interface=1,    # 1|True -> browser (quit on exit), (width,height) -> chromeapp (fallback to browser) (quit on exit), 0|False|None -> serve forever
@@ -319,7 +321,7 @@ class Runner:
             assert issubclass(tagClass,Tag)            
             self.add_route( "/", lambda request: self.serve( request, tagClass) )
 
-    def add_route(self,path,handler):
+    def add_route(self,path:str,handler) -> None:
         self._routes.append( (path, handler) )
         
 
@@ -349,7 +351,7 @@ class Runner:
                 logger.debug("watchdog will control socket connexions")
                 # kill server if 'interface' is closed (only ServerWS!)
                 async def watchdog():
-                    nb=3
+                    nb=4
                     while 1:
                         await asyncio.sleep(0.5)
                         #print(self.server.connected,flush=True)
@@ -358,7 +360,7 @@ class Runner:
                             if nb<1: self.stop()
                         else:
                             nb=3
-                loop.create_task( watchdog())
+                loop.create_task( watchdog() )
             else:
                 print("***WARNING*** the server won't autoquit when interface is closed",flush=True)
 
@@ -379,7 +381,11 @@ class Runner:
         os._exit(0)
 
 
-    def serve(self, request, tagClass) -> HTTPResponse:
+    # DEPRECATED
+    def serve(self, request, tagClass:type) -> HTTPResponse:
+        return self.handle( request, tagClass )
+    
+    def handle(self, request, tagClass:type) -> HTTPResponse:
         assert issubclass(tagClass,Tag)            
 
         init = commons.url2ak( str(request.path) )      # a init tuple

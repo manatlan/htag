@@ -68,7 +68,7 @@ class AnotherApp(Tag.body):
         self <= "X "
 
 #note : no path_params/query_params in route path !
-app.add_route( "/other", lambda request: app.serve(request, AnotherApp ) )
+app.add_route( "/other", lambda request: app.handle(request, AnotherApp ) )
 
 
 async def handlerItem( request ):

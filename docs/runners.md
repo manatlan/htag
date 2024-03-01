@@ -31,10 +31,9 @@ Currently, all are faked/simulated and use the new `Runner` instead (thus, a run
 
 ## Runner 'Runner'
 
-TODO: say more, because it's the new masterpiece ;-)
-
 This runner can simulate all old runners. All specialized features, that were in some runners only, are all available now. This runner is a pure python server (holding Websocket/HTTP connexions). Things like uvicorn/starlette/tornado were overbloated for a server which can handle one client ;-)
 
+See [Runner](runner)
 
 ## Runner 'PyScript'
 Run everything in client side, thanks to the marvellous [pyscript](https://pyscript.net/). Don't know if there is an utility, but it's possible ;-).
