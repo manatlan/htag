@@ -14,9 +14,9 @@ Thoses can be a browser, a pywebview, an android/apk, or anything based on cef, 
 As it's based on html/js rendering: you can easily mix powerful JS libs with powerful PY3 libs : and make powerful python apps !
 
  * For a **desktop app** : 
+    * You can use the [Runner](https://manatlan.github.io/htag/runner), which will run the UI in a local chrome in "app mode" (headless).
     * You can use the [PyWebView runner](https://manatlan.github.io/htag/runners/#pywebwiew), which will run the UI in a pywebview container 
-    * You can use the [ChromeApp runner](https://manatlan.github.io/htag/runners/#chromeapp), which will run the UI in a local chrome in "app mode" (headless).
- * For a **android app** : You can use the [AndroidApp runner](https://manatlan.github.io/htag/runners/#androidapp), which will run the UI in a kiwi webview thru tornado webserver, and can be embedded in an apk ([recipes](https://github.com/manatlan/htagapk))
+ * For a **android app** : See [htagapk](https://github.com/manatlan/htagapk)
  * For a **pyscript app** : you can use the [PyScript runner](https://manatlan.github.io/htag/runners/#pyscript), which will run completly in client side
  * For a **web app** : You can use the [htagweb](https://github.com/manatlan/htagweb).
 
@@ -44,10 +44,10 @@ Well tested:
 
 ## ROADMAP to 1.0.0
 
- * *IMPORTANT* : The **AndroidApp runner** could/would disappear from the main htag package (so nested dependancies kivy & co, too). Because there is another/clever/better way to make an androidapp, using buildozer/p4a with its 'webview' bootstrap (but need to clarify that everywhere where htag/android is involved ;-( )
- * the "0.60.x" is the pre-version before 1.0.0 (htag core will not change anymore). I need to fix some runners before.
  * tests tests
- * setup minimal docs, with [that](https://realpython.com/python-project-documentation-with-mkdocs/) ;-)
+ * the "0.90.x" version is important, because all previous runners (using starlette/uvicorn/tornado) are gone, and are simulated/faked with a new [Runner](https://manatlan.github.io/htag/runner) ! So compatibility shouldn't be breaked with htag <0.90 ! But they will be removed in 1.0.
+ * polish the new Runner [Runner](https://manatlan.github.io/htag/runner) and docs !
+ * ~~setup minimal docs, with [that](https://realpython.com/python-project-documentation-with-mkdocs/) ;-)~~
  * ~~top level api could change (Tag() -> create a Tag, Tag.mytag() -> create a TagBase ... can be a little bit ambiguous)~~
  * ~~manage "query params" from url to initialize Tags/routes~~
  * ~~I don't really like the current way to generate js in interaction : need to found something more solid.~~

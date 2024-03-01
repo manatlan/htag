@@ -50,6 +50,18 @@ If it's 1|True|None -> it will start the UI interface (start the default browser
 
 If it's a tuple (width,height) -> it will start a chrome app in app mode (chrome in headless mode), using the defined width/height. If it can't (because you don't have chrome on your computer), it will start the default browser. And the server will autoquit if there are no more interactions (closing the app -> close the server)
 
+example: running in "chrome app mode" (here in a window sized 640x480):
+
+```python
+...
+
+class App(Tag.body):
+    ...
+
+if __name__=="__main__":
+    from htag.runners import Runner
+    Runner(App,interface=(640,480)).run()
+```
 
 #### reload:bool = False 
 
