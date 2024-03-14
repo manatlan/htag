@@ -67,7 +67,7 @@ class App(Tag.body):
         self.toast.show(object.value)
     def load(self,filename):
         self.action(filename)
-        self.code.set( html.escape(open(filename).read()) )
+        self.code.clear( html.escape(open(filename).read()) )
 
 ###############################################################################
 from htag.runners import PyScript

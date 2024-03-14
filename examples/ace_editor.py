@@ -66,7 +66,7 @@ html, body {width:100%;height:100%;margin:0px}
         self <= self.txt
 
     def maj(self,o):
-        self.txt.set( f"{html.escape(repr(o))} saved -> '{o.value}'" )
+        self.txt.clear( f"{html.escape(repr(o))} saved -> '{o.value}'" )
 
 
 from htag.runners import DevApp as Runner           # need starlette+uvicorn !!!

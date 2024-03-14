@@ -105,9 +105,9 @@ class App(Tag.body):
             The best practice : the store is mutated only in this place !
         """
         if action == "LISTE":
-            self.main.set(PageList() )
+            self.main.clear(PageList() )
         elif action == "SELECT":
-            self.main.set(PageProduct( params["selected"] ) )
+            self.main.clear(PageProduct( params["selected"] ) )
         elif action == "ADD":
             self.__store["baskets"].append( params["selected"] )
         elif action == "CLEAR":

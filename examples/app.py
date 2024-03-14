@@ -44,7 +44,7 @@ class Cpt(Tag.div):
 
     def onclick(self,v):
         self.nb+=v
-        self.ocpt.set(self.nb)
+        self.ocpt.clear(self.nb)
 
 import time,asyncio
 

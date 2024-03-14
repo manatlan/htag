@@ -436,21 +436,21 @@ def test_discovering_js():
 
     class OOI(Tag.div): # immediate rendering
         def init(self):
-            self.set( O() )             # Tag directly in Tag
+            self.clear( O() )             # Tag directly in Tag
 
     class OOOI(Tag.div):  # immediate rendering
         def init(self):
-            self.set( Tag.div( O() ) )  # Tag in a TagBase
+            self.clear( Tag.div( O() ) )  # Tag in a TagBase
 
     class OOL(Tag.div):   # lately rendering
         def render(self):
             self.clear()
-            self.set( O() )             # Tag directly in Tag
+            self.clear( O() )             # Tag directly in Tag
 
     class OOOL(Tag.div):  # lately rendering
         def render(self): # BAD PRACTICE (creating a tag in render will always force rendering) !!!!!!!!!!!!!!!!!!
             self.clear()
-            self.set( Tag.div(O()) )    # Tag in a TagBase
+            self.clear( Tag.div(O()) )    # Tag in a TagBase
 
     async def test(r): # first call (init obj)
         # resp = await r.interact( r.tag, None, None, None)
@@ -481,19 +481,19 @@ def test_discovering_css():
 
     class OOI(Tag.div): # immediate rendering
         def init(self):
-            self.set( O() )             # Tag directly in Tag
+            self.clear( O() )             # Tag directly in Tag
 
     class OOOI(Tag.div):  # immediate rendering
         def init(self):
-            self.set( Tag.div( O() ) )  # Tag in a TagBase
+            self.clear( Tag.div( O() ) )  # Tag in a TagBase
 
     class OOL(Tag.div):   # lately rendering
         def render(self):
-            self.set( O() )             # Tag directly in Tag
+            self.clear( O() )             # Tag directly in Tag
 
     class OOOL(Tag.div):  # lately rendering
         def render(self):
-            self.set( Tag.div(O()) )    # Tag in a TagBase
+            self.clear( Tag.div(O()) )    # Tag in a TagBase
 
     def test(r): # first call (init obj)
         assert "/*CSS1*/" in str(r)

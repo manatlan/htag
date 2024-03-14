@@ -6,7 +6,7 @@ class Nimp(Tag.div):
         # !!! previous3 will not be saved in '/tmp/AEFFFF.json' !!!
         # (it's not the main/managed tag (which is Page), so it's an inner dict)
         self.state["previous3"]=self.state.get("previous3","") + "!"
-        self.set( self.state["previous3"] )
+        self.clear( self.state["previous3"] )
 
 
 class Page(Tag.body):

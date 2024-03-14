@@ -31,7 +31,7 @@ class App(Tag.body):
     async def loop_timer(self):
         while 1:
             await asyncio.sleep(0.5)
-            self.place.set(time.time() )
+            self.place.clear(time.time() )
             if not await self.place.update(): # update component (without interaction)
                 # break if can't (<- good practice to kill this asyncio/loop)
                 print("asyncio loop stopped")

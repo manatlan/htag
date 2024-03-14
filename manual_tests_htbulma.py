@@ -37,7 +37,7 @@ class Star2(Tag.div): # it's a component ;-)
 
     def inc(self,v):
         self.value+=v
-        self.content.set( "⭐"*self.value )
+        self.content.clear( "⭐"*self.value )
 
 
 

@@ -41,19 +41,19 @@ class Calc(Tag.div):
 
     def press(self,val):
         self.txt += val
-        self.aff.set( self.txt )
+        self.aff.clear( self.txt )
 
     def compute(self):
         try:
             self.txt = str(eval(self.txt.replace("x","*")))
-            self.aff.set( self.txt )
+            self.aff.clear( self.txt )
         except:
             self.txt = ""
-            self.aff.set( "Error" )
+            self.aff.clear( "Error" )
 
     def clean(self):
         self.txt=""
-        self.aff.set("&nbsp;")
+        self.aff.clear("&nbsp;")
 
 App=Calc
 

@@ -19,7 +19,7 @@ if(!window._hashchange_listener) {
 """
     @expose
     def _hashchange(self,hash):
-        self.set( self._refs.get(hash, self.default) )
+        self.clear( self._refs.get(hash, self.default) )
 
     def go(self,tag,anchor=None):
         """ Set object 'tag' in the View, and navigate to it """

@@ -24,7 +24,7 @@ class View(Tag.div):
         self.js = "window.addEventListener('hashchange',() => {%s;});" % self.bind._hashchange(b"document.location.hash")
 
     def _hashchange(self,hash=None):
-        self.set( self._refs.get(hash or None,"???") )
+        self.clear( self._refs.get(hash or None,"???") )
 
     def go(self,o,anchor=None):
         """ Set object 'o' in the View, and navigate to it """

@@ -22,13 +22,13 @@ def test_base_error():
 def test_base2():
     d=Tag.div("hello")
     assert str(d) == "<div>hello</div>"
-    d.set("world")
+    d.clear("world")
     assert str(d) == "<div>world</div>"
-    d.set( ("hello","world"))
+    d.clear( ("hello","world"))
     assert str(d) == "<div>helloworld</div>"
-    d.set( ["hello","world"])
+    d.clear( ["hello","world"])
     assert str(d) == "<div>helloworld</div>"
-    d.set(None) # like clear()
+    d.clear(None) # like clear()
     assert str(d) == "<div></div>"
 
     def gen():
@@ -37,7 +37,7 @@ def test_base2():
     d=Tag.div()
     d.add( gen() )
     assert str(d) == "<div>012</div>"
-    d.set( gen() )
+    d.clear( gen() )
     assert str(d) == "<div>012</div>"
 
     d.clear()
@@ -135,7 +135,7 @@ def test_childs():
     # del t.childs[2]
     # assert len(t.childs)==3
 
-    t.set( Tag.li() )
+    t.clear( Tag.li() )
     assert len(t.childs)==1
 
 

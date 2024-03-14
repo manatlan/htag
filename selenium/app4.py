@@ -44,7 +44,7 @@ class App(Tag.div): # it's a component ;-)
         self <= self.s1+self.s2+self.s3+self.reset + self.show + self.exiter
 
         # and so, this div will be updated at reset !
-        self.show.set("Values: %s,%s,%s" % (self.s1.value,self.s2.value,self.s3.value))
+        self.show.clear("Values: %s,%s,%s" % (self.s1.value,self.s2.value,self.s3.value))
 
     def clickreset(self,o):
         # so, resetting values, will redraw this component (App) automatically

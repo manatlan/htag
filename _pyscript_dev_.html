@@ -39,7 +39,7 @@ class App(Tag.body):
 
     async def loop_timer(self):
         while self.place:
-            self.place.set(time.time() )
+            self.place.clear(time.time() )
             await self.place.update()       # !!! update component (with tag.update() ) !!!
             await asyncio.sleep(0.5)
 

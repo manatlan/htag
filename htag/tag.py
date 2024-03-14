@@ -333,7 +333,7 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
 
 
     def __declareArgsKargs(self, content:AnyTags=None,**_attrs):
-        self.set(content)
+        self.clear(content)
 
         for k,v in _attrs.items():
             if k.startswith("_"):
