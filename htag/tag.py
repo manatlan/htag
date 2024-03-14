@@ -352,17 +352,20 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
             logger.error("This component is not tied in a hrenderer")
             return False
 
-    def clear(self):
-        """ remove all childs """
+    def clear(self,elt:AnyTags=None):
+        """ remove all childs and replace content if provided """
         for t in self._childs:      # remove parenting
             if isinstance(t,Tag):
                 t.remove()
         self._childs=Elements()
+        if elt is not None:
+            self.add( elt)    
 
+    # DEPRECATED
     def set(self,elt:AnyTags):
         """ a bit like .innerHTML setting (avoid clear+add)"""
-        self.clear()
-        self.add( elt)
+        print("***DEPRECATED***, use .clear(x) in place of .set(x) !")
+        self.clear(elt)
 
     def remove(self, elt=None):
         """Remove an object(elt) from its childs, or itself (if none), if attached (has parent)"""
