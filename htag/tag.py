@@ -11,6 +11,7 @@ import hashlib
 import logging,types,asyncio
 import weakref
 import inspect
+from collections import namedtuple
 from typing import Sequence,Union,Optional,Any,Callable,Type
 from .attrs import StrClass,StrStyle
 
@@ -406,18 +407,28 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         """ new mechanism (could replace self.bind.<m>()) ... one day"""
         logger.info(f"callback __on__ {eventjs} {a} {ka}")
         caller = self._callbacks_[eventjs]
-
         for method,a,ka in [(caller.callback,a,ka)] + caller._others:
-            if hasattr(method, '__self__') and method.__self__ == self:
+            isEventBased = "ev" in inspect.getargspec(method).args
+            if isEventBased:
+                # new mechanism > v0.100
+                typevent=namedtuple("event", ["target"] + list(self._event.keys()))
+                event = typevent( self, **self._event )
                 if asyncio.iscoroutinefunction( method ):
-                    r=await method(*a,**ka)
+                    r=await method(event)
                 else:
-                    r=method(*a,**ka)
+                    r=method(event)
             else:
-                if asyncio.iscoroutinefunction( method ):
-                    r=await method(self,*a,**ka)
+                # old mechanism htag <= v0.91
+                if hasattr(method, '__self__') and method.__self__ == self:
+                    if asyncio.iscoroutinefunction( method ):
+                        r=await method(*a,**ka)
+                    else:
+                        r=method(*a,**ka)
                 else:
-                    r=method(self,*a,**ka)
+                    if asyncio.iscoroutinefunction( method ):
+                        r=await method(self,*a,**ka)
+                    else:
+                        r=method(self,*a,**ka)
 
             if isinstance(r, types.AsyncGeneratorType):
                 async for i in r:
