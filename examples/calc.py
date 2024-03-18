@@ -28,9 +28,10 @@ class Calc(Tag.div):
         self <= Tag.button("=", _onclick=self.bind( self.compute ) )
 
     #-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/ with real keyboard
-        self["onkeyup"] = self.bind( self.presskey, b"event.key" )
+        self["onkeyup"] = self.presskey
 
-    def presskey(self,key):
+    def presskey(self,ev):
+        key=ev.key
         if key in "0123456789+-*/.":
             self.press(key)
         elif key=="Enter":
