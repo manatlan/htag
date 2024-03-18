@@ -77,7 +77,7 @@ def test_new_events(): # >0.7.4
     assert len(t["onclick"]._others ) == 1
 
 def test_base():
-    def test():
+    def test(o):
         print("kkk")
 
     b=Tag.button("hello")

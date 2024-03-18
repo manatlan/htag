@@ -82,7 +82,7 @@ def test_multiple_binded_himself_callback():
 
 
 def test_binded_concatenate_strings(): #TODO: need more tests
-    def action1():
+    def action1(o):
         pass
 
     s=Tag.button("hello")
@@ -115,7 +115,7 @@ def test_binded_concatenate_strings(): #TODO: need more tests
     assert "try{let x=41;" in s
 
 def test_binded_parent_callback(): # args/kargs
-    def action():
+    def action(o):
         pass
 
     p=Tag.div()
