@@ -130,7 +130,7 @@ class Caller(NotBindedCaller):
             raise HTagException("Caller can't be serizalized, it's not _assign'ed to an event !")
         newargs = tuple([self._assigned]+list(self.args))
 
-        isEventBased = "ev" in inspect.getfullargspec(self.callback).args
+        isEventBased = (inspect.getfullargspec(self.callback).args[-1] == "ev")
         if isEventBased:
             bc=BaseCaller(self.instance,"__on_event__", newargs, self.kargs)
         else:
