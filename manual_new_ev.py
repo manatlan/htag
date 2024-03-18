@@ -9,14 +9,18 @@ class App(Tag.body):
     def init(self, name="vide"):
         self["style"]="background:#FFE;"
         self <= "Hello "+name
-        self <= Tag.button("add content1 (new)", _onclick=self.add_content1)
+        self <= Tag.button("add content1 (old)", _onclick=self.add_content1)
         self <= Tag.button("add content2 (new)", _onclick=self.add_content2)
-        self <= Tag.button("add content (old)", _onclick=self.bind.add_content1(None))
+        self <= Tag.button("add content (very old)", _onclick=self.bind.add_content_old())
 
     def add_content1(self,o):           # old <= 0.91 : o is the caller_object, and event is in o.event
         self <= f"X {o.innerHTML}"
     def add_content2(self,ev):          # new >= 0.100 : ev is a real event (ev.target is the caller_object)
+        print(ev,flush=True)
         self <= f"X {ev.target.innerHTML}"
+
+    def add_content_old(self):
+        self <= f"X"
 
 
 

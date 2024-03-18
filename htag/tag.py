@@ -408,7 +408,7 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         logger.info(f"callback __on__ {eventjs} {a} {ka}")
         caller = self._callbacks_[eventjs]
         for method,a,ka in [(caller.callback,a,ka)] + caller._others:
-            isEventBased = "ev" in inspect.getargspec(method).args
+            isEventBased = "ev" in inspect.getfullargspec(method).args
             if isEventBased:
                 # new mechanism > v0.100
                 typevent=namedtuple("event", ["target"] + list(self._event.keys()))
