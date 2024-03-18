@@ -7,6 +7,7 @@
 # https://github.com/manatlan/htag
 # #############################################################################
 import json,asyncio,types,traceback
+import inspect
 
 from . import __version__
 from .tag import HTagException,Tag, BaseCaller
@@ -272,17 +273,29 @@ function jevent(e) {
             state = Stater(self.tag)
             obj = Tag.find_tag(oid)
             if obj:
-                obj._event=event or {}
-
                 # call the method
                 method=getattr(obj,method_name)
-
+                
                 logger.info(f"INTERACT with METHOD {fmtcaller(method_name,args,kargs)}, of %s", repr(obj) )
 
-                if asyncio.iscoroutinefunction( method ):
-                    r=await method(*args,**kargs)
-                else:
-                    r=method(*args,**kargs)
+                if method.__name__=="__on_event__":  # NEW
+                    cbname=args[0]
+                    if asyncio.iscoroutinefunction( method ):
+                        r=await method(cbname,event)
+                    else:
+                        r=method(cbname,event)
+                elif method.__name__=="__on__": # previous new
+                    obj._event=event or {}
+                    if asyncio.iscoroutinefunction( method ):
+                        r=await method(*args,**kargs)
+                    else:
+                        r=method(*args,**kargs)
+                else:                           # old mechanism
+                    obj._event=event or {}
+                    if asyncio.iscoroutinefunction( method ):
+                        r=await method(*args,**kargs)
+                    else:
+                        r=method(*args,**kargs)
 
                 if isinstance(r, types.AsyncGeneratorType) or isinstance(r, types.GeneratorType):
                     # save it, to avoid GC
