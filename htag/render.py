@@ -279,11 +279,11 @@ function jevent(e) {
                 logger.info(f"INTERACT with METHOD {fmtcaller(method_name,args,kargs)}, of %s", repr(obj) )
 
                 if method.__name__=="__on_event__":  # NEW
-                    cbname=args[0]
+                    cbname,*args = args
                     if asyncio.iscoroutinefunction( method ):
-                        r=await method(cbname,event)
+                        r=await method(cbname,event,*args,**kargs)
                     else:
-                        r=method(cbname,event)
+                        r=method(cbname,event,*args,**kargs)
                 elif method.__name__=="__on__": # previous new
                     obj._event=event or {}
                     if asyncio.iscoroutinefunction( method ):

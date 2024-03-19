@@ -130,7 +130,7 @@ class Caller(NotBindedCaller):
             raise HTagException("Caller can't be serizalized, it's not _assign'ed to an event !")
         newargs = tuple([self._assigned]+list(self.args))
 
-        isEventBased = (inspect.getfullargspec(self.callback).args[-1] == "ev")
+        isEventBased = "ev" in inspect.getfullargspec(self.callback).args[:2] #in the first 2 parameters
         if isEventBased:
             bc=BaseCaller(self.instance,"__on_event__", newargs, self.kargs)
         else:
@@ -408,17 +408,17 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
     #===============================================================================
     # Overriden methods
     #===============================================================================
-    async def __on_event__(self,method_name:str,jsevent): # new mechanism > v0.100 (method with "ev" param)
+    async def __on_event__(self,method_name:str,jsevent,*a,**ka): # new mechanism > v0.100 (method with "ev" param)
         """ really new mechanism (could replace self.bind.<m>()) ... one day"""
         logger.info(f"callback __on_event__ {method_name} ")
         caller = self._callbacks_[method_name]
-        for method,a,ka in [(caller.callback,-1,-1)] + caller._others:
+        for method,a,ka in [(caller.callback,a,ka)] + caller._others:
             typevent=namedtuple("event", ["target"] + list(jsevent.keys()))
             event = typevent( self, **jsevent )
             if asyncio.iscoroutinefunction( method ):
-                r=await method(event)
+                r=await method(event,*a,**ka)
             else:
-                r=method(event)
+                r=method(event,*a,**ka)
 
             if isinstance(r, types.AsyncGeneratorType):
                 async for i in r:
