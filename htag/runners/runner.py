@@ -351,6 +351,12 @@ class Runner:
                 logger.debug("watchdog will control socket connexions")
                 # kill server if 'interface' is closed (only ServerWS!)
                 async def watchdog():
+
+                    logger.debug("watchdog waiting 1st connexion")
+                    while self.server.connected==0:
+                        await asyncio.sleep(0.1)
+
+                    logger.debug("watchdog connected, handle the life")
                     nb=4
                     while 1:
                         await asyncio.sleep(0.5)
