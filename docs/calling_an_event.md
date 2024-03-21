@@ -2,6 +2,8 @@
 
 After months of use, and more than 100 htag apps later, here are my notes ;-)
 
+**TODO**: talk about the "ev" mechanism introduced in "htag 0.100.x"
+
 ## First of all
 
 You should really understand than setting an onclick event, is just a javascript call. So this thing will work as expected, on client side :
