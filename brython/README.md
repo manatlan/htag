@@ -10,5 +10,5 @@ In a `<script type="text/python">`, you can now add:
    from htag import Tag
 ```
 
-
+See [Example1](https://raw.githack.com/manatlan/htag/main/brython/example1.html)
 
