@@ -32,9 +32,9 @@ jobs:
       #############################################################################
       ## test the basic Runner (WS MODE)
       #############################################################################
-      - name: Run Tests BrowserStarletteHTTP ${{ matrix.app }}
+      - name: Run Tests BrowserStarletteWS ${{ matrix.app }}
         run: |
-          python selenium/run.py BrowserStarletteHTTP ${{ matrix.app }} &
+          python selenium/run.py BrowserStarletteWS ${{ matrix.app }} &
           python selenium/tests.py 8000 ${{ matrix.app }}
 
       #############################################################################
