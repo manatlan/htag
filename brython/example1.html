@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1"></meta>
+    <script type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/brython@3.12.2/brython.min.js">
+    </script>
+    <!--
+        script type="text/javascript"
+            src="https://cdn.jsdelivr.net/npm/brython@3.12.2/brython_stdlib.js">
+        </script
+    -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.14.0/cdn/themes/light.css" />
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.14.0/cdn/shoelace-autoloader.js"></script>    
+    <script type="text/python" src="https://raw.githubusercontent.com/manatlan/htag/main/brython/htag.txt" id="htag"></script>
+    <style>
+:not(:defined) {
+  visibility: hidden;
+}    
+
+.sl-toast-stack {
+  display: flex;
+  flex-direction: column-reverse;
+  top: auto;
+  bottom: 0;
+  right: 0;
+}
+    </style>
+</head>
+
+<body>
+
+<script type="text/python">
+#############################################################################
+from browser import document,window
+from htagbryt import Tag
+
+def dialog(content):
+    " example of use <sl-dialog> "
+    obj = Tag.sl_dialog( content, _label="popup",_onsl_after_hide=lambda ev: obj.remove())
+    document <= obj # removed on sl-after-hide event
+    window.customElements.whenDefined('sl-dialog').then( lambda ev: obj.show() )
+
+def toast(content):
+    " example of use <sl-alert> in toast imperative way "
+    obj = Tag.sl_alert( content ,_duration=1000)
+    document <= obj # removed by the toast method (imperative way)
+    window.customElements.whenDefined('sl-alert').then( lambda ev: obj.toast() )
+
+class MyComponent(Tag.sl_card):
+    " a component in the htag's style "
+    def __init__(self,txt):
+        self._txt=txt
+        self+=Tag.sl_button(f"add {txt}",_onclick=self.addline)
+		
+    def addline(self,ev):
+        self += Tag.li(self._txt)
+
+" example of use <sl-select> with <sl-option> in a composition style (with/as) "        
+with Tag.sl_select(_label="Select:",_onsl_change=lambda ev: toast(ev.target.value)) as my_select:
+    my_select += Tag.sl_option("value1",_value=1)
+    my_select += Tag.sl_option("value2",_value=2)
+    my_select += Tag.sl_option("value3",_value=3)
+
+
+" add the 'Tag' object instances "
+document["app"] <= my_select
+document["app"] <= Tag.button( ["nothing",Tag.b("hh")], _style="background:yellow")
+document["app"] <= Tag.sl_button("dialog",_variant="danger",_onclick=lambda ev: dialog('dialog msg')) <= Tag.sl_icon(_name="emoji-smile")
+document["app"] <= Tag.sl_button("toast",_variant="primary",_onclick=lambda ev: toast('toast msg')) <= Tag.sl_icon(_name="emoji-smile")
+document["app"] <= MyComponent("i'm 1")
+document["app"] <= MyComponent("i'm 2")
+############################################################################
+</script>
+
+<div id="app"></div>
+
+
+</body>
+
+</html>
