@@ -3,6 +3,14 @@
 [Brython](https://brython.info/) is a marvelous implementation of py3 in javascript, and here is an **htag.Tag** implem for brython.
 The goal of this side htag project, is to provide a brython's htag way to create components which are compatibles with **htag** and **brython**.
 
+In this repo, you will find :
+
+ - [htag.txt](https://github.com/manatlan/htag/blob/main/brython/htag.txt) : A minimal inplementation
+ - `htagfull.txt`(a more complete implem, when it will be ready)
+ - somes examples
+
+
+## Instructions
 Put this line in your html file :
 ```html
    <script type="text/python" src="https://raw.githubusercontent.com/manatlan/htag/main/brython/htag.txt" id="htag"></script>
@@ -14,5 +22,7 @@ In a `<script type="text/python">`, you can now add:
 ```
 And you can create your components, as you could do, with real [htag](https://github.com/manatlan/htag/) (NOT 100% compatible for now)
 
+
+## Examples
 See [Example1](https://raw.githack.com/manatlan/htag/main/brython/example1.html) (using [shoelace](https://shoelace.style/) too)
 
