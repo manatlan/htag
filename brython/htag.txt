@@ -1,13 +1,12 @@
-from browser import html
-
 #----------------------------------------------------------------------------
-# the (1st) "htag.Tag" implem in brython (in a dirty way)
+# An "htag.Tag" implem form brython (in a dirty way)
 #----------------------------------------------------------------------------
 # In html/head add:
-#  <script type="text/python" src="https://mlan.alwaysdata.net/pub/htagbryt.txt" id="htag"></script>
+#  <script type="text/python" src="https://raw.githubusercontent.com/manatlan/htag/main/brython/htag.txt" id="htag"></script>
 # In script/python add:
 #  from htag import Tag
 #----------------------------------------------------------------------------
+from browser import html
 
 class TAG:
     def __init__(self, content=None, **attrs):
