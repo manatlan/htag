@@ -5,8 +5,8 @@ The goal of this side htag project, is to provide a brython's htag way to create
 
 In this repo, you will find :
 
- - [htag.txt](https://github.com/manatlan/htag/blob/main/brython/htag.txt) : A minimal inplementation
- - `htagfull.txt`(a more complete implem, when it will be ready)
+ - [htag.txt](https://github.com/manatlan/htag/blob/main/brython/htag.txt) : A minimal implementation (to use with brython)
+ - `htagfull.txt` : a more complete implem ... **when it will be ready** ;-)
  - somes examples
 
 
@@ -24,5 +24,5 @@ And you can create your components, as you could do, with real [htag](https://gi
 
 
 ## Examples
-See [Example1](https://raw.githack.com/manatlan/htag/main/brython/example1.html) (using [shoelace](https://shoelace.style/) too)
+See [Example 1](https://raw.githack.com/manatlan/htag/main/brython/example1.html) (using [shoelace](https://shoelace.style/) too)
 
