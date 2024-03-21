@@ -35,7 +35,6 @@ def tests(client:hclient.HClient):
     return True
 
 if __name__=="__main__":
-    # hclient.run( App, "PyScript")
-    # hclient.run( App, "BrowserHTTP")
-    hclient.test( App, "BrowserHTTP", tests)
+    hclient.test( App, "WS", tests)
+    # hclient.test( App, "HTTP", tests)
     # hclient.test( App, "PyScript", tests) #NEED a "poetry build" before !!!!

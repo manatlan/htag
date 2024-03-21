@@ -33,6 +33,7 @@ class HClient:
         time.sleep(nbs)
 
 def run(App,runner:str,openBrowser=True,port=8000):
+    assert runner in ("PyScript","WS","HTTP")
     print("App runned in",runner)
 
     if runner=="PyScript":
@@ -98,9 +99,12 @@ PyScript( App  ).run( window )
                 sys.exit(-1)
         finally:
             os.unlink("index.html")
-    else:
-        import htag.runners
-        getattr(htag.runners,runner)(App).run(openBrowser=openBrowser,port=port)
+    elif runner == "WS":
+        from htag.runners import Runner
+        Runner(App,port=port,interface = 1 if openBrowser else 0).run()
+    elif runner == "HTTP":
+        from htag.runners import Runner
+        Runner(App,port=port,interface = 1 if openBrowser else 0,http_only=True).run()
 
 def test(App,runner:str, tests):
     """ for test on a local machine only """
