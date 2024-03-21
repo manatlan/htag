@@ -6,9 +6,11 @@ import hclient
 from htag import Tag,expose
 
 """
-Manual Tests  (will be in selenium tests soon)
+Manual Tests  (same as manual_tests_event_0.100.1.py)
 To tests all "events binding" (except async, but should be the same)
 for htag >= 0.100.1
+
+*** BY FAR: the more pertinent test ***
 """
 
 #----------------------------------------------------------
