@@ -20,7 +20,7 @@ As it's based on html/js rendering: you can easily mix powerful JS libs with pow
  * For a **web app** : You can use the [htagweb](https://github.com/manatlan/htagweb).
  * For a **html app** (think SPA (run in an html context (no python!))):
     * you can use the [PyScript runner](https://manatlan.github.io/htag/runners/#pyscript), which will run completly in client side
-    * you can use the [htag fro brython](https://github.com/manatlan/htag/blob/main/brython/README.md), which will run completly in client side
+    * you can use the [htag for brython](https://github.com/manatlan/htag/blob/main/brython/README.md), which will run completly in client side
 
 
 But yes … the promise is here : **it's a GUI toolkit for building "beautiful" applications for mobile, web, and desktop from a single codebase**.
