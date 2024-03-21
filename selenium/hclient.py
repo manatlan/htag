@@ -127,3 +127,7 @@ def testDriver(driver,tests):
     #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     return tests( hc )
 
+def normalRun(App):
+    """ just for test/dev in a normal context """
+    from htag.runners import Runner
+    Runner(App,interface = 1,use_first_free_port=True).run()    

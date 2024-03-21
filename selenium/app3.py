@@ -35,6 +35,7 @@ def tests(client:hclient.HClient):
 
 
 if __name__=="__main__":
+    # hclient.normalRun(App)
     hclient.test( App, "WS", tests)
     # hclient.test( App, "HTTP", tests)
     # hclient.test( App, "PyScript", tests) #NEED a "poetry build" before !!!!
