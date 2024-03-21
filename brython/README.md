@@ -13,14 +13,23 @@ In this repo, you will find :
 ## Instructions
 Put this line in your html file :
 ```html
-   <script type="text/python" src="https://raw.githubusercontent.com/manatlan/htag/main/brython/htag.txt" id="htag"></script>
+<script type="text/python" src="https://raw.githubusercontent.com/manatlan/htag/main/brython/htag.txt" id="htag"></script>
 ```
 In a `<script type="text/python">`, you can now add:
 
 ```python
-   from htag import Tag
+from htag import Tag
 ```
 And you can create your components, as you could do, with real [htag](https://github.com/manatlan/htag/) (NOT 100% compatible for now)
+
+```html
+<script type="text/python">
+from browser import document,window
+from htag import Tag
+
+document <= Tag.button("Say Hi", _style="color:red", _onclick=lambda ev: window.alert('hello world'))
+</script>
+```
 
 
 ## Examples
