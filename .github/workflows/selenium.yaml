@@ -10,9 +10,9 @@ jobs:
         app: [app1, app2, app3, app4]
     steps:
       - name: Check out this repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.7'
       - name: Installed package list
@@ -30,7 +30,15 @@ jobs:
 
 
       #############################################################################
-      ## test the basic Runner
+      ## test the basic Runner (WS MODE)
+      #############################################################################
+      - name: Run Tests BrowserStarletteHTTP ${{ matrix.app }}
+        run: |
+          python selenium/run.py BrowserStarletteHTTP ${{ matrix.app }} &
+          python selenium/tests.py 8000 ${{ matrix.app }}
+
+      #############################################################################
+      ## test the basic Runner (HTTP MODE)
       #############################################################################
       - name: Run Tests BrowserHTTP ${{ matrix.app }}
         run: |
