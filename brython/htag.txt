@@ -1,0 +1,44 @@
+from browser import html
+
+#----------------------------------------------------------------------------
+# the (1st) "htag.Tag" implem in brython (in a dirty way)
+#----------------------------------------------------------------------------
+# In html/head add:
+#  <script type="text/python" src="https://mlan.alwaysdata.net/pub/htagbryt.txt" id="htag"></script>
+# In script/python add:
+#  from htag import Tag
+#----------------------------------------------------------------------------
+
+class TAG:
+    def __init__(self, content=None, **attrs):
+        if content: self <= content
+        for k,v in attrs.items():
+            if k.startswith("_"):
+                k = k[1:].replace( "_", "-" )
+                if k.startswith("on"):
+                    self.bind( k[2:], v )
+                else:
+                    self.attrs[k] = v
+            else:
+                setattr( self, k, v )
+
+    def __iadd__(self, elt):   # "+=" (like "<=")
+        self <= elt
+        return self
+        
+    def __enter__(self): # so can use construction with 'with as:' statement
+        return self
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass     
+
+class TagCreator(type):
+    types={}
+    def __getattr__(self, tagName:str):
+        nodeName = tagName.replace( "_", "-" )
+        if nodeName not in TagCreator.types:
+            TagCreator.types[nodeName]=html.maketag(nodeName)
+        typ = TagCreator.types[nodeName]
+        return type('Tag%s' % tagName.capitalize(), (TAG,typ), {**TAG.__dict__,"tag":nodeName,"typ":typ})
+
+class Tag(metaclass=TagCreator):
+    pass
