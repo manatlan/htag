@@ -60,7 +60,21 @@ document <= Tag.sl_color_picker( _onsl_change = onchanged )
 ```
 will produce something like `<sl-color-picker sl-change='...'></sl-color-picker>`
 
+and best of all, you can easily compose components
 
+```python
+class MyComponent(Tag.sl_card):
+    " a component in the htag's style "
+    def __init__(self,txt):
+        self.txt=txt
+        self+=Tag.sl_button(f"add {txt}",_onclick=self.addline)
+		
+    def addline(self,ev):
+        self += Tag.li(self.txt)
+
+document <= MyComponent("C1")
+document <= MyComponent("C2")
+```
 
 
 ## Examples
