@@ -58,7 +58,7 @@ Ex:
 ```python
 document <= Tag.sl_color_picker( _onsl_change = onchanged )
 ```
-will produce something like `<sl-color-picker></sl-color-picker>`, with an auto-binded event on "sl-changed".
+will produce something like `<sl-color-picker></sl-color-picker>`, with an auto-binded event on "sl-change".
 
 And best of all, you can easily craft components
 
@@ -75,10 +75,10 @@ class MyComponent(Tag.sl_card):
 document <= MyComponent("C1")
 document <= MyComponent("C2")
 ```
-And like in real **htag** : this component is "closed", because it won't accept redefinition at construction time. If you want to "open" it, to be able to redefine some attributs : change its `init` method to :
+And like with real **htag** : this component is "closed", because it won't accept redefinition at construction time. If you want to "open" it, to be able to redefine some attributs : change its `init` method to :
 
 ```python
-    def init(self,txt,**a):
+    def init(self,txt, **a):
 ```
 and now, you can surcharge it (or not) at construction phase, like that :
 ```python
