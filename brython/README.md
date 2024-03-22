@@ -1,9 +1,9 @@
 # HTag for Brython
 
 [Brython](https://brython.info/) is a marvelous implementation of py3 in javascript, and here is an **htag.Tag** implem for brython.
-The goal of this side htag project, is to provide a brython's htag way to create components whose are compatibles with **htag** and **brython**.
+The goal of this side htag project, is to provide a brython's htag way to create components whose could be compatibles with **htag** and **brython**.
 
-It's a class helper, to facilitate the creation of html element.
+In fact, it's just It's a class helper, to facilitate the creation of html element.
 
 In this repo, you will find :
 
