@@ -65,7 +65,7 @@ and best of all, you can easily compose components
 ```python
 class MyComponent(Tag.sl_card):
     " a component in the htag's style "
-    def __init__(self,txt):
+    def init(self,txt):
         self.txt=txt
         self+=Tag.sl_button(f"add {txt}",_onclick=self.addline)
 		
