@@ -9,19 +9,57 @@
 from browser import html
 
 class TAG:
-    def __init__(self, content=None, **attrs):
-        if content: self <= content
-        for k,v in attrs.items():
-            if k.startswith("_"):
-                k = k[1:].replace( "_", "-" )
-                if k.startswith("on"):
-                    self.bind( k[2:], v )
-                else:
-                    self.attrs[k] = v
+    def __init__(self,*args,**kargs):
+        is_component=hasattr(self,"init")
+        attrs,events,props=self.__exkargs__(kargs)
+        if is_component:
+            # component creation
+            constructor=getattr(self,"init")
+            
+            print(f"TAG COMPONENT '{self.__class__.__name__}({self.tag})' with: {attrs=} {events=} {props=}")
+            if attrs:
+                # it's "open tag" (accept redef) (it should got a 'init( ..., **a)' )
+                # (because it tries call with "_var")
+                for k,v in attrs.items():
+                    self.attrs[k]=v
+                for k,v in events.items():
+                    self.bind(k,v)
+                
+                constructor(*args,**props,**kargs)  # to produce a typeerror if not "opened"
             else:
-                setattr( self, k, v )
+                # it's "closed tag" (refuse redef)
+                constructor(*args,**kargs)
 
-    def __iadd__(self, elt):   # "+=" (like "<=")
+        else:
+            # simple creation
+            print(f"TAG SIMPLE '{self.tag}' with: {args=} {kargs=}")
+            if len(args)>0:
+                content,*args = args
+                self <= content
+            
+            for k,v in attrs.items():
+                self.attrs[k]=v
+            for k,v in events.items():
+                self.bind(k,v)
+            for k,v in props.items():
+                setattr(self,k,v)
+                
+    def __exkargs__(self,kargs:dict) -> (dict,dict,dict):
+        events={}   # events
+        attrs={}    # html attibuts
+        props={}    # instance properties
+        for k,v in kargs.items():
+            if k.startswith("_"):
+                k=TagCreator.cname(k[1:])
+                if k.startswith("on"):
+                    events[ k[2:] ] = v
+                else:
+                    attrs[ k ] = v
+            else:
+                props[k]=v
+        return (attrs,events,props)
+
+    def __iadd__(self,  elt):   # "+=" (like "<=")
         self <= elt
         return self
         
@@ -33,11 +71,16 @@ class TAG:
 class TagCreator(type):
     types={}
     def __getattr__(self, tagName:str):
-        nodeName = tagName.replace( "_", "-" )
+        nodeName = TagCreator.cname(tagName)
         if nodeName not in TagCreator.types:
             TagCreator.types[nodeName]=html.maketag(nodeName)
         typ = TagCreator.types[nodeName]
-        return type('Tag%s' % tagName.capitalize(), (TAG,typ), {**TAG.__dict__,"tag":nodeName,"typ":typ})
+        return type("".join([i.capitalize() for i in ("tag_"+tagName).split("_")]), (TAG,typ), {**TAG.__dict__,"tag":nodeName})
+
+    @staticmethod
+    def cname(x:str) -> str:
+        return x.replace("_","-")
 
 class Tag(metaclass=TagCreator):
-    pass
+    imports=[]
+    statics=[]
