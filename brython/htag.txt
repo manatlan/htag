@@ -1,4 +1,4 @@
-from browser import html
+from browser import html,document
 
 class TAG:
     def __init__(self,*args,**kargs):
