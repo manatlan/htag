@@ -60,18 +60,16 @@ class Ed(Tag.div):
             self.ed.session.setUseWorker(False);
             self.ed.getSession().setUseSoftTabs(True);
 
-            self.ed.commands.addCommand({
-                "name": "commandSave1",
-                "bindKey": {"win": "Ctrl-S",  "mac": "Command-S"},
-                "readOnly": "True",
-                "exec": self._save,
-            })
-            self.ed.commands.addCommand({
-                "name": "commandSave2",
-                "bindKey": {"win": "Ctrl-Enter",  "mac": "Command-Enter"},
-                "readOnly": "True",
-                "exec": self._save,
-            })
+            def setShortcut(key, cb):
+                self.ed.commands.addCommand({
+                    "name": key,
+                    "bindKey": {"win": key,  "mac": key.replace("Ctrl","Command")},
+                    "readOnly": "True", # false if this command should not apply in readOnly mode
+                    "exec": cb
+                })
+        
+            setShortcut("Ctrl-S", self._save)
+            setShortcut("Ctrl-Enter",self._save)
         
         self.whenDefined( "window.ace", 0).then( start )
 
