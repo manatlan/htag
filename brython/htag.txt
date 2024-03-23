@@ -7,7 +7,9 @@ class TAG:
         if is_component:
             
             if self.statics:
-                document.head <= self.statics
+                def includer():
+                    document.head <= self.statics
+                self.whenDefined("document",0).then( includer )
             
             # component creation
             constructor=getattr(self,"init")
