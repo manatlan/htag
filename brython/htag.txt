@@ -9,8 +9,8 @@
 from browser import html,document,window
 
 class TAG:
-    imports=[]
     statics=[]
+
     def __init__(self,*args,**kargs):
         is_component=hasattr(self,"init")
         attrs,events,props=self.__exkargs__(kargs)
