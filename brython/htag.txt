@@ -1,11 +1,3 @@
-#----------------------------------------------------------------------------
-# An "htag.Tag" implem for brython (in a dirty way)
-#----------------------------------------------------------------------------
-# In html/head add:
-#  <script type="text/python" src="https://raw.githubusercontent.com/manatlan/htag/main/brython/htag.txt" id="htag"></script>
-# In script/python add:
-#  from htag import Tag
-#----------------------------------------------------------------------------
 from browser import html
 
 class TAG:
@@ -13,6 +5,10 @@ class TAG:
         is_component=hasattr(self,"init")
         attrs,events,props=self.__exkargs__(kargs)
         if is_component:
+            
+            if self.statics:
+                document.head <= self.statics
+            
             # component creation
             constructor=getattr(self,"init")
             
@@ -67,6 +63,22 @@ class TAG:
         return self
     def __exit__(self, exc_type, exc_val, exc_tb):
         pass     
+
+    def whenDefined(self,obj_str,timeout) -> "promise":
+        # https://codepen.io/eanbowman/pen/jxqKjJ
+        start = window.Date.now()
+    
+        def waitObjectStr(resolve, reject):
+            if window.eval(obj_str):
+                resolve(window.eval(obj_str))
+            elif timeout and (window.Date.now() - start) >= timeout:
+                reject(window.Error.new(f"Error: Timeout waiting for '{obj_str}' ;-("))
+            else:
+                window.setTimeout( lambda: waitObjectStr(resolve, reject) , 30)
+        
+        return window.Promise.new(waitObjectStr);
+     
+
 
 class TagCreator(type):
     types={}
