@@ -9,6 +9,8 @@
 from browser import html,document,window
 
 class TAG:
+    imports=[]
+    statics=[]
     def __init__(self,*args,**kargs):
         is_component=hasattr(self,"init")
         attrs,events,props=self.__exkargs__(kargs)
@@ -104,5 +106,4 @@ class TagCreator(type):
         return x.replace("_","-")
 
 class Tag(metaclass=TagCreator):
-    imports=[]
-    statics=[]
+    pass
