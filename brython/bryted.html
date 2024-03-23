@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>BrytEd</title>
+    <title>BrytEd (pre-version)</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1"></meta>
     <script type="text/javascript"
@@ -93,12 +93,11 @@ class Ed(Tag.div):
 ## example of use :
 ############################################################################
 def generate(code):
-    h='<html><head><title>BrythEd</title><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></meta><skript type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.12.2/brython.min.js"></skript><skript type="text/python" src="https://raw.githubusercontent.com/manatlan/htag/main/brython/htag.txt" id="htag"></skript><style> html,body {width:100%;height:100%;padding:0px;margin:0px; }</style></head><body><skript type="text/python">'+code+'</skript></body></html>'
+    h='<!DOCTYPE html><html><head><title>BrythEd</title><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></meta><skript type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.12.2/brython.min.js"></skript><skript type="text/python" src="https://raw.githubusercontent.com/manatlan/htag/main/brython/htag.txt" id="htag"></skript><style> html,body {width:100%;height:100%;padding:0px;margin:0px; }</style></head><body><skript type="text/python">'+code+'</skript></body></html>'
     return h.replace("skript","script") #trick to bypass brython parser
 
-src = '''#press CTRL-S
+src = '''from htag import Tag
 from browser import document,window
-from htag import Tag
 
 class MyTag(Tag.div):
     statics = Tag.style("body {background:#333;color:white}")
@@ -111,6 +110,9 @@ class MyTag(Tag.div):
 document.body <= MyTag("hello")
 '''
 
+help=Tag.h2("This is an Online Editor to test " + Tag.a("HTag for Brython",_href="https://github.com/manatlan/htag/tree/main/brython"))+Tag.p("Press CTRL+Enter to execute")
+
+
 def onsave(obj):
     document["output"].clear()
     iframe = Tag.iframe(_style="width:100%;height:100%")
@@ -121,9 +123,8 @@ def onsave(obj):
 
 document["app"] <= HSplit( 
     Ed(src, "python", onsave=onsave),
-    Tag.div(id="output",_style="width:100%;height:100%"),
+    Tag.div(help,id="output",_style="width:100%;height:100%"),
 )
-
 
 ############################################################################
 </script>
