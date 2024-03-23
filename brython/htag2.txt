@@ -17,7 +17,7 @@ class TAG:
         if is_component:
             
             if self.statics:
-                def includer():
+                def includer(o):
                     document.head <= self.statics
                 self.whenDefined("document",0).then( includer )
             
