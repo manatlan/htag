@@ -1,0 +1,109 @@
+#-------------------------------------------------------------------------------------------------------------------------------
+# An "htag.Tag" implem for brython (see https://github.com/manatlan/htag/tree/main/brython)
+#-------------------------------------------------------------------------------------------------------------------------------
+# In html/head add:
+#     <script type="text/python" src="https://raw.githubusercontent.com/manatlan/htag/main/brython/htag.txt" id="htag"></script>
+# In script/python add:
+#     from htag import Tag
+#-------------------------------------------------------------------------------------------------------------------------------
+from browser import html,document,window
+
+class TAG:
+    statics=[]
+
+    def __init__(self,*args,**kargs):
+        is_component=hasattr(self,"init")
+        attrs,events,props=self.__exkargs__(kargs)
+        if is_component:
+            
+            if self.statics:
+                def includer():
+                    document.head <= self.statics
+                self.whenDefined("document",0).then( includer )
+            
+            # component creation
+            constructor=getattr(self,"init")
+            
+            print(f"TAG COMPONENT '{self.__class__.__name__}({self.tag})' with: {attrs=} {events=} {props=}")
+            if attrs:
+                # it's "open tag" (accept redef) (it should got a 'init( ..., **a)' )
+                # (because it tries call with "_var")
+                for k,v in attrs.items():
+                    self.attrs[k]=v
+                for k,v in events.items():
+                    self.bind(k,v)
+                
+                constructor(*args,**props,**kargs)  # to produce a typeerror if not "opened"
+            else:
+                # it's "closed tag" (refuse redef)
+                constructor(*args,**kargs)
+
+        else:
+            # simple creation
+            print(f"TAG SIMPLE '{self.tag}' with: {args=} {kargs=}")
+            if len(args)>0:
+                content,*args = args
+                self <= content
+            
+            for k,v in attrs.items():
+                self.attrs[k]=v
+            for k,v in events.items():
+                self.bind(k,v)
+            for k,v in props.items():
+                setattr(self,k,v)
+                
+    def __exkargs__(self,kargs:dict) -> (dict,dict,dict):
+        events={}   # events
+        attrs={}    # html attibuts
+        props={}    # instance properties
+        for k,v in kargs.items():
+            if k.startswith("_"):
+                k=TagCreator.cname(k[1:])
+                if k.startswith("on"):
+                    events[ k[2:] ] = v
+                else:
+                    attrs[ k ] = v
+            else:
+                props[k]=v
+        return (attrs,events,props)
+
+    def __iadd__(self,  elt):   # "+=" (like "<=")
+        self <= elt
+        return self
+        
+    def __enter__(self): # so can use construction with 'with as:' statement
+        return self
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass     
+
+    def whenDefined(self,obj_str,timeout) -> "promise":
+        # https://codepen.io/eanbowman/pen/jxqKjJ
+        start = window.Date.now()
+    
+        def waitObjectStr(resolve, reject):
+            if window.eval(obj_str):
+                resolve(window.eval(obj_str))
+            elif timeout and (window.Date.now() - start) >= timeout:
+                reject(window.Error.new(f"Error: Timeout waiting for '{obj_str}' ;-("))
+            else:
+                window.setTimeout( lambda: waitObjectStr(resolve, reject) , 30)
+        
+        return window.Promise.new(waitObjectStr);
+     
+
+
+class TagCreator(type):
+    types={}
+    def __getattr__(self, tagName:str):
+        nodeName = TagCreator.cname(tagName)
+        if nodeName not in TagCreator.types:
+            TagCreator.types[nodeName]=html.maketag(nodeName)
+        typ = TagCreator.types[nodeName]
+        return type("".join([i.capitalize() for i in ("tag_"+tagName).split("_")]), (TAG,typ), {**TAG.__dict__,"tag":nodeName})
+
+    @staticmethod
+    def cname(x:str) -> str:
+        return x.replace("_","-")
+
+class Tag(metaclass=TagCreator):
+    pass
