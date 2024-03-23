@@ -1,10 +1,10 @@
 #----------------------------------------------------------------------------
-# An "htag.Tag" implem for brython (in a dirty way)
+# An "htag.Tag" implem for brython
 #----------------------------------------------------------------------------
 # In html/head add:
-#  <script type="text/python" src="https://raw.githubusercontent.com/manatlan/htag/main/brython/htag.txt" id="htag"></script>
+#    <script type="text/python" src="https://raw.githubusercontent.com/manatlan/htag/main/brython/htag.txt" id="htag"></script>
 # In script/python add:
-#  from htag import Tag
+#    from htag import Tag
 #----------------------------------------------------------------------------
 from browser import html,document,window
 
