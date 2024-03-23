@@ -10,7 +10,7 @@ In this repo, you will find :
  - [htag.txt](https://github.com/manatlan/htag/blob/main/brython/htag.txt) : the minimal implementation (to use with brython)
  - `htagfull.txt` : a more complete implem ... **when it will be ready** ;-)
  - somes examples
- - [bryted](https://raw.githack.com/manatlan/htag/main/brython/brythed.html) : an online editor to test brython'htag components (made with brython'htag) **PREVERSION**
+ - [bryted](https://raw.githack.com/manatlan/htag/main/brython/bryted.html) : an online editor to test brython'htag components (made with brython'htag) **PREVERSION**
 
 
 ## Instructions
