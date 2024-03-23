@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Example 2</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1"></meta>
+    <script type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/brython@3.12.2/brython.min.js">
+    </script>
+    <!--
+        script type="text/javascript"
+            src="https://cdn.jsdelivr.net/npm/brython@3.12.2/brython_stdlib.js">
+        </script
+    -->
+    <script type="text/python" src="https://raw.githubusercontent.com/manatlan/htag/main/brython/htag.txt" id="htag"></script>
+    <style>
+    html,body {
+        width:100%;
+        height:100%;
+        padding:0px;
+        margin:0px;
+    }
+    </style>
+    <script>
+    </script>
+</head>
+
+<body id="app">
+<script type="text/python">
+#############################################################################
+#############################################################################
+from browser import document,window,html
+from htag import Tag
+
+class HSplit(Tag.sl_split_panel):
+    statics = [
+        Tag.link(_rel="stylesheet",_href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.14.0/cdn/themes/light.css"),
+        Tag.script(_type="module",_src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.14.0/cdn/shoelace-autoloader.js"),
+    ]
+    def init(self,o1:Tag,o2:Tag,**a):
+        self["style"] = "width:100%;height:100%;"
+        o1["slot"]="start"
+        o2["slot"]="end"
+        self += o1+o2
+ 
+
+class Ed(Tag.div):
+    """ A class which embed the ace editor (python syntax) """
+    statics = [
+        Tag.script(_src="//cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ace.js"),
+        Tag.script(_src="//cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/mode-python.js"),
+        Tag.script(_src="//cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/theme-cobalt.js"),
+        Tag.script(_src="//cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ext-searchbox.js"),
+        Tag.script(_src="//cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ext-language_tools.js"),
+    ]
+        
+    def init(self,value,mode="python",onsave=None,**a):
+        self.id = id(self)
+        self.value = value
+        self["style"] = "width:100%;height:100%;"
+        self += value
+        self.onsave=onsave
+
+        def start(a):
+            self.ed=window.ace.edit(self.id)
+            self.ed.setTheme("ace/theme/cobalt");
+            self.ed.session.setMode( f"ace/mode/{mode}" );
+            self.ed.session.setUseWrapMode(False);
+            self.ed.setOptions({"fontSize": "12pt"});
+            self.ed.setBehavioursEnabled(False);
+            self.ed.session.setUseWorker(False);
+            self.ed.getSession().setUseSoftTabs(True);
+
+            def setShortcut(key, cb):
+                self.ed.commands.addCommand({
+                    "name": key,
+                    "bindKey": {"win": key,  "mac": key.replace("Ctrl","Command")},
+                    "readOnly": "True", # false if this command should not apply in readOnly mode
+                    "exec": cb
+                })
+        
+            setShortcut("Ctrl-S", self._save)
+            setShortcut("Ctrl-Enter",self._save)
+        
+        self.whenDefined( "window.ace", 0).then( start )
+
+    def _save(self,*a,**k):
+        value = self.ed.getValue()
+        self.value = value
+        if self.onsave: self.onsave(self)
+        
+############################################################################
+## example of use :
+############################################################################
+def generate(code):
+    h='<html><head><title>BrythEd</title><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></meta><skript type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.12.2/brython.min.js"></skript><skript type="text/python" src="https://raw.githubusercontent.com/manatlan/htag/main/brython/htag.txt" id="htag"></skript><style> html,body {width:100%;height:100%;padding:0px;margin:0px; }</style></head><body><skript type="text/python">'+code+'</skript></body></html>'
+    return h.replace("skript","script") #trick to bypass brython parser
+
+src = '''#press CTRL-S
+from browser import document,window
+from htag import Tag
+
+class MyTag(Tag.div):
+    statics = Tag.style("body {background:#333;color:white}")
+    def init(self,txt):
+        self <= txt
+        self <= Tag.button("hi", _onclick=self.click)
+    def click(self,ev):
+        self <= " world"
+        
+document.body <= MyTag("hello")
+'''
+
+def onsave(obj):
+    document["output"].clear()
+    iframe = Tag.iframe(_style="width:100%;height:100%")
+    document["output"] <= iframe
+    iframe.contentWindow.document.open();
+    iframe.contentWindow.document.write( generate(obj.value) );
+    iframe.contentWindow.document.close();    
+
+document["app"] <= HSplit( 
+    Ed(src, "python", onsave=onsave),
+    Tag.div(id="output",_style="width:100%;height:100%"),
+)
+
+
+############################################################################
+</script>
+
+</body>
+</html>
