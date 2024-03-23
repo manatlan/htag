@@ -17,7 +17,7 @@ class TAG:
             if self.statics:
                 def includer():
                     document.head <= self.statics
-                self.whenDefined("window.document",0).then( includer )
+                self.whenDefined("document",0).then( includer )
             
             # component creation
             constructor=getattr(self,"init")
