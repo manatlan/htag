@@ -6,7 +6,7 @@
 # In script/python add:
 #  from htag import Tag
 #----------------------------------------------------------------------------
-from browser import html,document
+from browser import html,document,window
 
 class TAG:
     def __init__(self,*args,**kargs):
