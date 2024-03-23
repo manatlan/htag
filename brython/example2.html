@@ -53,7 +53,7 @@ class Ed(Tag.div):
         def start(a):
             self.ed=window.ace.edit(self.id)
             self.ed.setTheme("ace/theme/cobalt");
-            self.ed.session.setMode(f"ace/mode/{mode}");
+            self.ed.session.setMode( "ace/mode/python" );
             self.ed.session.setUseWrapMode(False);
             self.ed.setOptions({"fontSize": "12pt"});
             self.ed.setBehavioursEnabled(False);
@@ -80,10 +80,14 @@ class Ed(Tag.div):
         self.value = value
         if self.onsave: self.onsave(self)
         
+############################################################################
+## example of use :
+############################################################################
+    
 def onsave(obj):
     window.alert(obj.value)
 
-document["app"] <= Ed("#press CTRL-S\nprint('hello')", "txt", onsave=onsave)
+document["app"] <= Ed("#press CTRL-S\nprint('hello')\n", "txt", onsave=onsave)
 
 ############################################################################
 </script>
