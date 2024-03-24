@@ -53,7 +53,8 @@ class HSplit(Tag.sl_split_panel):
         Tag.script(_type="module",_src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.14.0/cdn/shoelace-autoloader.js"),
     ]
     def init(self,o1:Tag,o2:Tag,**a):
-        self["style"] = "width:100%;height:100%;"
+        self["style"] = "width:100%;height:100%;--divider-width: 10px;"
+        self<= Tag.sl_icon(_slot="divider",_name="grip-vertical")
         o1["slot"]="start"
         o2["slot"]="end"
         self += o1+o2
@@ -126,7 +127,7 @@ def onsave(obj):
         document["output"] <= iframe
         iframe.contentWindow.document.open();
         iframe.contentWindow.document.write( generate(obj.value) );
-        iframe.contentWindow.document.close();    
+        iframe.contentWindow.document.close();  
         window.localStorage.setItem("bryted_src",obj.value)
 
 document["app"] <= HSplit( 
