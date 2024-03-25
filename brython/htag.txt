@@ -8,6 +8,37 @@
 #-------------------------------------------------------------------------------------------------------------------------------
 from browser import html,document,window
 
+
+def importStatics():
+    import __main__
+    if not document.hasOwnProperty("htagStaticsImported"):
+        all_statics={}
+        for k,v in __main__.__dict__.items():
+            if v!=TAG and issubclass(v,TAG):
+                liste = v.statics
+                if not (isinstance( v.statics, list) or isinstance( v.statics, tuple)):
+                    liste=[v.statics]
+                    
+                for i in liste:
+                    if isinstance(i,str):
+                        i=Tag.style(i)                    
+                    elif isinstance(i,bytes):
+                        i=Tag.script(i.decode())                    
+                    else:
+                        assert isinstance(i,TAG)
+                        
+                    computed_hash = hash(f"{i.tag} {i.attrs} {i.getInnerHTML()}")
+                    
+                    if i.attrs.get("src") or i.attrs.get("href"):
+                        i.setAttribute("htagNeedToLoadBeforeStart", True)
+                        i.onload = lambda ev: ev.target.removeAttribute("htagNeedToLoadBeforeStart")
+                    all_statics[ computed_hash ] = i
+            
+        document.head <= all_statics.values()
+        del all_statics
+        document.htagStaticsImported=True
+
+
 class TAG:
     statics=[]
 
@@ -15,16 +46,12 @@ class TAG:
         is_component=hasattr(self,"init")
         attrs,events,props=self.__exkargs__(kargs)
         if is_component:
-            
-            if self.statics:
-                def includer(o):
-                    document.head <= self.statics
-                self.whenDefined("document",0).then( includer )
+            importStatics()
             
             # component creation
             constructor=getattr(self,"init")
             
-            print(f"TAG COMPONENT '{self.__class__.__name__}({self.tag})' with: {attrs=} {events=} {props=}")
+            # print(f"TAG COMPONENT '{self.__class__.__name__}({self.tag})' with: {attrs=} {events=} {props=}")
             if attrs:
                 # it's "open tag" (accept redef) (it should got a 'init( ..., **a)' )
                 # (because it tries call with "_var")
@@ -33,14 +60,14 @@ class TAG:
                 for k,v in events.items():
                     self.bind(k,v)
                 
-                constructor(*args,**props,**kargs)  # to produce a typeerror if not "opened"
+                constructor(*args,**props,**kargs) # to produce a typeerror if not "opened"
             else:
                 # it's "closed tag" (refuse redef)
                 constructor(*args,**kargs)
 
         else:
             # simple creation
-            print(f"TAG SIMPLE '{self.tag}' with: {args=} {kargs=}")
+            #print(f"TAG SIMPLE '{self.tag}' with: {args=} {kargs=}")
             if len(args)>0:
                 content,*args = args
                 self <= content
@@ -76,6 +103,7 @@ class TAG:
     def __exit__(self, exc_type, exc_val, exc_tb):
         pass     
 
+    #DEPRECATED
     def whenDefined(self,obj_str,timeout) -> "promise":
         # https://codepen.io/eanbowman/pen/jxqKjJ
         start = window.Date.now()
@@ -91,7 +119,6 @@ class TAG:
         return window.Promise.new(waitObjectStr);
      
 
-
 class TagCreator(type):
     types={}
     def __getattr__(self, tagName:str):
@@ -106,4 +133,15 @@ class TagCreator(type):
         return x.replace("_","-")
 
 class Tag(metaclass=TagCreator):
-    pass
+
+    @staticmethod
+    def start( cb ):
+        importStatics()
+        def startWhenReady( cb ):
+            if document.querySelector("*[htagNeedToLoadBeforeStart]"):
+                window.setTimeout( lambda: startWhenReady(cb), 100 )
+            else:
+                cb()
+        startWhenReady(cb)
+
+        
