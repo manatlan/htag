@@ -90,5 +90,5 @@ It's a special, and useful, trick
 
 ## Examples
 - See [Example 1](https://raw.githack.com/manatlan/htag/main/brython/example1.html) (using [shoelace](https://shoelace.style/) web components)
-- See [Example 2](https://raw.githack.com/manatlan/htag/main/brython/example2.html) (using the "ace editor" as a Tag Component (usings statics & whenDefined method))
+- See [Example 2](https://raw.githack.com/manatlan/htag/main/brython/example2.html) (using the "ace editor" as a Tag Component (using statics and wait load))
 
