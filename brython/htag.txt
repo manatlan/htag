@@ -52,7 +52,7 @@ class TAG:
             constructor=getattr(self,"init")
             
             # print(f"TAG COMPONENT '{self.__class__.__name__}({self.tag})' with: {attrs=} {events=} {props=}")
-            if attrs:
+            if attrs or events:
                 # it's "open tag" (accept redef) (it should got a 'init( ..., **a)' )
                 # (because it tries call with "_var")
                 for k,v in attrs.items():
