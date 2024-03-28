@@ -27,7 +27,8 @@ def importStatics():
                     else:
                         assert isinstance(i,TAG)
                         
-                    computed_hash = hash(f"{i.tag} {i.attrs} {i.getInnerHTML()}")
+                    #computed_hash = hash(f"{i.tag} {i.attrs} {i.getInnerHTML()}")
+                    computed_hash = hash(f"{i.tag} {i.attrs} {i.innerHTML}")
                     
                     if i.attrs.get("src") or i.attrs.get("href"):
                         i.setAttribute("htagNeedToLoadBeforeStart", True)
