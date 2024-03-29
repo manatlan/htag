@@ -221,12 +221,6 @@ def onrecept(ed,ev):
             # put the source in editor
             ed.setValue(compo["src"])
         elif ev.data.htagshare_cmd=="back":
-            # if mode mobile : close the pane
-            # if "output" in document: 
-            #     onhelp()
-            # else:
-            #     if "outputmobile" in document: 
-            #         document["outputmobile"].remove()
             if "popup_server" in document: 
                 document["popup_server"].hide()
 
