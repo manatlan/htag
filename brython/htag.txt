@@ -136,7 +136,7 @@ class TagCreator(type):
 class Tag(metaclass=TagCreator):
 
     @staticmethod
-    def start( cb ):
+    def onload( cb ):
         importStatics()
         def startWhenReady( cb ):
             if document.querySelector("*[htagNeedToLoadBeforeStart]"):
