@@ -245,7 +245,8 @@ def main():
                     b=Tag.sl_button("> Enter <", _variant="success", _onclick=lambda ev: popup.hide())
                     help <= Tag.div(b,_style="text-align:center")
                     popup = showServer(help)
-        window.fetch("https://mlan.alwaysdata.net/api/htagshare").then( lambda req: req.text().then(verifAuthentified) )
+        cfg={"mode": 'cors',"credentials": 'include'}
+        window.fetch("https://mlan.alwaysdata.net/api/htagshare",cfg).then( lambda req: req.text().then(verifAuthentified) )
         ##################################################
         ed=Ed(window.localStorage.getItem("bryted_src") or SRC, onrun)
         ed.edit = None
