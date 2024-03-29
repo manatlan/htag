@@ -77,8 +77,8 @@ class Ed(Tag.div):
 ############################################################################
 ## example of use :
 ############################################################################
-@Tag.start    
-def start():   # will start when eveything is loaded (thanks @Tag.start)
+@Tag.onload    
+def main():   # will start when eveything is loaded (thanks @Tag.start)
     def onsave(obj):
         window.alert(obj.value)
     
