@@ -95,9 +95,14 @@ class TAG:
                 props[k]=v
         return (attrs,events,props)
 
+    #±++++++++++++++++++++
     def __iadd__(self,  elt):   # "+=" (like "<=")
         self <= elt
+        if hasattr(elt,"connected"):
+            connected=getattr(elt,"connected")
+            connected()
         return self
+    #++±++++++++++++++++++
         
     def __enter__(self): # so can use construction with 'with as:' statement
         return self
