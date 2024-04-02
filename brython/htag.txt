@@ -83,7 +83,7 @@ class TAG:
                     
                     return window.Promise.new(waitObjectStr)
     
-                waitConnected(1000).then( connected ) # 1sec for parent'ing
+                waitConnected(2000).then( lambda *a,**k: connected() ) # 2sec for parent'ing
         else:
             # simple creation
             #print(f"TAG SIMPLE '{self.tag}' with: {args=} {kargs=}")
