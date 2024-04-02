@@ -83,10 +83,13 @@ class HSplit(Tag.div):
 }        
         """),
     ]
-    def init(self,c1,c2,**a):
+    def init(self,*objs,**a):
         self["class"]="split"
-        self <= c1+c2
-        window.Split([c1,c2],dict(minSize=[100,100],sizes=[60,40],cursor='col-resize'))
+        self.childs=objs
+        self <= self.childs
+        
+    def connected(self):
+        window.Split(self.childs,dict(minSize=[100,100],sizes=[60,40]))
     
 
 class Ed(Tag.div):
@@ -98,8 +101,10 @@ class Ed(Tag.div):
     ]
     def init(self,src:str,onchange=None,**a):
         self["style"]="width:100%;height:100%"
-        mode="python"
-        
+        self.src=src
+        self.onchange=onchange
+
+    def connected(self):        
         CTRL_D=2082
         CTRL_Q=2095
         CTRL_S=2097
@@ -111,17 +116,17 @@ class Ed(Tag.div):
         ]);  
 
         self.ed = window.monaco.editor.create(self, {
-            "value": src,
-            "language": mode,
+            "value": self.src,
+            "language": "python",
             "minimap": { "enabled": False },
             "theme": "vs-dark",
             "fontSize": 14,
             "automaticLayout": True ,
         })
 
-        if onchange:
-            self.ed.addCommand(CTRL_S, lambda ed: onchange(self) )
-            self.ed.addCommand(CTRL_ENTER, lambda ed: onchange(self) )
+        if self.onchange:
+            self.ed.addCommand(CTRL_S, lambda ed: self.onchange(self) )
+            self.ed.addCommand(CTRL_ENTER, lambda ed: self.onchange(self) )
 
     def setValue(self, src:str) -> None:
         self.ed.setValue(src)
