@@ -66,6 +66,24 @@ class TAG:
                 # it's "closed tag" (refuse redef)
                 constructor(*args,**kargs)
 
+            if hasattr(self,"connected"):
+                connected=getattr(self,"connected")
+
+                def waitConnected( timeout ) -> "promise":
+                    # https://codepen.io/eanbowman/pen/jxqKjJ
+                    start = window.Date.now()
+                
+                    def waitObjectStr(resolve, reject):
+                        if self.parent != None:
+                            resolve(self.parent)
+                        elif timeout and (window.Date.now() - start) >= timeout:
+                            reject(window.Error.new(f"Error waitConnected: Timeout waiting for '{obj_str}' ;-("))
+                        else:
+                            window.setTimeout( lambda: waitObjectStr(resolve, reject) , 30 )
+                    
+                    return window.Promise.new(waitObjectStr)
+    
+                waitConnected(1000).then( connected ) # 1sec for parent'ing
         else:
             # simple creation
             #print(f"TAG SIMPLE '{self.tag}' with: {args=} {kargs=}")
@@ -95,35 +113,14 @@ class TAG:
                 props[k]=v
         return (attrs,events,props)
 
-    #±++++++++++++++++++++
     def __iadd__(self,  elt):   # "+=" (like "<=")
         self <= elt
-        if hasattr(elt,"connected"):
-            connected=getattr(elt,"connected")
-            connected()
         return self
-    #++±++++++++++++++++++
         
     def __enter__(self): # so can use construction with 'with as:' statement
         return self
     def __exit__(self, exc_type, exc_val, exc_tb):
         pass     
-
-    #DEPRECATED
-    def whenDefined(self,obj_str,timeout) -> "promise":
-        # https://codepen.io/eanbowman/pen/jxqKjJ
-        start = window.Date.now()
-    
-        def waitObjectStr(resolve, reject):
-            if window.eval(obj_str):
-                resolve(window.eval(obj_str))
-            elif timeout and (window.Date.now() - start) >= timeout:
-                reject(window.Error.new(f"Error: Timeout waiting for '{obj_str}' ;-("))
-            else:
-                window.setTimeout( lambda: waitObjectStr(resolve, reject) , 30)
-        
-        return window.Promise.new(waitObjectStr);
-     
 
 class TagCreator(type):
     types={}
