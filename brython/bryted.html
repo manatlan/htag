@@ -234,51 +234,49 @@ def onhelp():
 
 @Tag.onload
 def main():    
-    def go():
-        isMobile = window.innerWidth<600
-        ##################################################
-        def verifAuthentified(x):
-            if x.strip()!="1":
-                document["btnPublish"]["style"]="display:none"
-                if isMobile: 
-                    b=Tag.sl_button("> Enter <", _variant="success", _onclick=lambda ev: popup.hide())
-                    help <= Tag.div(b,_style="text-align:center")
-                    popup = showServer(help)
-        cfg={"mode": 'cors',"credentials": 'include'}
-        window.fetch("https://mlan.alwaysdata.net/api/htagshare",cfg).then( lambda req: req.text().then(verifAuthentified) )
-        ##################################################
-        ed=Ed(window.localStorage.getItem("bryted_src") or SRC, onrun)
-        ed.edit = None
-            
-        window.bind("message", lambda ev,ed=ed: onrecept(ed,ev))
+    isMobile = window.innerWidth<600
+    ##################################################
+    def verifAuthentified(x):
+        if x.strip()!="1":
+            document["btnPublish"]["style"]="display:none"
+            if isMobile: 
+                b=Tag.sl_button("> Enter <", _variant="success", _onclick=lambda ev: popup.hide())
+                help <= Tag.div(b,_style="text-align:center")
+                popup = showServer(help)
+    cfg={"mode": 'cors',"credentials": 'include'}
+    window.fetch("https://mlan.alwaysdata.net/api/htagshare",cfg).then( lambda req: req.text().then(verifAuthentified) )
+    ##################################################
+    ed=Ed(window.localStorage.getItem("bryted_src") or SRC, onrun)
+    ed.edit = None
         
-        with Tag.div() as menu:
-            menu+= Tag.sl_button("Run", _variant="success", _onclick=lambda ev: onrun(ed), _title="[Ctrl] + [Enter]",_class="btn")
-            menu+= Tag.sl_button("Publish new", _id="btnPublish", _variant="primary", _onclick=lambda ev: onpublish(ed), _class="btn")
-            menu+= Tag.sl_icon_button( _name="list", _onclick=lambda ev: onhelp(),_style="float:right;font-size: 1.5rem;")
-        
-        if isMobile:
-            document["app"] <= Tag.div([
-                menu,
-                Tag.div(
+    window.bind("message", lambda ev,ed=ed: onrecept(ed,ev))
+    
+    with Tag.div() as menu:
+        menu+= Tag.sl_button("Run", _variant="success", _onclick=lambda ev: onrun(ed), _title="[Ctrl] + [Enter]",_class="btn")
+        menu+= Tag.sl_button("Publish new", _id="btnPublish", _variant="primary", _onclick=lambda ev: onpublish(ed), _class="btn")
+        menu+= Tag.sl_icon_button( _name="list", _onclick=lambda ev: onhelp(),_style="float:right;font-size: 1.5rem;")
+    
+    if isMobile:
+        document["app"] <= Tag.div([
+            menu,
+            Tag.div(
+                ed,
+                _style="height:calc(100vh - 45px);overflow:hidden"
+            )
+        ],_style="display:flex;flex-flow:column nowrap;width:100%;height:100%;overflow:hidden")
+    else:
+        document["app"] <= Tag.div([
+            menu,
+            Tag.div(
+                HSplit( 
                     ed,
-                    _style="height:calc(100vh - 45px);overflow:hidden"
+                    Tag.div(help,id="output",_style="width:100%;height:100%"),
+                    _style="height:100%"
                 )
-            ],_style="display:flex;flex-flow:column nowrap;width:100%;height:100%;overflow:hidden")
-        else:
-            document["app"] <= Tag.div([
-                menu,
-                Tag.div(
-                    HSplit( 
-                        ed,
-                        Tag.div(help,id="output",_style="width:100%;height:100%"),
-                        _style="height:100%"
-                    )
-                    , _style="height:calc(100vh - 45px);overflow:hidden"
-                )
-            ],_style="display:flex;flex-flow:column nowrap;width:100%;height:100%;overflow:hidden")
-        
-    window.setTimeout(go,300 ) #NOT BEAUTIFUL AT ALL
+                , _style="height:calc(100vh - 45px);overflow:hidden"
+            )
+        ],_style="display:flex;flex-flow:column nowrap;width:100%;height:100%;overflow:hidden")
+    
 ############################################################################
 </script>
 
