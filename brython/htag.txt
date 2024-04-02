@@ -72,15 +72,15 @@ class TAG:
                     # https://codepen.io/eanbowman/pen/jxqKjJ
                     start = window.Date.now()
                 
-                    def waitObjectStr(resolve, reject):
+                    def waitParenting(resolve, reject):
                         if self.parent != None:
                             resolve()
                         elif timeout and (window.Date.now() - start) >= timeout:
                             reject(window.Error.new(f"Error waitConnected: Timeout waiting for '{obj_str}' ;-("))
                         else:
-                            window.setTimeout( lambda: waitObjectStr(resolve, reject) , 30 )
+                            window.setTimeout( lambda: waitParenting(resolve, reject) , 30 )
                     
-                    return window.Promise.new(waitObjectStr)
+                    return window.Promise.new(waitParenting)
     
                 waitConnected(2000).then( lambda *a,**k: self.connected() ) # 2sec for parent'ing
         else:
