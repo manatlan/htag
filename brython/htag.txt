@@ -75,7 +75,7 @@ class TAG:
                 
                     def waitObjectStr(resolve, reject):
                         if self.parent != None:
-                            resolve(self.parent)
+                            resolve()
                         elif timeout and (window.Date.now() - start) >= timeout:
                             reject(window.Error.new(f"Error waitConnected: Timeout waiting for '{obj_str}' ;-("))
                         else:
