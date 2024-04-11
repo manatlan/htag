@@ -8,9 +8,10 @@
 # #############################################################################
 
 from .tag import Tag,HTagException,expose
-from .runners import Runner
+#from .runners import Runner
 
 __version__ = "0.0.0" # auto-updated
 
-__all__= ["Tag","HTagException","expose","Runner"]
+#__all__= ["Tag","HTagException","expose","Runner"]
+__all__= ["Tag","HTagException","expose"]
 
