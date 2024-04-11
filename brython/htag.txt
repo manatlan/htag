@@ -1,13 +1,7 @@
 #-------------------------------------------------------------------------------------------------------------------------------
 # An "htag.Tag" implem for brython (see https://github.com/manatlan/htag/tree/main/brython)
 #-------------------------------------------------------------------------------------------------------------------------------
-# In html/head add:
-#     <script type="text/python" src="https://raw.githubusercontent.com/manatlan/htag/main/brython/htag.txt" id="htag"></script>
-# In script/python add:
-#     from htag import Tag
-#-------------------------------------------------------------------------------------------------------------------------------
 from browser import html,document,window
-
 
 def importStatics():
     import __main__
@@ -57,11 +51,19 @@ class TAG:
                 # it's "open tag" (accept redef) (it should got a 'init( ..., **a)' )
                 # (because it tries call with "_var")
                 for k,v in attrs.items():
-                    self.attrs[k]=v
+                    if isinstance(v,bool):
+                        if v: self.attrs[k]=""
+                    else:
+                        self.attrs[k]=v
                 for k,v in events.items():
                     self.bind(k,v)
                 
-                constructor(*args,**props,**kargs) # to produce a typeerror if not "opened"
+                kargs={k:v for k,v in kargs.items() if k not in props}
+                try:
+                    constructor(*args,**props,**kargs) # to produce a typeerror if not "opened"
+                except Exception as e:
+                    print(f"***ERROR*** {self.__class__.__name__} constructor:",e)
+                    raise e
             else:
                 # it's "closed tag" (refuse redef)
                 constructor(*args,**kargs)
@@ -91,7 +93,10 @@ class TAG:
                 self <= content
             
             for k,v in attrs.items():
-                self.attrs[k]=v
+                if isinstance(v,bool):
+                    if v: self.attrs[k]=""
+                else:
+                    self.attrs[k]=v
             for k,v in events.items():
                 self.bind(k,v)
             for k,v in props.items():
