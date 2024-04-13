@@ -6,4 +6,7 @@
 #
 # https://github.com/manatlan/htag
 # #############################################################################
-from htagui import *
+try:
+  from htagui.basics import *  # htagui>=0.3
+except ImportError:
+  from htagui import *  # htagui<0.3
