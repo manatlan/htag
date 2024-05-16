@@ -212,15 +212,53 @@ window.error=function(txt) {
 class ServerWS(MyServer):
     
     jsinteract = """
+function connectWebSocket(url, timeout) {
+    timeout = timeout || 2000;
+    return new Promise(function(resolve, reject) {
+        const socket = new WebSocket(url);
+
+        const timer = setTimeout(function() {
+            reject(new Error("webSocket timeout"));
+            done();
+            socket.close();
+        }, timeout);
+
+        function done() {
+            clearTimeout(timer);
+            socket.removeEventListener('error', error);
+        }
+
+        function error(e) {
+            reject(e);
+            done();
+        }
+
+        socket.addEventListener('open', function() {
+            resolve(socket);
+            done();
+        });
+        socket.addEventListener('error', error);
+    });
+}
+    
 async function interact( o ) {
-    ws.send( JSON.stringify(o) );
+    WS.send( JSON.stringify(o) );
 }
 
-var ws = new WebSocket("ws://"+document.location.host+"%s");
-ws.onopen = start;
-ws.onmessage = function(e) {
-    action( e.data );
-};
+var WS=null;
+let _url = document.location.host+"%s";
+
+function _ws_conected(socket) {
+    console.info("WS connected:",socket.url);
+    WS=socket;
+    WS.onmessage = function(e) {
+        action( e.data );
+    };
+    start();
+}
+connectWebSocket("ws://"+_url,500).then(_ws_conected).catch(function(err) {
+    connectWebSocket("wss://"+_url,2000).then(_ws_conected);
+});
 """    
     
     def run(self):
