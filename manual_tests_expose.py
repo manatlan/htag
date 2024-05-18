@@ -15,7 +15,7 @@ class App(Tag.div):
         #~ self+=Tag.button("test",_onclick='self.python(5,"x")')
 
         # ^^ REPLACE something like that ^^
-        self+=Tag.button("test3",_onclick='self.python(6,"[3]")')
+        self+=Tag.button("test3",_onclick='this.parentNode.python(6,"[3]")')
 
     @expose # only needed for button 'test3'
     def python(self,nb,data):
