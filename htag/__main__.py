@@ -44,7 +44,7 @@ If a [file] is given: it will try to run it (using dev mode),
 else it will create an empty htag file. The options are just here for the run mode.
 """,
     )
-    parser.add_argument('file', nargs='?', help="if present, the htag'file will be runned (reload/debug mode)")
+    parser.add_argument('file', nargs='?', help="if present, the htag'file will be runned (in dev mode)")
     parser.add_argument('--host', help='Host listener (default: 127.0.0.1)', default="127.0.0.1")
     parser.add_argument('--port', help='Port number (default: 8000)', default="8000")
     parser.add_argument('--gui', help="Automatically open interface in a browser (default!)",action=argparse.BooleanOptionalAction, default=True)
