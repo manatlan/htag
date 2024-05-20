@@ -34,6 +34,34 @@ if __name__ == "__main__":
 
 import argparse
 
+class BooleanOptionalAction(argparse.Action):
+    def __init__(self, option_strings, dest, default=None, required=False, help=None, **kwargs):
+        # Créer les options avec et sans 'no'
+        _option_strings = []
+        for option_string in option_strings:
+            _option_strings.append(option_string)
+            if option_string.startswith('--'):
+                _option_strings.append(option_string.replace('--', '--no-'))
+        
+        super(BooleanOptionalAction, self).__init__(
+            option_strings=_option_strings,
+            dest=dest,
+            nargs=0,
+            const=None,
+            default=default,
+            required=required,
+            help=help,
+            **kwargs
+        )
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        if option_string.startswith('--no-'):
+            setattr(namespace, self.dest, False)
+        else:
+            setattr(namespace, self.dest, True)
+    
+    def format_help(self):
+        return f"{', '.join(self.option_strings)}: {self.help} (default: {self.default})"
 
 if __name__=="__main__":
 
@@ -47,8 +75,8 @@ else it will create an empty htag file named 'main.py' in current path. Options 
     parser.add_argument('file', nargs='?', help="if present, the htag'file will be runned (in dev mode)")
     parser.add_argument('--host', help='Host listener [default: 127.0.0.1]', default="127.0.0.1")
     parser.add_argument('--port', help='Port number [default: 8000]', default="8000")
-    parser.add_argument('--gui', help="Automatically open interface in a browser [default]",action=argparse.BooleanOptionalAction, default=True)
-    parser.add_argument('--dev', help="Run in dev mode (reload+debug) [default]",action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument('--gui', help="Automatically open interface in a browser [default]",action=BooleanOptionalAction, default=True)
+    parser.add_argument('--dev', help="Run in dev mode (reload+debug) [default]",action=BooleanOptionalAction, default=True)
     args = parser.parse_args()
     if args.file:
         ##########################################################################
