@@ -35,6 +35,7 @@ if __name__ == "__main__":
 import argparse
 
 class BooleanOptionalAction(argparse.Action):
+    """ only here for compatibility with py < 3.9 """
     def __init__(self, option_strings, dest, default=None, required=False, help=None, **kwargs):
         # Créer les options avec et sans 'no'
         _option_strings = []
