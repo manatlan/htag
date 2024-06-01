@@ -644,21 +644,21 @@ class TagState:
         self._tag = tag
         self._fqn = tag.__class__.__module__+"."+tag.__class__.__qualname__
 
-        if self._tag.session:
-            self._data=self._tag.session
+        if self._tag.session is None:
+            self._current_session={}
         else:
-            self._data={}
+            self._current_session=self._tag.session
 
     def _load(self):
-        return self._data.get(self._fqn,{})
+        return self._current_session.get(self._fqn,{})
     
     def _save(self,d):
         """force to save state in session"""
         if len(d)>0:
-            self._data[self._fqn]=d
+            self._current_session[self._fqn]=d
         else:
-            if self._fqn in self._data:
-                del self._data[self._fqn]
+            if self._fqn in self._current_session:
+                del self._current_session[self._fqn]
 
     # read methods
     #--------------------------------
@@ -712,4 +712,4 @@ class TagState:
         return dict( self._load() )
 
 # declare a var that contains the list (set) of all reserved tag's keywords
-TAG_KEYWORDS = set( ["init"] + dir(Tag()) )
+TAG_KEYWORDS = set( ["init"] + dir(Tag))
