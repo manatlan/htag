@@ -47,7 +47,7 @@ Well tested:
 
 ## ROADMAP to 1.0.0
 
- * tests tests
+ * Some news 12/10/2024 : the 1.0 will come, because I mainly use it: without troubles/new_ideas : it works as expected. Perhaps some refactoring and polish : but features are here.
  * the "0.100.x" version introduce a "new event mechanism" ("ev") : need to find a solution if it will be mandatory for 1.0.0 (don't know yet), to not break my (more than) 200 apps ;-) ... currently both are available (depending of the parameter name)
  * the "0.90.x" version is important, because all previous runners (using starlette/uvicorn/tornado) are gone, and are simulated/faked with a new [Runner](https://manatlan.github.io/htag/runner) ! So compatibility shouldn't be breaked with htag <0.90 ! But they will be removed in 1.0.
  * polish the new Runner [Runner](https://manatlan.github.io/htag/runner) and docs !
