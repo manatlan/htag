@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width,initial-scale=1" />
+      <title>Test htag</title>
+      <link rel="stylesheet" href="https://pyscript.net/releases/2024.10.2/core.css">
+      <script type="module" src="https://pyscript.net/releases/2024.10.2/core.js"></script>
+  </head>
+  <body>
+   loading...
+    <script type="py" config='{"packages":["htag"]}'>
+###############################################################################
+    
+from htag import Tag
+
+class AComponent(Tag.div):
+    def init(self,txt):
+        self <= txt
+
+class Main(Tag.body):
+    statics = Tag.title("My Title")
+
+    def init(self):
+        self <= AComponent("htag demo in pyscript (2024.10.2)")
+        self <= Tag.button("add content",_onclick= self.test )
+        self <= Tag.button("js alert box",_onclick="alert(42)")
+
+    def test(self,ev):
+        self <= Tag.li("hello from pyscript")
+
+###############################################################################
+from htag.runners import PyScript
+from js import window
+
+PyScript( Main  ).run( window )
+    
+  </script>
+  </body>
+</html>
