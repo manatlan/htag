@@ -20,7 +20,7 @@ class PyScript:
         assert issubclass(tagClass,Tag)
         self.tagClass=tagClass
 
-    def run(self,window=None): # window: "pyscript js.window"
+    def run(self,window=None): # **DEPRECATED** window: "pyscript js.window"
         if window is None:
             try:
                 from js import window # this import should work in pyscript context ;-)
