@@ -1,19 +1,62 @@
-# -*- coding: utf-8 -*-
-# # #############################################################################
-# Copyright (C) 2022 manatlan manatlan[at]gmail(dot)com
-#
-# MIT licence
-#
-# https://github.com/manatlan/htag
-# #############################################################################
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.10.2/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.10.2/core.js"></script>
 
-from .. import Tag
-from ..render import HRenderer
-from . import commons
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--
+    set `script[@type='py']` with :
+
+        config='{"packages":["htag"]}'                                   # runned as local file (using pypi htag latest)
+        config='{"packages":["./dist/htag-0.0.0-py3-none-any.whl"]}'     # runned thru a webserver(*) (using local whl from webserver)
+
+    (*) This thing is complex to test/develop (need to use a local wheel, thru a webserver), you'll need to do :
+     - poetry build                                              # to produce dist/htag-0.0.0-py3-none-any.whl
+     - python3 -m http.server 8001
+     - chrome http://localhost:8001/_pyscript_dev2_.html
+    -->
+</head>
+
+<body> loading (recent/2024) pyscript ;-)
+
+<!--script type="py" config='{"packages":["htag"]}'-->
+<script type="py" config='{"packages":["./dist/htag-0.0.0-py3-none-any.whl"]}'>
+
+from htag import Tag
+import asyncio,time
+
+class App(Tag.body):
+    statics="body {background:#EEE;}"
+
+    def init(self):
+        self.place = Tag.div()
+
+        asyncio.ensure_future( self.loop_timer() )
+
+        self += "Hello World" + self.place
+        self+= Tag.button("yo",_onclick=self.doit)
+
+    async def doit(self,o):
+        self+="x"
+
+    async def loop_timer(self):
+        while self.place:
+            self.place.clear(time.time() )
+            await self.place.update()       # !!! update component (with tag.update() ) !!!
+            await asyncio.sleep(0.5)
+
+
+###############################################################################
+## here is the htag.runner.pyscript file (easier to modify in place)
+## should be the same as "htag.runner.pyscript.py"
+###############################################################################
+from htag.render import HRenderer
+from htag.runners import commons
 
 import json
 
-class PyScript:
+class PyScript2:
 
     def __init__(self,tagClass:type):
         #TODO: __init__ could accept a 'file' parameter based on localstorage to make persistent session !
@@ -75,3 +118,14 @@ function pyscript_starter() {
     async def updateactions(self, actions:dict):
         self.window.action( json.dumps(actions) )   # send action as json (not a js(py) object) ;-(
         return True
+
+###############################################################################
+# the runner part
+###############################################################################
+#from htag.runners import PyScript
+
+PyScript2( App ).run()  # use local one
+
+</script>
+</body>
+</html>
