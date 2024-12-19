@@ -47,28 +47,24 @@ def run(App,runner:str,openBrowser=True,port=8000):
         content = """<!DOCTYPE html>
 <html>
 <head>
-    <style>py-script,py-config {display: none}</style>
-    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.10.2/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.10.2/core.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <py-config>
-    packages = ["./dist/htag-0.0.0-py3-none-any.whl"]
-    </py-config>
 </head>
 
 <body> Starting pyscript ;-)
 
-<py-script>
+<script type="py" config='{"packages":["./dist/htag-0.0.0-py3-none-any.whl"]}'>
 ###############################################################################
 
 %s
 
 ###############################################################################
 from htag.runners import PyScript
-from js import window
 
-PyScript( App  ).run( window )
+PyScript( App  ).run()
 
-</py-script>
+</script>
 </body>
 </html>"""
 
