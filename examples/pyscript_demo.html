@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
-    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <py-config>packages = ["htag>=0.90.0"]</py-config>    
-</head>
-
-<body> Loading DEMO ;-)
-
-<py-script>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>Test htag</title>
+        <link rel="stylesheet" href="https://pyscript.net/releases/2024.10.2/core.css">
+        <script type="module" src="https://pyscript.net/releases/2024.10.2/core.js"></script>
+    </head>
+    <body>
+     loading...
+      <script type="py" config='{"packages":["htag"]}'>
 ###############################################################################
 from htag import Tag
 import urllib.parse
@@ -262,10 +262,9 @@ a.click();
 App=HTDemo
 ###############################################################################
 from htag.runners import PyScript
-from js import window
 
-PyScript( HTDemo ).run( window )
+PyScript( HTDemo ).run( )
 
-</py-script>
+</script>
 </body>
 </html>
