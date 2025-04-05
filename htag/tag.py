@@ -9,6 +9,7 @@
 import html,json
 import hashlib
 import logging,types,asyncio
+from types import NoneType
 import weakref
 import inspect
 from collections import namedtuple
@@ -484,6 +485,25 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
             value = Caller( self, value, (), {})
             value.assignEventOnTag( self, attr )
             logger.info("Assign event '%s' (simple callback) on %s" % (attr,repr(self)))
+        #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+        #/\ try something new (multiple callbacks as a list)
+        #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+        elif (isinstance(value,list) or isinstance(value,tuple)) and all([ type(caller) in [types.FunctionType,types.MethodType,NoneType] for caller in value ]):
+            value_list = value
+            value=None
+            for caller in value_list:
+                if value is not None:
+                    # auto-chain them
+                    value.bind( caller )
+                else:
+                    if caller is not None:
+                        value = Caller( self, caller, (), {})
+            if value:
+                value.assignEventOnTag( self, attr )
+                logger.info("Assign multiple events '%s' (simples callback) on %s" % (attr,repr(self)))
+        #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+        #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+        #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
         elif isinstance(value,Caller):
             value.assignEventOnTag( self, attr )
             logger.info("Assign event '%s' (handled) on %s" % (attr,repr(value.instance)))

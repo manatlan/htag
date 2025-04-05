@@ -81,6 +81,9 @@ def test_multiple_binded_himself_callback():
     assert caller._others==[ (action2,(),{})]
 
 
+
+
+
 def test_binded_concatenate_strings(): #TODO: need more tests
     def action1(o):
         pass
@@ -338,6 +341,27 @@ def test_on_event():
     assert asyncio.run( test(3) ) ==["hello"]
 
 
+def test_list_of_callers(): #TODO: need more tests
+    def action(obj):   # classic generator
+        assert isinstance(obj,Tag) and obj.tag=="button"
+        yield "hello"    
+
+    def action2(o):
+        o.iwashere = "world"   
+
+    async def test():
+        evt = s["onclick"]._assigned
+        return [i async for i in s.__on__( evt )]
+
+    s=Tag.button("hello", _onclick = action)
+    assert asyncio.run( test() ) == ["hello"]
+    s=Tag.button("hello", _onclick = [action])  # exactly the same as ^^
+    assert asyncio.run( test() ) == ["hello"]
+
+    s=Tag.button("hello", _onclick = [None,action,None,action,action2])
+    assert asyncio.run( test() ) == ["hello","hello"]
+    assert s.iwashere == "world"
+
 def test_auto_expose():
     class Jo(Tag.div):
         def init(self):
@@ -378,4 +402,5 @@ if __name__=="__main__":
     # test_ko()
     # test_try_to_bind_on_tagbase()
     # test_binded_concatenate_strings()
-    test_auto_expose()
+    # test_auto_expose()
+    test_list_of_callers()

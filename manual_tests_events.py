@@ -37,10 +37,16 @@ class Page(Tag.body):
         self <= "<hr>"
 
         # NEW MECHANISM
-        self <= Tag.button( "externe", _onclick=nimp )
+        self <= Tag.button( "externe (look in console)", _onclick=nimp )
         self <= Tag.button( "lambda", _onclick=lambda o: ffw(o,"lambda") )
+        #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+        #/\ try something new (multiple callbacks as a list)
+        #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+        self <= Tag.button( "**NEW**", _onclick=[ff,self.mm,lambda o: ffw(o,"KIKI")] )
+        #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
         self <= Tag.button( "ff", _onclick=ff )
         self <= Tag.button( "mm", _onclick=self.mm )
+
         self <= Tag.button( "ymm", _onclick=self.ymm )
         self <= Tag.button( "amm", _onclick=self.amm )
         self <= Tag.button( "aymm", _onclick=self.aymm )
