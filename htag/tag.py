@@ -9,7 +9,6 @@
 import html,json
 import hashlib
 import logging,types,asyncio
-from types import NoneType
 import weakref
 import inspect
 from collections import namedtuple
@@ -488,7 +487,7 @@ class Tag(metaclass=TagCreator): # custom tag (to inherit)
         #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
         #/\ try something new (multiple callbacks as a list)
         #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-        elif (isinstance(value,list) or isinstance(value,tuple)) and all([ type(caller) in [types.FunctionType,types.MethodType,NoneType] for caller in value ]):
+        elif (isinstance(value,list) or isinstance(value,tuple)) and all([ type(caller) in [types.FunctionType,types.MethodType,type(None)] for caller in value ]):
             value_list = value
             value=None
             for caller in value_list:
