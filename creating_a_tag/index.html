@@ -1,0 +1,629 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="GUI toolkit for building GUI toolikit (for building applications for desktop, web, and mobile from a single python3 codebase)">
+      
+      
+      
+      
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.17">
+    
+    
+      
+        <title>Creating a Tag : the complete guide - HTag's Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.bcfcd587.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="black">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#creating-a-tag-the-complete-guide" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="HTag&#39;s Docs" class="md-header__button md-logo" aria-label="HTag's Docs" data-md-component="logo">
+      
+  <img src="../htag.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            HTag's Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Creating a Tag : the complete guide
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/manatlan/htag" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    manatlan/htag
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="HTag&#39;s Docs" class="md-nav__button md-logo" aria-label="HTag's Docs" data-md-component="logo">
+      
+  <img src="../htag.png" alt="logo">
+
+    </a>
+    HTag's Docs
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/manatlan/htag" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    manatlan/htag
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorial/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Tutorial
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../concepts/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Concepts
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../runners/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Runners
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-basics" class="md-nav__link">
+    <span class="md-ellipsis">
+      The basics
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The basics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#at-construction-time" class="md-nav__link">
+    <span class="md-ellipsis">
+      At construction time
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-construction-time" class="md-nav__link">
+    <span class="md-ellipsis">
+      Post construction time
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#irl-in-a-runner-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      IRL (in A Runner Context)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#inherit-a-tag" class="md-nav__link">
+    <span class="md-ellipsis">
+      Inherit a Tag
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-a-dynamic-tag-using-a-renderself-method" class="md-nav__link">
+    <span class="md-ellipsis">
+      Create a dynamic tag (using a render(self) method)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating-a-placeholder-tag" class="md-nav__link">
+    <span class="md-ellipsis">
+      Creating a "PlaceHolder" Tag
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating-a-tag-generatior-yielding-content" class="md-nav__link">
+    <span class="md-ellipsis">
+      Creating a Tag generatior (yield'ing content)
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="creating-a-tag-the-complete-guide">Creating a Tag : the complete guide</h1>
+<p>If you come from <a href="https://github.com/byteface/domonic">domonic</a> or <a href="https://brython.info/static_doc/fr/create.html">brython</a> : htag borrows the best ideas from them.</p>
+<h2 id="the-basics">The basics</h2>
+<h3 id="at-construction-time">At construction time</h3>
+<p>A Tag (htag's Tag) is a helper to let you build easily html representation of an object.</p>
+<p>The signature of the helper could be: <code>Tag.&lt;html&gt;( &lt;content_or_None&gt;, **attrs ) -&gt; htag instance</code>
+ * Where <code>&lt;html&gt;</code> can be "div","span","input", .. or whatever you want (it will be the html tag representation)
+ * Where <code>&lt;content_or_None&gt;</code> can be None or whatever which is str'able (list are accepted too)
+ * Where <code>attrs</code> can be any attributs to specialize the creation (see later)</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span> <span class="nn">htag</span> <span class="kn">import</span> <span class="n">Tag</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nb">print</span><span class="p">(</span> <span class="n">Tag</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="s2">&quot;hello world&quot;</span><span class="p">)</span> <span class="p">)</span>
+</code></pre></div>
+Will generate <code>&lt;div&gt;hello world&lt;/div&gt;</code> ... easy ;-)</p>
+<p>If you want to set html attributs, prefix them with '_'</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">print</span><span class="p">(</span> <span class="n">Tag</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="s2">&quot;hello world&quot;</span><span class="p">,</span> <span class="n">_style</span><span class="o">=</span><span class="s2">&quot;background:yellow&quot;</span><span class="p">)</span> <span class="p">)</span>
+</code></pre></div>
+Will generate <code>&lt;div style="background:yellow"&gt;hello world&lt;/div&gt;</code> ;-)</p>
+<p>It will work for every kind of html attributs, and events too</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">print</span><span class="p">(</span> <span class="n">Tag</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="s2">&quot;hello world&quot;</span><span class="p">,</span> <span class="n">_onclick</span><span class="o">=</span><span class="s2">&quot;alert(42)&quot;</span><span class="p">)</span> <span class="p">)</span>
+</code></pre></div>
+Will generate <code>&lt;div onclick="alert(42)"&gt;hello world&lt;/div&gt;</code> ;-)</p>
+<p>You can construct whatever tag you want ...</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nb">print</span><span class="p">(</span> <span class="n">Tag</span><span class="o">.</span><span class="n">my_tag</span><span class="p">(</span><span class="s2">&quot;hello world&quot;</span><span class="p">,</span> <span class="n">_class</span><span class="o">=</span><span class="s2">&quot;mine&quot;</span><span class="p">)</span> <span class="p">)</span>
+</code></pre></div>
+Will generate <code>&lt;my-tag class="mine"&gt;hello world&lt;/my-tag&gt;</code> (notice that the <code>_</code> is replaced by <code>-</code> ;-)</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nb">print</span><span class="p">(</span> <span class="n">Tag</span><span class="o">.</span><span class="n">span</span><span class="p">(</span><span class="s2">&quot;hello world&quot;</span><span class="p">,</span> <span class="n">_val</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">_checked</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="p">)</span>
+</code></pre></div>
+Will generate <code>&lt;span val="12" checked&gt;hello world&lt;/span&gt;</code> !</p>
+<p>It's simple ;-)</p>
+<p>But you can init some instance properties at construction time ...
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="o">.</span><span class="n">span</span><span class="p">(</span><span class="s2">&quot;hello world&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">_value</span><span class="o">=</span><span class="mi">42</span> <span class="p">)</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nb">print</span><span class="p">(</span> <span class="n">tag</span> <span class="p">)</span>
+</code></pre></div>
+Will generate <code>&lt;span value="42"&gt;hello world&lt;/span&gt;</code>, but the instance var (here <code>tag</code>) will contain 12 ( tag.value==12 ) !
+So <code>_value</code> is an html attribut ... whereas <code>value</code> is an instance property (on python side only). It's important to understand the difference.</p>
+<p>Take a break, and medit on that ;-)</p>
+<p>You can compose tags ...
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">Tag</span><span class="o">.</span><span class="n">div</span><span class="p">(</span> <span class="n">Tag</span><span class="o">.</span><span class="n">span</span><span class="p">(</span><span class="s2">&quot;hello&quot;</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot; &quot;</span><span class="o">+</span><span class="n">Tag</span><span class="o">.</span><span class="n">b</span><span class="p">(</span><span class="s2">&quot;world&quot;</span><span class="p">)</span> <span class="p">)</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="c1"># or</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">Tag</span><span class="o">.</span><span class="n">div</span><span class="p">(</span> <span class="p">[</span><span class="n">Tag</span><span class="o">.</span><span class="n">span</span><span class="p">(</span><span class="s2">&quot;hello&quot;</span><span class="p">),</span><span class="s2">&quot; &quot;</span><span class="p">,</span><span class="n">Tag</span><span class="o">.</span><span class="n">b</span><span class="p">(</span><span class="s2">&quot;world&quot;</span><span class="p">)]</span> <span class="p">)</span>
+</code></pre></div>
+it's basically the same thing ^^</p>
+<h3 id="post-construction-time">Post construction time</h3>
+<p>all this variables are usable/settable post construction time.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="o">.</span><span class="n">span</span><span class="p">(</span><span class="s2">&quot;hello world&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">_value</span><span class="o">=</span><span class="mi">42</span> <span class="p">)</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">assert</span> <span class="n">tag</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span><span class="o">==</span><span class="mi">42</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="k">assert</span> <span class="n">tag</span><span class="o">.</span><span class="n">value</span><span class="o">==</span><span class="mi">12</span>
+</code></pre></div>
+html attributs are in the dictitem of the tag ! Whereas the instance properties are in the instance ;-)</p>
+<p>So you can do that:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="o">.</span><span class="n">a</span><span class="p">(</span><span class="s2">&quot;hello world&quot;</span><span class="p">)</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">tag</span><span class="p">[</span><span class="s2">&quot;onclick&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;alert(42)&quot;</span>
+</code></pre></div>
+And you can compose them like that :</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">div</span><span class="o">=</span><span class="n">Tag</span><span class="o">.</span><span class="n">div</span><span class="p">()</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">div</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">Tag</span><span class="o">.</span><span class="n">span</span><span class="p">(</span><span class="s2">&quot;hello&quot;</span><span class="p">)</span> <span class="p">)</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">div</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="s2">&quot; &quot;</span> <span class="p">)</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="n">div</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">Tag</span><span class="o">.</span><span class="n">b</span><span class="p">(</span><span class="s2">&quot;world&quot;</span><span class="p">)</span> <span class="p">)</span>
+</code></pre></div>
+<p>but there are operators (<code>+=</code> (prefer) or <code>&lt;=</code> (brython style)), to simplify that :
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">div</span> <span class="o">=</span> <span class="n">Tag</span><span class="o">.</span><span class="n">div</span><span class="p">()</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">div</span> <span class="o">+=</span> <span class="n">Tag</span><span class="o">.</span><span class="n">span</span><span class="p">(</span><span class="s2">&quot;hello&quot;</span><span class="p">)</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="n">div</span> <span class="o">+=</span> <span class="s2">&quot; &quot;</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="n">div</span> <span class="o">+=</span> <span class="n">Tag</span><span class="o">.</span><span class="n">b</span><span class="p">(</span><span class="s2">&quot;world&quot;</span><span class="p">)</span>
+</code></pre></div></p>
+<p>easy, no ?</p>
+<p>BTW, you can use the <code>with/as</code> statement, like that (since htag&gt;=0.13):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">with</span> <span class="n">Tag</span><span class="o">.</span><span class="n">div</span><span class="p">()</span> <span class="k">as</span> <span class="n">t</span><span class="p">:</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>    <span class="n">t</span> <span class="o">+=</span> <span class="n">Tag</span><span class="o">.</span><span class="n">span</span><span class="p">(</span><span class="s2">&quot;hello&quot;</span><span class="p">)</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>    <span class="n">t</span> <span class="o">+=</span> <span class="s2">&quot; &quot;</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>    <span class="n">t</span> <span class="o">+=</span> <span class="n">Tag</span><span class="o">.</span><span class="n">b</span><span class="p">(</span><span class="s2">&quot;world&quot;</span><span class="p">)</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>    <span class="n">t</span><span class="p">[</span><span class="s2">&quot;style&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;background:#EEE&quot;</span>
+</code></pre></div>
+<h3 id="irl-in-a-runner-context">IRL (in A Runner Context)</h3>
+<p>An important thing to understand, is that a Tag renders differently when used in a runner (TODO:LINK).
+AS you see before, the tags are rendered without attributs 'id'. But, IRL, when using in a htag runner context, all tags are rendered with an html id attribut (it's the main reason why you can't set an <code>_id</code> at runtime !). Htag's runner manage all the tags, with theirs ids: it's the core feature, to be able to keep states/rendering between the gui/client_side and the back/python ;-)</p>
+<p>When used in a Runner Context, some specials properties are setted on a Tag.
+ * <code>root</code> : Contains the instance of the main tag (AKA the one drived by the HTag's Runner)
+ * <code>parent</code> : Contains the instance of the parent tag (AKA the one which had added it)</p>
+<p>The <code>root</code> is very usefull, to refer global properties/methods from a single place. The <code>parent</code> can be usefull in complex components which involve other tree components.</p>
+<p>But <strong>BE AWARE</strong> : theses properties are only setted at rendering time ! Not a construction time : in others terms -&gt; you can't use them in a construction phase ! It really important to understand that!</p>
+<h3 id="inherit-a-tag">Inherit a Tag</h3>
+<p>It's really the main goal of htag : be able to create feature rich components in python style, to be reusable in others apps.</p>
+<p>here is a simple div construction:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">Tag</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="s1">&#39;hello&#39;</span><span class="p">,</span><span class="n">_style</span><span class="o">=</span><span class="s2">&quot;background:red&quot;</span><span class="p">)</span>
+</code></pre></div></p>
+<p>Here is the same, using inheritance (to create a <code>Div</code> class) :</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">class</span> <span class="nc">Div</span><span class="p">(</span><span class="n">Tag</span><span class="o">.</span><span class="n">div</span><span class="p">):</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>        <span class="bp">self</span> <span class="o">+=</span> <span class="s2">&quot;hello&quot;</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;style&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;background:red&quot;</span>
+</code></pre></div>
+Both rendering exactly the same kind of result.</p>
+<p>Here, you will notice that it uses a special constructor (<code>init</code>) in place of the real python constructor (<code>__init__</code>). It's just to simplify the process. If you want to use the real python constructor, you can do (but it's longer):</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">class</span> <span class="nc">Div</span><span class="p">(</span><span class="n">Tag</span><span class="o">.</span><span class="n">div</span><span class="p">):</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>        <span class="bp">self</span> <span class="o">+=</span> <span class="s2">&quot;Hello world&quot;</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;style&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;background:red&quot;</span>
+</code></pre></div>
+It produces exactly the same kind of result.</p>
+<p>Now, when you want to use your new component, it's as simple as always :</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="k">class</span> <span class="nc">App</span><span class="p">(</span><span class="n">Tag</span><span class="o">.</span><span class="n">body</span><span class="p">):</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>        <span class="bp">self</span> <span class="o">+=</span> <span class="n">Div</span><span class="p">()</span>
+</code></pre></div>
+<p>Now, an important thing to understand : this component 'Div' is said "closed", because you can't specialize it (with html attributs, or instance properties) at construction time.
+You can't reuse it like that:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">class</span> <span class="nc">App</span><span class="p">(</span><span class="n">Tag</span><span class="o">.</span><span class="n">body</span><span class="p">):</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>        <span class="bp">self</span> <span class="o">+=</span> <span class="n">Div</span><span class="p">(</span><span class="n">_class</span><span class="o">=</span><span class="s2">&quot;myclass&quot;</span><span class="p">)</span>   <span class="c1"># will throw an exception (because it&#39;s closed)</span>
+</code></pre></div>
+<p>Because 'Div' doens't accept something in its constructor. So we say that it's "closed".</p>
+<p>If you wanted to make you component "opened" (by opposite : to accept html attributs, or instance properties), you should declare it like that :
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="k">class</span> <span class="nc">Div</span><span class="p">(</span><span class="n">Tag</span><span class="o">.</span><span class="n">div</span><span class="p">):</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">**</span><span class="n">a</span><span class="p">):</span>     <span class="c1"># notice the &#39;**a&#39; !</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>        <span class="bp">self</span> <span class="o">+=</span> <span class="s2">&quot;hello&quot;</span>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;style&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;background:red&quot;</span>
+</code></pre></div></p>
+<p>With classical python constructor it should be :
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">class</span> <span class="nc">Div</span><span class="p">(</span><span class="n">Tag</span><span class="o">.</span><span class="n">div</span><span class="p">):</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">a</span><span class="p">):</span>  <span class="c1"># notice the &#39;**a&#39; !</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">a</span><span class="p">)</span> <span class="c1"># notice the &#39;**a&#39; !</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>        <span class="bp">self</span> <span class="o">+=</span> <span class="s2">&quot;Hello world&quot;</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;style&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;background:red&quot;</span>
+</code></pre></div></p>
+<p>It's good practice, to create its components in a "opened" way (to be able to customized them later). But sometimes, it makes sense to refuse customization.</p>
+<p>BTW, keep in mind, that in all cases ("opened" or "closed"), you can customize them after creation.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">class</span> <span class="nc">App</span><span class="p">(</span><span class="n">Tag</span><span class="o">.</span><span class="n">body</span><span class="p">):</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>        <span class="n">div</span><span class="o">=</span><span class="n">Div</span><span class="p">()</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>        <span class="n">div</span><span class="p">[</span><span class="s2">&quot;class&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;myclass&quot;</span>  <span class="c1"># &lt;- like that</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>        <span class="bp">self</span> <span class="o">+=</span> <span class="n">div</span>
+</code></pre></div></p>
+<h3 id="create-a-dynamic-tag-using-a-renderself-method">Create a dynamic tag (using a <code>render(self)</code> method)</h3>
+<p>You can create a component which will auto render itself on changes. This kind of component is neat for small component. This kind of component are named "dynamic" component, and to be a dynamic component : it must implement a <code>render(self) -&gt; None</code>, which will redraw all its content.</p>
+<p>A simple example:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="k">class</span> <span class="nc">Starrer</span><span class="p">(</span><span class="n">Tag</span><span class="o">.</span><span class="n">div</span><span class="p">):</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">=</span><span class="n">value</span>
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>
+<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a>        <span class="k">def</span> <span class="nf">inc</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+<a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">+=</span><span class="n">v</span>
+<a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a>
+<a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">bless</span> <span class="o">=</span> <span class="n">Tag</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">_onclick</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="n">inc</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">)</span>
+<a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">bmore</span> <span class="o">=</span> <span class="n">Tag</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span> <span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="n">_onclick</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="n">inc</span><span class="p">(</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="p">)</span>
+<a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a>
+<a id="__codelineno-20-11" name="__codelineno-20-11" href="#__codelineno-20-11"></a>    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<a id="__codelineno-20-12" name="__codelineno-20-12" href="#__codelineno-20-12"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+<a id="__codelineno-20-13" name="__codelineno-20-13" href="#__codelineno-20-13"></a>        <span class="bp">self</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bless</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">bmore</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;⭐&quot;</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+</code></pre></div></p>
+<p><strong>IMPORTANT</strong>: AVOID USING <code>Tag.&lt;html&gt;(content,**kargs)</code> IN A render() METHOD !!!!!!! (avoid creating new tag instance, because it will create new instance (new ids), and force rendering at each interaction)</p>
+<p>See <a href="https://htag.glitch.me">Example c30</a></p>
+<h2 id="creating-a-placeholder-tag">Creating a "PlaceHolder" Tag</h2>
+<p>A placeholder tag : is a Tag "without outerHTML", It has no html representation from itself. And its rendering depends on its childs.</p>
+<p>TODO: say more ;-)</p>
+<h2 id="creating-a-tag-generatior-yielding-content">Creating a Tag generatior (yield'ing content)</h2>
+<p>Sometimes, it can be usefull to render on-demand. Imagine that you want to populate a big list, it will be impossible (or very long). <strong>HTag</strong> provide a way to do that, to avoid to draw all the html in one interaction. It can render by fragment, using the <code>yield</code> statement.</p>
+<p>TODO: say more ;-)</p>
+<p>See <a href="https://htag.glitch.me">Example c90</a></p>
+<p>... TODO ...</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.1e8ae164.min.js"></script>
+      
+    
+  </body>
+</html>
