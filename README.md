@@ -27,7 +27,7 @@ But yes … the promise is here : **it's a GUI toolkit for building "beautiful" 
 
 [DOCUMENTATION](https://manatlan.github.io/htag/)
 
-[DEMO/TUTORIAL](https://htag.glitch.me/)
+~~[DEMO/TUTORIAL](https://htag.glitch.me/)~~
 
 [Changelog](https://github.com/manatlan/htag/releases)
 
@@ -42,11 +42,12 @@ Well tested:
 
 ## To have a look
 
- * [htag.glitch.me](https://htag.glitch.me/): A htag app, hosted on glitch.com, running with [htagweb](https://github.com/manatlan/htagweb). Many examples from simpler to complex ones, in tutorial spirit.
+ * ~~[htag.glitch.me](https://htag.glitch.me/): A htag app, hosted on glitch.com, running with [htagweb](https://github.com/manatlan/htagweb). Many examples from simpler to complex ones, in tutorial spirit.~~ (a new version is available, just ask)
  * [pyscript/demo](https://raw.githack.com/manatlan/htag/main/examples/pyscript_demo.html): A htag app in a simple html page, running with [pyscript runner](https://manatlan.github.io/htag/runners/#pyscript). Many examples in a REPL mode (you can try/edit/run them). (ONLY HTML needed)
 
 ## ROADMAP to 1.0.0
 
+ * mid-2025 ... I really need to release the 1.0 ;-) (I use the latest a lot, and it's near perfection (at least for me))
  * Some news 12/10/2024 : the 1.0 will come, because I mainly use it: without troubles/new_ideas : it works as expected. Perhaps some refactoring and polish : but features are here. (preparing a [htag demo in a docker container](https://github.com/manatlan/htagdemo))
  * the "0.100.x" version introduce a "new event mechanism" ("ev") : need to find a solution if it will be mandatory for 1.0.0 (don't know yet), to not break my (more than) 200 apps ;-) ... currently both are available (depending of the parameter name)
  * the "0.90.x" version is important, because all previous runners (using starlette/uvicorn/tornado) are gone, and are simulated/faked with a new [Runner](https://manatlan.github.io/htag/runner) ! So compatibility shouldn't be breaked with htag <0.90 ! But they will be removed in 1.0.
