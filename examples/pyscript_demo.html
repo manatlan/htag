@@ -71,7 +71,9 @@ def get_external_modules(code) -> list:
     node_iter.visit_Import = visit_Import
     node_iter.visit_ImportFrom = visit_ImportFrom
     node_iter.visit(ast.parse(code))
-    return list(modules - set(sys.stdlib_module_names))
+    ll = list(modules - set(sys.stdlib_module_names))
+    ll = ["htag==0.120.0" if x == "htag" else x for x in ll]
+    return ll
 
 def generate_python(code:str) -> str:
     top="# -*- coding: utf-8 -*-\n# YOU WILL NEED (at least) HTAG, just pip it:\n# python3 -m pip install htag\n"
