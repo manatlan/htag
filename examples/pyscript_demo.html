@@ -244,8 +244,11 @@ self.ed.focus();
         html = generate_pyscript(o.value)
         test=Tag.button( Tag.img(_src=IMG,_width="18px")+"py",_style="float:right",_onclick=self.download_p,_class="button white",_title="Download as python file")
         test2=Tag.button(Tag.img(_src=IMG,_width="18px")+"demo",_style="float:right",_onclick=self.download_h,_class="button white",_title="Download as pyscript/html demo file")
-        self.ui+=Back(Tag.iframe(_src=dataurlh(html)),test+test2)
-        
+        iframe = Tag.iframe(_src=dataurlh(html))
+        self.ui+=Back(iframe,test+test2)
+        iframe.call("""self.src = URL.createObjectURL(new Blob([`%s`], {type: 'text/html'}));""" % html)
+
+
     def download_h(self,o):
         self._download( dataurlh(generate_pyscript(self.ed.value)),"YourHtagApp.html")
     def download_p(self,o):

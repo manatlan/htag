@@ -27,7 +27,7 @@ But yes … the promise is here : **it's a GUI toolkit for building "beautiful" 
 
 [DOCUMENTATION](https://manatlan.github.io/htag/)
 
-~~[DEMO/TUTORIAL](https://htag.glitch.me/)~~
+[DEMO](https://raw.githack.com/manatlan/htag/main/examples/pyscript_demo.html) (with pyscript)
 
 [Changelog](https://github.com/manatlan/htag/releases)
 
