@@ -78,8 +78,8 @@ def generate_python(code:str) -> str:
     top="# -*- coding: utf-8 -*-\n# YOU WILL NEED (at least) HTAG, just pip it:\n# python3 -m pip install htag\n"
     sep="#"*78 +"\n"
     end="""if __name__=="__main__":
-    from htag.runners import BrowserHTTP
-    BrowserHTTP( App ).run()"""
+    from htag import Runner
+    Runner( App, interface=(640,480) ).run()"""
     return top+sep+code+sep+end
     
 def generate_pyscript(code:str) -> str:
