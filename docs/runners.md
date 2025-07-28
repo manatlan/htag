@@ -45,15 +45,14 @@ Run your `App` (htag.Tag class), in a HTML file, like this :
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
-    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.10.2/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.10.2/core.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <py-config>
-    packages = ["htag"]
-    </py-config>
 </head>
 <body> loading pyscript ;-)
-<py-script>
+<script type="py" config='{"packages":["htag"]}'>
+
 ###############################################################################
 from htag import Tag
 
