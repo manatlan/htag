@@ -27,7 +27,9 @@ But yes … the promise is here : **it's a GUI toolkit for building "beautiful" 
 
 [DOCUMENTATION](https://manatlan.github.io/htag/)
 
-[DEMO](https://raw.githack.com/manatlan/htag/main/examples/pyscript_demo.html) (with pyscript)
+[DEMO(pyscript)](https://raw.githack.com/manatlan/htag/main/examples/pyscript_demo.html)
+
+[htagdemo](https://htagdemo.onrender.com/)
 
 [Changelog](https://github.com/manatlan/htag/releases)
 
@@ -42,7 +44,7 @@ Well tested:
 
 ## To have a look
 
- * ~~[htag.glitch.me](https://htag.glitch.me/): A htag app, hosted on glitch.com, running with [htagweb](https://github.com/manatlan/htagweb). Many examples from simpler to complex ones, in tutorial spirit.~~ (a new version is available, just ask)
+ * [htagdemo](https://htagdemo.onrender.com/): A htag app, hosted on render.com, running with [htagweb](https://github.com/manatlan/htagweb). Many examples from simpler to complex ones, in tutorial spirit. (in construction, so may have bugs)
  * [pyscript/demo](https://raw.githack.com/manatlan/htag/main/examples/pyscript_demo.html): A htag app in a simple html page, running with [pyscript runner](https://manatlan.github.io/htag/runners/#pyscript). Many examples in a REPL mode (you can try/edit/run them). (ONLY HTML needed)
 
 ## ROADMAP to 1.0.0
