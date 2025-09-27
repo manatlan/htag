@@ -6,7 +6,7 @@
         {
             "label": "Test Coverage",
             "type": "shell",
-            "command": "python3 -m pytest --cov-report html --cov=htag . && google-chrome htmlcov/index.html",
+            "command": "uv run pytest --cov-report html --cov=htag . && google-chrome htmlcov/index.html",
             "problemMatcher": [],
             "presentation": {
                 "panel": "new",

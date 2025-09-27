@@ -1,32 +1,48 @@
-[tool.poetry]
+[project]
 name = "htag"
-version = "0.0.0" # auto-updated
+version = "0.0.0"  # auto-updated
 description = "GUI toolkit for building GUI toolkits (and create beautiful applications for mobile, web, and desktop from a single python3 codebase)"
-authors = ["manatlan <manatlan@gmail.com>"]
-readme = 'README.md'
-license="MIT"
-keywords=['gui', 'electron', "cef", "pywebview", "starlette", "uvicorn", "tornado", "asyncio", "desktop", "web", "mobile", "http", "websocket", "html", "pyscript", "android", "kivy", "apk"]
-homepage = "https://github.com/manatlan/htag"
-repository = "https://github.com/manatlan/htag"
-documentation = "https://manatlan.github.io/htag/"
+authors = [{name = "manatlan", email = "manatlan@gmail.com"}]
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.7"
+keywords = [
+    "gui", "electron", "cef", "pywebview", "starlette", "uvicorn", 
+    "tornado", "asyncio", "desktop", "web", "mobile", "http", 
+    "websocket", "html", "pyscript", "android", "kivy", "apk"
+]
 classifiers = [
-        "Operating System :: OS Independent",
-        "Topic :: Software Development :: Libraries :: Python Modules",
-        "Topic :: Software Development :: Build Tools",
-        "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Build Tools",
+    "License :: OSI Approved :: Apache Software License",
 ]
 
-[tool.poetry.dependencies]
-python = "^3.7"
+[project.urls]
+Homepage = "https://github.com/manatlan/htag"
+Repository = "https://github.com/manatlan/htag"
+Documentation = "https://manatlan.github.io/htag/"
 
-[tool.poetry.dev-dependencies]
-pytest = "^6"
-pytest-cov = "^3"
-pytest-asyncio="^0.19"
-pywebview = "^3.6"
-selenium = "^4"
-fake-winreg = "^1.6"
+[project.optional-dependencies]
+dev = [
+    "pytest>=6",
+    "pytest-cov>=3",
+    "pytest-asyncio>=0.19",
+    "pywebview>=3.6",
+    "selenium>=4",
+    "fake-winreg>=1.6",
+]
 
 [build-system]
-requires = ["poetry>=0.12"]
-build-backend = "poetry.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=6",
+    "pytest-cov>=3",
+    "pytest-asyncio>=0.19",
+    "pywebview>=3.6",
+    "selenium>=4",
+    "fake-winreg>=1.6",
+]

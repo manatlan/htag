@@ -52,7 +52,7 @@ jobs:
       ## test with PyScript Runner
       #############################################################################
       - name: Build WHL for pyscript tests
-        run: poetry build
+        run: uv build
 
       - name: Run Tests PyScript (can't exit itself) ${{ matrix.app }}
         run: |
