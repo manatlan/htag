@@ -1,43 +1,76 @@
-name: "On Tag -> Deploy a release to pypi"
+# This workflow will upload a Python Package to PyPI when a release is created
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python#publishing-to-package-registries
 
-#TODO: in the future, try to do that : https://mestrak.com/blog/semantic-release-with-python-poetry-github-actions-20nn
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: Upload Python Package
 
 on:
+  # workflow_dispatch:  # to be able to test manually on github/actions
+  # release:
+  #   types: [published]
   push:
     tags:
-      - 'v*.*.*'
+      - "v*.*.*"
+
+permissions:
+  contents: read
+
 jobs:
-  test:
+  release-build:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: "3.x"
 
-      - name: Patch Sources with "tag version ref"
-        run: python .github/workflows/update_version.py ${{github.ref_name}}
-
-      - name: Install dependencies # could be done by poetry ;-)
+      - name: Build release distributions
         run: |
+          # NOTE: put your own distribution build steps here.
           python -m pip install uv
           uv sync --dev
+          python .github/workflows/update_version.py ${{github.ref_name}}
+          uv build
 
-      - name: Test htag pytests
-        run: |
-          uv run pytest .
-
-      - name: Create htag artifact from source versionned
+      - name: Upload distributions
         uses: actions/upload-artifact@v4
         with:
-          name: htag_release_sources_${{github.ref_name}}
-          path: |
-            htag/*
+          name: release-dists
+          path: dist/
+
+  pypi-publish:
+    runs-on: ubuntu-latest
+    needs:
+      - release-build
+    permissions:
+      # IMPORTANT: this permission is mandatory for trusted publishing
+      id-token: write
+
+    # Dedicated environments with protections for publishing are strongly recommended.
+    # For more information, see: https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment#deployment-protection-rules
+    environment:
+      name: pypi
+      # OPTIONAL: uncomment and update to include your PyPI project URL in the deployment status:
+      # url: https://pypi.org/p/YOURPROJECT
+      #
+      # ALTERNATIVE: if your GitHub Release name is the PyPI project version string
+      # ALTERNATIVE: exactly, uncomment the following line instead:
+      # url: https://pypi.org/project/YOURPROJECT/${{ github.event.release.name }}
+
+    steps:
+      - name: Retrieve release distributions
+        uses: actions/download-artifact@v4
+        with:
+          name: release-dists
+          path: dist/
 
       - name: Publish release distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: dist/
-
