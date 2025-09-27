@@ -26,8 +26,8 @@ jobs:
         run: sudo apt purge chromium-browser
       - name: Install a new Chromium
         run: sudo apt install -y chromium-browser
-      - name: Install selenium/poetry packages
-        run: pip install webdriver-manager selenium poetry
+      - name: Install selenium/uv packages
+        run: pip install webdriver-manager selenium uv
       - name: pip list
         run: pip list
 

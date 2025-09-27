@@ -39,7 +39,7 @@ def run(App,runner:str,openBrowser=True,port=8000):
     if runner=="PyScript":
         """
         This thing is complex to test/develop (need to py-env the wheel), you'll need to do :
-        - poetry build                                              # to produce dist/htag-0.0.0-py3-none-any.whl
+        - uv build                                              # to produce dist/htag-0.0.0-py3-none-any.whl
         - python3 -m http.server 8001
         - chrome http://localhost:8001/manual_pyscript.html
 
