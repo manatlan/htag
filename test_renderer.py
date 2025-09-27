@@ -733,6 +733,93 @@ def test_state_and_session():
     assert not hr.tag.state
     assert len(ses)==1
 
+def test_stater_guess_no_real_parent_exception_jules():
+    placeholder = Tag()
+    root = Tag.div(placeholder)
+    s = Stater(root)
+    placeholder.add("content") # modify it
+    placeholder._parent = None # break the link
+    with pytest.raises(HTagException, match="no real parent"):
+        s.guess()
+
+def test_hrenderer_init_typeerror_fallback_jules():
+    class MyTag(Tag):
+        def __init__(self, value, **kargs): # requires an argument
+            super().__init__(**kargs)
+            self.value = value
+    # HRenderer will try MyTag() which raises a TypeError.
+    # It will catch it, log a warning, and create a default error tag.
+    r = HRenderer(MyTag, "")
+    assert "init error" in str(r.tag)
+    assert "required positional argument" in str(r.tag)
+
+def test_hrenderer_interact_on_path_jules():
+    class MyTag(Tag.div):
+        def __init__(self, **kargs):
+            super().__init__(**kargs)
+            self.clicked = False
+        def handler(self): # no 'ev', so it will use the '__on__' path
+            self.clicked = True
+
+    r = HRenderer(MyTag, "")
+    t = r.tag
+    t['onclick'] = t.handler # simple assignment creates a Caller
+    assert "__on__" in str(t['onclick'])
+
+    async def run():
+        assigned_id = t['onclick']._assigned
+        await r.interact(id(t), "__on__", [assigned_id], {})
+        assert t.clicked == True
+    asyncio.run(run())
+
+def test_hrenderer_interact_legacy_path_jules():
+    from htag.tag import expose
+
+    class MyTag(Tag.div):
+        def __init__(self, **kargs):
+            super().__init__(**kargs)
+            self.value = 0
+
+        @expose
+        def exposed_method(self, val):
+            self.value = val
+
+    r = HRenderer(MyTag, "")
+    t = r.tag
+
+    async def run():
+        await r.interact(id(t), "exposed_method", [42], {})
+        assert t.value == 42
+    asyncio.run(run())
+
+
+@pytest.mark.asyncio
+async def test_hrenderer_update_with_scripts_jules():
+    class MyTag(Tag.div):
+        def add_script(self):
+            self.call("console.log('hello')")
+
+    r = HRenderer(MyTag, "")
+    t = r.tag
+
+    sent_actions = None
+    async def mock_sendactions(actions):
+        nonlocal sent_actions
+        sent_actions = actions
+        return True
+
+    r.sendactions = mock_sendactions
+    t.add_script()
+
+    result = await r.update(t)
+    assert result is True
+    assert sent_actions is not None
+    assert "post" in sent_actions
+    assert "console.log('hello')" in sent_actions["post"]
+    assert "update" in sent_actions
+    assert id(t) in sent_actions["update"]
+
+
 if __name__=="__main__":
     # test_ko_try_render_a_tagbase()
     # test_render_a_tag_with_interaction()

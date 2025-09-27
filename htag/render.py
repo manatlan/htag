@@ -70,7 +70,7 @@ class Stater:
                     logger.debug("STATE BEFORE for %s = '%s'", repr(tag), state_before )
                     logger.debug("STATE AFTER  for %s = '%s'", repr(tag), state_after )
 
-                    while tag.tag is None:
+                    while tag is not None and tag.tag is None:
                         tag = tag.parent
 
                     if tag is None: # should be impossible
