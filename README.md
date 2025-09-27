@@ -49,6 +49,7 @@ Well tested:
 
 ## ROADMAP to 1.0.0
 
+ * 2025/9/27 ... migrate repo from poetry to the marvelous **uv**
  * mid-2025 ... I really need to release the 1.0 ;-) (I use the latest a lot, and it's near perfection (at least for me))
  * Some news 12/10/2024 : the 1.0 will come, because I mainly use it: without troubles/new_ideas : it works as expected. Perhaps some refactoring and polish : but features are here. (preparing a [htag demo in a docker container](https://github.com/manatlan/htagdemo))
  * the "0.100.x" version introduce a "new event mechanism" ("ev") : need to find a solution if it will be mandatory for 1.0.0 (don't know yet), to not break my (more than) 200 apps ;-) ... currently both are available (depending of the parameter name)
