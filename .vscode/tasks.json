@@ -11,6 +11,10 @@
             "presentation": {
                 "panel": "new",
                 "focus": true
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
             }
         },
         {
@@ -32,6 +36,6 @@
                 "panel": "new",
                 "focus": true
             }
-        },
+        }
     ]
 }
