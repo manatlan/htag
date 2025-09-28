@@ -64,8 +64,8 @@ class BooleanOptionalAction(argparse.Action):
     def format_help(self):
         return f"{', '.join(self.option_strings)}: {self.help} (default: {self.default})"
 
-if __name__=="__main__":
 
+def command():
     parser = argparse.ArgumentParser(
         prog="htag",
         description="""Entrypoint to help you <to create> or <to run> a htag'app.
@@ -128,3 +128,6 @@ else it will create an empty htag file named 'main.py' in current path. Options 
             print("HTag App file created -->", newfile)
         else:
             print(f"It seems that you've already got a '{newfile}' file")
+
+if __name__=="__main__":
+    command()

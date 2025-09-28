@@ -37,6 +37,9 @@ dev = [
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+[project.scripts]
+htag = "htag.__main__:command"
+
 [tool.uv]
 dev-dependencies = [
     "pytest>=6",
