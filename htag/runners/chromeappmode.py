@@ -29,27 +29,26 @@ logger = logging.getLogger(__name__)
 class FULLSCREEN: pass
 CHROMECACHE=".cache"
 
+def find_chrome_win():
+    import winreg
+
+    reg_path = r"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe"
+    for install_type in winreg.HKEY_CURRENT_USER, winreg.HKEY_LOCAL_MACHINE:
+        try:
+            with winreg.OpenKey(install_type, reg_path, 0, winreg.KEY_READ) as reg_key:
+                return winreg.QueryValue(reg_key, None)
+        except WindowsError:
+            pass
+
+def find_chrome_mac():
+    default_dir = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+    if os.path.exists(default_dir):
+        return default_dir
+
 class ChromeApp:
     def __init__(self, url, appname="driver",size=None,lockPort=None,chromeargs=[]):
         self._p=None
         
-        def find_chrome_win():
-            import winreg  # TODO: pip3 install winreg
-
-            reg_path = r"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe"
-            for install_type in winreg.HKEY_CURRENT_USER, winreg.HKEY_LOCAL_MACHINE:
-                try:
-                    with winreg.OpenKey(install_type, reg_path, 0, winreg.KEY_READ) as reg_key:
-                        return winreg.QueryValue(reg_key, None)
-                except WindowsError:
-                    pass
-
-        def find_chrome_mac():
-            default_dir = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-            if os.path.exists(default_dir):
-                return default_dir
-
-
         if sys.platform[:3] == "win":
             exe = find_chrome_win()
         elif sys.platform == "darwin":
