@@ -208,6 +208,212 @@ async def test_server_http_jules():
         assert "application/json" in response.headers.get("Content-Type")
         assert json.loads(response.content) == {"actions": "test_actions"}
 
+@pytest.mark.asyncio
+async def test_runner_run_ws_mode_jules():
+    from htag.runners import Runner
+    with patch('asyncio.get_event_loop') as mock_get_loop, \
+         patch('webbrowser.open_new_tab'), \
+         patch('htag.runners.runner.isFree', return_value=True), \
+         patch('htag.runners.runner.ServerWS') as MockServerWS:
+
+        mock_loop = mock_get_loop.return_value
+        mock_loop.run_forever.side_effect = KeyboardInterrupt() # prevent blocking
+        with patch('os._exit'):
+            runner = Runner(MyApp, interface=1)
+            runner.run()
+            mock_loop.create_task.assert_called_once() # watchdog was created
+
+@pytest.mark.asyncio
+async def test_runner_run_http_mode_jules():
+    from htag.runners import Runner
+    with patch('asyncio.get_event_loop') as mock_get_loop, \
+         patch('webbrowser.open_new_tab'), \
+         patch('htag.runners.runner.isFree', return_value=True), \
+         patch('htag.runners.runner.ServerHTTP'):
+
+        mock_loop = mock_get_loop.return_value
+        mock_loop.run_forever.side_effect = KeyboardInterrupt() # prevent blocking
+        with patch('os._exit'):
+            runner = Runner(MyApp, http_only=True, interface=True)
+            runner.run()
+            mock_loop.create_task.assert_not_called() # no watchdog
+
+@pytest.mark.asyncio
+async def test_runner_with_chrome_app_jules():
+    from htag.runners import Runner
+    with patch('asyncio.get_event_loop') as mock_get_loop, \
+         patch('htag.runners.runner.runChromeApp') as mock_run_chrome, \
+         patch('htag.runners.runner.isFree', return_value=True), \
+         patch('htag.runners.runner.ServerWS'):
+
+        mock_loop = mock_get_loop.return_value
+        mock_loop.run_forever.side_effect = KeyboardInterrupt()
+        with patch('os._exit'):
+            runner = Runner(MyApp, interface=(800, 600))
+            runner.run()
+            mock_run_chrome.assert_called_with("127.0.0.1", 8000, (800, 600))
+
+
+def test_runner_init_with_file_jules():
+    from htag.runners import Runner
+    with patch('htag.runners.commons.SessionFile') as mock_session_file:
+        runner = Runner(MyApp, file="/path/to/session.json")
+        assert runner.session == mock_session_file.return_value
+
+@pytest.mark.asyncio
+async def test_runner_bad_interface_jules():
+    from htag.runners import Runner
+    with patch('asyncio.get_event_loop'), \
+         patch('htag.runners.runner.isFree', return_value=True), \
+         patch('htag.runners.runner.ServerWS'):
+        runner = Runner(MyApp, interface="invalid")
+        with pytest.raises(Exception, match="Not a good 'interface' !"):
+            runner.run()
+
+@pytest.mark.asyncio
+async def test_runner_port_search_jules():
+    from htag.runners import Runner
+    with patch('htag.runners.runner.isFree', side_effect=[False, False, True]) as mock_is_free, \
+         patch('asyncio.get_event_loop') as mock_get_loop:
+
+        mock_loop = mock_get_loop.return_value
+        mock_loop.run_forever.side_effect = KeyboardInterrupt() # prevent blocking
+        with patch('os._exit'):
+            runner = Runner(MyApp, use_first_free_port=True)
+            assert runner.port == 8000
+            runner.run()
+            assert runner.port == 8002
+            assert mock_is_free.call_count == 3
+
+def test_reload_no_module_jules():
+    from htag.runners.runner import reload
+    with patch('inspect.getmodule', return_value=None):
+        reloaded_class = reload(MyApp)
+        assert reloaded_class == MyApp
+
+def test_hrcreate_no_dev_jules():
+    from htag.runners.runner import MyServer
+    # Non-dev mode
+    server_no_dev = MyServer("localhost", 8080, None, False, [], dev=False, exit_callback=Mock())
+    hrenderer_no_dev = server_no_dev.hrcreate(MyApp, "js", ((),{}))
+    assert not hrenderer_no_dev.fullerror
+
+    # Dev mode
+    server_dev = MyServer("localhost", 8080, None, False, [], dev=True, exit_callback=Mock())
+    hrenderer_dev = server_dev.hrcreate(MyApp, "js", ((),{}))
+    assert hrenderer_dev.fullerror
+
+    # Check that dev mode adds exactly 2 statics (template and script)
+    assert len(hrenderer_dev._statics) == len(hrenderer_no_dev._statics) + 2
+
+@pytest.mark.asyncio
+async def test_server_ws_handler_exception_jules():
+    from htag.runners.runner import ServerWS
+    ws = AsyncMock()
+    ws.request.path = "/"
+    ws.recv.side_effect = [Exception("test exception"), None]
+
+    server = ServerWS("localhost", 8080, None, False, [("/", Mock())], False, Mock())
+    server._routes["/"]["hr"] = Mock()
+
+    with patch("htag.runners.runner.start_server") as mock_start:
+        await server.run()
+        handler_ws = mock_start.call_args[0][1]
+        await handler_ws(ws)
+        ws.send.assert_awaited_with('{}')
+
+def test_runner_stop_with_chromeapp_jules():
+    from htag.runners import Runner
+    runner = Runner(MyApp)
+    chromeapp_mock = Mock()
+    runner.chromeapp = chromeapp_mock
+    with patch('os._exit') as mock_exit:
+        runner.stop()
+        chromeapp_mock.exit.assert_called_once()
+        mock_exit.assert_called_once_with(0)
+
+def test_runner_init_with_invalid_tag_jules():
+    from htag.runners import Runner
+    class NotATag:
+        pass
+    with pytest.raises(AssertionError):
+        Runner(NotATag)
+
+@pytest.mark.asyncio
+async def test_my_server_routing_jules():
+    from htag.runners.runner import MyServer, HTTPResponse
+
+    async def handler_with_params(request):
+        return HTTPResponse(200, f"params:{request.path_params}")
+
+    async def handler_get(request, handler):
+        return await handler(request)
+
+    async def handler_post(request, hr):
+        if request.path == "/error_post":
+            raise ValueError("POST error")
+        return HTTPResponse(200, "ok post")
+
+    async def error_handler_get(request):
+        raise ValueError("GET error")
+
+    async def error_handler_params(request):
+        raise ValueError("params error")
+
+    routes = [
+        ("/items/{id}", handler_with_params),
+        ("/direct", lambda req: HTTPResponse(200,"ok")),
+        ("/error_get", error_handler_get),
+        ("/error_params/{id}", error_handler_params),
+        ("/error_post", lambda req: HTTPResponse(200,"ok")),
+    ]
+    server = MyServer("localhost", 8080, None, False, routes, False, Mock())
+    server._routes["/error_post"]["hr"] = Mock()
+
+    with patch("htag.runners.runner.start_server", new_callable=AsyncMock) as mock_start_server:
+        await server.server(handler_get, handler_post, None)
+        routing = mock_start_server.call_args.args[0]
+
+        # Test GET path params
+        request = Mock()
+        request.path = "/items/123"
+        request.method = "GET"
+        response = await routing(request)
+        assert response.status == 200
+        assert b"params:{'id': '123'}" in response.content
+
+        # Test not found
+        request.path = "/notfound"
+        response = await routing(request)
+        assert response.status == 404
+
+        # Test bad method on direct route
+        request.path = "/direct"
+        request.method = "PUT"
+        response = await routing(request)
+        assert response.status == 400
+
+        # Test handler exception on direct route
+        request.path = "/error_get"
+        request.method = "GET"
+        response = await routing(request)
+        assert response.status == 500
+        assert b"GET error" in response.content
+
+        # Test handler exception on route with params
+        request.path = "/error_params/1"
+        request.method = "GET"
+        response = await routing(request)
+        assert response.status == 500
+        assert b"params error" in response.content
+
+        # Test POST handler exception
+        request.path = "/error_post"
+        request.method = "POST"
+        response = await routing(request)
+        assert response.status == 500
+        assert b"POST error" in response.content
+
 if __name__=="__main__":
     test_default()
     test_runner_instantiation_and_methods_jules()
@@ -215,3 +421,82 @@ if __name__=="__main__":
     asyncio.run(test_my_server_jules())
     asyncio.run(test_server_ws_jules())
     asyncio.run(test_server_http_jules())
+    asyncio.run(test_runner_run_ws_mode_jules())
+    asyncio.run(test_runner_run_http_mode_jules())
+    asyncio.run(test_runner_with_chrome_app_jules())
+    asyncio.run(test_my_server_routing_jules())
+
+deprecated_runners_data = [
+    ("BrowserHTTP", {"http_only": True}),
+    ("BrowserStarletteHTTP", {"http_only": True}),
+    ("BrowserStarletteWS", {}),
+    ("DevApp", {"debug": True, "reload": True, "use_first_free_port": True}),
+    ("ChromeApp", {"use_first_free_port": True}),
+    ("WinApp", {"use_first_free_port": True}),
+    ("BrowserTornadoHTTP", {"http_only": True}),
+]
+
+@pytest.mark.parametrize("runner_name, runner_args", deprecated_runners_data)
+def test_deprecated_runners_jules(runner_name, runner_args):
+    from htag import runners
+
+    with patch("htag.runners.Runner.__init__") as mock_runner_init, \
+         patch("htag.runners.Runner.run") as mock_runner_run, \
+         patch("htag.runners.deprecated") as mock_deprecated:
+
+        RunnerClass = getattr(runners, runner_name)
+        instance = RunnerClass(MyApp)
+
+        mock_deprecated.assert_called_once_with(instance)
+
+        mock_runner_init.assert_called_once()
+        call_args, call_kwargs = mock_runner_init.call_args
+
+        assert call_args[0] is instance
+        assert call_args[1] is MyApp
+        assert call_args[2] is None # file is always None
+
+        assert call_kwargs == runner_args
+
+        # Test the run method
+        if runner_name in ["ChromeApp", "WinApp"]:
+            instance.run(size=(100,100))
+            assert instance.interface == (100,100)
+        else:
+            instance.run(openBrowser=False)
+            assert instance.interface == 0
+
+        mock_runner_run.assert_called_once()
+
+
+def test_android_app_runner_jules():
+    from htag import runners
+    with patch("htag.runners.Runner.__init__") as mock_runner_init, \
+         patch("htag.runners.Runner.run") as mock_runner_run, \
+         patch("htag.runners.deprecated") as mock_deprecated:
+
+        instance = runners.AndroidApp(MyApp)
+        mock_deprecated.assert_called_once()
+
+        mock_runner_init.assert_called_once()
+        call_args, call_kwargs = mock_runner_init.call_args
+
+        assert call_args[0] is instance
+        assert call_args[1] is MyApp
+        assert call_args[2] is None # file is None
+
+        assert call_kwargs == {"interface": 0, "port": 12458, "use_first_free_port": False}
+
+        instance.run()
+        mock_runner_run.assert_called_once()
+
+def test_runner_import_error_jules():
+    import sys
+    with patch.dict('sys.modules', {'htag.runners.pywebview': None}):
+        # Force a reload of the module to trigger the import error
+        importlib.reload(importlib.import_module("htag.runners"))
+        from htag import runners
+        with pytest.raises(Exception):
+            runners.PyWebView(MyApp)
+    # Restore the original state
+    importlib.reload(importlib.import_module("htag.runners"))

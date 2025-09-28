@@ -363,7 +363,7 @@ async def connect(wsurl, **kwds):
         port = 80
         if url.port:
             port = url.port
-        if url.scheme.startswith('wss://'):
+        if url.scheme == 'wss':
             if not url.port:
                 port = 443
 

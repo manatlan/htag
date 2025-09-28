@@ -92,7 +92,7 @@ try:
     from .pywebview import PyWebView
 except Exception as err:
     ERROR=err
-    class PyWebWiew(_RunnerNotFunctionnal): pass
+    class PyWebView(_RunnerNotFunctionnal): pass
 
 # try:
 #     # mono instance (just one chrome app instance)                  !!! CAN UPDATE !!!

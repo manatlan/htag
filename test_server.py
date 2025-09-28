@@ -374,3 +374,114 @@ async def test_handle_server_websocket_handshake_fail_jules(mock_reader_jules, m
 
         funcws.assert_not_awaited()
         mock_writer_jules.close.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_send_frame_medium_payload_jules(mock_writer_jules):
+    # fin=0, opcode=TEXT, length=126
+    await server.send_frame(mock_writer_jules, True, server._TEXT, b'a' * 200)
+    # b1 = 0x01 (FIN=0, opcode=TEXT) <-- Bug in implementation
+    # b2 = 126
+    # length = 200
+    expected_header = bytearray(b'\x01\x7e') + struct.pack('!H', 200)
+    mock_writer_jules.write.assert_any_call(expected_header)
+
+@pytest.mark.asyncio
+async def test_send_frame_large_payload_jules(mock_writer_jules):
+    # fin=0, opcode=TEXT, length=127
+    await server.send_frame(mock_writer_jules, True, server._TEXT, b'a' * 70000)
+    # b1 = 0x01 (FIN=0, opcode=TEXT) <-- Bug in implementation
+    # b2 = 127
+    # length = 70000
+    expected_header = bytearray(b'\x01\x7f') + struct.pack('!Q', 70000)
+    mock_writer_jules.write.assert_any_call(expected_header)
+
+@pytest.mark.asyncio
+async def test_send_frame_with_flush_jules(mock_writer_jules):
+    await server.send_frame(mock_writer_jules, True, server._TEXT, b"hello", flush=True)
+    mock_writer_jules.drain.assert_awaited_once()
+
+def test_http_response_unknown_status_jules():
+    response = HTTPResponse(999, "Custom", "text/plain")
+    response_bytes = response.toHTTPResponse()
+    assert b"HTTP/1.1 999 UNKNOWN" in response_bytes
+
+@pytest.mark.asyncio
+async def test_handshake_with_client_no_key_jules(mock_reader_jules, mock_writer_jules):
+    request_headers = [b'GET /ws HTTP/1.1\r\n', b'Upgrade: websocket\r\n', b'\r\n']
+    mock_reader_jules.readline.side_effect = request_headers
+    with pytest.raises(ClosedException, match="Sec-WebSocket-Key does not exist"):
+        await server.handshake_with_client(mock_reader_jules, mock_writer_jules, AsyncMock())
+
+@pytest.mark.asyncio
+async def test_handshake_with_client_cancelled_jules(mock_reader_jules, mock_writer_jules):
+    mock_reader_jules.readline.side_effect = asyncio.CancelledError("Cancelled")
+    await server.handshake_with_client(mock_reader_jules, mock_writer_jules, AsyncMock())
+    written_data = b"".join([call[0][0] for call in mock_writer_jules.write.call_args_list])
+    assert b"400 Bad Request" in written_data
+    mock_writer_jules.close.assert_called_once()
+
+@pytest.mark.asyncio
+async def test_handshake_with_server_bad_key_jules(mock_reader_jules, mock_writer_jules):
+    url = urllib.parse.urlparse('ws://example.com/ws')
+    response_headers = [
+        b'HTTP/1.1 101 Switching Protocols\r\n',
+        b'Sec-WebSocket-Accept: badkey\r\n',
+        b'\r\n'
+    ]
+    mock_reader_jules.readline.side_effect = response_headers
+    with pytest.raises(ProtocolError, match="Sec-WebSocket-Accept key does not match"):
+        await server.handshake_with_server(mock_reader_jules, mock_writer_jules, url)
+
+@pytest.mark.asyncio
+async def test_recv_entire_frame_invalid_utf8_jules():
+    ws = Mock(spec=Websocket)
+    ws._reader = AsyncMock()
+    ws._reader.readexactly.side_effect = [
+        b'\x81\x05',
+        b'\x80\x81\x82\x83\x84'
+    ]
+    ws._queue = asyncio.Queue()
+    ws.writer = AsyncMock()
+    ws.writer.close = Mock()
+
+    await server.recv_entire_frame(ws)
+
+    ws.writer.close.assert_called_once()
+    assert ws._queue.get_nowait() is None
+    assert ws.status == 1002
+    assert "invalid utf-8" in ws.reason
+
+@pytest.mark.asyncio
+async def test_recv_entire_frame_unknown_opcode_jules(mock_reader_jules):
+    ws = Mock(spec=Websocket)
+    ws._reader = mock_reader_jules
+    mock_reader_jules.readexactly.return_value = b'\x8f\x00'
+    ws.writer = AsyncMock()
+    ws.writer.close = Mock()
+    ws._queue = asyncio.Queue()
+    ws.close = AsyncMock()
+
+    await server.recv_entire_frame(ws)
+
+    ws.writer.close.assert_called_once()
+    assert ws._queue.get_nowait() is None
+    assert "unknown opcode" in ws.reason
+
+@pytest.mark.asyncio
+async def test_connect_wss_jules():
+    with patch('asyncio.open_connection', new_callable=AsyncMock) as mock_open_connection, \
+         patch('htag.runners.server.handshake_with_server', new_callable=AsyncMock):
+
+        mock_reader, mock_writer = AsyncMock(), AsyncMock()
+        mock_open_connection.return_value = (mock_reader, mock_writer)
+
+        await server.connect('wss://example.com')
+        mock_open_connection.assert_awaited_with(host='example.com', port=443)
+
+@pytest.mark.asyncio
+async def test_connect_fail_jules():
+    with patch('asyncio.open_connection', new_callable=AsyncMock) as mock_open_connection:
+        mock_open_connection.side_effect = OSError("Connection failed")
+        with pytest.raises(OSError):
+            await server.connect('ws://example.com')
