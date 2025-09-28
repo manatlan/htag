@@ -485,3 +485,211 @@ async def test_connect_fail_jules():
         mock_open_connection.side_effect = OSError("Connection failed")
         with pytest.raises(OSError):
             await server.connect('ws://example.com')
+
+@pytest.mark.asyncio
+async def test_recv_entire_frame_fragmented_text_jules(mock_reader_jules):
+    ws = Websocket(mock_reader_jules, AsyncMock())
+    # FIN=0, opcode=TEXT, data="Hello"
+    # FIN=0, opcode=STREAM, data=" "
+    # FIN=1, opcode=STREAM, data="World"
+    mock_reader_jules.readexactly.side_effect = [
+        b'\x01\x05', b'Hello',  # Not FIN, TEXT
+        b'\x00\x01', b' ',      # Not FIN, STREAM
+        b'\x80\x05', b'World'   # FIN, STREAM
+    ]
+
+    # Create a task to run recv_entire_frame
+    task = asyncio.create_task(server.recv_entire_frame(ws))
+
+    # Get the result from the queue
+    result = await ws.recv()
+
+    assert result == "Hello World"
+    await task
+
+
+@pytest.mark.asyncio
+async def test_recv_entire_frame_fragmented_binary_jules(mock_reader_jules):
+    ws = Websocket(mock_reader_jules, AsyncMock())
+    # FIN=0, opcode=BINARY, data=b"Hello"
+    # FIN=1, opcode=STREAM, data=b" World"
+    mock_reader_jules.readexactly.side_effect = [
+        b'\x02\x05', b'Hello',
+        b'\x80\x06', b' World'
+    ]
+    task = asyncio.create_task(server.recv_entire_frame(ws))
+    result = await ws.recv()
+    assert result == b"Hello World"
+    await task
+
+@pytest.mark.asyncio
+async def test_recv_entire_frame_ping_jules(mock_reader_jules, mock_writer_jules):
+    ws = Websocket(mock_reader_jules, mock_writer_jules)
+    # PING frame, then a text message
+    mock_reader_jules.readexactly.side_effect = [
+        b'\x89\x04', b'ping', # PING
+        b'\x81\x05', b'hello' # TEXT
+    ]
+    task = asyncio.create_task(server.recv_entire_frame(ws))
+    result = await ws.recv()
+
+    assert result == 'hello'
+    # Check if a PONG was sent
+    # The header and payload are written in separate calls
+    mock_writer_jules.write.assert_any_call(bytearray(b'\x8a\x04'))
+    mock_writer_jules.write.assert_any_call(b'ping')
+    await task
+
+
+@pytest.mark.asyncio
+async def test_recv_entire_frame_close_no_payload_jules(mock_reader_jules, mock_writer_jules):
+    ws = Websocket(mock_reader_jules, mock_writer_jules)
+    mock_reader_jules.readexactly.return_value = b'\x88\x00' # CLOSE, no payload
+
+    with patch('htag.runners.server.send_close_frame', new_callable=AsyncMock) as mock_send_close:
+        task = asyncio.create_task(server.recv_entire_frame(ws))
+        result = await ws.recv() # Will get None because of close
+
+        assert result is None
+        assert ws._closed
+        assert ws.status == 1000
+        mock_send_close.assert_awaited_once_with(ws.writer, 1000, b'', False)
+        await task
+
+
+@pytest.mark.asyncio
+async def test_recv_entire_frame_close_with_payload_jules(mock_reader_jules, mock_writer_jules):
+    ws = Websocket(mock_reader_jules, mock_writer_jules)
+    # CLOSE with status 1001 and reason "Going away"
+    close_payload = struct.pack('!H', 1001) + b'Going away'
+    mock_reader_jules.readexactly.side_effect = [
+        b'\x88' + len(close_payload).to_bytes(1, 'big'),
+        close_payload
+    ]
+
+    with patch('htag.runners.server.send_close_frame', new_callable=AsyncMock) as mock_send_close:
+        task = asyncio.create_task(server.recv_entire_frame(ws))
+        result = await ws.recv()
+
+        assert result is None
+        assert ws._closed
+        assert ws.status == 1001
+        assert ws.reason == "Going away"
+        mock_send_close.assert_awaited_once_with(ws.writer, 1001, "Going away", False)
+        await task
+
+@pytest.mark.asyncio
+async def test_handshake_with_client_no_upgrade_jules(mock_reader_jules, mock_writer_jules):
+    # Simulate a standard HTTP GET request without upgrade headers
+    request_headers = [
+        b'GET / HTTP/1.1\r\n',
+        b'Host: example.com\r\n',
+        b'Connection: keep-alive\r\n',
+        b'\r\n'
+    ]
+    mock_reader_jules.readline.side_effect = request_headers
+    mock_reader_jules.read.return_value = b'' # No body for GET
+
+    funchttp = AsyncMock(return_value=HTTPResponse(200, "OK"))
+    request = await server.handshake_with_client(mock_reader_jules, mock_writer_jules, funchttp)
+
+    funchttp.assert_awaited_once()
+    assert request.path == '/'
+    assert request.body is None
+    # Check that a standard HTTP response was sent, not a WebSocket handshake
+    written_data = b"".join([call.args[0] for call in mock_writer_jules.write.call_args_list])
+    assert b'HTTP/1.1 200 OK' in written_data
+    assert b'Switching Protocols' not in written_data
+
+def test_http_response_all_statuses_jules():
+    statuses = {
+        200: "OK", 201: "CREATED", 400: "BAD REQUEST",
+        404: "NOT FOUND", 500: "SERVER ERROR"
+    }
+    for code, reason in statuses.items():
+        response = HTTPResponse(code, "")
+        response_bytes = response.toHTTPResponse()
+        assert f"HTTP/1.1 {code} {reason}".encode() in response_bytes
+
+@pytest.mark.asyncio
+async def test_recv_frame_rsv_bit_set_jules(mock_reader_jules):
+    # RSV1 bit set, which is not allowed
+    mock_reader_jules.readexactly.return_value = b'\xc1\x05'
+    with pytest.raises(ClosedException) as excinfo:
+        await server.recv_frame(mock_reader_jules, 1024)
+    assert excinfo.value.status == 1002
+    assert "RSV bit must be 0" in excinfo.value.reason
+
+@pytest.mark.asyncio
+async def test_recv_frame_control_frame_too_large_jules(mock_reader_jules):
+    # PING frame with payload > 125
+    mock_reader_jules.readexactly.return_value = b'\x89\x7e' # len = 126
+    with pytest.raises(ClosedException) as excinfo:
+        await server.recv_frame(mock_reader_jules, 1024)
+    assert excinfo.value.status == 1002
+    assert "control frame length can not be > 125" in excinfo.value.reason
+
+@pytest.mark.asyncio
+async def test_connect_handshake_fail_jules():
+    with patch('asyncio.open_connection', new_callable=AsyncMock) as mock_open, \
+         patch('htag.runners.server.handshake_with_server', new_callable=AsyncMock) as mock_handshake:
+
+        mock_reader, mock_writer = AsyncMock(), AsyncMock()
+        mock_open.return_value = (mock_reader, mock_writer)
+        mock_handshake.side_effect = ProtocolError("Handshake Failed")
+
+        with pytest.raises(ProtocolError):
+            await server.connect('ws://example.com')
+
+        mock_writer.close.assert_called_once()
+
+@pytest.mark.asyncio
+async def test_recv_entire_frame_fragment_protocol_error_jules(mock_reader_jules):
+    ws = Websocket(mock_reader_jules, AsyncMock())
+    # Send a stream frame without a start frame
+    mock_reader_jules.readexactly.side_effect = [b'\x80\x05', b'World']
+    task = asyncio.create_task(server.recv_entire_frame(ws))
+    result = await ws.recv()
+    assert result is None
+    assert ws.status == 1002
+    assert "fragmentation protocol error" in ws.reason
+    await task
+
+@pytest.mark.asyncio
+async def test_recv_entire_frame_fragment_control_message_jules(mock_reader_jules):
+    ws = Websocket(mock_reader_jules, AsyncMock())
+    # Send a PING frame as a fragment, which is illegal
+    mock_reader_jules.readexactly.side_effect = [b'\x09\x04', b'ping']
+    task = asyncio.create_task(server.recv_entire_frame(ws))
+    result = await ws.recv()
+    assert result is None
+    assert ws.status == 1002
+    assert "control messages can not be fragmented" in ws.reason
+    await task
+
+@pytest.mark.asyncio
+async def test_handshake_with_client_header_too_large_jules(mock_reader_jules, mock_writer_jules):
+    # Simulate headers larger than the max_header limit
+    mock_reader_jules.readline.return_value = b'a' * 200
+    with pytest.raises(ClosedException) as excinfo:
+        await server.handshake_with_client(mock_reader_jules, mock_writer_jules, AsyncMock(), max_header=100)
+    assert excinfo.value.status == 1009
+    assert "header too large" in excinfo.value.reason
+
+@pytest.mark.asyncio
+async def test_handshake_with_client_no_data_jules(mock_reader_jules, mock_writer_jules):
+    mock_reader_jules.readline.return_value = b'' # No data from endpoint
+    with pytest.raises(ClosedException) as excinfo:
+        await server.handshake_with_client(mock_reader_jules, mock_writer_jules, AsyncMock())
+    assert excinfo.value.status == 1002
+    assert "no data from endpoint" in excinfo.value.reason
+
+@pytest.mark.asyncio
+async def test_send_close_frame_bytes_reason_jules(mock_writer_jules):
+    await server.send_close_frame(mock_writer_jules, 1000, b'reason')
+    # b1 = 0x88 (FIN=1, opcode=CLOSE)
+    # b2 = len(payload) = 2 (status) + 6 (reason) = 8
+    expected_header = bytearray(b'\x88\x08')
+    expected_payload = struct.pack('!H', 1000) + b'reason'
+    mock_writer_jules.write.assert_any_call(expected_header)
+    mock_writer_jules.write.assert_any_call(expected_payload)
