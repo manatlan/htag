@@ -19,7 +19,7 @@ import struct
 import random
 import urllib.parse
 from io import BytesIO
-from http.client import HTTPResponse
+from http.client import HTTPResponse as ClientHTTPResponse
 from http.server import BaseHTTPRequestHandler
 
     
@@ -441,6 +441,7 @@ async def handle_server_websocket(reader, writer, server, funchttp, func, **kwds
             websocket.request = request
         except BaseException as e:
             websocket._closed = True
+            return
 
         def task_done(task):
             server.remove_task(task)
@@ -489,7 +490,7 @@ async def handshake_with_server(reader, writer, parsed_url, **kwds):
             if header in b'\r\n':
                 break
 
-        response = HTTPResponse(FakeSocket(header_buffer))
+        response = ClientHTTPResponse(FakeSocket(header_buffer))
         response.begin()
 
         accept_key = response.getheader('sec-websocket-accept')
