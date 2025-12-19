@@ -9,7 +9,7 @@
     </head>
     <body>
      loading...
-      <script type="py" config='{"packages":["htag"]}'>
+      <script type="py" config='{"packages":["htag==0.120.0"]}'>
 from htag import Tag
 
 class AComponent(Tag.div):
@@ -31,6 +31,7 @@ class Main(Tag.body):
 from htag.runners import PyScript
 
 PyScript( Main  ).run()
+
 
 </script>
 </body>
