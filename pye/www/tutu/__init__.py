@@ -9,3 +9,5 @@ class App(Tag.App):
         
     def do_click(self, o):
         self.msg += "tutu Clicked! "
+
+app=App
