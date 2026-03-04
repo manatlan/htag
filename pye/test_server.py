@@ -41,6 +41,19 @@ class app(Tag.App):
     # Static file inside the folder app
     (folder_app_dir / "logo.png").write_text("fake image")
     
+    # A module htag App setting app=MyClass
+    module_app_dir = apps_dir / "mymodule"
+    module_app_dir.mkdir()
+    module_content = """from htag import Tag
+class MyModApp(Tag.App):
+    def init(self):
+        self += Tag.h1("Hello ModApp")
+app=MyModApp
+"""
+    (module_app_dir / "__init__.py").write_text(module_content)
+    (module_app_dir / "static.txt").write_text("module static content")
+    (module_app_dir / "secret.py").write_text("print('SECRET_PYTHON_OUTPUT')")
+
     yield apps_dir
     
     # Clean up sys.path
@@ -83,6 +96,23 @@ def test_folder_htag_app(client):
     response = client.get("/myfolder/")
     assert response.status_code == 200
     assert "Hello FolderApp" in response.text
+
+def test_module_htag_app(client):
+    response = client.get("/mymodule/")
+    assert response.status_code == 200
+    assert "Hello ModApp" in response.text
+
+def test_static_in_module_app(client):
+    response = client.get("/mymodule/static.txt")
+    assert response.status_code == 200
+    assert response.text == "module static content"
+
+def test_python_in_module_app_no_source_leak(client):
+    response = client.get("/mymodule/secret.py")
+    assert response.status_code == 200
+    # It executes the script, we must get the output but NEVER the source code!
+    assert "print('SECRET_PYTHON_OUTPUT')" not in response.text
+    assert "SECRET_PYTHON_OUTPUT" in response.text
 
 def test_static_in_folder_app(client):
     response = client.get("/myfolder/logo.png")
