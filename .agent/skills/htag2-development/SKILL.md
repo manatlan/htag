@@ -100,6 +100,7 @@ htag2 automatically binds input events to Python.
 The `htag/server.py` implementation is fully robust against network irregularities:
 - **WebSocket to HTTP Fallback**: If a WebSocket drops or fails to connect, the Javascript bridge automatically falls back to utilizing standard HTTP POST requests (`/event`) and Server-Sent Events (`/stream`).
 - **Graceful Reconnections**: A user pressing F5 will not kill the server thread. The server only exits when the browser tab is explicitly closed or navigates away cleanly without returning within the 1-second reconnect window. 
+- **Parano Mode (Payload Obfuscation)**: WebApp accepts a `parano=True` parameter that obfuscates all JSON traffic over WebSockets and HTTP routes. This lightweight symmetric XOR cipher hides data from simple MITM proxies without needing heavy cryptographic libraries on the frontend.
 
 ### 7. Session & Request Integration
 When using `WebApp`, every tag has access to the current Starlette `Request` or `WebSocket` via the **`self.request`** property. This allows for direct access to the session, headers, and other request data.

@@ -48,6 +48,28 @@ class Event:
         return f"Event({self.name} on {self.target.tag})"
 
 
+def _obf_dumps(obj: Any, key: str | None) -> str:
+    if key:
+        import base64
+        bdata = json.dumps(obj, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+        bkey = key.encode("utf-8")
+        res = bytearray(len(bdata))
+        for i in range(len(bdata)):
+            res[i] = bdata[i] ^ bkey[i % len(bkey)]
+        return base64.b64encode(res).decode("ascii")
+    return json.dumps(obj)
+
+def _obf_loads(data: str, key: str | None) -> Any:
+    if key:
+        import base64
+        bdata = base64.b64decode(data)
+        bkey = key.encode("utf-8")
+        res = bytearray(len(bdata))
+        for i in range(len(bdata)):
+            res[i] = bdata[i] ^ bkey[i % len(bkey)]
+        return json.loads(res.decode("utf-8"))
+    return json.loads(data)
+
 CLIENT_JS = """
 // The client-side bridge that connects the browser to the Python server.
 var ws;
@@ -144,7 +166,25 @@ window.onunhandledrejection = function(event) {
     }
 };
 
+function _enc(obj) {
+    if(window.PARANO) {
+        var str = unescape(encodeURIComponent(JSON.stringify(obj)));
+        var res = "";
+        for(var i=0; i<str.length; i++) res += String.fromCharCode(str.charCodeAt(i) ^ window.PARANO.charCodeAt(i % window.PARANO.length));
+        return btoa(res);
+    }
+    return JSON.stringify(obj);
+}
 
+function _dec(b64) {
+    if(window.PARANO) {
+        var str = atob(b64);
+        var res = "";
+        for(var i=0; i<str.length; i++) res += String.fromCharCode(str.charCodeAt(i) ^ window.PARANO.charCodeAt(i % window.PARANO.length));
+        return JSON.parse(decodeURIComponent(escape(res)));
+    }
+    return JSON.parse(b64);
+}
 
 function init_ws() {
     var ws_protocol = window.location.protocol === "https:" ? "wss://" : "ws://";
@@ -155,7 +195,7 @@ function init_ws() {
     };
 
     ws.onmessage = function(event) {
-        var data = JSON.parse(event.data);
+        var data = _dec(event.data);
         handle_payload(data);
     };
 
@@ -243,7 +283,7 @@ function fallback() {
     sse = new window.EventSource(_base_path + "stream");
     sse.onopen = () => console.log("htag: SSE connected");
     sse.onmessage = function(event) {
-        handle_payload(JSON.parse(event.data));
+        handle_payload(_dec(event.data));
     };
     sse.onerror = function(err) {
         console.error("htag: SSE error", err);
@@ -282,7 +322,7 @@ function htag_event(id, event_name, event) {
     var payload = {id: id, event: event_name, data: data};
     
     if(!use_fallback && ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify(payload));
+        ws.send(_enc(payload));
     } else {
         // Use HTTP POST Fallback
         // (Fastest trigger even if SSE is still initializing)
@@ -290,7 +330,7 @@ function htag_event(id, event_name, event) {
         fetch(_base_path + "event", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(payload)
+            body: _enc(payload)
         }).then(response => {
             if (!response.ok) {
                 if(_error_overlay && typeof _error_overlay.show === 'function') {
@@ -325,11 +365,13 @@ class WebApp:
         tag_entity: type[App] | App,
         on_instance: Callable[[App, Request | WebSocket], None] | None = None,
         debug: bool = True,
+        parano: bool = False,
     ) -> None:
         self._lock = threading.Lock()
         self.tag_entity = tag_entity  # Class or Instance
         self.on_instance = on_instance  # Optional callback(instance)
         self.debug = debug
+        self.parano_key = os.urandom(8).hex() if parano else None
         self.instances: dict[str, App] = {}  # sid -> App instance
         self.app = Starlette()
         self._setup_routes()
@@ -358,6 +400,7 @@ class WebApp:
 
                         # Propagate debug mode
                         self.instances[sid].debug = self.debug
+                        self.instances[sid].parano_key = self.parano_key
 
                         # Store a backlink to the webserver for session-aware logic
                         setattr(self.instances[sid], "_webserver", self)
@@ -426,7 +469,8 @@ class WebApp:
             instance = self._get_instance(htag_sid, request)
             token = current_request.set(request)
             try:
-                msg = await request.json()
+                msg_body = await request.body()
+                msg = _obf_loads(msg_body.decode("utf-8"), getattr(instance, "parano_key", None))
                 # Run the event in the background to not block the HTTP response
                 # Broadcast will trigger async queues anyway
                 asyncio.create_task(instance.handle_event(msg, None))
@@ -504,6 +548,7 @@ class App(GTag):
                 <script>{CLIENT_JS}</script>
                 <script>
                     window.HTAG_RELOAD = {"true" if getattr(self, "_reload", False) else "false"};
+                    window.PARANO = {f'"{self.parano_key}"' if getattr(self, "parano_key", None) else 'null'};
                 </script>
                 {statics_html}
             </head>
@@ -523,7 +568,7 @@ class App(GTag):
             js: list[str] = []
             self.collect_updates(self, {}, js)
 
-            payload = json.dumps({"action": "update", "updates": updates, "js": js})
+            payload = _obf_dumps({"action": "update", "updates": updates, "js": js}, getattr(self, "parano_key", None))
             # EventSource requires 'data: {payload}\n\n'
             yield f"data: {payload}\n\n"
         except Exception as e:
@@ -557,7 +602,7 @@ class App(GTag):
             self.collect_updates(self, {}, js)  # We only want the JS calls here
 
             await websocket.send_text(
-                json.dumps({"action": "update", "updates": updates, "js": js})
+                _obf_dumps({"action": "update", "updates": updates, "js": js}, getattr(self, "parano_key", None))
             )
             logger.debug("Sent initial state to client")
         except Exception as e:
@@ -566,7 +611,7 @@ class App(GTag):
         try:
             while True:
                 data = await websocket.receive_text()
-                msg = json.loads(data)
+                msg = _obf_loads(data, getattr(self, "parano_key", None))
                 await self.handle_event(msg, websocket)
         except (WebSocketDisconnect, Exception):
             pass
@@ -721,7 +766,7 @@ class App(GTag):
                     )
                     logger.error(error_msg)
                     # Use broadcast-like update for error reporting
-                    err_payload: str = json.dumps(
+                    err_payload: str = _obf_dumps(
                         {
                             "action": "error",
                             "traceback": error_trace
@@ -729,7 +774,7 @@ class App(GTag):
                             else "Internal Server Error",
                             "callback_id": callback_id,
                             "result": None,
-                        }
+                        }, getattr(self, "parano_key", None)
                     )
 
                     if ws:
@@ -767,13 +812,13 @@ class App(GTag):
             )
             logger.error(error_msg)
 
-            err_payload = json.dumps(
+            err_payload = _obf_dumps(
                 {
                     "action": "error",
                     "traceback": error_trace if self.debug else "Internal Server Error",
                     "callback_id": callback_id,
                     "result": None,
-                }
+                }, getattr(self, "parano_key", None)
             )
 
             # Send to websocket clients
@@ -816,7 +861,7 @@ class App(GTag):
                 result if callback_id else "n/a",
             )
 
-            payload = json.dumps(data)
+            payload = _obf_dumps(data, getattr(self, "parano_key", None))
 
             # Send to websocket clients
             dead_ws_clients: list[WebSocket] = []

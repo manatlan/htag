@@ -34,6 +34,7 @@ if __name__ == "__main__":
     - Full control over routes, middleware, and documentation.
     - Seamlessly mix standard HTML/API routes with reactive `htag2` components.
     - Support for subpath mounting (e.g., `app.mount("/app", ...)`).
+    - Built-in `parano=True` mode for payload obfuscation (dynamic XOR cipher) to protect traffic against simple MITM proxies.
 
 ## Desktop Deployment (ChromeApp)
 

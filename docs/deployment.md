@@ -27,6 +27,16 @@ You can now run this with `uvicorn`:
 uvicorn app:app --host 0.0.0.0 --port 80
 ```
 
+### Security Options (Parano Mode)
+
+When exposing your application on the internet, you can use the `parano=True` argument when initializing your `WebApp`. This enables **Parano Mode**, which obfuscates all JSON payloads exchanged between the frontend and backend (over WebSockets and HTTP fallbacks) using a dynamic XOR cipher. This makes your network traffic unreadable to simple Man-In-The-Middle (MITM) proxies without needing complex cryptography libraries.
+
+```python
+# Create the WebApp runner with payload obfuscation
+from htag.server import WebApp
+app = WebApp(MyApp, debug=False, parano=True).app
+```
+
 ## Embedding htag in existing Starlette/FastAPI apps
 
 Since `htag` uses a `WebApp` wrapper, you can also mount it as a sub-application or include its routes in a larger Starlette or FastAPI project.
