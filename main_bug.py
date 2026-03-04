@@ -1,6 +1,8 @@
 import time
 from htag import Tag, State
 
+# hi2
+
 class App(Tag.App):
     def init(self):
         self <= Tag.button("Trigger Python Error", _class="btn", _onclick=self.trigger_py_error)

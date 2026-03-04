@@ -69,5 +69,14 @@ async def login(request):
 app.mount("/app", WebApp(MyApp).app) 
 
 if __name__ == "__main__":
-    print("🚀 Server started at http://127.0.0.1:8000")
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    import os
+    import sys
+
+    # Enable htag2 auto-reload polling in the frontend
+    MyApp._reload = True
+    
+    print("🚀 Server started at http://127.0.0.1:8000 (with hot-reload)")
+    
+    # We use the string import path to allow uvicorn's reload feature
+    file_name = os.path.basename(__file__)[:-3] # "main_integration"
+    uvicorn.run(f"{file_name}:app", host="127.0.0.1", port=8000, reload=True)
