@@ -66,9 +66,17 @@ class HtagError extends HTMLElement {
                 :host {
                     display: none;
                     position: fixed;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    z-index: 2147483647;
+                    align-items: center;
+                    justify-content: center;
+                    backdrop-filter: blur(2px);
+                }
+                :host([show]) { display: flex; }
+                .dialog {
                     width: 80%;
                     max-width: 600px;
                     background: #fee2e2;
@@ -77,24 +85,38 @@ class HtagError extends HTMLElement {
                     color: #991b1b;
                     padding: 15px;
                     border-radius: 4px;
-                    z-index: 2147483647;
                     font-family: system-ui, -apple-system, sans-serif;
                     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
                     max-height: 80vh;
                     overflow-y: auto;
                     text-align: left;
+                    position: relative;
                 }
-                :host([show]) { display: block; }
-                h3 { margin: 0 0 10px 0; font-size: 16px; }
+                h3 { margin: 0 0 10px 0; font-size: 16px; display: inline-block;}
                 pre { background: #fef2f2; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 12px; overflow-x: auto; margin:0; text-align: left; }
                 .close { position: absolute; top: 10px; right: 15px; cursor: pointer; font-weight: bold; font-size: 18px; color: #ef4444; }
                 .close:hover { color: #b91c1c; }
+                .copy { float: right; margin-right: 40px; cursor: pointer; background: #ef4444; color: white; border: none; padding: 2px 8px; border-radius: 3px; font-size: 12px; transition: background 0.2s; }
+                .copy:hover { background: #b91c1c; }
+                .copy:active { background: #991b1b; }
             </style>
-            <div class="close" title="Close">×</div>
-            <h3 id="title">Error</h3>
-            <pre id="trace"></pre>
+            <div class="dialog">
+                <div class="close" title="Close">×</div>
+                <button class="copy" id="copy-btn">Copy</button>
+                <h3 id="title">Error</h3>
+                <pre id="trace"></pre>
+            </div>
         `;
         this.shadowRoot.querySelector('.close').onclick = () => this.removeAttribute('show');
+        this.shadowRoot.getElementById('copy-btn').onclick = () => {
+            const trace = this.shadowRoot.getElementById('trace').textContent;
+            navigator.clipboard.writeText(trace).then(() => {
+                const btn = this.shadowRoot.getElementById('copy-btn');
+                const old = btn.textContent;
+                btn.textContent = 'Copied!';
+                setTimeout(() => btn.textContent = old, 1500);
+            });
+        };
     }
     show(title, trace) {
         this.shadowRoot.getElementById('title').textContent = title;
