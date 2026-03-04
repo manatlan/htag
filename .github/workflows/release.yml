@@ -3,13 +3,15 @@ name: Build and Release
 on:
   push:
     branches: [ main ]
-    tags: [ 'v*' ]
   pull_request:
     branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.check_version.outputs.version }}
+      is_new_version: ${{ steps.check_version.outputs.is_new }}
     steps:
       - uses: actions/checkout@v4
       
@@ -21,11 +23,17 @@ jobs:
       - name: Run tests
         run: uv run pytest
           
-      - name: Update version from tag
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Check version
+        id: check_version
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          VERSION=${GITHUB_REF#refs/tags/v}
-          sed -i "s/^version = .*/version = \"$VERSION\"/" pyproject.toml
+          VERSION=$(grep -m 1 '^version = ' pyproject.toml | cut -d '"' -f 2)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          if [ -n "$(git ls-remote --tags origin "refs/tags/v$VERSION")" ]; then
+            echo "is_new=false" >> $GITHUB_OUTPUT
+          else
+            echo "is_new=true" >> $GITHUB_OUTPUT
+          fi
           
       - name: Build package
         run: uv build --wheel
@@ -39,7 +47,7 @@ jobs:
   release:
     name: GitHub Release
     needs: build
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.build.outputs.is_new_version == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -52,6 +60,9 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: v${{ needs.build.outputs.version }}
+          name: "Release v${{ needs.build.outputs.version }}"
+          target_commitish: ${{ github.sha }}
           files: dist/*
           draft: false
           prerelease: false
@@ -83,7 +94,7 @@ jobs:
   release-pypi:
     name: Publish to PyPI
     needs: build
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.build.outputs.is_new_version == 'true'
     runs-on: ubuntu-latest
     environment:
       name: pypi
