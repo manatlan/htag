@@ -1,7 +1,7 @@
 import time
 from htag import Tag, State
 
-# hi2
+# hi2 !!
 
 class App(Tag.App):
     def init(self):

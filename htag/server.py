@@ -238,6 +238,7 @@ init_ws();
 // Returns a Promise that resolves with the server's return value.
 function htag_event(id, event_name, event) {
     var callback_id = Math.random().toString(36).substring(2);
+    event = event || {};
     
     // Determine the value to send (handle checkboxes specifically)
     var val = null;

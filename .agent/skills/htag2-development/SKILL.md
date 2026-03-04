@@ -121,6 +121,79 @@ htag2 includes a built-in visual aid mechanism to help developers track bugs:
 - **`Runner(App, debug=True)` (Default)**: During development, ANY error that occurs (a Python exception in a callback, a JavaScript error, or a network disconnection) is visually reported via a Shadow DOM overlay in the screen (displaying js/traceback errors).
 - **`Runner(App, debug=False)`**: Use this for production. Tracebacks are logged internally on the server, and only generic "Internal Server Error" messages are shown in the client UI to prevent sensitive data leakage.
 
+### 9. Reactive vs Persistent Trees
+
+When building complex hierarchical structures (like file trees or nested menus), choosing the right rendering strategy is critical for both performance and reliability.
+
+**Dynamic (Lambda-based) Rendering**:
+- **Usage**: `Tag.div(lambda: self.render_items(self.data.value))`
+- **Pros**: Very clean, "standard" htag2 way.
+- **Cons**: Every state change triggers a full re-render of the entire branch. In htag2, this creates **new Tag objects with new IDs**. If a user clicks an item while another update is happening, the event might be dispatched to an ID that no longer exists in the server-side tree, causing "ghost" clicks or unresponsiveness.
+
+**Persistent (Init-based) Rendering (Recommended for complex trees)**:
+- **Usage**: Build the tags once in `init()` and toggle their visibility.
+- **Pros**: **Stable IDs**. Tags are created once and stay in memory. Events always reach the correct target.
+- **Mechanism**: Use reactive classes to hide/show branches.
+
+```python
+def build_tree(self, folder_data):
+    for item in folder_data:
+        # 1. Create the toggleable branch container
+        with Tag.div() as container:
+            # 2. Add the header/toggle
+            Tag.div(item.name, _onclick=lambda e, p=item.path: self.toggle(p))
+            
+            # 3. Create the children container with REACTIVE visibility
+            with Tag.div(_class=lambda p=item.path: "" if p in self.expanded.value else "hidden"):
+                if item.children:
+                    self.build_tree(item.children) # Recurse
+```
+
+### 10. Best Practices for Large Trees
+
+1.  **Stable IDs**: As shown above, prefer persistent tags for elements that handle clicks/inputs.
+2.  **CSS Visibility over DOM Removal**: Toggling a `hidden` class is much faster than htag2's engine adding/removing elements from the DOM.
+3.  **Path Normalization**: When using paths as keys in a `State(set())`, always use `os.path.normpath()` to avoid mismatching due to trailing slashes or different separators.
+4.  **Closure Capture**: In loops, always use default arguments in lambdas to capture the current iteration value: `_onclick=lambda e, p=current_path: self.do(p)`.
+
+### 11. Toast Notification System
+
+Modern web applications should avoid blocking `alert()` boxes in favor of non-intrusive toast notifications.
+
+**Structure**:
+1.  **Container**: A fixed element (usually bottom-right) that acts as a stacking context.
+2.  **Toast**: Individual components with high z-index and exit animations.
+
+**Implementation Pattern (JS-side Timer)**:
+Prefer using **client-side timers** (`setTimeout`) to trigger the auto-dismissal. This is much more efficient than using `asyncio.sleep` in Python, as it offloads the timing logic to the browser and avoids keeping Python tasks alive for simple UI effects.
+
+```python
+class App(Tag.App):
+    def init(self):
+        # 1. Stacking container
+        self.toasts = Tag.div(_class="toast-container")
+        self += self.toasts
+
+    def notify(self, message, type="info"):
+        # 2. Add individual toast with an 'expire' event
+        t = Tag.div(message, _class=f"toast toast-{type}", 
+                  _onexpire=lambda e: t.remove_self())
+        self.toasts.add(t)
+        
+        # 3. Trigger dismissal via client-side setTimeout
+        # Best Practice: Always pass an empty object {} if no DOM event is forwarded
+        t.call_js(f"setTimeout(() => htag_event('{t.id}', 'expire', {{}}), 5000)")
+```
+
+**Manual JS Events (`htag_event`)**:
+The global `htag_event(id, event_name, event)` function is the bridge that triggers Python callbacks from JS:
+- **`id`**: The target component's ID (`self.id`).
+- **`event_name`**: The callback name (e.g., `'click'`, `'expire'`).
+- **`event`**: (Optional) Data object passed to the Python `event` argument. Always pass `{}` if no specific data is needed to ensure robustness across browser environments.
+
+**Premium Aesthetics**:
+Use CSS keyframes for entry animations (e.g., sliding up or fading in) and distinct background colors for Success, Error, and Info states.
+
 ## Best Practices
 
 ### Layout & Styling
