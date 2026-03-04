@@ -1,6 +1,6 @@
 from htag import Tag
 
-class App(Tag.App):
+class Tutu(Tag.App):
     def init(self):
         self += Tag.h1("Hello tutu!!!", _style="color: blue;")
         self += Tag.button("Click me", _onclick=self.do_click)
@@ -8,6 +8,6 @@ class App(Tag.App):
         self += self.msg
         
     def do_click(self, o):
-        self.msg += "tutu Clicked! "
+        self.msg += Tag.p("tutu Clicked! ")
 
-app=App
+app=Tutu

@@ -3,8 +3,11 @@ import importlib
 import os
 import subprocess
 import sys
+import time
 from dataclasses import dataclass
 from pathlib import Path
+
+APP_TTL = 10 * 60  # 10 minutes
 
 from starlette.applications import Starlette
 from starlette.responses import HTMLResponse, FileResponse
@@ -46,10 +49,11 @@ class AppInfo:
     Data class storing metadata for a discovered htag application.
     """
 
-    app: Starlette
+    app: Starlette | None
     file: Path
     mtime: float
     mod_path: str
+    last_accessed: float
 
 
 class DynamicHtagApps:
@@ -117,6 +121,7 @@ class DynamicHtagApps:
                                     file=init_file,
                                     mtime=get_app_mtime(init_file),
                                     mod_path=mod_path,
+                                    last_accessed=time.time(),
                                 )
                                 continue  # Don't descend further into an app package
                         except Exception as e:
@@ -151,6 +156,7 @@ class DynamicHtagApps:
                                     file=p,
                                     mtime=get_app_mtime(p),
                                     mod_path=mod_path,
+                                    last_accessed=time.time(),
                                 )
                         except Exception as e:
                             print(f"WARNING: Discovery failed for {mod_path}: {e}")
@@ -250,6 +256,14 @@ class DynamicHtagApps:
         if scope["type"] not in ["http", "websocket"]:
             return
 
+        # Garbage collect inactive apps
+        if scope["type"] == "http":
+            now = time.time()
+            for name, info in list(self.apps.items()):
+                if info.app is not None and (now - info.last_accessed > APP_TTL):
+                    print(f"INFO: TTL expired for htag app '{name}' ({APP_TTL}s), unloading...")
+                    info.app = None
+
         path: str = scope["path"]
         rel_path: str = path.strip("/")
 
@@ -272,25 +286,36 @@ class DynamicHtagApps:
             for name in sorted(self.apps.keys(), key=len, reverse=True):
                 if rel_path == name or rel_path.startswith(name + "/"):
                     app_info: AppInfo = self.apps[name]
+                    app_info.last_accessed = time.time()
 
-                    # Check for source file modifications ONLY on http requests (avoid reloading during websocket)
                     try:
-                        if scope["type"] == "http":
-                            current_mtime: float = get_app_mtime(app_info.file)
-                            if current_mtime > app_info.mtime:
+                        current_mtime: float = get_app_mtime(app_info.file)
+                        
+                        needs_load = app_info.app is None
+                        needs_reload = (scope["type"] == "http" and current_mtime > app_info.mtime)
+
+                        if needs_load or needs_reload:
+                            if needs_load:
+                                print(f"INFO: Loading htag app '{name}'...")
+                            else:
                                 print(f"INFO: Auto-reloading htag app '{name}'...")
-                                mod = importlib.reload(sys.modules[app_info.mod_path])
-                                app_class = getattr(mod, "app", None)
-                                if (
-                                    app_class
-                                    and isinstance(app_class, type)
-                                    and issubclass(app_class, Tag.App)
-                                ):
-                                    wa = WebApp(app_class)
-                                    app_info.app = wa.app
-                                    app_info.mtime = current_mtime
+
+                            mod = (
+                                importlib.reload(sys.modules[app_info.mod_path])
+                                if app_info.mod_path in sys.modules
+                                else importlib.import_module(app_info.mod_path)
+                            )
+                            app_class = getattr(mod, "app", None)
+                            if (
+                                app_class
+                                and isinstance(app_class, type)
+                                and issubclass(app_class, Tag.App)
+                            ):
+                                wa = WebApp(app_class)
+                                app_info.app = wa.app
+                                app_info.mtime = current_mtime
                     except Exception as e:
-                        print(f"WARNING: Failed to auto-reload '{name}': {e}")
+                        print(f"WARNING: Failed to load/reload '{name}': {e}")
 
                     matching_app = app_info.app
                     app_path = "/" + name
