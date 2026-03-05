@@ -11,3 +11,7 @@ wheels/
 site/
 local_ideas/
 htmlcov/
+
+# Buildozer apk
+.buildozer/
+buildozer.spec
