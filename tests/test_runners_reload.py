@@ -16,10 +16,10 @@ def cleanup_env():
         del os.environ["HTAG_RELOADER"]
 
 
-@patch("htag.runner.threading.Thread")
-@patch("htag.runner.subprocess.Popen")
-@patch("htag.runner.uvicorn.run")
-@patch("htag.runner.ChromeApp._run_with_reloader")
+@patch("htag.runners.chromeapp.threading.Thread")
+@patch("htag.runners.chromeapp.subprocess.Popen")
+@patch("htag.runners.chromeapp.uvicorn.run")
+@patch("htag.runners.chromeapp.ChromeApp._run_with_reloader")
 def test_chromeapp_reload_master(mock_run_reloader, mock_uvicorn, mock_popen, mock_thread):
     """
     Test ChromeApp with reload=True when it's the MASTER process.
@@ -40,10 +40,10 @@ def test_chromeapp_reload_master(mock_run_reloader, mock_uvicorn, mock_popen, mo
     mock_thread.assert_called_once()
 
 
-@patch("htag.runner.threading.Thread")
-@patch("htag.runner.subprocess.Popen")
-@patch("htag.runner.uvicorn.run")
-@patch("htag.runner.ChromeApp._run_with_reloader")
+@patch("htag.runners.chromeapp.threading.Thread")
+@patch("htag.runners.chromeapp.subprocess.Popen")
+@patch("htag.runners.chromeapp.uvicorn.run")
+@patch("htag.runners.chromeapp.ChromeApp._run_with_reloader")
 def test_chromeapp_reload_child(mock_run_reloader, mock_uvicorn, mock_popen, mock_thread):
     """
     Test ChromeApp with reload=True when it's the CHILD WORKER process.
@@ -64,14 +64,14 @@ def test_chromeapp_reload_child(mock_run_reloader, mock_uvicorn, mock_popen, moc
     mock_thread.assert_not_called()
 
 
-@patch("htag.runner.subprocess.Popen")
-@patch("htag.runner.time.sleep")
+@patch("htag.runners.chromeapp.subprocess.Popen")
+@patch("htag.runners.chromeapp.time.sleep")
 def test_base_run_with_reloader(mock_sleep, mock_popen):
     """
     Test the base watcher loop logic. We simulate that the child process 
     will immediately exit so it doesn't infinite loop.
     """
-    from htag.runner import ChromeApp
+    from htag.runners.chromeapp import ChromeApp
     
     # Fake process that returns 0 (normal exit) immediately
     mock_process = MagicMock()

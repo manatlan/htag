@@ -13,7 +13,7 @@ import threading
 import uvicorn
 
 if TYPE_CHECKING:
-    from .server import App
+    from ..server import App
 
 logger = logging.getLogger("htag")
 
@@ -195,7 +195,7 @@ class ChromeApp:
             self._run_with_reloader(host=host, port=port)
             return
 
-        from .server import WebApp
+        from ..server import WebApp
 
         def on_inst(inst: App) -> None:
             inst.exit_on_disconnect = True
