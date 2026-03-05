@@ -31,6 +31,10 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           if [ -n "$(git ls-remote --tags origin "refs/tags/v$VERSION")" ]; then
             echo "is_new=false" >> $GITHUB_OUTPUT
+            # Update pyproject.toml to use a +latest local version identifier so it's explicitly different from PyPI
+            DEV_VERSION="${VERSION}+latest"
+            sed -i "s/^version = \"$VERSION\"/version = \"$DEV_VERSION\"/" pyproject.toml
+            echo "Using local version identifier: $DEV_VERSION"
           else
             echo "is_new=true" >> $GITHUB_OUTPUT
           fi
