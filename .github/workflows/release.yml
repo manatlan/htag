@@ -15,10 +15,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
       - name: Install uv
         uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
+          
+      - name: Install dependencies
+        run: uv sync --all-extras --dev
           
       - name: Run tests
         run: uv run pytest
@@ -28,25 +36,28 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           VERSION=$(grep -m 1 '^version = ' pyproject.toml | cut -d '"' -f 2)
+          echo "Extracted version: $VERSION"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           if [ -n "$(git ls-remote --tags origin "refs/tags/v$VERSION")" ]; then
             echo "is_new=false" >> $GITHUB_OUTPUT
+            echo "Version $VERSION already exists (skipping release)"
             # Update pyproject.toml to use a +latest local version identifier so it's explicitly different from PyPI
             DEV_VERSION="${VERSION}+latest"
             sed -i "s/^version = \"$VERSION\"/version = \"$DEV_VERSION\"/" pyproject.toml
             echo "Using local version identifier: $DEV_VERSION"
           else
             echo "is_new=true" >> $GITHUB_OUTPUT
+            echo "Version $VERSION is new! (triggering release)"
           fi
           
       - name: Build package
-        run: uv build --wheel
+        run: uv build
         
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: htag2-wheel
-          path: dist/*.whl
+          name: htag2-dist
+          path: dist/*
           
   release:
     name: GitHub Release
@@ -58,7 +69,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: htag2-wheel
+          name: htag2-dist
           path: dist/
           
       - name: Create Release
@@ -82,7 +93,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: htag2-wheel
+          name: htag2-dist
           path: dist/
           
       - name: Update Latest Release
@@ -108,7 +119,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: htag2-wheel
+          name: htag2-dist
           path: dist/
           
       - name: Publish package distributions to PyPI
