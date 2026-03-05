@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import os
 import sys
 import subprocess
@@ -6,6 +5,7 @@ import shutil
 import argparse
 import re
 from pathlib import Path
+import tempfile
 
 
 class C:
@@ -93,14 +93,117 @@ def build(entrypoint: str):
             print(f"🧹 {C.CYAN}Cleaning up{C.END} '{spec_file}'...")
             spec_file.unlink()
 
+def build_apk(entrypoint: str, is_tv: bool = False):
+    """
+    Builds an Android APK for an htag app using Docker and Buildozer.
+    """
+    entry_path = Path(entrypoint).resolve()
+    if not entry_path.exists():
+        print(f"{C.RED}{C.BOLD}Error:{C.END} Entrypoint '{entrypoint}' not found.")
+        sys.exit(1)
+
+    app_name = entry_path.stem
+
+    if not shutil.which("docker"):
+        print(f"❌ {C.RED}{C.BOLD}Error:{C.END} Docker is required to build an APK.")
+        print("Please install docker: https://docs.docker.com/engine/install/")
+        sys.exit(1)
+
+    print(f"🚀 {C.BLUE}Building APK{C.END} for '{C.BOLD}{app_name}{C.END}' from '{entry_path}'...")
+
+    DOCKER_IMAGE = "mybuildozer"
+
+    # Check if mybuildozer image exists
+    print(f"🐳 {C.CYAN}Checking Docker image '{DOCKER_IMAGE}'...{C.END}")
+    try:
+        res = subprocess.run(f"docker images {DOCKER_IMAGE} -q", shell=True, capture_output=True, text=True)
+        if not res.stdout.strip():
+            print(f"⬇️  {C.YELLOW}Docker image '{DOCKER_IMAGE}' not found. Building it...{C.END}")
+            with tempfile.TemporaryDirectory() as tmpdir:
+                subprocess.run(f"cd {tmpdir} && git clone https://github.com/manatlan/buildozer.git .", shell=True, check=True)
+                print(f"⚙️  {C.YELLOW}Building docker image (this may take a while)...{C.END}")
+                subprocess.run(f"cd {tmpdir} && docker build --tag={DOCKER_IMAGE} .", shell=True, check=True)
+            print(f"✅ {C.GREEN}{C.BOLD}Docker image '{DOCKER_IMAGE}' built successfully.{C.END}")
+    except subprocess.CalledProcessError as e:
+        print(f"❌ {C.RED}{C.BOLD}Failed to build/check Docker image.{C.END}")
+        sys.exit(1)
+
+    # Create buildozer.spec if it doesn't exist
+    spec_path = Path("buildozer.spec")
+    if not spec_path.exists():
+        print(f"📝 {C.CYAN}Generating default 'buildozer.spec'...{C.END}")
+        # Adjust settings for Android TV
+        orientation = "landscape" if is_tv else "portrait"
+        fullscreen = "1" if is_tv else "0"
+        android_archs = "armeabi-v7a" if is_tv else "arm64-v8a"
+
+        icon_path = entry_path.parent / "icon.png"
+        icon_setting = f"icon.filename = %(source.dir)s/icon.png\n" if icon_path.exists() else ""
+
+        spec_content = f"""[app]
+title = {app_name.capitalize()}
+package.name = {app_name.lower()}
+package.domain = org.htag
+version = 1.0
+
+source.dir = .
+source.include_exts = py,png,jpg,jpeg,svg,js,css,html
+
+requirements = android,htag2
+orientation = {orientation}
+fullscreen = {fullscreen}
+android.archs = {android_archs}
+{icon_setting}
+
+home_app = 1
+android.permissions = INTERNET
+android.accept_sdk_license = True
+
+p4a.hook = p4a/hook.py
+p4a.port = 12458
+p4a.bootstrap = webview
+p4a.branch = v2023.09.16
+
+[buildozer]
+log_level = 2
+"""
+        spec_path.write_text(spec_content)
+        print(f"✅ {C.GREEN}Created 'buildozer.spec'{C.END}")
+
+    # Ensure .buildozer exists locally
+    Path(".buildozer").mkdir(exist_ok=True)
+
+    print(f"⚙️ {C.YELLOW}Running buildozer in Docker...{C.END}")
+    
+    # Run buildozer in Docker
+    cwd = Path.cwd()
+    cmd = [
+        "docker", "run", "-it", "--rm",
+        "-v", f"{cwd}/.buildozer:/home/user/.buildozer",
+        "-v", f"{cwd}:/home/user/hostcwd",
+        DOCKER_IMAGE, "android", "debug"
+    ]
+    
+    try:
+        subprocess.run(cmd, check=True)
+        print(f"✅ {C.GREEN}{C.BOLD}Successfully built APK{C.END} in 'bin/' directory.")
+    except subprocess.CalledProcessError as e:
+        print(f"❌ {C.RED}{C.BOLD}Buildozer failed{C.END} with return code {e.returncode}")
+        print(f"💡 {C.DIM}Check the logs above for details. You might need to adjust 'buildozer.spec'.{C.END}")
+        sys.exit(e.returncode)
 
 def clear_build():
-    """Removes build/ and dist/ directories"""
-    for d in ["build", "dist"]:
+    """Removes build/, dist/, .buildozer/ and bin/ directories"""
+    for d in ["build", "dist", ".buildozer", "bin"]:
         path = Path(d)
-        if path.exists() and path.is_dir():
+        if path.exists():
             print(f"🧹 {C.CYAN}Removing{C.END} '{path}'...")
-            shutil.rmtree(path)
+            if path.is_dir():
+                shutil.rmtree(path)
+            else:
+                path.unlink()
+    
+    # also remove spec file as part of clear? Up to user preference, leaving it for now so they don't lose config
     print(f"✨ {C.GREEN}{C.BOLD}Cleanup complete.{C.END}")
 
 
@@ -148,6 +251,9 @@ class UvHelpFormatter(argparse.HelpFormatter):
                 clean_line = clean_line.replace(
                     "{build}", f"{C.CYAN}<COMMAND>{C.END}{C.YELLOW}"
                 )
+                clean_line = clean_line.replace(
+                    "{build,apk}", f"{C.CYAN}<COMMAND>{C.END}{C.YELLOW}"
+                )
                 new_lines.append(
                     f"{C.YELLOW}{C.BOLD}Usage:{C.END} {C.YELLOW}{clean_line}{C.END}"
                 )
@@ -190,6 +296,27 @@ def main():
         "path", help="Path to main script, or 'clear' to reset folders"
     )
 
+    # Apk command
+    apk_parser = subparsers.add_parser(
+        "apk",
+        help="Build Android APKs for your htag app via Docker.",
+        description=f"{C.BOLD}Build Android APKs for your htag app via Docker & Buildozer.{C.END}",
+        formatter_class=UvHelpFormatter,
+        add_help=False,
+    )
+    apk_parser._positionals.title = "Arguments"
+    apk_parser._optionals.title = "Options"
+
+    apk_parser.add_argument(
+        "-h", "--help", action="help", help="Display help for the apk command"
+    )
+    apk_parser.add_argument(
+        "path", help="Path to main script to build as APK"
+    )
+    apk_parser.add_argument(
+        "--tv", action="store_true", help="Build optimized for Android TV (landscape, fullscreen, armeabi-v7a)"
+    )
+
     args = parser.parse_args()
 
     if args.command == "build":
@@ -197,6 +324,11 @@ def main():
             clear_build()
         else:
             build(args.path)
+    elif args.command == "apk":
+        if args.path == "clear":
+            clear_build()
+        else:
+            build_apk(args.path, is_tv=args.tv)
     else:
         parser.print_help()
         sys.exit(1)
