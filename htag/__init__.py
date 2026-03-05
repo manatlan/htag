@@ -8,4 +8,13 @@ import logging
 # logging won't see "No handler found" warnings.
 logging.getLogger("htag").addHandler(logging.NullHandler())
 
-__all__ = ["Tag", "ChromeApp", "PyScript", "prevent", "stop", "State", "WebApp"]
+__all__ = [
+    "Tag",
+    "ChromeApp",
+    "PyScript",
+    "prevent",
+    "stop",
+    "State",
+    "WebApp",
+    "current_request",
+]

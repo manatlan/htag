@@ -1,4 +1,5 @@
 from __future__ import annotations
+from .logo import LOGO_PNG_B64
 
 import asyncio
 import json
@@ -14,7 +15,6 @@ from starlette.websockets import WebSocket, WebSocketDisconnect
 from starlette.requests import Request
 from starlette.responses import (
     HTMLResponse,
-    FileResponse,
     StreamingResponse,
     Response,
     JSONResponse,
@@ -24,7 +24,6 @@ from .core import GTag, current_request
 logger = logging.getLogger("htag")
 
 # Embedded logo (PNG base64 encoded)
-from .logo import LOGO_PNG_B64
 
 
 class Event:
@@ -51,7 +50,10 @@ class Event:
 def _obf_dumps(obj: Any, key: str | None) -> str:
     if key:
         import base64
-        bdata = json.dumps(obj, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+
+        bdata = json.dumps(obj, separators=(",", ":"), ensure_ascii=False).encode(
+            "utf-8"
+        )
         bkey = key.encode("utf-8")
         res = bytearray(len(bdata))
         for i in range(len(bdata)):
@@ -59,9 +61,11 @@ def _obf_dumps(obj: Any, key: str | None) -> str:
         return base64.b64encode(res).decode("ascii")
     return json.dumps(obj)
 
+
 def _obf_loads(data: str, key: str | None) -> Any:
     if key:
         import base64
+
         bdata = base64.b64decode(data)
         bkey = key.encode("utf-8")
         res = bytearray(len(bdata))
@@ -69,6 +73,7 @@ def _obf_loads(data: str, key: str | None) -> Any:
             res[i] = bdata[i] ^ bkey[i % len(bkey)]
         return json.loads(res.decode("utf-8"))
     return json.loads(data)
+
 
 CLIENT_JS = """
 // The client-side bridge that connects the browser to the Python server.
@@ -388,7 +393,9 @@ class WebApp:
                         else:
                             # tag_entity is an App instance
                             self.instances[sid] = self.tag_entity  # type: ignore
-                            logger.info("Using shared instance for session sid: %s", sid)
+                            logger.info(
+                                "Using shared instance for session sid: %s", sid
+                            )
 
                         if self.on_instance:
                             # Check if it's the old signature (1 arg) or new (2 args)
@@ -433,7 +440,10 @@ class WebApp:
 
         async def favicon(request: Request) -> Response:
             import base64
-            return Response(content=base64.b64decode(LOGO_PNG_B64), media_type="image/png")
+
+            return Response(
+                content=base64.b64decode(LOGO_PNG_B64), media_type="image/png"
+            )
 
         async def websocket_endpoint(websocket: WebSocket) -> None:
             htag_sid: str | None = websocket.cookies.get("htag_sid")
@@ -470,7 +480,9 @@ class WebApp:
             token = current_request.set(request)
             try:
                 msg_body = await request.body()
-                msg = _obf_loads(msg_body.decode("utf-8"), getattr(instance, "parano_key", None))
+                msg = _obf_loads(
+                    msg_body.decode("utf-8"), getattr(instance, "parano_key", None)
+                )
                 # Run the event in the background to not block the HTTP response
                 # Broadcast will trigger async queues anyway
                 asyncio.create_task(instance.handle_event(msg, None))
@@ -548,7 +560,7 @@ class App(GTag):
                 <script>{CLIENT_JS}</script>
                 <script>
                     window.HTAG_RELOAD = {"true" if getattr(self, "_reload", False) else "false"};
-                    window.PARANO = {f'"{self.parano_key}"' if getattr(self, "parano_key", None) else 'null'};
+                    window.PARANO = {f'"{self.parano_key}"' if getattr(self, "parano_key", None) else "null"};
                 </script>
                 {statics_html}
             </head>
@@ -568,7 +580,10 @@ class App(GTag):
             js: list[str] = []
             self.collect_updates(self, {}, js)
 
-            payload = _obf_dumps({"action": "update", "updates": updates, "js": js}, getattr(self, "parano_key", None))
+            payload = _obf_dumps(
+                {"action": "update", "updates": updates, "js": js},
+                getattr(self, "parano_key", None),
+            )
             # EventSource requires 'data: {payload}\n\n'
             yield f"data: {payload}\n\n"
         except Exception as e:
@@ -602,7 +617,10 @@ class App(GTag):
             self.collect_updates(self, {}, js)  # We only want the JS calls here
 
             await websocket.send_text(
-                _obf_dumps({"action": "update", "updates": updates, "js": js}, getattr(self, "parano_key", None))
+                _obf_dumps(
+                    {"action": "update", "updates": updates, "js": js},
+                    getattr(self, "parano_key", None),
+                )
             )
             logger.debug("Sent initial state to client")
         except Exception as e:
@@ -682,6 +700,7 @@ class App(GTag):
         Recursively traverses the tag tree to find 'dirty' tags that need re-rendering.
         Also collects pending JavaScript calls from tags.
         """
+
         def visitor(t: GTag) -> None:
             with t._GTag__lock:
                 if t.is_dirty:
@@ -694,6 +713,7 @@ class App(GTag):
 
     def collect_statics(self, tag: GTag, result: list[str]) -> None:
         """Recursively collects statics from the whole tag tree."""
+
         def visitor(t: GTag) -> None:
             s_instance = getattr(t, "statics", [])
             s_class = getattr(t.__class__, "statics", [])
@@ -774,7 +794,8 @@ class App(GTag):
                             else "Internal Server Error",
                             "callback_id": callback_id,
                             "result": None,
-                        }, getattr(self, "parano_key", None)
+                        },
+                        getattr(self, "parano_key", None),
                     )
 
                     if ws:
@@ -818,7 +839,8 @@ class App(GTag):
                     "traceback": error_trace if self.debug else "Internal Server Error",
                     "callback_id": callback_id,
                     "result": None,
-                }, getattr(self, "parano_key", None)
+                },
+                getattr(self, "parano_key", None),
             )
 
             # Send to websocket clients

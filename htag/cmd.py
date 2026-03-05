@@ -93,6 +93,7 @@ def build(entrypoint: str):
             print(f"🧹 {C.CYAN}Cleaning up{C.END} '{spec_file}'...")
             spec_file.unlink()
 
+
 def build_apk(entrypoint: str, is_tv: bool = False):
     """
     Builds an Android APK for an htag app using Docker and Buildozer.
@@ -109,22 +110,43 @@ def build_apk(entrypoint: str, is_tv: bool = False):
         print("Please install docker: https://docs.docker.com/engine/install/")
         sys.exit(1)
 
-    print(f"🚀 {C.BLUE}Building APK{C.END} for '{C.BOLD}{app_name}{C.END}' from '{entry_path}'...")
+    print(
+        f"🚀 {C.BLUE}Building APK{C.END} for '{C.BOLD}{app_name}{C.END}' from '{entry_path}'..."
+    )
 
     DOCKER_IMAGE = "mybuildozer"
 
     # Check if mybuildozer image exists
     print(f"🐳 {C.CYAN}Checking Docker image '{DOCKER_IMAGE}'...{C.END}")
     try:
-        res = subprocess.run(f"docker images {DOCKER_IMAGE} -q", shell=True, capture_output=True, text=True)
+        res = subprocess.run(
+            f"docker images {DOCKER_IMAGE} -q",
+            shell=True,
+            capture_output=True,
+            text=True,
+        )
         if not res.stdout.strip():
-            print(f"⬇️  {C.YELLOW}Docker image '{DOCKER_IMAGE}' not found. Building it...{C.END}")
+            print(
+                f"⬇️  {C.YELLOW}Docker image '{DOCKER_IMAGE}' not found. Building it...{C.END}"
+            )
             with tempfile.TemporaryDirectory() as tmpdir:
-                subprocess.run(f"cd {tmpdir} && git clone https://github.com/manatlan/buildozer.git .", shell=True, check=True)
-                print(f"⚙️  {C.YELLOW}Building docker image (this may take a while)...{C.END}")
-                subprocess.run(f"cd {tmpdir} && docker build --tag={DOCKER_IMAGE} .", shell=True, check=True)
-            print(f"✅ {C.GREEN}{C.BOLD}Docker image '{DOCKER_IMAGE}' built successfully.{C.END}")
-    except subprocess.CalledProcessError as e:
+                subprocess.run(
+                    f"cd {tmpdir} && git clone https://github.com/manatlan/buildozer.git .",
+                    shell=True,
+                    check=True,
+                )
+                print(
+                    f"⚙️  {C.YELLOW}Building docker image (this may take a while)...{C.END}"
+                )
+                subprocess.run(
+                    f"cd {tmpdir} && docker build --tag={DOCKER_IMAGE} .",
+                    shell=True,
+                    check=True,
+                )
+            print(
+                f"✅ {C.GREEN}{C.BOLD}Docker image '{DOCKER_IMAGE}' built successfully.{C.END}"
+            )
+    except subprocess.CalledProcessError:
         print(f"❌ {C.RED}{C.BOLD}Failed to build/check Docker image.{C.END}")
         sys.exit(1)
 
@@ -138,7 +160,9 @@ def build_apk(entrypoint: str, is_tv: bool = False):
         android_archs = "armeabi-v7a" if is_tv else "arm64-v8a"
 
         icon_path = entry_path.parent / "icon.png"
-        icon_setting = f"icon.filename = %(source.dir)s/icon.png\n" if icon_path.exists() else ""
+        icon_setting = (
+            "icon.filename = %(source.dir)s/icon.png\n" if icon_path.exists() else ""
+        )
 
         spec_content = f"""[app]
 title = {app_name.capitalize()}
@@ -174,23 +198,35 @@ log_level = 2
     Path(".buildozer").mkdir(exist_ok=True)
 
     print(f"⚙️ {C.YELLOW}Running buildozer in Docker...{C.END}")
-    
+
     # Run buildozer in Docker
     cwd = Path.cwd()
     cmd = [
-        "docker", "run", "-it", "--rm",
-        "-v", f"{cwd}/.buildozer:/home/user/.buildozer",
-        "-v", f"{cwd}:/home/user/hostcwd",
-        DOCKER_IMAGE, "android", "debug"
+        "docker",
+        "run",
+        "-it",
+        "--rm",
+        "-v",
+        f"{cwd}/.buildozer:/home/user/.buildozer",
+        "-v",
+        f"{cwd}:/home/user/hostcwd",
+        DOCKER_IMAGE,
+        "android",
+        "debug",
     ]
-    
+
     try:
         subprocess.run(cmd, check=True)
         print(f"✅ {C.GREEN}{C.BOLD}Successfully built APK{C.END} in 'bin/' directory.")
     except subprocess.CalledProcessError as e:
-        print(f"❌ {C.RED}{C.BOLD}Buildozer failed{C.END} with return code {e.returncode}")
-        print(f"💡 {C.DIM}Check the logs above for details. You might need to adjust 'buildozer.spec'.{C.END}")
+        print(
+            f"❌ {C.RED}{C.BOLD}Buildozer failed{C.END} with return code {e.returncode}"
+        )
+        print(
+            f"💡 {C.DIM}Check the logs above for details. You might need to adjust 'buildozer.spec'.{C.END}"
+        )
         sys.exit(e.returncode)
+
 
 def clear_build():
     """Removes build/, dist/, .buildozer/ and bin/ directories"""
@@ -202,7 +238,7 @@ def clear_build():
                 shutil.rmtree(path)
             else:
                 path.unlink()
-    
+
     # also remove spec file as part of clear? Up to user preference, leaving it for now so they don't lose config
     print(f"✨ {C.GREEN}{C.BOLD}Cleanup complete.{C.END}")
 
@@ -310,11 +346,11 @@ def main():
     apk_parser.add_argument(
         "-h", "--help", action="help", help="Display help for the apk command"
     )
+    apk_parser.add_argument("path", help="Path to main script to build as APK")
     apk_parser.add_argument(
-        "path", help="Path to main script to build as APK"
-    )
-    apk_parser.add_argument(
-        "--tv", action="store_true", help="Build optimized for Android TV (landscape, fullscreen, armeabi-v7a)"
+        "--tv",
+        action="store_true",
+        help="Build optimized for Android TV (landscape, fullscreen, armeabi-v7a)",
     )
 
     args = parser.parse_args()

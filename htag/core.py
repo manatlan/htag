@@ -23,7 +23,9 @@ _ctx = _HtagLocal()
 logger = logging.getLogger("htag")
 
 # Global context for passing the current request/websocket object
-current_request: contextvars.ContextVar[Any] = contextvars.ContextVar("current_request", default=None)
+current_request: contextvars.ContextVar[Any] = contextvars.ContextVar(
+    "current_request", default=None
+)
 
 # Cache for scoped CSS: maps class -> (scope_class_name, scoped_css_string)
 _scoped_style_cache: dict[type, tuple[str, str]] = {}
@@ -430,7 +432,9 @@ class GTag:  # aka "Generic Tag"
 
     def toggle_class(self, name: str) -> "GTag":
         """Add the class if absent, remove it if present."""
-        return self._update_classes(lambda c: c.remove(name) if name in c else c.append(name))
+        return self._update_classes(
+            lambda c: c.remove(name) if name in c else c.append(name)
+        )
 
     def has_class(self, name: str) -> bool:
         """Check whether the tag has the given CSS class."""

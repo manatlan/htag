@@ -32,7 +32,10 @@
                 # Interactive element
                 self.btn = Tag.button("Increment: 0", _onclick=self.increment)
                 self.btn._style = "padding: 10px 20px; font-size: 16px; cursor: pointer; border-radius: 5px; background: #3b82f6; color: white; border: none;"
+
+                self <= Tag.button("Trigger Python Error", _class="btn", _onclick=self.trigger_py_error)
                 
+
                 # Centering wrapper
                 wrapper = Tag.div(self.btn)
                 wrapper._style = "display: flex; justify-content: center; align-items: center; padding: 20px;"
@@ -46,6 +49,9 @@
                 self.count += 1
                 self.btn.clear()
                 self.btn += f"Increment: {self.count}"
+
+            def trigger_py_error(self, event):
+                raise ValueError("This is a deliberate Python backend error!")
 
         # Run the PyScript runner!
         # It replaces the current document.body with the App content.

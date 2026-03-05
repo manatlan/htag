@@ -150,6 +150,10 @@ window.handle_payload = function(data) {
             var el = document.getElementById(id);
             if(el) el.outerHTML = data.updates[id];
         }
+        // Ensure overlay is still in the DOM (in case the body was replaced)
+        if(window._error_overlay && window._error_overlay.parentNode !== document.body) {
+            document.body.appendChild(window._error_overlay);
+        }
         if(data.js) {
             for(var i=0; i<data.js.length; i++) eval(data.js[i]);
         }
@@ -234,7 +238,7 @@ class PyScript:
             import traceback
 
             error_trace = traceback.format_exc()
-            safe_trace = error_trace.replace('`', '\\`')
+            safe_trace = error_trace.replace("`", "\\`")
             logger.error("Error during initial render: %s\n%s", e, error_trace)
             body_html = f"<body><htag-error show='true'></htag-error><script>document.querySelector('htag-error').show('Initial Render Error', `{safe_trace}`);</script></body>"
 
@@ -243,7 +247,7 @@ class PyScript:
         self.app.collect_statics(self.app, statics)
         self.app.sent_statics = set(statics)
         for s in statics:
-            safe_s = s.replace('`', '\\`')
+            safe_s = s.replace("`", "\\`")
             js.eval(
                 f"""
             var div = document.createElement('div');
@@ -259,6 +263,9 @@ class PyScript:
         # Replace the `<body>...</body>` with our App's render!
         js.document.body.outerHTML = body_html
 
+        # Ensure overlay is still in the DOM (in case the body was replaced)
+        js.document.body.appendChild(js.window._error_overlay)
+
         self.app._trigger_mount()
 
     def _handle_event(self, msg_str: str) -> None:
@@ -266,4 +273,4 @@ class PyScript:
         import asyncio
 
         msg = json.loads(msg_str)
-        asyncio.create_task(self.app.handle_event(msg, self._dummy_ws)) # type: ignore
+        asyncio.create_task(self.app.handle_event(msg, self._dummy_ws))  # type: ignore
