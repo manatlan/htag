@@ -8,6 +8,9 @@
   <a href="https://pypi.org/project/htag2/">
     <img src="https://img.shields.io/pypi/v/htag2?style=for-the-badge&logo=pypi&color=blue" alt="PyPI">
   </a>
+  <a href="https://github.com/manatlan/htag2/actions/workflows/tests.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/manatlan/htag2/tests.yml?branch=main&style=for-the-badge&logo=github&label=Tests" alt="Test Status">
+  </a>
   <a href="https://github.com/manatlan/htag2/releases/tag/latest">
     <img src="https://img.shields.io/badge/Download-Latest_Build-blue?style=for-the-badge&logo=github" alt="Download Latest Build">
   </a>
