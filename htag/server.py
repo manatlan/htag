@@ -5,6 +5,7 @@ import asyncio
 import json
 import logging
 import os
+import sys
 import threading
 import traceback
 import uuid
@@ -376,10 +377,45 @@ class WebApp:
         self.tag_entity = tag_entity  # Class or Instance
         self.on_instance = on_instance  # Optional callback(instance)
         self.debug = debug
+        self.exit_on_disconnect = False
         self.parano_key = os.urandom(8).hex() if parano else None
         self.instances: dict[str, App] = {}  # sid -> App instance
         self.app = Starlette()
         self._setup_routes()
+
+    def run(
+        self,
+        host: str = "127.0.0.1",
+        port: int = 8000,
+        open_browser: bool = True,
+        exit_on_disconnect: bool = True,
+        **kwargs: Any,
+    ) -> None:
+        """
+        Runs the WebApp using uvicorn.
+        """
+        import uvicorn
+
+        self.exit_on_disconnect = exit_on_disconnect
+
+        if open_browser:
+
+            def open_tab() -> None:
+                import time
+                import webbrowser
+
+                time.sleep(1)
+                webbrowser.open(f"http://{host}:{port}")
+
+            threading.Thread(target=open_tab, daemon=True).start()
+
+        # Standard uvicorn logging configuration
+        log_config = (
+            None if getattr(sys, "frozen", False) else uvicorn.config.LOGGING_CONFIG
+        )
+
+        logger.info("Starting WebApp on http://%s:%s", host, port)
+        uvicorn.run(self.app, host=host, port=port, log_config=log_config, **kwargs)
 
     def _get_instance(self, sid: str, request_or_ws: Request | WebSocket) -> "App":
         if sid not in self.instances:
@@ -405,8 +441,10 @@ class WebApp:
                             else:
                                 self.on_instance(self.instances[sid], request_or_ws)
 
-                        # Propagate debug mode
+                        # Propagate debug mode and exit_on_disconnect
                         self.instances[sid].debug = self.debug
+                        if self.exit_on_disconnect:
+                            self.instances[sid].exit_on_disconnect = True
                         self.instances[sid].parano_key = self.parano_key
 
                         # Store a backlink to the webserver for session-aware logic
@@ -644,12 +682,19 @@ class App(GTag):
     async def _handle_disconnect(self) -> None:
         """Centralized disconnect handler to manage graceful shutdown across WS and SSE"""
         if self.websockets or self.sse_queues:
+            logger.debug(
+                "Disconnect handler called, but still active clients: WS=%d, SSE=%d",
+                len(self.websockets),
+                len(self.sse_queues),
+            )
             return  # Still active clients (WS or SSE)
 
         # Exit when last browser window is closed, IF enabled
         if self.exit_on_disconnect:
+            logger.info("Last client disconnected, checking for exit...")
             # Give it a small delay in case of F5 / Page Refresh
             await asyncio.sleep(0.5)
+
 
             # Check again if a client reconnects during the delay
             if self.websockets or self.sse_queues:
@@ -657,27 +702,24 @@ class App(GTag):
                 return
 
             # Session-aware exit: only exit if NO other session has active connections
-            other_active = False
-            if hasattr(self, "_webserver") and len(self._webserver.instances) > 1:
+            active_sessions = []
+            if hasattr(self, "_webserver"):
                 webserver = getattr(self, "_webserver")
                 for sid, inst in webserver.instances.items():
-                    if inst is not self and (inst.websockets or inst.sse_queues):
-                        other_active = True
-                        break
+                    if inst.websockets or inst.sse_queues:
+                        active_sessions.append(f"{sid} (WS:{len(inst.websockets)}, SSE:{len(inst.sse_queues)})")
 
-            if not other_active:
-                logger.info(
-                    "Last client of the last active session disconnected, exiting..."
-                )
+            if not active_sessions:
+                # No sessions have active connections anymore
+                logger.info("Last client disconnected, no other active sessions: exiting...")
                 if hasattr(self, "_browser_cleanup"):
                     self._browser_cleanup()
                 os._exit(0)
             else:
-                logger.info(
-                    "Session disconnected, but other sessions are still active."
-                )
+                logger.info("Active sessions still exist: %s", ", ".join(active_sessions))
         else:
             logger.info("Last client disconnected (server stays alive)")
+
 
     def render_initial(self) -> str:
         # Initial render of the page (body)

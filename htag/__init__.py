@@ -9,12 +9,16 @@ import logging
 logging.getLogger("htag").addHandler(logging.NullHandler())
 
 __all__ = [
-    "Tag",
+    "Tag",  # the main thing
+    "State",    # State management
+    "WebApp",   # the ASGI runner
+
+    # Specialize runners
     "ChromeApp",
     "PyScript",
+
+    # events decorator
     "prevent",
     "stop",
-    "State",
-    "WebApp",
-    "current_request",
+
 ]
