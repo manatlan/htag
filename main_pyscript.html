@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>htag2 with PyScript</title>
+    <!-- PyScript styles and scripts -->
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+
+    <!-- PyScript configuration -->
+    <script type="py" config>
+        # Include any required packages for htag to run on Pyodide
+        packages = ["starlette"]
+        
+        # We fetch the local htag directory so the script can import it
+        # You'll need to serve the root directory where main_pyscript.html is
+        # e.g., uv run python -m http.server
+        [sync]
+        htag = "./htag"
+    </script>
+</head>
+
+<body>
+    <div style="text-align: center; margin-top: 50px; font-family: sans-serif;">
+        <h2>Loading htag2 PyScript App...</h2>
+        <p>This may take a moment while Pyodide provisions the Python environment.</p>
+    </div>
+
+    <script type="py">
+        from htag import Tag
+        from htag.server import App
+        from htag.runners import PyScript
+
+        class CounterApp(App):
+            def init(self):
+                self.count = 0
+                
+                # Title
+                self += Tag.h1("htag2 Counter in PyScript!")
+                
+                # Instruction
+                self += Tag.p("This entire htag2 application runs fully in the browser via PyScript without any Python backend server.")
+                
+                # Interactive element
+                self.btn = Tag.button("Increment: 0", _onclick=self.increment)
+                self.btn._style = "padding: 10px 20px; font-size: 16px; cursor: pointer; border-radius: 5px; background: #3b82f6; color: white; border: none;"
+                
+                # Centering wrapper
+                wrapper = Tag.div(self.btn)
+                wrapper._style = "display: flex; justify-content: center; align-items: center; padding: 20px;"
+                
+                self += wrapper
+                
+                # Add styles to App body
+                self._style = "font-family: system-ui, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);"
+
+            def increment(self, ev):
+                self.count += 1
+                self.btn.clear()
+                self.btn += f"Increment: {self.count}"
+
+        # Run the PyScript runner!
+        # It replaces the current document.body with the App content.
+        PyScript(CounterApp).run()
+    </script>
+</body>
+
+</html>
