@@ -195,6 +195,35 @@ The global `htag_event(id, event_name, event)` function is the bridge that trigg
 **Premium Aesthetics**:
 Use CSS keyframes for entry animations (e.g., sliding up or fading in) and distinct background colors for Success, Error, and Info states.
 
+### 12. Simple Events & HashChange
+
+htag2 supports "simple events" where the `htag_event` function can be used to pass primitive values (strings, numbers) or custom objects from JavaScript to Python, bypassing the standard DOM Event extraction.
+
+**`_onhashchange` support**:
+The framework automatically handles the `hashchange` event. When `self._onhashchange` is set, the Python callback receives an `event` object with `newURL` and `oldURL` attributes.
+
+```python
+class App(Tag.App):
+    def init(self):
+        self._onhashchange = self.on_hash
+        
+    def on_hash(self, e):
+        # e.newURL and e.oldURL are available
+        print(f"Navigated to: {e.newURL}")
+```
+
+**Custom simple events**:
+You can trigger custom events from JavaScript with any data:
+
+```python
+# In Python
+tag._oncustom = lambda e: print(f"Received: {e.value}")
+
+# In JavaScript (via call_js or statics)
+htag_event('tag_id', 'custom', 'any string or number')
+htag_event('tag_id', 'custom', {any: 'object'})
+```
+
 ## Best Practices
 
 ### Layout & Styling

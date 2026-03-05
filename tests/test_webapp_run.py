@@ -48,4 +48,4 @@ def test_webapp_run_exit_on_disconnect_propagation():
     inst = wa._get_instance("sid123", mock_request)
     
     assert inst.exit_on_disconnect is True
-    assert getattr(inst, "_webserver") == wa
+    assert getattr(inst, "htag_webserver") == wa

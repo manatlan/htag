@@ -112,24 +112,29 @@ window._htag_callbacks = {};
 
 window.htag_event = function(id, event_name, event) {
     var callback_id = Math.random().toString(36).substring(2);
-    event = event || {};
-    
-    var val = null;
-    if (event.target) {
-        if (event.target.type === 'checkbox') {
-            val = event.target.checked;
-        } else {
-            val = event.target.value;
+    var data = {callback_id: callback_id};
+
+    if (event instanceof Event) {
+        if (event.target) {
+            if (event.target.type === 'checkbox') {
+                data.value = event.target.checked;
+            } else {
+                data.value = event.target.value;
+            }
         }
+        data.key = event.key;
+        data.pageX = event.pageX;
+        data.pageY = event.pageY;
+        
+        // HashChangeEvent specifics
+        if (event.newURL) data.newURL = event.newURL;
+        if (event.oldURL) data.oldURL = event.oldURL;
+    } else if (event && typeof event === 'object') {
+        Object.assign(data, event);
+    } else if (event !== undefined) {
+        data.value = event;
     }
     
-    var data = {
-        value: val,
-        key: event.key,
-        pageX: event.pageX,
-        pageY: event.pageY,
-        callback_id: callback_id
-    };
     var payload = {id: id, event: event_name, data: data};
     
     // Call PyScript runner proxy

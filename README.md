@@ -23,7 +23,9 @@ It feels very good. Currently, it's not a replacement, it's just a POC.
 It's completely crazy, but it works :
 
 - For building desktop apps (ChromeApp on linux/windows)
-- For building web apps (WebApp as an asgi app (starlette/fastapi/...))
+- For building web apps (WebApp as an asgi app (for starlette/fastapi/...))
+- For building SPA HTML Page (with the PyScript runner)
+- ~~For building android apps~~ (not yet)
 
 
 ## Get Started
@@ -74,3 +76,4 @@ htag2 is a Python library for building web applications using HTML, CSS, and Jav
 *   **Scoped Styles (`styles`)**: Define a `styles` class attribute on any component to get automatically scoped CSS. The framework prefixes every rule with `.htag-ClassName`, handles `@media`, `@keyframes`, pseudo-selectors, and multi-selectors.
 *   **CSS Class Helpers**: `add_class()`, `remove_class()`, `toggle_class()`, and `has_class()` for convenient class manipulation without manual string handling.
 *   **`State.notify()`**: Manually trigger reactive updates after in-place mutations of mutable values (lists, dicts).
+*   **Simple Events & HashChange**: Support for passing primitive values or custom objects from JS. Includes built-in support for `_onhashchange` with `newURL` and `oldURL` attributes.

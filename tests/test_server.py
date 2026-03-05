@@ -362,7 +362,7 @@ async def test_handle_websocket_lifecycle():
     
     server = MagicMock()
     server.instances = {"sid1": app, "sid2": app2}
-    app._webserver = server
+    app.htag_webserver = server
     
     with patch("htag.server.os._exit") as mock_exit, \
          patch("htag.server.asyncio.sleep", side_effect=fast_sleep):

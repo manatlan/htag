@@ -1,5 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+<!--
+to test this file, run:
+
+$ uv build
+
+adapt line 30 to setup the wheel that was built by the previous command.
+
+$ uv run python -m http.server
+
+then open http://localhost:8000/main_pyscript.html
+-->
 
 <head>
     <meta charset="UTF-8">
@@ -16,7 +27,7 @@
         <p>This may take a moment while Pyodide provisions the Python environment.</p>
     </div>
 
-    <script type="py" config='{"packages":["./dist/htag2-0.1.2-py3-none-any.whl", "anyio", "starlette", "uvicorn"]}'>
+    <script type="py" config='{"packages":["./dist/htag2-0.1.3-py3-none-any.whl", "anyio", "starlette", "uvicorn"]}'>
         from htag import Tag, PyScript
 
         class CounterApp(Tag.App):
@@ -44,6 +55,15 @@
                 
                 # Add styles to App body
                 self._style = "font-family: system-ui, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);"
+
+                self._onhashchange = self.on_hash
+
+                with Tag.div():
+                    Tag.a("[P1]", _href="#page1")
+                    Tag.a("[P2]", _href="#page2")
+
+            def on_hash(self, ev):
+                self <= Tag.div("hash changed to", ev.newURL)
 
             def increment(self, ev):
                 self.count += 1

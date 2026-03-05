@@ -20,7 +20,7 @@ from starlette.responses import (
     Response,
     JSONResponse,
 )
-from .core import GTag, current_request
+from .core import GTag, current_request, App as BaseApp
 
 logger = logging.getLogger("htag")
 
@@ -38,8 +38,12 @@ class Event:
         self.id: str = msg.get("id", "")
         self.name: str = msg.get("event", "")
         # Flat access to msg['data'] (e.g., e.value, e.x, etc.)
-        for k, v in msg.get("data", {}).items():
-            setattr(self, k, v)
+        data = msg.get("data", {})
+        if isinstance(data, dict):
+            for k, v in data.items():
+                setattr(self, k, v)
+        else:
+            self.value = data
 
     def __getattr__(self, name: str) -> Any:
         return None
@@ -306,25 +310,32 @@ init_ws();
 // Returns a Promise that resolves with the server's return value.
 function htag_event(id, event_name, event) {
     var callback_id = Math.random().toString(36).substring(2);
-    event = event || {};
-    
-    // Determine the value to send (handle checkboxes specifically)
-    var val = null;
-    if (event.target) {
-        if (event.target.type === 'checkbox') {
-            val = event.target.checked;
-        } else {
-            val = event.target.value;
+    var data = {callback_id: callback_id};
+
+    if (event instanceof Event) {
+        // Standard DOM Event
+        if (event.target) {
+            if (event.target.type === 'checkbox') {
+                data.value = event.target.checked;
+            } else {
+                data.value = event.target.value;
+            }
         }
+        data.key = event.key;
+        data.pageX = event.pageX;
+        data.pageY = event.pageY;
+        
+        // HashChangeEvent specifics
+        if (event.newURL) data.newURL = event.newURL;
+        if (event.oldURL) data.oldURL = event.oldURL;
+    } else if (event && typeof event === 'object') {
+        // Custom object passed as event
+        Object.assign(data, event);
+    } else if (event !== undefined) {
+        // Simple value passed as event
+        data.value = event;
     }
-    
-    var data = {
-        value: val,
-        key: event.key,
-        pageX: event.pageX,
-        pageY: event.pageY,
-        callback_id: callback_id
-    };
+
     var payload = {id: id, event: event_name, data: data};
     
     if(!use_fallback && ws && ws.readyState === WebSocket.OPEN) {
@@ -424,7 +435,11 @@ class WebApp:
                     token = current_request.set(request_or_ws)
                     try:
                         if inspect.isclass(self.tag_entity):
-                            self.instances[sid] = self.tag_entity()
+                            if issubclass(self.tag_entity, App):
+                                self.instances[sid] = self.tag_entity()
+                            else:
+                                # Wrap plain GTag class in an App runner
+                                self.instances[sid] = App(self.tag_entity)
                             logger.info("Created new session instance for sid: %s", sid)
                         else:
                             # tag_entity is an App instance
@@ -448,7 +463,7 @@ class WebApp:
                         self.instances[sid].parano_key = self.parano_key
 
                         # Store a backlink to the webserver for session-aware logic
-                        setattr(self.instances[sid], "_webserver", self)
+                        setattr(self.instances[sid], "htag_webserver", self)
 
                         # Trigger lifecycle mount on the root App instance
                         self.instances[sid]._trigger_mount()
@@ -457,7 +472,7 @@ class WebApp:
 
         # Always update the current request object on the instance
         # to ensure session data is fresh for the current interaction
-        setattr(self.instances[sid], "_request", request_or_ws)
+        setattr(self.instances[sid], "htag_request", request_or_ws)
 
         return self.instances[sid]
 
@@ -543,7 +558,7 @@ class WebApp:
 # --- App ---
 
 
-class App(GTag):
+class App(BaseApp):
     """
     The main application class for htag2.
     Handles HTML rendering, event dispatching, and WebSocket communication.
@@ -703,11 +718,12 @@ class App(GTag):
 
             # Session-aware exit: only exit if NO other session has active connections
             active_sessions = []
-            if hasattr(self, "_webserver"):
-                webserver = getattr(self, "_webserver")
+            if hasattr(self, "htag_webserver"):
+                webserver = getattr(self, "htag_webserver")
                 for sid, inst in webserver.instances.items():
-                    if inst.websockets or inst.sse_queues:
-                        active_sessions.append(f"{sid} (WS:{len(inst.websockets)}, SSE:{len(inst.sse_queues)})")
+                    # Ensure inst has websockets attribute (it should if it's a server.App)
+                    if getattr(inst, "websockets", set()) or getattr(inst, "sse_queues", set()):
+                        active_sessions.append(f"{sid} (WS:{len(getattr(inst, 'websockets', []))}, SSE:{len(getattr(inst, 'sse_queues', []))})")
 
             if not active_sessions:
                 # No sessions have active connections anymore
@@ -778,10 +794,11 @@ class App(GTag):
 
         target_tag = self.find_tag(self, tag_id)
         if target_tag:
-            callback_id = msg.get("data", {}).get("callback_id")
+            data = msg.get("data", {})
+            callback_id = data.get("callback_id") if isinstance(data, dict) else None
             # Auto-sync value from client (bypass __setattr__ to avoid re-rendering the input while typing)
-            if "value" in msg.get("data", {}):
-                target_tag._set_attr_direct("value", msg["data"]["value"])
+            if isinstance(data, dict) and "value" in data:
+                target_tag._set_attr_direct("value", data["value"])
 
             if event_name in target_tag._get_events():
                 logger.info(
@@ -982,3 +999,4 @@ class App(GTag):
 from .core import Tag  # noqa: E402
 
 Tag._registry["App"] = App
+Tag.App = App  # type: ignore

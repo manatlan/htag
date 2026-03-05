@@ -94,6 +94,38 @@ def handle_submit(e):
     pass
 ```
 
+## Simple Events & HashChange
+
+`htag2` supports "simple events" where you can pass primitive values or custom objects from JavaScript back to Python.
+
+### HashChange Event
+
+When you set `self._onhashchange`, the Python callback receives an `Event` object with `newURL` and `oldURL` attributes.
+
+```python
+class App(Tag.App):
+    def init(self):
+        self._onhashchange = self.on_hash
+        
+    def on_hash(self, e):
+        print(f"Navigated to: {e.newURL}")
+```
+
+### Custom Simple Events
+
+You can trigger custom events from JavaScript with any data using the global `htag_event` function:
+
+```python
+# In Python
+tag._oncustom = lambda e: print(f"Received value: {e.value}")
+
+# In JavaScript
+htag_event('tag_id', 'custom', 'some string')
+htag_event('tag_id', 'custom', {key: 'value'})
+```
+
+If a primitive value is passed, it is available as `e.value` in Python. If an object is passed, its properties are mapped directly to the `Event` object.
+
 ## Client-side JavaScript
 
 You can execute arbitrary JavaScript from the server using `call_js()`:

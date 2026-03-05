@@ -104,7 +104,7 @@ class State:
         self._notify_observers()
 
     def _notify_observers(self) -> None:
-        for observer in self._observers:
+        for observer in list(self._observers):
             observer._GTag__dirty = True
 
 
@@ -315,12 +315,18 @@ class GTag:  # aka "Generic Tag"
     def __setattr__(self, name: str, value: Any) -> None:
         """
         Magic attribute handling:
-        - Internal attributes are set normally.
-        - Attributes starting with '_' are treated as HTML attributes.
-        - Attributes starting with 'on' are treated as event callbacks.
+        - Internal attributes (starting with _ and containing __) are set normally.
+        - Public names (not starting with _) are set normally.
+        - Attributes starting with '_' (HTML-mapped) are treated as HTML attributes.
+        - Attributes starting with '_on' are treated as event callbacks.
         - Setting an HTML attribute or event marks the tag as 'dirty' for client-side update.
         """
-        if name.startswith("_GTag__") or name in ("childs", "parent", "tag", "id"):
+        if (name.startswith("_") and "__" in name) or name in (
+            "childs",
+            "parent",
+            "tag",
+            "id",
+        ):
             super().__setattr__(name, value)
         elif name.startswith("_on") and (callable(value) or isinstance(value, str)):
             # Event (e.g., self._onclick = my_callback or self._onclick = "alert(1)")
@@ -338,8 +344,14 @@ class GTag:  # aka "Generic Tag"
             super().__setattr__(name, value)
 
     def __getattr__(self, name: str) -> Any:
-        if name.startswith("_") and name[1:] in self.__attrs:
-            return self.__attrs[name[1:]]
+        if name.startswith("_") and "__" not in name:
+            try:
+                # Use super().__getattribute__ to avoid recursion loop with __getattr__
+                attrs = super().__getattribute__("_GTag__attrs")
+                if name[1:] in attrs:
+                    return attrs[name[1:]]
+            except AttributeError:
+                pass
         return super().__getattribute__(name)
 
     def __add__(self, other: Any) -> list[Any]:
@@ -355,9 +367,8 @@ class GTag:  # aka "Generic Tag"
     def remove(self, item: str | GTag | Callable) -> GTag:
         with self.__lock:
             if item in self.childs:
-                if isinstance(item, GTag):
-                    if self.root is not None:
-                        item._trigger_unmount()
+                if self.root is not None:
+                    item._trigger_unmount()
                 self.childs.remove(item)
                 if isinstance(item, GTag):
                     item.parent = None
@@ -371,9 +382,10 @@ class GTag:  # aka "Generic Tag"
 
     @property
     def root(self) -> GTag | None:
+        """Returns the root Tag (App) of the tree."""
         current: GTag | None = self
         while current is not None:
-            if isinstance(current, Tag.App):
+            if isinstance(current, App):
                 return current
             current = current.parent
         return None
@@ -384,7 +396,7 @@ class GTag:  # aka "Generic Tag"
         # 1. Try to get it from the root instance (if set by server)
         root = self.root
         if root is not None:
-            r = getattr(root, "_request", None)
+            r = getattr(root, "htag_request", None)
             if r is not None:
                 return r
 
@@ -528,6 +540,12 @@ class GTag:  # aka "Generic Tag"
                 return content
 
 
+class App(GTag):
+    """Base class for the root of a htag2 application tree."""
+
+    pass
+
+
 def prevent(func: Callable) -> Callable:
     """Decorator to mark an event handler as needing preventDefault()"""
     setattr(func, "_htag_prevent", True)
@@ -551,6 +569,9 @@ class TagCreator:
         """
         if name in self._registry:
             return self._registry[name]
+
+        if name == "App":
+            return App
 
         # Create a dynamic subclass of GTag
         tag_name = name.lower().replace("_", "-")
