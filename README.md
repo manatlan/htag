@@ -1,10 +1,13 @@
 # htag2
 
 <p align="center">
-  <img src="docs/assets/logo.png" width="300" alt="htag2 logo">
+  <img src="https://manatlan.github.io/htag2/assets/logo.png" width="300" alt="htag2 logo">
 </p>
 
 <p align="center">
+  <a href="https://pypi.org/project/htag2/">
+    <img src="https://img.shields.io/pypi/v/htag2?style=for-the-badge&logo=pypi&color=blue" alt="PyPI">
+  </a>
   <a href="https://github.com/manatlan/htag2/releases/tag/latest">
     <img src="https://img.shields.io/badge/Download-Latest_Build-blue?style=for-the-badge&logo=github" alt="Download Latest Build">
   </a>
@@ -24,12 +27,20 @@ Check the [Official Documentation](https://manatlan.github.io/htag2/) for more i
 ## Install
 
 ```bash
+uv add htag2
+```
+
+Or using pip:
+```bash
+pip install htag2
+```
+
+Alternatively, you can run from source:
+```bash
 git clone https://github.com/manatlan/htag2.git
 cd htag2
 uv run main3.py
 ```
-
-currently, it's not available yet on pypi ... but the latest working wheel is available on the [latest release](https://github.com/manatlan/htag2/releases/tag/latest).
 
 ### Skill
 
