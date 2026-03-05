@@ -68,11 +68,13 @@ def build(entrypoint: str):
     for hi in hidden_imports:
         cmd.extend(["--hidden-import", hi])
 
-    assets_dir = Path("docs/assets")
+    # Ensure assets directory is bundled if it exists
+    assets_dir = Path("assets")
     if assets_dir.exists():
         print(f"📦 {C.CYAN}Bundling assets{C.END} from '{assets_dir}'...")
+        # PyInstaller uses different path separators for data depending on OS
         separator = ";" if os.name == "nt" else ":"
-        cmd.extend(["--add-data", f"{assets_dir}{separator}docs/assets"])
+        cmd.extend(["--add-data", f"{assets_dir}{separator}assets"])
 
     cmd.append(str(entry_path))
 
