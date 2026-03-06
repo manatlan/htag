@@ -1,6 +1,6 @@
 import pytest
 from htag.runners import PyScript
-from htag.server import App
+from htag.server import AppRunner as App
 
 def test_pyscript_runner_initializes(monkeypatch):
     class FakeJS:

@@ -4,9 +4,7 @@ import inspect
 import json
 import logging
 import sys
-from typing import Any
-
-from ..server import App
+from ..runner import AppRunner as App
 
 logger = logging.getLogger("htag")
 
@@ -20,168 +18,18 @@ else:
         return f
 
 
+from ..client_js import CLIENT_JS
+
 HTAG_PYSCRIPT_JS = """
-// --- htag-error Web Component (Shadow DOM for style isolation) ---
-class HtagError extends HTMLElement {
-    constructor() {
-        super();
-        this.attachShadow({mode: 'open'});
-        this.shadowRoot.innerHTML = `
-            <style>
-                :host {
-                    display: none;
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    z-index: 2147483647;
-                    align-items: center;
-                    justify-content: center;
-                    backdrop-filter: blur(2px);
-                }
-                :host([show]) { display: flex; }
-                .dialog {
-                    width: 80%;
-                    max-width: 600px;
-                    background: #fee2e2;
-                    border: 1px solid #ef4444;
-                    border-left: 5px solid #ef4444;
-                    color: #991b1b;
-                    padding: 15px;
-                    border-radius: 4px;
-                    font-family: system-ui, -apple-system, sans-serif;
-                    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
-                    max-height: 80vh;
-                    overflow-y: auto;
-                    text-align: left;
-                    position: relative;
-                }
-                h3 { margin: 0 0 10px 0; font-size: 16px; display: inline-block;}
-                pre { background: #fef2f2; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 12px; overflow-x: auto; margin:0; text-align: left; }
-                .close { position: absolute; top: 10px; right: 15px; cursor: pointer; font-weight: bold; font-size: 18px; color: #ef4444; }
-                .close:hover { color: #b91c1c; }
-                .copy { float: right; margin-right: 40px; cursor: pointer; background: #ef4444; color: white; border: none; padding: 2px 8px; border-radius: 3px; font-size: 12px; transition: background 0.2s; }
-                .copy:hover { background: #b91c1c; }
-                .copy:active { background: #991b1b; }
-            </style>
-            <div class="dialog">
-                <div class="close" title="Close">×</div>
-                <button class="copy" id="copy-btn">Copy</button>
-                <h3 id="title">Error</h3>
-                <pre id="trace"></pre>
-            </div>
-        `;
-        this.shadowRoot.querySelector('.close').onclick = () => this.removeAttribute('show');
-        this.shadowRoot.getElementById('copy-btn').onclick = () => {
-            const trace = this.shadowRoot.getElementById('trace').textContent;
-            navigator.clipboard.writeText(trace).then(() => {
-                const btn = this.shadowRoot.getElementById('copy-btn');
-                const old = btn.textContent;
-                btn.textContent = 'Copied!';
-                setTimeout(() => btn.textContent = old, 1500);
-            });
-        };
-    }
-    show(title, trace) {
-        this.shadowRoot.getElementById('title').textContent = title;
-        this.shadowRoot.getElementById('trace').textContent = trace || 'No traceback available.';
-        this.setAttribute('show', '');
-    }
-}
-if (!customElements.get('htag-error')) {
-    customElements.define('htag-error', HtagError);
-}
+// Tell standard JS not to connect WebSockets since we are in a PyScript SPA
+window.HTAG_EXT_INIT = true;
 
-if (!window._error_overlay) {
-    window._error_overlay = document.createElement('htag-error');
-    document.body.appendChild(window._error_overlay);
-    window.onerror = function(message, source, lineno, colno, error) {
-        if(window._error_overlay && typeof window._error_overlay.show === 'function') {
-            window._error_overlay.show("Client JavaScript Error", `${message}\\n${source}:${lineno}:${colno}\\n${error ? error.stack : ''}`);
-        }
-    };
-    window.onunhandledrejection = function(event) {
-        if(window._error_overlay && typeof window._error_overlay.show === 'function') {
-            window._error_overlay.show("Unhandled Promise Rejection", String(event.reason));
-        }
-    };
-}
-
-window._htag_callbacks = {};
-
-window.htag_event = function(id, event_name, event) {
-    var callback_id = Math.random().toString(36).substring(2);
-    var data = {callback_id: callback_id};
-
-    if (event instanceof Event) {
-        if (event.target) {
-            if (event.target.type === 'checkbox') {
-                data.value = event.target.checked;
-            } else {
-                data.value = event.target.value;
-            }
-        }
-        data.key = event.key;
-        data.pageX = event.pageX;
-        data.pageY = event.pageY;
-        
-        // HashChangeEvent specifics
-        if (event.newURL) data.newURL = event.newURL;
-        if (event.oldURL) data.oldURL = event.oldURL;
-    } else if (event && typeof event === 'object') {
-        Object.assign(data, event);
-    } else if (event !== undefined) {
-        data.value = event;
-    }
-    
-    var payload = {id: id, event: event_name, data: data};
-    
-    // Call PyScript runner proxy
+// Define custom transport for PyScript to route directly to Python instead of WS/HTTP
+window.htag_transport = function(payload) {
     if (window.py_htag_event) {
         window.py_htag_event(JSON.stringify(payload));
     } else {
         console.error("PyScript htag_event proxy not found! Cannot send event to Python.");
-    }
-
-    return new Promise(resolve => {
-        window._htag_callbacks[callback_id] = resolve;
-    });
-};
-
-window.handle_payload = function(data) {
-    if (data.action === "update") {
-        for(var id in data.updates) {
-            var el = document.getElementById(id);
-            if(el) el.outerHTML = data.updates[id];
-        }
-        // Ensure overlay is still in the DOM (in case the body was replaced)
-        if(window._error_overlay && window._error_overlay.parentNode !== document.body) {
-            document.body.appendChild(window._error_overlay);
-        }
-        if(data.js) {
-            for(var i=0; i<data.js.length; i++) eval(data.js[i]);
-        }
-        if(data.statics) {
-            data.statics.forEach(s => {
-                var div = document.createElement('div');
-                div.innerHTML = s.trim();
-                var node = div.firstChild;
-                if (node && (node.tagName === "STYLE" || node.tagName === "LINK")) {
-                    document.head.appendChild(node);
-                }
-            });
-        }
-        if(data.callback_id && window._htag_callbacks[data.callback_id]) {
-            window._htag_callbacks[data.callback_id](data.result);
-            delete window._htag_callbacks[data.callback_id];
-        }
-    } else if (data.action === "error") {
-        if(window._error_overlay && window._error_overlay.show) {
-            window._error_overlay.show("Server Error", data.traceback);
-        } else {
-            console.error("Server Error:", data.traceback);
-        }
     }
 };
 """
@@ -234,7 +82,10 @@ class PyScript:
         self._proxy = create_proxy(self._handle_event)
         js.window.py_htag_event = self._proxy
 
+        # Setup PyScript specific transport configuration FIRST
         js.eval(HTAG_PYSCRIPT_JS)
+        # Then evaluate generic HTAG client logic
+        js.eval(CLIENT_JS)
 
         # Generate initial DOM (HTML body)
         try:

@@ -1,4 +1,5 @@
-from htag.core import GTag, Tag, prevent, stop, State
+from htag.core import GTag, prevent, stop, State
+from htag import Tag
 
 def test_gtag_init():
     t = Tag.div("hello")

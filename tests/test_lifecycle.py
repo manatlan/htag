@@ -1,4 +1,5 @@
-from htag.core import GTag, Tag
+from htag.core import GTag
+from htag import Tag
 
 def test_gtag_init_called():
     class MyTag(GTag):

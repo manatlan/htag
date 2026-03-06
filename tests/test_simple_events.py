@@ -1,7 +1,7 @@
 import pytest
 import json
 from unittest.mock import MagicMock, AsyncMock
-from htag.server import Event, App
+from htag.server import Event, AppRunner as App
 from htag import Tag
 
 @pytest.mark.asyncio

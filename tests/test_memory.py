@@ -1,7 +1,8 @@
 import gc
 import weakref
 import pytest
-from htag.core import State, Tag
+from htag.core import State
+from htag import Tag
 
 def test_state_observer_garbage_collection():
     """Verify that State doesn't keep alive components that are no longer used."""

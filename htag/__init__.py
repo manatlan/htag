@@ -1,5 +1,7 @@
-from .core import Tag, prevent, stop, State, current_request
-from .server import WebApp
+from .core import prevent, stop, State, current_request
+from .tag import Tag
+from .runner import AppRunner as App
+from .web import WebApp
 from .runners import ChromeApp, PyScript
 
 import logging

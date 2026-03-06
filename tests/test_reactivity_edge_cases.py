@@ -1,7 +1,8 @@
 import asyncio
 import pytest
-from htag.core import Tag, GTag, State
-from htag.server import App
+from htag.core import GTag, State
+from htag import Tag
+from htag.server import AppRunner as App
 
 def test_boolean_attributes_edge_cases():
     """Test boolean attribute rendering in GTag (branches 65, 67 in core.py)"""

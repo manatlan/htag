@@ -308,7 +308,7 @@ async def test_app_handle_event_gtag_result():
     assert last_call["result"] is True
 
 def test_render_tag_special_cases():
-    from htag.server import App
+    from htag.server import AppRunner as App
     app = App()
     
     # Ensure the auto-injected oninput is there
@@ -347,8 +347,8 @@ async def test_handle_websocket_lifecycle():
         json.dumps({"id": app.id, "event": "click", "data": {}}),
         WebSocketDisconnect()
     ]
-    with patch("htag.server.os._exit") as mock_exit, \
-         patch("htag.server.asyncio.sleep", side_effect=fast_sleep):
+    with patch("htag.runner.os._exit") as mock_exit, \
+         patch("htag.runner.asyncio.sleep", side_effect=fast_sleep):
         await app._handle_websocket(ws)
         await real_sleep(0.1) # Yield to background tasks
         assert mock_exit.called
@@ -364,8 +364,8 @@ async def test_handle_websocket_lifecycle():
     server.instances = {"sid1": app, "sid2": app2}
     app.htag_webserver = server
     
-    with patch("htag.server.os._exit") as mock_exit, \
-         patch("htag.server.asyncio.sleep", side_effect=fast_sleep):
+    with patch("htag.runner.os._exit") as mock_exit, \
+         patch("htag.runner.asyncio.sleep", side_effect=fast_sleep):
         await app._handle_websocket(ws2)
         await real_sleep(0.1)
         assert not mock_exit.called
@@ -376,8 +376,8 @@ async def test_handle_websocket_lifecycle():
     app3 = App()
     app3.exit_on_disconnect = True
     app3._browser_cleanup = MagicMock()
-    with patch("htag.server.os._exit") as mock_exit, \
-         patch("htag.server.asyncio.sleep", side_effect=fast_sleep):
+    with patch("htag.runner.os._exit") as mock_exit, \
+         patch("htag.runner.asyncio.sleep", side_effect=fast_sleep):
         await app3._handle_websocket(ws3)
         await real_sleep(0.1)
         assert app3._browser_cleanup.called

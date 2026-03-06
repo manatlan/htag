@@ -7,7 +7,7 @@ packages = ["htag","htag.runners"]
 
 [project]
 name = "htag2"
-version = "0.1.4"
+version = "0.2.0"
 description = "A modern, state-of-the-art Python GUI framework"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -48,7 +48,7 @@ dev = [
 ]
 
 [project.scripts]
-htagm = "htag.cmd:main"
+htagm = "htag.cli:main"
 
 [tool.pytest.ini_options]
 pythonpath = ["."]

@@ -8,73 +8,12 @@ import contextvars
 from typing import Any, Callable
 
 
-class _HtagLocal(threading.local):
-    stack: list[GTag]
-    current_eval: GTag | None  # Track which GTag is evaluating a reactive lambda
+from .context import _ctx, current_request
 
-    def __init__(self) -> None:
-        super().__init__()
-        self.stack = []
-        self.current_eval = None
-
-
-_ctx = _HtagLocal()
-
+import logging
 logger = logging.getLogger("htag")
 
-# Global context for passing the current request/websocket object
-current_request: contextvars.ContextVar[Any] = contextvars.ContextVar(
-    "current_request", default=None
-)
-
-# Cache for scoped CSS: maps class -> (scope_class_name, scoped_css_string)
-_scoped_style_cache: dict[type, tuple[str, str]] = {}
-
-
-def _scope_css(css: str, scope_cls: str) -> str:
-    """Prefix CSS selectors with a scope class, handling @-rules correctly."""
-    result: list[str] = []
-    depth = 0
-    buf = ""
-
-    for ch in css:
-        buf += ch
-        if ch == "{":
-            depth += 1
-        elif ch == "}":
-            depth -= 1
-            if depth == 0:
-                blocks_item = buf.strip()
-                buf = ""
-                brace = blocks_item.index("{")
-                selector = blocks_item[:brace].strip()
-                body = blocks_item[brace:]
-
-                if selector.startswith("@"):
-                    if selector.startswith(("@keyframes", "@font-face")):
-                        result.append(blocks_item)  # Pass through unchanged
-                    else:
-                        # @media, @supports, etc.: recursively scope inner rules
-                        inner = body[body.index("{") + 1 : body.rindex("}")]
-                        result.append(f"{selector} {{{_scope_css(inner, scope_cls)}}}")
-                else:
-                    # For each selector, match both the root element itself and descendants
-                    parts = [s.strip() for s in selector.split(",")]
-                    scoped_parts: list[str] = []
-                    for p in parts:
-                        if not p:
-                            continue
-                        # .htag-X.selector = root element itself (if selector is a class/id/pseudo)
-                        # selector.htag-X = root element itself (if selector is a tag)
-                        # .htag-X .selector = descendant elements
-                        if p[0] in (".", "#", ":", "["):
-                            scoped_parts.append(f".{scope_cls}{p}")
-                        else:
-                            scoped_parts.append(f"{p}.{scope_cls}")
-                        scoped_parts.append(f".{scope_cls} {p}")
-                    result.append(f"{', '.join(scoped_parts)} {body}")
-
-    return " ".join(result)
+from .css import _scope_css, _scoped_style_cache
 
 
 class State:
@@ -127,8 +66,41 @@ VOID_ELEMENTS: set[str] = {
 
 
 class GTag:  # aka "Generic Tag"
+    # Basic structural info
     tag: str | None = None
     id: str
+
+    # --- Common HTML Attributes (Type hints for IDE autocompletion) ---
+    _class: str
+    _style: str
+    _id: str
+    _hidden: bool
+    _disabled: bool
+    _readonly: bool
+    _placeholder: str
+    _value: Any
+    _name: str
+    _type: str
+    _href: str
+    _src: str
+    _alt: str
+    _title: str
+    _tabindex: int | str
+
+    # --- Common Events (Type hints for IDE autocompletion) ---
+    _onclick: Callable | str
+    _onchange: Callable | str
+    _oninput: Callable | str
+    _onsubmit: Callable | str
+    _onkeydown: Callable | str
+    _onkeyup: Callable | str
+    _onkeypress: Callable | str
+    _onfocus: Callable | str
+    _onblur: Callable | str
+    _onmouseover: Callable | str
+    _onmouseout: Callable | str
+    _ondblclick: Callable | str
+    _oncontextmenu: Callable | str
 
     def _render_attrs(self) -> str:
         """
@@ -558,27 +530,4 @@ def stop(func: Callable) -> Callable:
     return func
 
 
-class TagCreator:
-    def __init__(self) -> None:
-        self._registry: dict[str, type[GTag]] = {}
 
-    def __getattr__(self, name: str) -> type[GTag]:
-        """
-        Dynamically creates GTag subclasses on the fly.
-        Allows using 'Tag.Div(...)', 'Tag.Button(...)', etc.
-        """
-        if name in self._registry:
-            return self._registry[name]
-
-        if name == "App":
-            return App
-
-        # Create a dynamic subclass of GTag
-        tag_name = name.lower().replace("_", "-")
-        # We cache it in registry for performance and consistency
-        new_class = type(name, (GTag,), {"tag": tag_name})
-        self._registry[name] = new_class
-        return new_class
-
-
-Tag = TagCreator()  # Singleton instance

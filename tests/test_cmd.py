@@ -3,12 +3,12 @@ import sys
 import subprocess
 from unittest.mock import patch, MagicMock
 from pathlib import Path
-from htag import cmd
+from htag import cli
 
 def test_build_missing_entrypoint(capsys):
-    with patch("htag.cmd.Path.exists", return_value=False):
+    with patch("htag.cli.Path.exists", return_value=False):
         with pytest.raises(SystemExit) as e:
-            cmd.build("missing_app.py")
+            cli.build("missing_app.py")
         assert e.value.code == 1
     
     captured = capsys.readouterr()
@@ -16,7 +16,7 @@ def test_build_missing_entrypoint(capsys):
     assert "Entrypoint 'missing_app.py' not found" in captured.out
 
 def test_build_success(capsys):
-    # We mock Path.resolve() because cmd.build does entry_path.resolve()
+    # We mock Path.resolve() because cli.build does entry_path.resolve()
     mock_entry_path = MagicMock()
     mock_entry_path.exists.return_value = True
     mock_entry_path.stem = "my_app"
@@ -39,13 +39,13 @@ def test_build_success(capsys):
             return m
         return Path(path_str) # Default fallback
 
-    with patch("htag.cmd.Path", side_effect=mock_path_constructor), \
-         patch("htag.cmd.subprocess.run") as mock_run:
+    with patch("htag.cli.Path", side_effect=mock_path_constructor), \
+         patch("htag.cli.subprocess.run") as mock_run:
         
         # We need mock_entry_path.resolve() to return itself
         mock_entry_path.resolve.return_value = mock_entry_path
         
-        cmd.build("my_app.py")
+        cli.build("my_app.py")
         
         # Assert subprocess was called correctly
         assert mock_run.called
@@ -72,13 +72,13 @@ def test_build_subprocess_failure(capsys):
     mock_entry_path.stem = "failing_app"
     mock_entry_path.resolve.return_value = mock_entry_path
     
-    with patch("htag.cmd.Path", return_value=mock_entry_path), \
-         patch("htag.cmd.subprocess.run") as mock_run:
+    with patch("htag.cli.Path", return_value=mock_entry_path), \
+         patch("htag.cli.subprocess.run") as mock_run:
         
         mock_run.side_effect = subprocess.CalledProcessError(returncode=42, cmd=["uv"])
         
         with pytest.raises(SystemExit) as e:
-            cmd.build("failing_app.py")
+            cli.build("failing_app.py")
         assert e.value.code == 42
         
         captured = capsys.readouterr()
@@ -89,10 +89,10 @@ def test_clear_build(capsys):
     mock_dir.exists.return_value = True
     mock_dir.is_dir.return_value = True
     
-    with patch("htag.cmd.Path", return_value=mock_dir), \
-         patch("htag.cmd.shutil.rmtree") as mock_rmtree:
+    with patch("htag.cli.Path", return_value=mock_dir), \
+         patch("htag.cli.shutil.rmtree") as mock_rmtree:
         
-        cmd.clear_build()
+        cli.clear_build()
         
         # Should be called 4 times, once for build, dist, .buildozer, bin
         assert mock_rmtree.call_count == 4
@@ -104,7 +104,7 @@ def test_clear_build(capsys):
 def test_main_help(capsys):
     with patch.object(sys, "argv", ["htagm", "--help"]):
         with pytest.raises(SystemExit) as e:
-            cmd.main()
+            cli.main()
         assert e.value.code == 0
         
         captured = capsys.readouterr()
@@ -114,7 +114,7 @@ def test_main_help(capsys):
 def test_main_missing_command(capsys):
     with patch.object(sys, "argv", ["htagm"]):
         with pytest.raises(SystemExit) as e:
-            cmd.main()
+            cli.main()
         assert e.value.code == 1
         
         captured = capsys.readouterr()
@@ -122,12 +122,12 @@ def test_main_missing_command(capsys):
 
 def test_main_build_command():
     with patch.object(sys, "argv", ["htagm", "build", "app.py"]), \
-         patch("htag.cmd.build") as mock_build:
-        cmd.main()
+         patch("htag.cli.build") as mock_build:
+        cli.main()
         mock_build.assert_called_once_with("app.py")
 
 def test_main_build_clear_command():
     with patch.object(sys, "argv", ["htagm", "build", "clear"]), \
-         patch("htag.cmd.clear_build") as mock_clear:
-        cmd.main()
+         patch("htag.cli.clear_build") as mock_clear:
+        cli.main()
         mock_clear.assert_called_once()
