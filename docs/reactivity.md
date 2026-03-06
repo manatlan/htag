@@ -58,10 +58,12 @@ Attributes can also be reactive by passing a lambda.
 ### Dynamic Classes and Styles
 
 ```python
-Tag.div(
     _class=lambda: "text-red-600" if self.error.value else "text-green-600",
     _style=lambda: f"opacity: {self.opacity.value}%"
 )
+
+# Also works with dictionary syntax
+div["class"] = lambda: "active" if self.is_active.value else "hidden"
 ```
 
 ### Boolean Attributes

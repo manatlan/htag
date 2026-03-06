@@ -145,7 +145,7 @@ function handle_payload(data) {
     if(data.action == "update") {
         // Apply partial DOM updates received from the server
         for(var id in data.updates) {
-            var el = document.getElementById(id);
+            var el = document.getElementById(id) || document.querySelector('[data-htag-id="' + id + '"]');
             if(el) el.outerHTML = data.updates[id];
         }
         

@@ -226,7 +226,7 @@ class App(Tag.App):
         """Show a toast notification."""
         t_class = f"toast toast-{type}"
         # Create toast with an 'expire' event that removes itself
-        t = Tag.div(message, _class=t_class, _onexpire=lambda e: t.remove_self())
+        t = Tag.div(message, _class=t_class, _onexpire=lambda e: t.remove())
         self.toast_container.add(t)
         
         # Trigger the 'expire' event from client-side after 5 seconds

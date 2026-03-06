@@ -11,7 +11,11 @@ def my_callback(e: Any) -> None:
     print(f"Clicked on {e.target.id}")
     e.target.add(Tag.span("!"))
 
+# Attached via underscore property
 btn = Tag.button("Click me", _onclick=my_callback)
+
+# Attached via dictionary syntax
+btn["onclick"] = my_callback
 ```
 
 ### The Event Object

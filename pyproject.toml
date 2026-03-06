@@ -4,6 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 packages = ["htag","htag.runners"]
+include-package-data = true
 
 [project]
 name = "htag2"
@@ -11,6 +12,7 @@ version = "0.2.0"
 description = "A modern, state-of-the-art Python GUI framework"
 readme = "README.md"
 requires-python = ">=3.10"
+license = {text = "MIT"}
 authors = [
     { name = "manatlan" }
 ]
@@ -24,7 +26,6 @@ classifiers = [
 ]
 
 dependencies = [
-    "python-multipart>=0.0.22",
     "starlette>=0.40.0",
     "uvicorn>=0.40.0",
     "websockets>=16.0",

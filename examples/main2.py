@@ -14,7 +14,7 @@ class MessageBox(Tag.div):
         with Tag.div(_class="msgbox-card"):
             Tag.h2(title, _class="msgbox-title")
             Tag.p(message, _class="msgbox-text")
-            Tag.button("OK", _onclick=lambda e: self.remove_self(), _class="btn btn-primary btn-wide")
+            Tag.button("OK", _onclick=lambda e: self.remove(), _class="btn btn-primary btn-wide")
 
 class MyApp(Tag.App):
     statics = [

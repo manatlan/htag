@@ -473,7 +473,7 @@ class AppRunner(BaseApp):
         result: list[GTag | None] = [None]
 
         def visitor(t: GTag) -> None:
-            if result[0] is None and t.id == tag_id:
+            if result[0] is None and (t.id == tag_id or t._get_attrs().get("id") == tag_id):
                 result[0] = t
 
         self._walk_tree(root, visitor)

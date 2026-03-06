@@ -49,7 +49,7 @@ class Card(Tag.div):
             # Explicitly add to self (Card), not body (via override add)
             Tag.div.add(self, header)
             # Re-ensure body is after header in child list
-            self.body.remove_self()
+            self.body.remove()
             Tag.div.add(self, self.body)
 
     # Override the default append behavior to add to the card body instead of the main wrapper

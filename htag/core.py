@@ -108,15 +108,17 @@ class GTag:  # aka "Generic Tag"
         Handles boolean attributes (True -> key only, False -> omit).
         """
         attrs_list: list[str] = []
-        for k, v in self.__attrs.items():
-            attr_name = k.replace("_", "-")
-            val = self._eval_child(v, stringify=False)
+        for k, val in self.__attrs.items():
+            attr_name = k
+            val = self._eval_child(val, stringify=False)
 
             if val is True:
                 attrs_list.append(attr_name)
             elif val is False or val is None:
                 continue
             else:
+                # Use htag's internal ID if no HTML id set, otherwise htag's internal ID is always used for events
+                # but we render 'id' attribute from attrs if present
                 attrs_list.append(f'{attr_name}="{html.escape(str(val))}"')
 
         for name, callback in self.__events.items():
@@ -133,7 +135,13 @@ class GTag:  # aka "Generic Tag"
         attrs = " ".join(attrs_list)
         if attrs:
             attrs = " " + attrs
-        attrs += f' id="{self.id}"'
+        
+        # Always append htag's internal unique ID as 'data-htag-id' or just 'id' if not already present
+        if "id" not in self.__attrs:
+            attrs += f' id="{self.id}"'
+        else:
+            # If user provided a custom ID, we still need htag id for event mapping
+            attrs += f' data-htag-id="{self.id}"'
         return attrs
 
     def __enter__(self) -> GTag:
@@ -169,7 +177,10 @@ class GTag:  # aka "Generic Tag"
         # If tag is not set by subclass (class attribute), take it from first arg
         if getattr(self, "tag", None) is None:
             if args:
-                self.tag = args[0].replace("_", "-")
+                if args[0] is not None:
+                    self.tag = str(args[0]).replace("_", "-")
+                else:
+                    self.tag = None  # Explicit fragment
                 args = args[1:]
             else:
                 self.tag = "div"  # fallback
@@ -192,7 +203,7 @@ class GTag:  # aka "Generic Tag"
                 self.__events[k[3:]] = v
             elif k.startswith("_"):
                 # Attributes like _class="foo" -> class="foo"
-                self.__attrs[k[1:]] = v
+                self.__attrs[k[1:].replace("_", "-")] = v
             else:
                 left_kwargs[k] = v
 
@@ -261,7 +272,7 @@ class GTag:  # aka "Generic Tag"
             else:
                 if isinstance(item, GTag):
                     if item.parent is not None and item.parent is not self:
-                        item.remove_self()
+                        item.remove()
 
                 with self.__lock:
                     if isinstance(item, GTag):
@@ -307,7 +318,7 @@ class GTag:  # aka "Generic Tag"
                 self.__dirty = True
         elif name.startswith("_"):
             # HTML attribute (e.g., self._class = "foo")
-            attr_name = name[1:]
+            attr_name = name[1:].replace("_", "-")
             with self.__lock:
                 self.__attrs[attr_name] = value
                 self.__dirty = True
@@ -320,11 +331,40 @@ class GTag:  # aka "Generic Tag"
             try:
                 # Use super().__getattribute__ to avoid recursion loop with __getattr__
                 attrs = super().__getattribute__("_GTag__attrs")
-                if name[1:] in attrs:
-                    return attrs[name[1:]]
+                attr_name = name[1:].replace("_", "-")
+                if attr_name in attrs:
+                    return attrs[attr_name]
             except AttributeError:
                 pass
         return super().__getattribute__(name)
+
+    def __getitem__(self, name: str) -> Any:
+        if name.startswith("on") and name[2:] in self.__events:
+            return self.__events[name[2:]]
+        return self.__attrs[name]
+
+    def __setitem__(self, name: str, value: Any) -> None:
+        if name.startswith("on") and (callable(value) or isinstance(value, str)):
+            with self.__lock:
+                self.__events[name[2:]] = value
+                self.__dirty = True
+        else:
+            with self.__lock:
+                self.__attrs[name] = value
+                self.__dirty = True
+
+    def __delitem__(self, name: str) -> None:
+        if name.startswith("on") and name[2:] in self.__events:
+            with self.__lock:
+                del self.__events[name[2:]]
+                self.__dirty = True
+        else:
+            with self.__lock:
+                if name in self.__attrs:
+                    del self.__attrs[name]
+                    self.__dirty = True
+                else:
+                    raise KeyError(name)
 
     def __add__(self, other: Any) -> list[Any]:
         if isinstance(other, list):
@@ -336,7 +376,12 @@ class GTag:  # aka "Generic Tag"
             return other + [self]
         return [other, self]
 
-    def remove(self, item: str | GTag | Callable) -> GTag:
+    def remove(self, item: str | GTag | Callable | None = None) -> GTag:
+        if item is None:
+            if self.parent:
+                self.parent.remove(self)
+            return self
+
         with self.__lock:
             if item in self.childs:
                 if self.root is not None:
@@ -347,10 +392,6 @@ class GTag:  # aka "Generic Tag"
                 self.__dirty = True
         return self
 
-    def remove_self(self) -> "GTag":
-        if self.parent:
-            self.parent.remove(self)
-        return self
 
     @property
     def root(self) -> GTag | None:

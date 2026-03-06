@@ -46,9 +46,9 @@ class Clock(Tag.div):
 
 - `self.add(*content)`: Adds children (strings or other components).
 - `self <= content`: An elegant shorthand for `self.add(content)`.
-- `self.remove(child)`: Removes a child.
+- `self.remove(child)`: Removes a child component or string.
+- `self.remove()`: Removes the component itself from its parent (equivalent to the old `remove_self()`).
 - `self.clear()`: Removes all children.
-- `self.remove_self()`: Removes the component from its parent.
 - `self.root`: Returns the `Tag.App` instance this component belongs to (or `None` if unattached).
 - `self.parent`: Returns the parent `GTag` instance (or `None` if unattached).
 - `self.childs`: A list of the component's children (strings or other `GTag` instances).
@@ -79,23 +79,38 @@ Use the `.text` property to quickly replace all children of a tag with a single 
 self.label.text = "Status: OK"
 ```
 
-## Attributes and Style
+Attributes can be managed using either properties starting with an underscore or dictionary-style access. Both methods trigger UI updates and are strictly synchronized.
 
-Attributes are managed using properties starting with an underscore. This mapping covers all standard and custom HTML attributes.
+### Underscore Properties
+Ideal for standard attributes and quick definitions.
 
 ```python
-# Mapping attributes
+# In constructors
 img = Tag.img(_src="/logo.png", _alt="Logo")
-img._width = "100"
 
-# Custom data attributes
-div = Tag.div(_data_user_id="123")
+# Direct assignment
+img._width = "100"
 ```
 
-- `_class`: Maps to the `class` attribute.
-- `_id`: Maps to the `id` attribute.
-- `_style`: Maps to the `style` attribute.
-- `_any_thing`: Maps to `any-thing` in the rendered HTML.
+### Dictionary Access
+Recommended for attributes with dashes (like `data-*` or `aria-*`) or dynamic attribute names. **Note: underscores are automatically converted to dashes internally.**
+
+```python
+# Canonical way for dashed attributes
+div["data-user-id"] = "123"
+
+# Also works (auto-normalized to "data-user-id")
+div._data_user_id = "123" 
+
+# Dynamic access
+attr_name = "class"
+div[attr_name] = "active"
+```
+
+- `_class` / `["class"]`: Maps to the `class` attribute.
+- `_id` / `["id"]`: Maps to the `id` attribute.
+- `_style` / `["style"]`: Maps to the `style` attribute.
+- `_any_thing` / `["any-thing"]`: Maps to `any-thing` in HTML.
 
 ### CSS Class Helpers
 

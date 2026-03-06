@@ -44,7 +44,7 @@ def test_gtag_attr_magic():
     t = Tag.div(_class="foo", _data_id="123")
     assert t._class == "foo"
     assert t._GTag__attrs["class"] == "foo"
-    assert t._GTag__attrs["data_id"] == "123"
+    assert t._GTag__attrs["data-id"] == "123"
     assert t.id is not None
     
     t._class = "bar"
@@ -180,7 +180,7 @@ def test_gtag_remove_self():
     parent = Tag.div()
     child = Tag.span()
     parent.add(child)
-    child.remove_self()
+    child.remove()
     assert child not in parent.childs
     assert child.parent is None
 
@@ -274,7 +274,7 @@ def test_gtag_reparenting_and_duplicates():
     # Reparenting
     p1.add(c)
     assert c.parent == p1
-    p2.add(c) # Should trigger remove_self() on c
+    p2.add(c) # Should trigger remove() on c
     assert c.parent == p2
     assert c not in p1.childs
     
@@ -559,3 +559,35 @@ def test_scoped_style_complex_css():
     assert "@keyframes fadeIn" in css
     assert ".htag-ComplexWidget from" not in css
     assert ".htag-ComplexWidget to" not in css
+
+def test_gtag_dict_attr_access():
+    t = Tag.div(_class="foo", _data_id="123")
+    
+    # __getitem__
+    assert t["class"] == "foo"
+    assert t["data-id"] == "123"
+    
+    # __setitem__
+    t["data-state"] = "active"
+    assert t._GTag__attrs["data-state"] == "active"
+    
+    # __delitem__
+    del t["class"]
+    assert "class" not in t._GTag__attrs
+    
+def test_gtag_dict_event_access():
+    def h1(e): pass
+    def h2(e): pass
+    
+    t = Tag.button(_onclick=h1)
+    
+    # __getitem__
+    assert t["onclick"] == h1
+    
+    # __setitem__
+    t["onmouseover"] = h2
+    assert t._GTag__events["mouseover"] == h2
+    
+    # __delitem__
+    del t["onclick"]
+    assert "click" not in t._GTag__events

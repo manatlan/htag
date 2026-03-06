@@ -1,3 +1,14 @@
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#     "htag2",
+#     "itsdangerous",
+#     "python-multipart",
+# ]
+# [tool.uv.sources]
+# htag2 = { path = ".." }
+# ///
+
 from htag import Tag, WebApp
 from starlette.applications import Starlette
 from starlette.middleware import Middleware

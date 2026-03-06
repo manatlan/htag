@@ -31,6 +31,18 @@ class MyComponent(Tag.div):
         with Tag.div(_class="container"):
             Tag.h2("Subtitle")
             Tag.p("Content goes here")
+
+### 1a. Fragments (`Tag()`)
+A fragment allows grouping multiple tags without rendering a wrapper tag (like `div`) in the final HTML.
+- Use `Tag()` (without arguments) to create a fragment.
+- **Limitation**: Since a fragment has no physical presence in the DOM, it cannot be targets of partial reactive updates. For elements that need to update their own `.text` or `_class` reactively, prefer `Tag.span()` or `Tag.div()`.
+
+```python
+with Tag() as fragment:
+    Tag.span("Part 1")
+    Tag.span("Part 2")
+self <= fragment
+```
 ```
 
 ### 2. Component Lifecycle
@@ -77,19 +89,37 @@ htag2 supports both traditional "dirty-marking" and modern reactive `State`.
 - Use the `.text` property to quickly replace all text content of a tag: `self.my_label.text = "New Status"`. This completely clears existing children and replaces them with a single string.
 
 **Traditional Reactivity (HTML Attributes & Events)**:
-- **HTML Attributes**: MUST start with `_` to be rendered as HTML attributes and trigger updates.
+- **HTML Attributes**: MUST start with `_` (or use dictionary syntax) to be rendered as HTML attributes and trigger updates.
   - **In Tag Constructors**: `Tag.div(_class="btn", _id="myid")`
   - **Direct Assignment on `self`**: Use the underscore prefix: `self._style = "color:red"`, `self._disabled = True`.
+  - **Dictionary Assignment**: You can also use dictionary syntax for attributes, perfectly handling dashes: `self["data-test"] = 123`, `self["class"] = "btn"`.
   - **Why?**: Assigning to `self.style` (without underscore) merely sets a private Python attribute that won't be rendered in HTML.
-  - Correct: `_class="btn"`, `_src="image.png"`, `_type="checkbox"`
+  - Correct: `_class="btn"`, `_src="image.png"`, `self["data-value"] = 5`
   - Incorrect: `class="btn"`, `src="image.png"`
-- **Events**: Properties starting with `_on` are mapped to Python callbacks.
+- **Events**: Properties starting with `_on` (or dictionary keys starting with `on`) are mapped to Python callbacks.
+  - Example: `self._onclick = my_func` or `self["onclick"] = my_func`
 
 **CSS Class Helpers**:
 - `tag.add_class("active")` — adds a class if not already present
 - `tag.remove_class("active")` — removes a class if present
 - `tag.toggle_class("hidden")` — adds or removes a class
 - `tag.has_class("active")` — returns `bool`
+
+### 4a. Finding Tags (`find_tag`)
+You can recursively search for a tag within a tree using `self.find_tag(root, tag_id)`.
+- It searches both internal htag IDs and manual HTML `id` attributes.
+- Returns the `GTag` object or `None`.
+
+```python
+# In test.py example:
+target = self.find_tag(self, "my-custom-id")
+if target:
+    target.text = "Found and updated!"
+```
+
+### 4b. Custom IDs
+htag2 supports setting custom HTML IDs via `_id="myid"`.
+- **Note**: To maintain reactivity with custom IDs, htag2 automatically injects a `data-htag-id` attribute. The internal communication bridge uses this to ensure partial DOM updates still target the correct element even if the HTML `id` attribute is overridden.
 
 ### 5. Forms & Inputs
 htag2 automatically binds input events to Python.
@@ -178,7 +208,7 @@ class App(Tag.App):
     def notify(self, message, type="info"):
         # 2. Add individual toast with an 'expire' event
         t = Tag.div(message, _class=f"toast toast-{type}", 
-                  _onexpire=lambda e: t.remove_self())
+                  _onexpire=lambda e: t.remove())
         self.toasts.add(t)
         
         # 3. Trigger dismissal via client-side setTimeout
@@ -284,20 +314,20 @@ Use decorators to control event behavior:
 - `@prevent`: Calls `event.preventDefault()` on the client side.
 - `@stop`: Calls `event.stopPropagation()` on the client side.
 
-### Use `yield` for UI Rendering
-In event handlers, you can use `yield` to trigger partial UI updates. This is extremely useful for:
-- Showing a "Processing..." state before a long-running task.
-- Creating step-by-step UI progressions without complex state management.
-- Providing immediate visual feedback.
+### Use `yield` for UI Rendering (Stepping)
+In event handlers, you can use `yield` to trigger partial UI updates. Combined with `async def`, this allows for clean, multi-step asynchronous progressions.
 
 ```python
-def _onclick(self, event):
-    self.text = "Processing..."
+async def _onclick(self, event):
+    self.text = "Step 1: Processing..."
     yield # UI updates immediately to show "Processing..."
 
-    time.sleep(2) # Simulate work
+    await asyncio.sleep(1) # Asynchronous wait (non-blocking)
+    self.text = "Step 2: Nearly done..."
+    yield
+
+    await asyncio.sleep(1)
     self.text = "Done!"
-    # UI updates again at the end of the method
 ```
 
 ## Runner Choice & Developer Experience

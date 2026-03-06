@@ -7,6 +7,13 @@ class TagCreator:
     def __init__(self) -> None:
         self._registry: dict[str, type[GTag]] = {}
 
+    def __call__(self, *args: Any, **kwargs: Any) -> GTag:
+        """
+        Allows using 'Tag(...)' to create a fragment (a tag with no name).
+        Useful for grouping elements without adding a wrapper tag.
+        """
+        return GTag(None, *args, **kwargs)
+
     def __getattr__(self, name: str) -> type[GTag]:
         """
         Dynamically creates GTag subclasses on the fly.
