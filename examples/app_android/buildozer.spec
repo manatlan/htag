@@ -11,6 +11,8 @@ requirements = android,htag2,starlette,uvicorn,websockets,anyio,typing_extension
 orientation = portrait
 fullscreen = 0
 android.archs = arm64-v8a
+android.api = 33
+android.minapi = 24
 
 
 home_app = 1

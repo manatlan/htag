@@ -1,7 +1,9 @@
 
-# Recipe
+# Building APK works !!!
 
-You should have docker, adb, and a device/phone in dev mode !
+You should have docker, adb, and a device/phone in dev mode ! (Currently it works, at least for me (Ubuntu 24.04.4 LTS & Pixel8))
+
+**TODO:** The process need to be improved, to make the process easier !
 
 In CLI, inside this folder, follow these steps :
 
@@ -13,7 +15,7 @@ Ensure the htag app is working (using the runner `WebApp(DemoApp).run()`):
 notes:
 
 - Currently only with the runner *WebApp* !
-- It should start on port 13333 (`WebApp(DemoApp).run( host="127.0.0.1", port=13333 )`)
+- It should start on port localhost:13333 (`WebApp(DemoApp).run( host="127.0.0.1", port=13333 )`)
 
 ## Build the APK
 To build the APK, run :
@@ -22,7 +24,7 @@ To build the APK, run :
 
 notes:
 
-- It will create a `buildozer.spec` file (if not already existing), you can change it later.
+- It will create a default `buildozer.spec` file (if not already existing), you can change it later.
 - First run it can takes 10 to 20 minutes, subsequent runs are faster.
 - The apk should be generated in the `bin` folder (as `main-1.0-arm64-v8a-debug.apk`).
 - As you don't set '--tv' option, it will be built for phone (arm64-v8a).
