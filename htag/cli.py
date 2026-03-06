@@ -114,9 +114,9 @@ def build_apk(entrypoint: str, is_tv: bool = False):
         f"🚀 {C.BLUE}Building APK{C.END} for '{C.BOLD}{app_name}{C.END}' from '{entry_path}'..."
     )
 
-    DOCKER_IMAGE = "mybuildozer"
+    DOCKER_IMAGE = "kivy/buildozer"
 
-    # Check if mybuildozer image exists
+    # Check if Buildozer image exists
     print(f"🐳 {C.CYAN}Checking Docker image '{DOCKER_IMAGE}'...{C.END}")
     try:
         res = subprocess.run(
@@ -131,7 +131,7 @@ def build_apk(entrypoint: str, is_tv: bool = False):
             )
             with tempfile.TemporaryDirectory() as tmpdir:
                 subprocess.run(
-                    f"cd {tmpdir} && git clone https://github.com/manatlan/buildozer.git .",
+                    f"cd {tmpdir} && git clone https://github.com/kivy/buildozer.git .",
                     shell=True,
                     check=True,
                 )
@@ -177,8 +177,9 @@ requirements = android,htag2,starlette,uvicorn,websockets,anyio,typing_extension
 orientation = {orientation}
 fullscreen = {fullscreen}
 android.archs = {android_archs}
-android.api = 33
+android.api = 34
 android.minapi = 24
+android.ndk = 26b
 
 {icon_setting}
 

@@ -25,7 +25,7 @@ To build the APK, run :
 notes:
 
 - It will create a default `buildozer.spec` file (if not already existing), you can change it later.
-- First run it can takes 10 to 20 minutes, subsequent runs are faster.
+- First run it can takes 5 to 10 minutes, subsequent runs are faster.
 - The apk should be generated in the `bin` folder (as `main-1.0-arm64-v8a-debug.apk`).
 - As you don't set '--tv' option, it will be built for phone (arm64-v8a).
 
