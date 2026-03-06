@@ -14,4 +14,4 @@ htmlcov/
 
 # Buildozer apk
 .buildozer/
-buildozer.spec
+examples/app_android/bin/

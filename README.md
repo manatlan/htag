@@ -25,7 +25,7 @@ It's completely crazy, but it works :
 - For building desktop apps (ChromeApp on linux/windows)
 - For building web apps (WebApp as an asgi app (for starlette/fastapi/...))
 - For building SPA HTML Page (with the PyScript runner)
-- ~~For building android apps~~ (not yet)
+- For building android apps ([it works](examples/app_android/README.md), **but need to improve**)
 
 
 ## Get Started
