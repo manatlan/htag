@@ -205,6 +205,7 @@ class GTag:  # aka "Generic Tag"
                 # Attributes like _class="foo" -> class="foo"
                 self.__attrs[k[1:].replace("_", "-")] = v
             else:
+                setattr(self, k, v)
                 left_kwargs[k] = v
 
         _ctx.stack.append(self)

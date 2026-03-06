@@ -17,6 +17,19 @@ class MyComponent(Tag.div):
     def init(self, name: str) -> None:
         self._class = "my-class"
         self.add(f"Hello {name}!")
+
+### Automatic Attribute Assignment
+
+Any non-prefixed keyword argument (not starting with `_` or `_on`) passed during component instantiation is automatically assigned as an instance attribute *before* the `init()` hook is called.
+
+```python
+class MyTag(Tag.div):
+    def init(self, **kwargs):
+        # self.v is already 42!
+        self <= f"Value is {self.v}"
+
+t = MyTag(v=42)
+```
 ```
 
 ### Lifecycle Hooks

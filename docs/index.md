@@ -17,6 +17,7 @@
 - **Modern HTML**: Native support for HTML5 void elements.
 - **Scoped Styles**: Simple, robust CSS scoping via the `styles` attribute.
 - **Class Helpers**: Convenient methods like `toggle_class()` and `has_class()`.
+- **Automatic Attributes**: Non-prefixed keyword arguments are automatically assigned as instance attributes.
 
 ## Quick Start
 

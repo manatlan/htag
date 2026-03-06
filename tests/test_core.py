@@ -591,3 +591,25 @@ def test_gtag_dict_event_access():
     # __delitem__
     del t["onclick"]
     assert "click" not in t._GTag__events
+
+def test_gtag_auto_attr_assignment():
+    """Test that non-prefixed kwargs are assigned as instance attributes."""
+    t = Tag.div("hello", toto=42, name="test")
+    assert t.toto == 42
+    assert t.name == "test"
+    # Ensure they are NOT in HTML attributes
+    assert "toto" not in t._get_attrs()
+    assert "name" not in t._get_attrs()
+
+    # Test collision with GTag properties
+    t2 = Tag.div(tag="overridden")
+    assert t2.tag == "overridden"
+
+    # Test that subclasses can use these attributes in init()
+    class MyTag(Tag.div):
+        def init(self, **kwargs):
+            self.success = (self.val == 123)
+    
+    t3 = MyTag(val=123)
+    assert t3.val == 123
+    assert t3.success is True

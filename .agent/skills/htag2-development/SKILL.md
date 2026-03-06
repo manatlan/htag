@@ -47,7 +47,10 @@ self <= fragment
 
 ### 2. Component Lifecycle
 htag2 provides three lifecycle hooks to override on custom components:
-- `init(**kwargs)`: Called exactly once at the end of component initialization. Use this instead of overriding `__init__` to avoid `super()` boilerplate. Positional arguments (`*args`) are automatically appended as children before `init` is evaluated.
+- `init(**kwargs)`: Called exactly once at the end of component initialization. Use this instead of overriding `__init__` to avoid `super()` boilerplate. 
+    - **Automatic Assignment**: Any non-prefixed keyword argument (not starting with `_` or `_on`) is automatically assigned as an instance attribute *before* `init` is called.
+    - **Example**: `Tag.div(toto=42)` will result in the instance having a `.toto` attribute set to `42`.
+    - **Positional Arguments**: `*args` are automatically appended as children before `init` is evaluated.
 - `on_mount()`: Fired when the component is firmly attached to the main `App` tree (`self.root` is ready).
 - `on_unmount(self)`: Fired when the component is removed, ideal for cleaning up tasks, caches, or event listeners.
 
