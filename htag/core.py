@@ -30,9 +30,8 @@ class State:
 
     @value.setter
     def value(self, new_value: Any) -> None:
-        if self._value != new_value:
-            self._value = new_value
-            self._notify_observers()
+        self._value = new_value
+        self._notify_observers()
 
     def set(self, value: Any) -> Any:
         self.value = value
@@ -45,6 +44,87 @@ class State:
     def _notify_observers(self) -> None:
         for observer in list(self._observers):
             observer._GTag__dirty = True
+
+    def __getattr__(self, name: str) -> Any:
+        attr = getattr(self.value, name)
+        if callable(attr):
+
+            def wrapper(*args: Any, **kwargs: Any) -> Any:
+                res = attr(*args, **kwargs)
+                self.notify()
+                return res
+
+            return wrapper
+        return attr
+
+    def __getitem__(self, key: Any) -> Any:
+        return self.value[key]
+
+    def __setitem__(self, key: Any, value: Any) -> None:
+        self.value[key] = value
+        self.notify()
+
+    def __delitem__(self, key: Any) -> None:
+        del self.value[key]
+        self.notify()
+
+    def __len__(self) -> int:
+        return len(self.value)
+
+    def __iter__(self) -> Any:
+        return iter(self.value)
+
+    def __contains__(self, item: Any) -> bool:
+        return item in self.value
+
+    # --- In-place operators (trigger notification) ---
+    def __iadd__(self, other: Any) -> "State":
+        self.value += other
+        return self
+
+    def __isub__(self, other: Any) -> "State":
+        self.value -= other
+        return self
+
+    def __imul__(self, other: Any) -> "State":
+        self.value *= other
+        return self
+
+    def __itruediv__(self, other: Any) -> "State":
+        self.value /= other
+        return self
+
+    def __ifloordiv__(self, other: Any) -> "State":
+        self.value //= other
+        return self
+
+    def __imod__(self, other: Any) -> "State":
+        self.value %= other
+        return self
+
+    def __ipow__(self, other: Any) -> "State":
+        self.value **= other
+        return self
+
+    def __ilshift__(self, other: Any) -> "State":
+        self.value <<= other
+        return self
+
+    def __irshift__(self, other: Any) -> "State":
+        self.value >>= other
+        return self
+
+    def __iand__(self, other: Any) -> "State":
+        self.value &= other
+        return self
+
+    def __ixor__(self, other: Any) -> "State":
+        self.value ^= other
+        return self
+
+    def __ior__(self, other: Any) -> "State":
+        self.value |= other
+        return self
 
     def __call__(self) -> Any:
         return self.value

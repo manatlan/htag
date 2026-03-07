@@ -71,14 +71,14 @@ htag2 is a Python library for building web applications using HTML, CSS, and Jav
 *   **Declarative UI with Context Managers (`with`)**: You can now build component trees visually using `with` blocks (e.g., `with Tag.div(): Tag.h1("Hello")`), removing the need for `self <= ...` boilerplate.
 *   **Dual Attribute Access (Dictionary Style)**: In addition to `self._class = "foo"`, you can now use `self["class"] = "foo"`. This is the preferred way to handle attributes with dashes (e.g., `self["data-id"] = 123`).
 *   **Automatic Attribute Normalization**: HTML attributes are normalized to use dashes internally. Setting `self._data_id = "123"` is strictly equivalent to setting `self["data-id"] = "123"`.
-*   **Reactive State Management (`State`)**: Introducing `State(value)` for automatic UI reactivity. Simply assign a `State` to a component directly (e.g. `Tag.div(state)`) or using a lambda (e.g. `Tag.div(lambda: state.value)`), and the UI will auto-update whenever the state changes. Use `state.set(new_value)` for functional updates inside callbacks.
+*   **Reactive State Management (`State`)**: Introducing `State(value)` for automatic UI reactivity. `State` acts as a transparent **Proxy**: you can use operators directly (`self.count += 1`), and calling methods on it (like `self.list.append("x")`) automatically triggers a re-render.
+*   **Automatic Method Proxying**: Calling methods on `State` objects (like `list.append()` or `dict.update()`) automatically triggers reactive updates without needing manual `notify()` calls.
 *   **Reactive & Boolean Attributes**: Attributes like `_class`, `_style`, or `_disabled` now support lambdas for dynamic updates. Boolean attributes (e.g. `_disabled=True`) are correctly rendered as key-only or omitted.
 *   **Simplified Removal (`.remove()`)**: To remove a component from its parent, simply call `self.remove()` without arguments.
 *   **Rapid Content Replacement (`.text`)**: Use the `.text` property on any tag to quickly replace its inner text content without needing to manually clear its children first.
 *   **Recursive Statics & JS**: Components created dynamically (via lambdas) now have their `statics` (CSS) and `call_js` commands correctly collected and sent to the client.
 *   **Scoped Styles (`styles`)**: Define a `styles` class attribute on any component to get automatically scoped CSS. The framework prefixes every rule with `.htag-ClassName`, handles `@media`, `@keyframes`, pseudo-selectors, and multi-selectors.
 *   **CSS Class Helpers**: `add_class()`, `remove_class()`, `toggle_class()`, and `has_class()` for convenient class manipulation without manual string handling.
-*   **`State.notify()`**: Manually trigger reactive updates after in-place mutations of mutable values (lists, dicts).
 *   **Simple Events & HashChange**: Support for passing primitive values or custom objects from JS (via `tag["onclick"] = func` or `tag._onclick = func`). Includes built-in support for `_onhashchange`.
 *   **Fragments (`Tag()`)**: Create virtual components that group children without adding a wrapper tag to the DOM.
 *   **Advanced Tag Search (`.find_tag()`)**: Effortlessly locate any component in the tree by its internal htag ID or its manually assigned HTML `id`.

@@ -37,7 +37,7 @@ class HelloApp(Tag.App):
             Tag.button("Click Me", _onclick=self.increment)
 
     def increment(self, e: Any) -> None:
-        self.count.value += 1
+        self.count += 1
 
 if __name__ == "__main__":
     WebApp(HelloApp).run()

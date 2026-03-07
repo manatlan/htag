@@ -74,16 +74,16 @@ class Card(Tag.div):
 ### 4. State & Reactivity
 htag2 supports both traditional "dirty-marking" and modern reactive `State`.
 
-**Reactive State (Preferred for data-driven UIs)**:
+**Reactive State (Transparent Proxy)**:
 - Use `from htag import State`.
 - Declare state variables: `self.count = State(0)`.
-- Read state dynamically using State objects directly (recommended) or lambdas: `Tag.div(self.count)` or `Tag.div(lambda: f"Count: {self.count.value}")`.
-- Modify state directly: `self.count.value += 1`.
-- Functional updates: Use `state.set(new_value)` if you need to update state and return the value in a single expression (e.g., inside a lambda): `_onclick=lambda e: self.count.set(self.count.value + 1)`.
-- Mutable values: When mutating a value in-place (e.g., appending to a list), call `state.notify()` to force a re-render: `self.items.value.append("new"); self.items.notify()`.
+- Use operators directly: `self.count += 1`.
+- Automatic notification on method calls: `self.items.append("new")` (no more manual `.notify()` needed in most cases).
+- Direct item access: `self.dico["key"] = val`.
+- Data-driven UIs: `Tag.div(self.count)` or `Tag.div(lambda: f"Count: {self.count}")`.
 
 **Reactive & Boolean Attributes**:
-- Attributes support lambdas for dynamic updates: `Tag.div(_class=lambda: "active" if self.is_active.value else "hidden")`.
+- Attributes support lambdas for dynamic updates: `Tag.div(_class=lambda: "active" if self.is_active else "hidden")`.
 - Boolean attributes (e.g., `_disabled`, `_checked`, `_required`) are handled automatically:
     - `True`: Renders the attribute name only (e.g., `disabled`).
     - `False` or `None`: Omits the attribute entirely.
@@ -160,7 +160,7 @@ htag2 includes a built-in visual aid mechanism to help developers track bugs:
 When building complex hierarchical structures (like file trees or nested menus), choosing the right rendering strategy is critical for both performance and reliability.
 
 **Dynamic (Lambda-based) Rendering**:
-- **Usage**: `Tag.div(lambda: self.render_items(self.data.value))`
+- **Usage**: `Tag.div(lambda: self.render_items(self.data))`
 - **Pros**: Very clean, "standard" htag2 way.
 - **Cons**: Every state change triggers a full re-render of the entire branch. In htag2, this creates **new Tag objects with new IDs**. If a user clicks an item while another update is happening, the event might be dispatched to an ID that no longer exists in the server-side tree, causing "ghost" clicks or unresponsiveness.
 
@@ -178,7 +178,7 @@ def build_tree(self, folder_data):
             Tag.div(item.name, _onclick=lambda e, p=item.path: self.toggle(p))
             
             # 3. Create the children container with REACTIVE visibility
-            with Tag.div(_class=lambda p=item.path: "" if p in self.expanded.value else "hidden"):
+            with Tag.div(_class=lambda p=item.path: "" if p in self.expanded else "hidden"):
                 if item.children:
                     self.build_tree(item.children) # Recurse
 ```
@@ -292,7 +292,7 @@ The generated CSS will be `.htag-MyCard .title { ... }` — no style leaking. Th
 > ```python
 > self._style = "color: red;"              # inline style
 > self.toggle_class("active")              # toggle CSS class
-> Tag.div(_class=lambda: "on" if s.value else "off")  # reactive
+> Tag.div(_class=lambda: "on" if s else "off")  # reactive
 > ```
 
 ### Global Statics (`Tag.statics`)
