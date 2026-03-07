@@ -7,7 +7,7 @@ packages = ["htag","htag.runners"]
 include-package-data = true
 
 [project]
-name = "htag2"
+name = "htag"
 version = "0.2.4"
 description = "A modern, state-of-the-art Python GUI framework"
 readme = "README.md"
@@ -32,9 +32,9 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/manatlan/htag2"
-Repository = "https://github.com/manatlan/htag2.git"
-"Bug Tracker" = "https://github.com/manatlan/htag2/issues"
+Homepage = "https://github.com/manatlan/htag"
+Repository = "https://github.com/manatlan/htag.git"
+"Bug Tracker" = "https://github.com/manatlan/htag/issues"
 
 [dependency-groups]
 dev = [
