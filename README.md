@@ -1,17 +1,17 @@
-# htag2
+# htag 2
 
 <p align="center">
-  <img src="https://manatlan.github.io/htag2/assets/logo.png" width="300" alt="htag2 logo">
+  <img src="https://manatlan.github.io/htag/assets/logo.png" width="300" alt="htag logo">
 </p>
 
 <p align="center">
-  <a href="https://pypi.org/project/htag2/">
-    <img src="https://img.shields.io/pypi/v/htag2?style=for-the-badge&logo=pypi&color=blue" alt="PyPI">
+  <a href="https://pypi.org/project/htag/">
+    <img src="https://img.shields.io/pypi/v/htag?style=for-the-badge&logo=pypi&color=blue" alt="PyPI">
   </a>
-  <a href="https://github.com/manatlan/htag2/actions/workflows/tests.yml">
-    <img src="https://img.shields.io/github/actions/workflow/status/manatlan/htag2/tests.yml?branch=main&style=for-the-badge&logo=github&label=Tests" alt="Test Status">
+  <a href="https://github.com/manatlan/htag/actions/workflows/tests.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/manatlan/htag/tests.yml?branch=main&style=for-the-badge&logo=github&label=Tests" alt="Test Status">
   </a>
-  <a href="https://github.com/manatlan/htag2/releases/tag/latest">
+  <a href="https://github.com/manatlan/htag/releases/tag/latest">
     <img src="https://img.shields.io/badge/Download-Latest_Build-blue?style=for-the-badge&logo=github" alt="Download Latest Build">
   </a>
 </p>
@@ -30,34 +30,34 @@ It's completely crazy, but it works :
 
 ## Get Started
 
-Check the [Official Documentation](https://manatlan.github.io/htag2/) for more information.
+Check the [Official Documentation](https://manatlan.github.io/htag/) for more information.
 
 ## Install
 
 ```bash
-uv add htag2
+uv add htag
 ```
 
 Or using pip:
 ```bash
-pip install htag2
+pip install htag
 ```
 
 Alternatively, you can run from source:
 ```bash
-git clone https://github.com/manatlan/htag2.git
-cd htag2
+git clone https://github.com/manatlan/htag.git
+cd htag
 uv run examples/main3.py
 ```
 
 ### Skill
 
-With gemini-cli, claude-code, mistral-vibe (or others), you can use this [SKILL.md](.agent/skills/htag2-development/SKILL.md) to create a htag2 application.
+With gemini-cli, claude-code, mistral-vibe (or others), you can use this [SKILL.md](.agent/skills/htag-development/SKILL.md) to create a htag application.
 
 
 ## Antigravity resumes :
 
-htag2 is a Python library for building web applications using HTML, CSS, and JavaScript.
+htag is a Python library for building web applications using HTML, CSS, and JavaScript.
 
 ### Key Resiliency Features Added
 *   **Zero-Config Hot-Reload**: Passing `reload=True` to any runner (e.g. `ChromeApp(App).run(reload=True)`) automatically watches for Python file changes, seamlessly restarts the backend, and gracefully refreshes the frontend without losing your browser window session.
@@ -82,5 +82,5 @@ htag2 is a Python library for building web applications using HTML, CSS, and Jav
 *   **Simple Events & HashChange**: Support for passing primitive values or custom objects from JS (via `tag["onclick"] = func` or `tag._onclick = func`). Includes built-in support for `_onhashchange`.
 *   **Fragments (`Tag()`)**: Create virtual components that group children without adding a wrapper tag to the DOM.
 *   **Advanced Tag Search (`.find_tag()`)**: Effortlessly locate any component in the tree by its internal htag ID or its manually assigned HTML `id`.
-*   **Custom ID Resilience**: Manual HTML `id` attributes are now supported without breaking htag2's reactive partial updates, thanks to an automatic `data-htag-id` fallback mechanism.
+*   **Custom ID Resilience**: Manual HTML `id` attributes are now supported without breaking htag's reactive partial updates, thanks to an automatic `data-htag-id` fallback mechanism.
 *   **Automatic Attribute Assignment**: Non-prefixed keyword arguments passed during component instantiation are automatically assigned as instance attributes, simplifying data passing to custom components.

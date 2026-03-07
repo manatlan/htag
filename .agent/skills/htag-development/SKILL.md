@@ -1,16 +1,16 @@
 ---
-name: htag2-development
-description: Guidelines and best practices for building modern, state-of-the-art web applications using the htag2 framework.
+name: htag-development
+description: Guidelines and best practices for building modern, state-of-the-art web applications using the htag v2 framework.
 ---
 
-# htag2 Developer Skill
+# htag Developer Skill
 
-Use this skill to design, implement, and refine web applications using the **htag2** framework.
+Use this skill to design, implement, and refine web applications using the **htag** framework.
 
 ## Core Architecture
 
 ### 1. Components (`Tag`)
-Every UI element in htag2 is a component created via `Tag`.
+Every UI element in htag is a component created via `Tag`.
 - Use the `Tag` factory for standard HTML elements (e.g., `Tag.div`, `Tag.button`).
 - Create custom components by subclassing any `Tag.*` class.
 - Add children using `+=` or the `<=` operator (e.g., `self <= Tag.p("hello")` or `self += Tag.p("hello")`).
@@ -46,7 +46,7 @@ self <= fragment
 ```
 
 ### 2. Component Lifecycle
-htag2 provides three lifecycle hooks to override on custom components:
+htag provides three lifecycle hooks to override on custom components:
 - `init(**kwargs)`: Called exactly once at the end of component initialization. Use this instead of overriding `__init__` to avoid `super()` boilerplate. 
     - **Automatic Assignment**: Any non-prefixed keyword argument (not starting with `_` or `_on`) is automatically assigned as an instance attribute *before* `init` is called.
     - **Example**: `Tag.div(toto=42)` will result in the instance having a `.toto` attribute set to `42`.
@@ -72,7 +72,7 @@ class Card(Tag.div):
 ```
 
 ### 4. State & Reactivity
-htag2 supports both traditional "dirty-marking" and modern reactive `State`.
+htag supports both traditional "dirty-marking" and modern reactive `State`.
 
 **Reactive State (Transparent Proxy)**:
 - Use `from htag import State`.
@@ -124,11 +124,11 @@ if target:
 ```
 
 ### 4b. Custom IDs
-htag2 supports setting custom HTML IDs via `_id="myid"`.
-- **Note**: To maintain reactivity with custom IDs, htag2 automatically injects a `data-htag-id` attribute. The internal communication bridge uses this to ensure partial DOM updates still target the correct element even if the HTML `id` attribute is overridden.
+htag supports setting custom HTML IDs via `_id="myid"`.
+- **Note**: To maintain reactivity with custom IDs, htag automatically injects a `data-htag-id` attribute. The internal communication bridge uses this to ensure partial DOM updates still target the correct element even if the HTML `id` attribute is overridden.
 
 ### 5. Forms & Inputs
-htag2 automatically binds input events to Python.
+htag automatically binds input events to Python.
 - For text/number inputs, the current value is accessed safely via event handlers: `val = event.value`
 - For checkboxes/toggles, the framework synchronizes the boolean state. Access it safely using `getattr(self.checkbox, "_value", False)`. Do not use `.value` directly on a checkbox component as it will raise an `AttributeError`.
 
@@ -154,7 +154,7 @@ class MyComponent(Tag.div):
 ```
 
 ### 8. Debug Mode & Error Visualization
-htag2 includes a built-in visual aid mechanism to help developers track bugs:
+htag includes a built-in visual aid mechanism to help developers track bugs:
 - **`Runner(App, debug=True)` (Default)**: During development, ANY error that occurs (a Python exception in a callback, a JavaScript error, or a network disconnection) is visually reported via a Shadow DOM overlay in the screen (displaying js/traceback errors).
 - **`Runner(App, debug=False)`**: Use this for production. Tracebacks are logged internally on the server, and only generic "Internal Server Error" messages are shown in the client UI to prevent sensitive data leakage.
 
@@ -164,8 +164,8 @@ When building complex hierarchical structures (like file trees or nested menus),
 
 **Dynamic (Lambda-based) Rendering**:
 - **Usage**: `Tag.div(lambda: self.render_items(self.data))`
-- **Pros**: Very clean, "standard" htag2 way.
-- **Cons**: Every state change triggers a full re-render of the entire branch. In htag2, this creates **new Tag objects with new IDs**. If a user clicks an item while another update is happening, the event might be dispatched to an ID that no longer exists in the server-side tree, causing "ghost" clicks or unresponsiveness.
+- **Pros**: Very clean, "standard" htag way.
+- **Cons**: Every state change triggers a full re-render of the entire branch. In htag, this creates **new Tag objects with new IDs**. If a user clicks an item while another update is happening, the event might be dispatched to an ID that no longer exists in the server-side tree, causing "ghost" clicks or unresponsiveness.
 
 **Persistent (Init-based) Rendering (Recommended for complex trees)**:
 - **Usage**: Build the tags once in `init()` and toggle their visibility.
@@ -189,7 +189,7 @@ def build_tree(self, folder_data):
 ### 10. Best Practices for Large Trees
 
 1.  **Stable IDs**: As shown above, prefer persistent tags for elements that handle clicks/inputs.
-2.  **CSS Visibility over DOM Removal**: Toggling a `hidden` class is much faster than htag2's engine adding/removing elements from the DOM.
+2.  **CSS Visibility over DOM Removal**: Toggling a `hidden` class is much faster than htag's engine adding/removing elements from the DOM.
 3.  **Path Normalization**: When using paths as keys in a `State(set())`, always use `os.path.normpath()` to avoid mismatching due to trailing slashes or different separators.
 4.  **Closure Capture**: In loops, always use default arguments in lambdas to capture the current iteration value: `_onclick=lambda e, p=current_path: self.do(p)`.
 
@@ -233,7 +233,7 @@ Use CSS keyframes for entry animations (e.g., sliding up or fading in) and disti
 
 ### 12. Simple Events & HashChange
 
-htag2 supports "simple events" where the `htag_event` function can be used to pass primitive values (strings, numbers) or custom objects from JavaScript to Python, bypassing the standard DOM Event extraction.
+htag supports "simple events" where the `htag_event` function can be used to pass primitive values (strings, numbers) or custom objects from JavaScript to Python, bypassing the standard DOM Event extraction.
 
 **`_onhashchange` support**:
 The framework automatically handles the `hashchange` event. When `self._onhashchange` is set, the Python callback receives an `event` object with `newURL` and `oldURL` attributes.
@@ -351,7 +351,7 @@ if __name__ == "__main__":
 ```
 
 ## Build standalone executable
-When you are in developpment using "uv" (and htag2 is installed in the venv).
+When you are in developpment using "uv" (and htag is installed in the venv).
 Use `uv run htagm build <path>` to build a standalone executable for your htag app.
 
 ```bash
