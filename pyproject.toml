@@ -8,7 +8,7 @@ include-package-data = true
 
 [project]
 name = "htag"
-version = "0.2.4"
+version = "2.0.0"
 description = "A modern, state-of-the-art Python GUI framework"
 readme = "README.md"
 requires-python = ">=3.10"
