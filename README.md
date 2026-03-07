@@ -18,7 +18,7 @@
 
 Here is a full rewrite of **htag 1.0.0**, using only antigravity and prompts/intentions.
 
-It feels very good. Currently, it's the future of htag.
+It's the future of htag.
 
 Currently, it works ...
 
