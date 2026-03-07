@@ -3,8 +3,6 @@
 
 You should have docker, adb, and a device/phone in dev mode ! (Currently it works, at least for me (Ubuntu 24.04.4 LTS & Pixel8))
 
-But Got [Support 16 KB page, trouble](https://github.com/kivy/python-for-android/issues/3165)
-
 **TODO:** The process need to be improved, to make the process easier !
 
 In CLI, inside this folder, follow these steps :
