@@ -87,3 +87,12 @@ htag is a Python library for building web applications using HTML, CSS, and Java
 *   **Advanced Tag Search (`.find_tag()`)**: Effortlessly locate any component in the tree by its internal htag ID or its manually assigned HTML `id`.
 *   **Custom ID Resilience**: Manual HTML `id` attributes are now supported without breaking htag's reactive partial updates, thanks to an automatic `data-htag-id` fallback mechanism.
 *   **Automatic Attribute Assignment**: Non-prefixed keyword arguments passed during component instantiation are automatically assigned as instance attributes, simplifying data passing to custom components.
+
+
+## History
+
+At the beginning, there was [guy](https://github.com/manatlan/guy), which was/is the same concept as [python-eel](https://github.com/ChrisKnott/Eel), but more advanced.
+One day, I've discovered [remi](https://github.com/rawpython/remi), and asked my self, if it could be done in a *guy way*. The POC was very good, so I released
+a version of it, named [gtag](https://github.com/manatlan/gtag). It worked well despite some drawbacks, but was too difficult to maintain. So I decided to rewrite all
+from scratch, while staying away from *guy* (to separate, *rendering* and *runners*)... and [htag](https://github.com/manatlan/htag/tree/v1-legacy) was born. The codebase is very short, concepts are better implemented, and it's very easy to maintain. And now (2026) [htag v2](https://github.com/manatlan/htag is here (a full rewrite of v1 with antigravity) !
+
