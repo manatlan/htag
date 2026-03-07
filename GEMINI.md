@@ -22,6 +22,6 @@
 - ensure comments are in english
 - when you add/edit examples (main*.py files), always use the skill best practices
 - when I say "core", focus on all files in ./htag folder
-- when I say "docs", focus on .agent/skills/htag-development/SKILL.md, ./README.md, and alls files in ./docs folder
+- when I say "docs", focus on .agent/skills/htag-development/SKILL.md, ./README.md, and alls files in ./docs folder, EXCEPT ./docs/v1 folder, (never touch files in ./docs/v1 folder)
 - when I say "examples", focus on all files in **/main*.py**
 - if you add/change core feature, always update docs

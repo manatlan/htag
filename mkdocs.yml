@@ -57,6 +57,7 @@ nav:
   - Runners: runners.md
   - Deployment: deployment.md
   - Advanced: advanced.md
+  - Legacy v1 (Archive): v1/index.md
 
 markdown_extensions:
   - admonition

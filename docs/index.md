@@ -53,3 +53,8 @@ if __name__ == "__main__":
 ---
 
 [Next: Components →](components.md) | [Reactivity & State →](reactivity.md)
+
+---
+
+> [!NOTE]
+> Looking for the old version? [Access htag v1 Documentation (Archive)](v1/index.md).
