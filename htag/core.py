@@ -807,7 +807,7 @@ class GTag:  # aka "Generic Tag"
 
 
 class App(GTag):
-    """Base class for the root of a htag2 application tree."""
+    """Base class for the root of a htag application tree."""
 
     pass
 

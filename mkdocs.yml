@@ -1,15 +1,15 @@
 site_name: htag
-site_url: https://manatlan.github.io/htag2/
+site_url: https://manatlan.github.io/htag/
 site_description: Build modern web apps in Python
-repo_url: https://github.com/manatlan/htag2
-repo_name: manatlan/htag2
+repo_url: https://github.com/manatlan/htag
+repo_name: manatlan/htag
 
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/manatlan/htag2
+      link: https://github.com/manatlan/htag
     - icon: fontawesome/brands/python
-      link: https://pypi.org/project/htag2/
+      link: https://pypi.org/project/htag/
 
 theme:
   name: material

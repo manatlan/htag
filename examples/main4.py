@@ -371,7 +371,7 @@ class FileNavigator(Tag.App):
         with Tag.div(_class="main-container"):
             # Header
             with Tag.div(_class="navbar"):
-                Tag.h1("htag2 Explorer")
+                Tag.h1("htag Explorer")
                 Tag.button("↑ Back", 
                     _class="btn", 
                     _disabled=lambda: self.path.value.parent == self.path.value,

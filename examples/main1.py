@@ -20,7 +20,7 @@ class DemoApp(Tag.App):
                 Tag.h3("1. L'État Réactif (State)", _style="margin-top: 0;")
                 Tag.p("Le texte ci-dessous se met à jour TOUT SEUL quand la valeur change.")
                 
-                # La fonction lambda permet à htag2 de s'abonner automatiquement au "State".
+                # La fonction lambda permet à htag de s'abonner automatiquement au "State".
                 Tag.div(lambda: f"👉 Valeur actuelle du compteur : {self.compteur.value}", _style="font-size: 1.2em; font-weight: bold; margin-bottom: 15px; color: #e74c3c;")
                 
                 # Le bouton modifie seulement la variable, pas l'interface
@@ -39,7 +39,7 @@ class DemoApp(Tag.App):
 
     def incrementer_state(self, e):
         # On modifie PUREMENT la logique métier. 
-        # htag2 détecte ce changement et rafraîchit l'UI correspondante instantanément.
+        # htag détecte ce changement et rafraîchit l'UI correspondante instantanément.
         self.compteur.value += 1
 
     def changer_texte(self, e):

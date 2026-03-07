@@ -70,7 +70,7 @@ def my_generator(e: Any) -> Generator:
 
 ### Async Generators
 
-htag2 also supports `async for` generators for asynchronous UI streaming.
+htag also supports `async for` generators for asynchronous UI streaming.
 
 ```python
 async def my_async_gen(e: Any) -> AsyncGenerator:
@@ -100,7 +100,7 @@ def handle_submit(e):
 
 ## Simple Events & HashChange
 
-`htag2` supports "simple events" where you can pass primitive values or custom objects from JavaScript back to Python.
+`htag` supports "simple events" where you can pass primitive values or custom objects from JavaScript back to Python.
 
 ### HashChange Event
 

@@ -94,8 +94,8 @@ def test_clear_build(capsys):
         
         cli.clear_build()
         
-        # Should be called 4 times, once for build, dist, .buildozer, bin
-        assert mock_rmtree.call_count == 4
+        # Should be called 5 times, once for build, dist, .buildozer, bin
+        assert mock_rmtree.call_count == 5
         
         captured = capsys.readouterr()
         assert "Removing" in captured.out

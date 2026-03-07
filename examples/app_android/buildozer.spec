@@ -7,7 +7,7 @@ version = 1.0
 source.dir = .
 source.include_exts = py,png,jpg,jpeg,svg,js,css,html
 
-requirements = android,htag2,starlette,uvicorn,websockets,anyio,typing_extensions,click,httpx,h11
+requirements = android,htag,starlette,uvicorn,websockets,anyio,typing_extensions,click,httpx,h11
 orientation = portrait
 fullscreen = 0
 android.archs = arm64-v8a

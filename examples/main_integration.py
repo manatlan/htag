@@ -1,12 +1,12 @@
 # /// script
 # requires-python = ">=3.10"
 # dependencies = [
-#     "htag2",
+#     "htag",
 #     "itsdangerous",
 #     "python-multipart",
 # ]
 # [tool.uv.sources]
-# htag2 = { path = ".." }
+# htag = { path = ".." }
 # ///
 
 from htag import Tag, WebApp
@@ -24,13 +24,13 @@ class MyApp(Tag.App):
         username = self.request.session.get("username", "Anonyme")
 
         self._style = "font-family: sans-serif; padding: 20px; border: 2px solid #646cff; border-radius: 8px; max-width: 400px; margin: 20px auto; text-align: center;"
-        self <= Tag.h2(f"Welcome to htag2, {username}!")
+        self <= Tag.h2(f"Welcome to htag, {username}!")
         self <= Tag.p("I am mounted at /app")
         
         def change_name(e):
             # Mutate Starlette session directly!
             self.request.session["username"] = "Admin_Htag"
-            # In htag2, we just update the UI
+            # In htag, we just update the UI
             self.clear()
             self.init()
 
@@ -63,7 +63,7 @@ async def home(request):
                     <button type="submit">Set Session</button>
                 </form>
                 <hr>
-                <a href="/app" style="font-size: 1.5em; color: #646cff;">Launch htag2 App (/app)</a>
+                <a href="/app" style="font-size: 1.5em; color: #646cff;">Launch htag App (/app)</a>
             </body>
         </html>
     """)
@@ -83,7 +83,7 @@ if __name__ == "__main__":
     import os
     import sys
 
-    # Enable htag2 auto-reload polling in the frontend
+    # Enable htag auto-reload polling in the frontend
     MyApp._reload = True
     
     print("🚀 Server started at http://127.0.0.1:8000 (with hot-reload)")

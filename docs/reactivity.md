@@ -1,6 +1,6 @@
 # Reactivity and State
 
-htag2 features a powerful, zero-boilerplate reactivity system inspired by modern web frameworks. It allows you to build data-driven UIs where components update automatically as your data changes.
+htag features a powerful, zero-boilerplate reactivity system inspired by modern web frameworks. It allows you to build data-driven UIs where components update automatically as your data changes.
 
 ## The State Object
 
@@ -99,7 +99,7 @@ Tag.p(lambda: f"Items: {len(self.items)}")
 
 ---
 
-You can pass a `State` object directly as a child to any tag, or use a lambda for more complex expressions. htag2 will automatically track which `State` objects are accessed and will re-render just that part of the UI when the state changes.
+You can pass a `State` object directly as a child to any tag, or use a lambda for more complex expressions. htag will automatically track which `State` objects are accessed and will re-render just that part of the UI when the state changes.
 
 ```python
 # Direct usage (recommended for simple values)
@@ -111,7 +111,7 @@ Tag.p(lambda: f"The current count is {self.count}")
 
 ### Lists of Components
 
-Lambdas can also return lists or tuples of components. htag2 handles the flattening and rendering automatically.
+Lambdas can also return lists or tuples of components. htag handles the flattening and rendering automatically.
 
 ```python
 Tag.ul(lambda: [Tag.li(user.name) for user in self.users])
@@ -134,7 +134,7 @@ div["class"] = lambda: "active" if self.is_active else "hidden"
 
 ### Boolean Attributes
 
-htag2 handles boolean attributes (like `disabled`, `checked`, `required`, `readonly`) intelligently:
+htag handles boolean attributes (like `disabled`, `checked`, `required`, `readonly`) intelligently:
 
 - **True**: Renders the attribute name only (e.g., `<button disabled>`).
 - **False / None**: Omit the attribute entirely (e.g., `<button>`).
@@ -146,6 +146,6 @@ Tag.button("Submit", _disabled=lambda: self.is_loading)
 
 ## How it Works
 
-1.  **Dependency Tracking**: When a reactive lambda is executed, htag2 records which `State` objects were read.
+1.  **Dependency Tracking**: When a reactive lambda is executed, htag records which `State` objects were read.
 2.  **Notification**: When a `State` value is modified, it notifies all recorded components ("observers").
 3.  **Selective Re-rendering**: The framework re-renders only the necessary components and sends the minimal HTML delta to the browser over WebSockets.

@@ -171,7 +171,7 @@ class Toggle(Tag.label):
         self._class = "relative inline-flex items-center cursor-pointer"
         
         # The hidden checkbox is what stores the state
-        # In htag2, an input automatically updates its `value` attribute on client changes
+        # In htag, an input automatically updates its `value` attribute on client changes
         self.checkbox = Tag.input(_type="checkbox", _class="sr-only peer")
         if onchange:
              self.checkbox._onchange = onchange
@@ -493,7 +493,7 @@ class DemoApp(Tag.App):
             
             with Tag.div(_class="text-center mb-10"):
                 Tag.h1("Tailwind Components Demo", _class="text-4xl font-extrabold text-slate-900 tracking-tight")
-                Tag.p("htag2 + Tailwind CSS in action", _class="mt-2 text-lg text-slate-600")
+                Tag.p("htag + Tailwind CSS in action", _class="mt-2 text-lg text-slate-600")
 
             # Create a Grid for our Cards
             with Tag.div(_class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl"):
@@ -579,14 +579,14 @@ class DemoApp(Tag.App):
                         
                         with Tag.div():
                             Tag.h3("Code Snippet", _class="text-sm font-semibold text-gray-700 mb-2")
-                            CodeBlock('def hello_world():\n    print("Hello from htag2!")', language="python")
+                            CodeBlock('def hello_world():\n    print("Hello from htag!")', language="python")
 
                 # --- Card 7: Advanced ---
                 with Card(title="Advanced Components", _class="md:col-span-2"):
                     with Tag.div(_class="grid grid-cols-1 md:grid-cols-2 gap-8"):
                         with Tag.div():
                             Tag.h3("Accordions / Expansion Panels", _class="text-sm font-semibold text-gray-700 mb-4")
-                            Accordion("What is htag2?", "htag2 is a lightweight, pure Python framework for building modern web applications without writing JavaScript.", is_open=True)
+                            Accordion("What is htag?", "htag is a lightweight, pure Python framework for building modern web applications without writing JavaScript.", is_open=True)
                             Accordion("Why use Tailwind CSS?", "Tailwind allows you to rapidly build custom user interfaces by composing utility classes directly in your markup, keeping CSS files small.")
                         
                         with Tag.div():

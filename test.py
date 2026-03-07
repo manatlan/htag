@@ -101,7 +101,7 @@ class Showcase(Tag.App):
 
     def init(self):
         with Tag.header():
-            Tag.h1("htag2 Showcase")
+            Tag.h1("htag Showcase")
             Tag.p("Ultimate Feature Validation Suite")
 
         with Tag.div(_class="grid"):
@@ -201,7 +201,7 @@ class Showcase(Tag.App):
                     Tag.button("Unmount", _onclick=lambda e: self.lc.clear(), _class="danger")
 
         with Tag.footer():
-            Tag.p("htag2 exhaustive validation • Shared App Instance aware")
+            Tag.p("htag exhaustive validation • Shared App Instance aware")
 
     async def stepper(self, e):
         """Demonstrates: Async Generator (Yield)."""

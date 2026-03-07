@@ -1,5 +1,5 @@
 class HtagError(Exception):
-    """Base class for all htag2 exceptions."""
+    """Base class for all htag exceptions."""
     pass
 
 

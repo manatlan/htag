@@ -51,7 +51,7 @@ class Event:
 
 class AppRunner(BaseApp):
     """
-    The main application class for htag2.
+    The main application class for htag.
     Handles HTML rendering, event dispatching, and WebSocket communication.
     """
 

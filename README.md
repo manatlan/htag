@@ -16,11 +16,11 @@
   </a>
 </p>
 
-Here is a full rewrite of [htag](https://github.com/manatlan/htag), using only antigravity and prompts/intentions.
+Here is a full rewrite of **htag 1.0.0**, using only antigravity and prompts/intentions.
 
-It feels very good. Currently, it's not a replacement, it's just a POC.
+It feels very good. Currently, it's the future of htag.
 
-It's completely crazy, but it works :
+Currently, it works ...
 
 - For building desktop apps (ChromeApp on linux/windows)
 - For building web apps (WebApp as an asgi app (for starlette/fastapi/...))

@@ -56,7 +56,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: htag2-dist
+          name: htag-dist
           path: dist/*
           
   release:
@@ -69,7 +69,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: htag2-dist
+          name: htag-dist
           path: dist/
           
       - name: Create Release
@@ -93,7 +93,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: htag2-dist
+          name: htag-dist
           path: dist/
           
       - name: Update Latest Release
@@ -113,13 +113,13 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/htag2
+      url: https://pypi.org/p/htag
     permissions:
       id-token: write
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: htag2-dist
+          name: htag-dist
           path: dist/
           
       - name: Publish package distributions to PyPI

@@ -54,7 +54,7 @@ class StyledComponent(Tag.div):
     ]
 ```
 
-`htag2` ensures that statics are:
+`htag` ensures that statics are:
 
 - Collected recursively from all active tags, including those created dynamically via reactive lambdas.
 - Sent to the client only once per session, regardless of how many instances of the component exist.

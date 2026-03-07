@@ -3,7 +3,7 @@ from htag import Tag
 """
 this code could be a good start for the future "htag.ui" module
 
-it should be KISS and respect shoelace/htag2 components on all best practices.
+it should be KISS and respect shoelace/htag components on all best practices.
 
 The current toast is still broken ;-(
 """

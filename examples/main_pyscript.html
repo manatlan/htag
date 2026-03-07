@@ -15,7 +15,7 @@ then open http://localhost:8000/examples/main_pyscript.html
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>htag2 with PyScript</title>
+    <title>htag with PyScript</title>
     <!-- PyScript styles and scripts -->
     <link rel="stylesheet" href="https://pyscript.net/releases/2026.3.1/core.css">
     <script type="module" src="https://pyscript.net/releases/2026.3.1/core.js"></script>
@@ -23,11 +23,11 @@ then open http://localhost:8000/examples/main_pyscript.html
 
 <body>
     <div style="text-align: center; margin-top: 50px; font-family: sans-serif;">
-        <h2>Loading htag2 PyScript App...</h2>
+        <h2>Loading htag PyScript App...</h2>
         <p>This may take a moment while Pyodide provisions the Python environment.</p>
     </div>
 
-    <script type="py" config='{"packages":["../dist/htag2-0.2.1-py3-none-any.whl", "starlette", "uvicorn"]}'>
+    <script type="py" config='{"packages":["../dist/htag-0.2.4-py3-none-any.whl", "starlette", "uvicorn"]}'>
         from htag import Tag, PyScript
 
         class CounterApp(Tag.App):
@@ -35,10 +35,10 @@ then open http://localhost:8000/examples/main_pyscript.html
                 self.count = 0
                 
                 # Title
-                self += Tag.h1("htag2 Counter in PyScript!")
+                self += Tag.h1("htag Counter in PyScript!")
                 
                 # Instruction
-                self += Tag.p("This entire htag2 application runs fully in the browser via PyScript without any Python backend server.")
+                self += Tag.p("This entire htag application runs fully in the browser via PyScript without any Python backend server.")
                 
                 # Interactive element
                 self.btn = Tag.button("Increment: 0", _onclick=self.increment)

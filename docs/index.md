@@ -1,10 +1,10 @@
 # htag Documentation
 
-![htag2 logo](assets/logo.png)
+![htag logo](assets/logo.png)
 
 `htag` is a modern, state-of-the-art Python library for building interactive web applications using a declarative, component-based approach. It bridges the gap between Python and the browser by synchronizing state and events over WebSockets.
 
-[View on GitHub](https://github.com/manatlan/htag2)
+[View on GitHub](https://github.com/manatlan/htag)
 
 ## Features
 

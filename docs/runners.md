@@ -4,7 +4,7 @@ Runners are responsible for hosting your `App` and launching the interface.
 
 ## Web Deployment (Starlette Integration)
 
-For web-based deployment, we recommend integrating your `htag2` application directly into a **Starlette** (or FastAPI) server. This provides the most flexibility and follows standard Python web practices.
+For web-based deployment, we recommend integrating your `htag` application directly into a **Starlette** (or FastAPI) server. This provides the most flexibility and follows standard Python web practices.
 
 ```python
 from htag import Tag
@@ -32,7 +32,7 @@ if __name__ == "__main__":
 
 - **Advantages**: 
     - Full control over routes, middleware, and documentation.
-    - Seamlessly mix standard HTML/API routes with reactive `htag2` components.
+    - Seamlessly mix standard HTML/API routes with reactive `htag` components.
     - Support for subpath mounting (e.g., `app.mount("/app", ...)`).
     - Built-in `parano=True` mode for payload obfuscation (dynamic XOR cipher) to protect traffic against simple MITM proxies.
 
@@ -67,7 +67,7 @@ if __name__ == "__main__":
 ```
 
 When `reload=True` is provided:
-1. **Zero-Config File Watcher**: `htag2` spawns a master process that watches all `.py` files in your current directory recursively.
+1. **Zero-Config File Watcher**: `htag` spawns a master process that watches all `.py` files in your current directory recursively.
 2. **Auto-Restart**: When you save a file, the Python ASGI backend is instantly terminated and restarted with your new code.
 3. **Seamless Browser Refresh**: The UI frontend stays open. It will realize the backend went offline, automatically poll for reconnection, and gracefully refresh the window once the new backend is up.
 
