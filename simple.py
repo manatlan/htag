@@ -2,7 +2,9 @@ from htag import Tag, ChromeApp, State, prevent, stop
 import time
 
 class Showcase(Tag.App):
-    styles='html,body {margin:0px;padding:0px} div {border:1px solid red}' # scoped
+    styles='''html,body {margin:0px;padding:0px}
+    .box {border:1px solid green;padding:8px}
+    ''' # scoped
     
     def init(self):
         self.s_cpt=State(0)
@@ -10,24 +12,29 @@ class Showcase(Tag.App):
         self.s_dico=State({}) #mutable
         self.s_text=State("hello")
         
+
         with self:
-            Tag.button("+1", _onclick=lambda ev: self.s_cpt.set(self.s_cpt.value + 1))
-            Tag.div(self.s_cpt)
+            with Tag.div(_class="box"):
+                Tag.button("+1", _onclick=lambda ev: self.s_cpt.set(self.s_cpt.value + 1))
+                Tag.div(self.s_cpt)
 
-            Tag.hr()
+            with Tag.div(_class='box'):
+                Tag.button("+liste", _onclick=lambda ev: self.s_liste.append("b"))
+                Tag.div(self.s_liste)
 
-            Tag.button("+liste", _onclick=lambda ev: self.s_liste.append("b"))
-            Tag.div(self.s_liste)
+            with Tag.div(_class='box'):
+                Tag.button("+dict", _onclick=lambda ev: self.s_dico.update({time.time(): 42}))
+                Tag.div(self.s_dico)
 
-            Tag.hr()
+            with Tag.div(_class='box'):
 
-            Tag.button("+dict", _onclick=lambda ev: self.s_dico.update({time.time(): 42}))
-            Tag.div(self.s_dico)
+                # change on each key press
+                Tag.input(_value=self.s_text.value, _onkeyup=lambda ev: self.s_text.set(ev.value))
+                Tag.div(self.s_text)
 
-            Tag.hr()
-
-            Tag.input(_value=self.s_text.value, _onkeyup=lambda ev: self.s_text.set(ev.value))
-            Tag.div(self.s_text)
+                # change on blur
+                Tag.input(_value=self.s_text, _onchange=lambda ev: self.s_text.set(ev.value))
+                Tag.div(self.s_text)
 
 if __name__ == "__main__":
     ChromeApp(Showcase).run(reload=True)
