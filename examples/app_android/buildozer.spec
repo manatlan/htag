@@ -11,9 +11,9 @@ requirements = android,htag2,starlette,uvicorn,websockets,anyio,typing_extension
 orientation = portrait
 fullscreen = 0
 android.archs = arm64-v8a
-android.api = 34
+android.api = 35
 android.minapi = 24
-android.ndk = 27c
+android.ndk = 28
 icon.filename = %(source.dir)s/icon.png
 
 home_app = 1

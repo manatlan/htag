@@ -156,7 +156,8 @@ def build_apk(entrypoint: str, is_tv: bool = False):
         print(f"📝 {C.CYAN}Generating default 'buildozer.spec'...{C.END}")
         # Adjust settings for Android TV
         orientation = "landscape" if is_tv else "portrait"
-        fullscreen = "1" if is_tv else "0"
+        #fullscreen = "1" if is_tv else "0"
+        fullscreen = "1"
         android_archs = "armeabi-v7a" if is_tv else "arm64-v8a"
 
         icon_path_entry = entry_path.parent / "icon.png"
@@ -179,9 +180,9 @@ requirements = android,htag2,starlette,uvicorn,websockets,anyio,typing_extension
 orientation = {orientation}
 fullscreen = {fullscreen}
 android.archs = {android_archs}
-android.api = 34
+android.api = 35
 android.minapi = 24
-android.ndk = 27c
+android.ndk = 28
 {icon_setting}
 home_app = 1
 android.permissions = INTERNET
