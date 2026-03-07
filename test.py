@@ -109,13 +109,10 @@ class Showcase(Tag.App):
             self.counter = State(0)
             self.items = State(["A"])
             with FeatureSection("1. Reactivity"):
-                Tag.div(lambda: f"Count: {self.counter.value} | Items: {','.join(self.items.value)}", _class="demo-box")
+                Tag.div(lambda: f"Count: {self.counter} | Items: {','.join(self.items)}", _class="demo-box")
                 with Tag.div(_class="actions"):
                     Tag.button("+1", _onclick=lambda e: self.counter.set(self.counter.value + 1))
-                    def mutate(e):
-                        self.items.value.append("X")
-                        self.items.notify()
-                    Tag.button("Mutate", _onclick=mutate, _class="alt")
+                    Tag.button("Mutate", _onclick=lambda e: self.items.append("X"), _class="alt")
 
             # 2. Async Stepping (Yield)
             with FeatureSection("2. Stepping (Yield)"):
@@ -125,8 +122,8 @@ class Showcase(Tag.App):
             # 3. Input Auto-Binding & Toggle Class
             with FeatureSection("3. Binding & Class"):
                 self.val = State("Edit me")
-                box = Tag.div(lambda: f"Live: {self.val.value}", _class="demo-box")
-                Tag.input(_value=self.val.value, _oninput=lambda e: self.val.set(e.value))
+                box = Tag.div(lambda: f"Live: {self.val}", _class="demo-box")
+                Tag.input(_value=self.val, _oninput=lambda e: self.val.set(e.value))
                 def toggle(e): box.toggle_class("active")
                 Tag.button("Toggle State", _onclick=toggle, _class="alt")
 
@@ -178,8 +175,8 @@ class Showcase(Tag.App):
                 with Tag.div(_class="actions"):
                     Tag.button("Py", _onclick=lambda e: 1/0, _class="danger")
                     Tag.button("JS", _onclick="err()", _class="danger")
-                    Tag.button("Render", _onclick=lambda e: self.crash.set(True), _class="danger")
-                    Tag.button("Reset", _onclick=lambda e: self.crash.set(False))
+                    Tag.button("Render", _onclick=lambda e: setattr(self.crash, 'value', True), _class="danger")
+                    Tag.button("Reset", _onclick=lambda e: setattr(self.crash, 'value', False))
 
             # 8. Safe Playground
             with FeatureSection("8. Playground"):
