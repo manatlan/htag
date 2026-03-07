@@ -33,7 +33,7 @@ class HelloApp(Tag.App):
         
         with Tag.div(_class="container"):
             Tag.h1("Hello htag!")
-            Tag.p(lambda: f"Clicked {self.count.value} times")
+            Tag.p(self.count)  # Direct state usage!
             Tag.button("Click Me", _onclick=self.increment)
 
     def increment(self, e: Any) -> None:

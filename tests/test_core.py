@@ -613,3 +613,30 @@ def test_gtag_auto_attr_assignment():
     t3 = MyTag(val=123)
     assert t3.val == 123
     assert t3.success is True
+
+def test_state_direct_usage():
+    """State objects can be used directly as children and are reactive."""
+    s = State(0)
+    t = Tag.div(s)
+    
+    # Initial render should show value
+    assert str(t) == f'<div id="{t.id}">0</div>'
+    
+    # Tag should be observing the state
+    assert t in s._observers
+    t._GTag__dirty = False
+    
+    # Update state
+    s.value = 1
+    assert t._GTag__dirty is True
+    assert str(t) == f'<div id="{t.id}">1</div>'
+
+def test_state_repr_str():
+    """State objects have proper repr and str (showing their value)."""
+    s = State(42)
+    assert str(s) == "42"
+    assert repr(s) == "42"
+    
+    s2 = State("hello")
+    assert str(s2) == "hello"
+    assert repr(s2) == "'hello'"

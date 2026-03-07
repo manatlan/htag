@@ -46,6 +46,15 @@ class State:
         for observer in list(self._observers):
             observer._GTag__dirty = True
 
+    def __call__(self) -> Any:
+        return self.value
+
+    def __repr__(self) -> str:
+        return repr(self.value)
+
+    def __str__(self) -> str:
+        return str(self.value)
+
 
 VOID_ELEMENTS: set[str] = {
     "area",

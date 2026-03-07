@@ -34,12 +34,13 @@ def add_item(e):
     self.items.notify()  # triggers re-render
 ```
 
-## Reactive Children
-
-You can pass a lambda as a child to any tag. htag2 will automatically track which `State` objects are accessed during the lambda's execution and will re-render just that part of the UI when the state changes.
+You can pass a `State` object directly as a child to any tag, or use a lambda for more complex expressions. htag2 will automatically track which `State` objects are accessed and will re-render just that part of the UI when the state changes.
 
 ```python
-# The text will update automatically whenever self.count changes
+# Direct usage (recommended for simple values)
+Tag.p(self.count)
+
+# Lambda usage (for expressions)
 Tag.p(lambda: f"The current count is {self.count.value}")
 ```
 
