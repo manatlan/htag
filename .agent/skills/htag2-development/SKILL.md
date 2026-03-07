@@ -77,9 +77,12 @@ htag2 supports both traditional "dirty-marking" and modern reactive `State`.
 **Reactive State (Transparent Proxy)**:
 - Use `from htag import State`.
 - Declare state variables: `self.count = State(0)`.
-- Use operators directly: `self.count += 1`.
-- Automatic notification on method calls: `self.items.append("new")` (no more manual `.notify()` needed in most cases).
-- Direct item access: `self.dico["key"] = val`.
+- Use operators directly: `self.count += 1`, `if self.count > 0: ...` (full support for comparison and math).
+- Automatic notification on method calls: `self.items.append("new")`.
+- Nested reactivity: `self.data["users"].append(new_user)` works automatically (nested dicts, lists, sets, and tuples are proxied).
+- Iterative reactivity: `for item in self.items: item.done = True` works reactively because iteration yields proxies.
+- Attribute delegation: `self.user.name = "Bob"` (where `self.user` is a `State(User())`) delegates setting to the underlying object and notifies automatically.
+- Type conversions: `int(self.count)`, `bool(self.status)` work transparently.
 - Data-driven UIs: `Tag.div(self.count)` or `Tag.div(lambda: f"Count: {self.count}")`.
 
 **Reactive & Boolean Attributes**:

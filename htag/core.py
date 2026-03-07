@@ -31,7 +31,7 @@ class State:
     @value.setter
     def value(self, new_value: Any) -> None:
         self._value = new_value
-        self._notify_observers()
+        self.notify()
 
     def set(self, value: Any) -> Any:
         self.value = value
@@ -39,11 +39,13 @@ class State:
 
     def notify(self) -> None:
         """Force notification after in-place mutation of mutable values (lists, dicts)."""
-        self._notify_observers()
-
-    def _notify_observers(self) -> None:
         for observer in list(self._observers):
             observer._GTag__dirty = True
+
+    def _wrap(self, val: Any) -> Any:
+        if isinstance(val, (list, dict, set, tuple)):
+            return _StateProxy(self, val)
+        return val
 
     def __getattr__(self, name: str) -> Any:
         attr = getattr(self.value, name)
@@ -52,13 +54,30 @@ class State:
             def wrapper(*args: Any, **kwargs: Any) -> Any:
                 res = attr(*args, **kwargs)
                 self.notify()
-                return res
+                return self._wrap(res)
 
             return wrapper
-        return attr
+        return self._wrap(attr)
+
+    def __setattr__(self, name: str, value: Any) -> None:
+        if name.startswith("_") or name == "value":
+            object.__setattr__(self, name, value)
+        else:
+            try:
+                setattr(self.value, name, value)
+                self.notify()
+            except AttributeError:
+                object.__setattr__(self, name, value)
+
+    def __delattr__(self, name: str) -> None:
+        if name.startswith("_"):
+            object.__delattr__(self, name)
+        else:
+            delattr(self.value, name)
+            self.notify()
 
     def __getitem__(self, key: Any) -> Any:
-        return self.value[key]
+        return self._wrap(self.value[key])
 
     def __setitem__(self, key: Any, value: Any) -> None:
         self.value[key] = value
@@ -72,12 +91,42 @@ class State:
         return len(self.value)
 
     def __iter__(self) -> Any:
-        return iter(self.value)
+        for item in self.value:
+            yield self._wrap(item)
 
     def __contains__(self, item: Any) -> bool:
         return item in self.value
 
-    # --- In-place operators (trigger notification) ---
+    # --- Comparison operators ---
+    def __lt__(self, other): return self.value < other
+    def __le__(self, other): return self.value <= other
+    def __eq__(self, other): return self.value == other
+    def __ne__(self, other): return self.value != other
+    def __gt__(self, other): return self.value > other
+    def __ge__(self, other): return self.value >= other
+
+    # --- Arithmetic operators ---
+    def __add__(self, other): return self.value + other
+    def __sub__(self, other): return self.value - other
+    def __mul__(self, other): return self.value * other
+    def __truediv__(self, other): return self.value / other
+    def __floordiv__(self, other): return self.value // other
+    def __mod__(self, other): return self.value % other
+    def __divmod__(self, other): return divmod(self.value, other)
+    def __pow__(self, other): return self.value ** other
+    def __lshift__(self, other): return self.value << other
+    def __rshift__(self, other): return self.value >> other
+    def __and__(self, other): return self.value & other
+    def __xor__(self, other): return self.value ^ other
+    def __or__(self, other): return self.value | other
+
+    # --- Unary operators ---
+    def __neg__(self): return -self.value
+    def __pos__(self): return +self.value
+    def __abs__(self): return abs(self.value)
+    def __invert__(self): return ~self.value
+
+    # --- In-place operators ---
     def __iadd__(self, other: Any) -> "State":
         self.value += other
         return self
@@ -126,14 +175,127 @@ class State:
         self.value |= other
         return self
 
+    # --- Conversions & call ---
+    def __bool__(self) -> bool: return bool(self.value)
+    def __int__(self) -> int: return int(self.value)
+    def __float__(self) -> float: return float(self.value)
+    def __index__(self) -> int: return self.value.__index__()
+
     def __call__(self) -> Any:
         return self.value
+
+    __hash__ = object.__hash__
 
     def __repr__(self) -> str:
         return repr(self.value)
 
     def __str__(self) -> str:
         return str(self.value)
+
+
+class _StateProxy:
+    """A proxy that delegates everything to a value and notifies a parent State on mutations."""
+
+    def __init__(self, state: State, value: Any):
+        self._state = state
+        self._value = value
+
+    def __getattr__(self, name: str) -> Any:
+        attr = getattr(self._value, name)
+        if callable(attr):
+
+            def wrapper(*args: Any, **kwargs: Any) -> Any:
+                res = attr(*args, **kwargs)
+                self._state.notify()
+                return self._state._wrap(res)
+
+            return wrapper
+        return self._state._wrap(attr)
+
+    def __setattr__(self, name: str, value: Any) -> None:
+        if name.startswith("_"):
+            object.__setattr__(self, name, value)
+        else:
+            setattr(self._value, name, value)
+            self._state.notify()
+
+    def __delattr__(self, name: str) -> None:
+        if name.startswith("_"):
+            object.__delattr__(self, name)
+        else:
+            delattr(self._value, name)
+            self._state.notify()
+
+    def __getitem__(self, key: Any) -> Any:
+        return self._state._wrap(self._value[key])
+
+    def __setitem__(self, key: Any, value: Any) -> None:
+        self._value[key] = value
+        self._state.notify()
+
+    def __delitem__(self, key: Any) -> None:
+        del self._value[key]
+        self._state.notify()
+
+    def __len__(self) -> int:
+        return len(self._value)
+
+    def __iter__(self) -> Any:
+        for item in self._value:
+            yield self._state._wrap(item)
+
+    def __contains__(self, item: Any) -> bool:
+        return item in self._value
+
+    # --- Comparison operators ---
+    def __lt__(self, other): return self._value < other
+    def __le__(self, other): return self._value <= other
+    def __eq__(self, other): return self._value == other
+    def __ne__(self, other): return self._value != other
+    def __gt__(self, other): return self._value > other
+    def __ge__(self, other): return self._value >= other
+
+    # --- Arithmetic operators ---
+    def __add__(self, other): return self._value + other
+    def __sub__(self, other): return self._value - other
+    def __mul__(self, other): return self._value * other
+    def __truediv__(self, other): return self._value / other
+    def __floordiv__(self, other): return self._value // other
+    def __mod__(self, other): return self._value % other
+    def __divmod__(self, other): return divmod(self._value, other)
+    def __pow__(self, other): return self._value ** other
+    def __lshift__(self, other): return self._value << other
+    def __rshift__(self, other): return self._value >> other
+    def __and__(self, other): return self._value & other
+    def __xor__(self, other): return self._value ^ other
+    def __or__(self, other): return self._value | other
+
+    # --- Unary operators ---
+    def __neg__(self): return -self._value
+    def __pos__(self): return +self._value
+    def __abs__(self): return abs(self._value)
+    def __invert__(self): return ~self._value
+
+    # --- Conversions & call ---
+    def __bool__(self) -> bool: return bool(self._value)
+    def __int__(self) -> int: return int(self._value)
+    def __float__(self) -> float: return float(self._value)
+    def __index__(self) -> int: return self._value.__index__()
+
+    def __call__(self) -> Any:
+        if _ctx.current_eval is not None:
+            self._state._observers.add(_ctx.current_eval)
+        return self._value
+
+    __hash__ = object.__hash__
+
+    def __repr__(self) -> str:
+        return repr(self._value)
+
+    def __str__(self) -> str:
+        return str(self._value)
+
+
 
 
 VOID_ELEMENTS: set[str] = {

@@ -22,20 +22,66 @@ You can use standard Python operators directly on the `State` object. The framew
 Tag.button("+1", _onclick=lambda e: self.count += 1)
 ```
 
-### Transparent Method Proxy
+### Transparent Method Proxy & Nested Reactivity
 
-When the state wraps a mutable object (like a list or dict), calling any of its methods (e.g., `.append()`, `.update()`, `.pop()`) will automatically trigger a re-render after the method executes.
+When the state wraps a mutable object (like a list, dict, set, or tuple), calling any of its methods will automatically trigger a re-render. 
+
+**Nested objects** are fully reactive. This includes mutations inside loops:
 
 ```python
-self.items = State(["a", "b"])
+self.data = State({"users": [{"name": "Alice"}, {"name": "Bob"}]})
 
-def add_item(e):
-    self.items.append("c")  # Automatically triggers re-render!
+def toggle_all(e):
+    # Iteration yields proxies!
+    for user in self.data["users"]:
+        user["name"] = user["name"].upper()
+```
+
+### Attribute & Class Delegation
+
+`State` objects delegate attribute access and assignment to the underlying value. This allows for clean interaction with custom objects:
+
+```python
+class User:
+    def __init__(self, name): self.name = name
+
+self.user = State(User("Alice"))
+
+# Directly assign to the state's attribute:
+self.user.name = "Bob"  # Mutates User and triggers re-render!
+```
+
+### Full Operator Support
+
+`State` objects behave like their underlying values in expressions. They support all comparison, arithmetic, and unary operators:
+
+```python
+self.count = State(10)
+
+# Comparisons (registers dependency if used in a lambda)
+if self.count > 5:
+    print("Large")
+
+# Arithmetic
+new_val = self.count + 5  # 15
+```
+
+### Type Conversions
+
+You can explicitly convert `State` objects to standard Python types:
+
+```python
+self.id_str = State("123")
+id_int = int(self.id_str)
+
+self.status = State(0)
+if not self.status:  # bool() conversion
+    print("Inactive")
 ```
 
 ### Collection Protocols
 
-`State` objects also support standard collection protocols like indexing, length, and iteration:
+`State` objects also support standard collection protocols like indexing, length, and iteration. Accessing an element of a collection returns a proxy if it's a list or dict, maintaining reactivity:
 
 ```python
 self.dico = State({"a": 1})
@@ -49,7 +95,7 @@ Tag.p(lambda: f"Items: {len(self.items)}")
 ### Advanced: `.set()` and `.notify()`
 
 - **`.set(new_value)`**: Updates the state and returns the new value. Useful for expressions within lambdas.
-- **`.notify()`**: Manually triggers observers. Useful if you've deeply mutated an object in a way that the proxy couldn't detect (though this is rare).
+- **`.notify()`**: Manually triggers observers. Useful if you've deeply mutated an object in a way that the proxy couldn't detect (though this is extremely rare with nested reactivity).
 
 ---
 

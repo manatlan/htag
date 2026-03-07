@@ -36,5 +36,6 @@ class Showcase(Tag.App):
                 Tag.input(_value=self.s_text, _onchange=lambda ev: self.s_text.set(ev.value))
                 Tag.div(self.s_text)
 
+
 if __name__ == "__main__":
     ChromeApp(Showcase).run(reload=True)
