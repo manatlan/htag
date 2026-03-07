@@ -31,4 +31,4 @@ jobs:
       run: uv run playwright install --with-deps chromium
       
     - name: Run Playwright tests
-      run: uv run pytest tests/test_playwright_showcase.py
+      run: uv run pytest tests_ui/test_playwright_showcase.py
