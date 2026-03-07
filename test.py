@@ -123,7 +123,7 @@ class Showcase(Tag.App):
             with FeatureSection("3. Binding & Class"):
                 self.val = State("Edit me")
                 box = Tag.div(lambda: f"Live: {self.val}", _class="demo-box")
-                Tag.input(_value=self.val, _oninput=lambda e: self.val.set(e.value))
+                Tag.input(_value=self.val.value, _oninput=lambda e: self.val.set(e.value))
                 def toggle(e): box.toggle_class("active")
                 Tag.button("Toggle State", _onclick=toggle, _class="alt")
 
