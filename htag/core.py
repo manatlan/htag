@@ -31,7 +31,7 @@ class State:
     @value.setter
     def value(self, new_value: Any) -> None:
         self._value = new_value
-        self.notify()
+        self._notify_observers()
 
     def set(self, value: Any) -> Any:
         self.value = value
@@ -39,6 +39,9 @@ class State:
 
     def notify(self) -> None:
         """Force notification after in-place mutation of mutable values (lists, dicts)."""
+        self._notify_observers()
+
+    def _notify_observers(self) -> None:
         for observer in list(self._observers):
             observer._GTag__dirty = True
 
@@ -294,8 +297,6 @@ class _StateProxy:
 
     def __str__(self) -> str:
         return str(self._value)
-
-
 
 
 VOID_ELEMENTS: set[str] = {
