@@ -13,9 +13,8 @@ fullscreen = 0
 android.archs = arm64-v8a
 android.api = 34
 android.minapi = 24
-android.ndk = 26b
-
-
+android.ndk = 27c
+icon.filename = %(source.dir)s/icon.png
 
 home_app = 1
 android.permissions = INTERNET
@@ -25,6 +24,5 @@ p4a.hook = p4a/hook.py
 p4a.port = 13333
 p4a.bootstrap = webview
 p4a.branch = v2024.01.21
-
 [buildozer]
 log_level = 2

@@ -159,7 +159,9 @@ def build_apk(entrypoint: str, is_tv: bool = False):
         fullscreen = "1" if is_tv else "0"
         android_archs = "armeabi-v7a" if is_tv else "arm64-v8a"
 
-        icon_path = entry_path.parent / "icon.png"
+        icon_path_entry = entry_path.parent / "icon.png"
+        icon_path_cwd = Path("icon.png")
+        icon_path = icon_path_cwd if icon_path_cwd.exists() else icon_path_entry
         icon_setting = (
             "icon.filename = %(source.dir)s/icon.png\n" if icon_path.exists() else ""
         )
@@ -179,10 +181,8 @@ fullscreen = {fullscreen}
 android.archs = {android_archs}
 android.api = 34
 android.minapi = 24
-android.ndk = 26b
-
+android.ndk = 27c
 {icon_setting}
-
 home_app = 1
 android.permissions = INTERNET
 android.accept_sdk_license = True
@@ -191,7 +191,6 @@ p4a.hook = p4a/hook.py
 p4a.port = 13333
 p4a.bootstrap = webview
 p4a.branch = v2024.01.21
-
 [buildozer]
 log_level = 2
 """
@@ -233,15 +232,18 @@ log_level = 2
 
 
 def clear_build():
-    """Removes build/, dist/, .buildozer/ and bin/ directories"""
-    for d in ["build", "dist", ".buildozer", "bin"]:
+    """Removes build/, dist/, .buildozer/ and bin/ directories, and buildozer.spec"""
+    for d in ["build", "dist", ".buildozer", "bin", "buildozer.spec"]:
         path = Path(d)
         if path.exists():
             print(f"🧹 {C.CYAN}Removing{C.END} '{path}'...")
-            if path.is_dir():
-                shutil.rmtree(path)
-            else:
-                path.unlink()
+            try:
+                if path.is_dir():
+                    shutil.rmtree(path)
+                else:
+                    path.unlink()
+            except Exception as e:
+                print(f"⚠️ {C.YELLOW}Warning:{C.END} Could not remove '{path}': {e}")
 
     # also remove spec file as part of clear? Up to user preference, leaving it for now so they don't lose config
     print(f"✨ {C.GREEN}{C.BOLD}Cleanup complete.{C.END}")
