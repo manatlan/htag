@@ -38,6 +38,7 @@ Currently, it works ...
 - DX: errors are a lot better handled/viewable
 - Better events
 - less boilerplate (kiss minded)
+- Styles can be scoped by component
 - ...
 
 
