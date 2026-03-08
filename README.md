@@ -30,6 +30,7 @@ Currently, it works ...
 ## Major differences between v1 and v2
 
 - A lot simpler & more reactive
+- `Tag.App` is the main app component
 - Full starlette compliant from the ground
 - Websocket communication, if fails : fallback to HTTP SSE
 - No more generic Runner
