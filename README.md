@@ -16,13 +16,13 @@
   </a>
 </p>
 
-Here is a full rewrite of **htag 1.0.0**, using only antigravity and prompts/intentions.
+**htag** is a Python3 GUI toolkit for building "beautiful" applications for mobile, web, and desktop from a single codebase
 
-It's the future of htag.
+Here is a full rewrite of **htag 1.0.0**, using only antigravity and prompts/intentions. It's the future of **htag**.
 
 Currently, it works ...
 
-- For building desktop apps (ChromeApp on linux/windows)
+- For building desktop apps (ChromeApp on linux/windows/mac, or simple WebApp)
 - For building web apps (WebApp as an asgi app (for starlette/fastapi/...))
 - For building SPA HTML Page (with the PyScript runner)
 - For building android apps ([it works](examples/app_android/README.md), **but need to improve**)
@@ -30,6 +30,13 @@ Currently, it works ...
 ## Major differences between v1 and v2
 
 - a lot simpler & more reactive
+- websocket communication, if fails : fallback to HTTP SSE
+- No more generic Runner
+- State object for reactivity
+- DX: errors are a lot better handled/viewable
+- Better events
+- less boilerplate (kiss minded)
+- ...
 
 (more details soon)
 
@@ -40,12 +47,12 @@ Check the [Official V2 Documentation](https://manatlan.github.io/htag/) for more
 ## Install
 
 ```bash
-uv add htag
+uv add htag -U
 ```
 
 Or using pip:
 ```bash
-pip install htag
+pip install -U htag
 ```
 
 Alternatively, you can run from source:
@@ -57,7 +64,7 @@ uv run examples/main3.py
 
 ### Skill
 
-With gemini-cli, claude-code, mistral-vibe (or others), you can use this [SKILL.md](.agent/skills/htag-development/SKILL.md) to create a htag application.
+With agentic llm, you can use this [SKILL.md](.agent/skills/htag-development/SKILL.md) to create an htag application.
 
 
 ## Antigravity resumes :
@@ -94,5 +101,5 @@ htag is a Python library for building web applications using HTML, CSS, and Java
 At the beginning, there was [guy](https://github.com/manatlan/guy), which was/is the same concept as [python-eel](https://github.com/ChrisKnott/Eel), but more advanced.
 One day, I've discovered [remi](https://github.com/rawpython/remi), and asked my self, if it could be done in a *guy way*. The POC was very good, so I released
 a version of it, named [gtag](https://github.com/manatlan/gtag). It worked well despite some drawbacks, but was too difficult to maintain. So I decided to rewrite all
-from scratch, while staying away from *guy* (to separate, *rendering* and *runners*)... and [htag](https://github.com/manatlan/htag/tree/v1-legacy) was born. The codebase is very short, concepts are better implemented, and it's very easy to maintain. And now (2026) [htag v2](https://github.com/manatlan/htag is here (a full rewrite of v1 with antigravity) !
+from scratch, while staying away from *guy* (to separate, *rendering* and *runners*)... and [htag](https://github.com/manatlan/htag/tree/v1-legacy) was born. The codebase is very short, concepts are better implemented, and it's very easy to maintain. And now (2026) [htag v2](https://github.com/manatlan/htag) is here (a full rewrite of v1 with antigravity) !
 
