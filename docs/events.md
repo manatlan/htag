@@ -67,6 +67,7 @@ def my_generator(e: Any) -> Generator:
     
     time.sleep(2)
     e.target.add("Finished!")
+```
 
 ### Async Generators
 
@@ -82,7 +83,7 @@ async def my_async_gen(e: Any) -> AsyncGenerator:
 
 > [!TIP]
 > Use generators for any operation that takes more than 100ms to keep the UI responsive and provide feedback to the user.
-```
+
 
 ## Event Decorators
 

@@ -17,6 +17,7 @@ class MyComponent(Tag.div):
     def init(self, name: str) -> None:
         self._class = "my-class"
         self.add(f"Hello {name}!")
+```
 
 ### Automatic Attribute Assignment
 
@@ -30,7 +31,7 @@ class MyTag(Tag.div):
 
 t = MyTag(v=42)
 ```
-```
+
 
 ### Lifecycle Hooks
 

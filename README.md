@@ -35,7 +35,7 @@ Currently, it works ...
 - Websocket communication, if fails : fallback to HTTP SSE
 - No more generic Runner
 - State object for reactivity
-- DX: errors are a lot better handled/viewable
+- DX: errors are a lot better handled/viewable, hot-reload available
 - Better events
 - less boilerplate (kiss minded)
 - Styles can be scoped by component
