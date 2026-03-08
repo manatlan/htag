@@ -1,4 +1,4 @@
-# Events and Reactivity
+# Events and Interactions
 
 `htag` provides a seamless way to handle user interactions on the server side.
 
@@ -6,7 +6,9 @@
 
 You can attach event handlers to any `Tag` component using the `_on{event}` syntax:
 
-```python
+from typing import Any
+from htag import Tag
+
 def my_callback(e: Any) -> None:
     print(f"Clicked on {e.target.id}")
     e.target.add(Tag.span("!"))
@@ -45,7 +47,9 @@ class MyForm(Tag.App):
 
 `htag` fully supports `asyncio`. You can define callbacks as `async def`:
 
-```python
+import asyncio
+from typing import Any
+
 async def my_async_callback(e: Any) -> None:
     await asyncio.sleep(1)
     e.target.add("Done!")
@@ -55,7 +59,8 @@ async def my_async_callback(e: Any) -> None:
 
 For long-running tasks that need to update the UI multiple times, you can use generators:
 
-```python
+from typing import Any, Generator
+
 def my_generator(e: Any) -> Generator:
     e.target.add("Starting...")
     yield # Triggers a UI update to the client
@@ -73,7 +78,8 @@ def my_generator(e: Any) -> Generator:
 
 htag also supports `async for` generators for asynchronous UI streaming.
 
-```python
+from typing import Any, AsyncGenerator
+
 async def my_async_gen(e: Any) -> AsyncGenerator:
     e.target.add("Fetching...")
     yield

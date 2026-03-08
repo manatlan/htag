@@ -28,10 +28,12 @@ When the state wraps a mutable object (like a list, dict, set, or tuple), callin
 
 **Nested objects** are fully reactive. This includes mutations inside loops:
 
-```python
+from typing import Any
+from htag import Tag, State
+
 self.data = State({"users": [{"name": "Alice"}, {"name": "Bob"}]})
 
-def toggle_all(e):
+def toggle_all(e: Any):
     # Iteration yields proxies!
     for user in self.data["users"]:
         user["name"] = user["name"].upper()

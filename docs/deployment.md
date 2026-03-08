@@ -17,7 +17,7 @@ class MyApp(Tag.App):
         self <= Tag.h1("Production App")
 
 # Create the WebApp runner (production: debug=False)
-from htag.server import WebApp
+from htag import WebApp
 app = WebApp(MyApp, debug=False).app
 ```
 
@@ -33,7 +33,7 @@ When exposing your application on the internet, you can use the `parano=True` ar
 
 ```python
 # Create the WebApp runner with payload obfuscation
-from htag.server import WebApp
+from htag import WebApp
 app = WebApp(MyApp, debug=False, parano=True).app
 ```
 
@@ -44,7 +44,7 @@ Since `htag` uses a `WebApp` wrapper, you can also mount it as a sub-application
 ```python
 from starlette.applications import Starlette
 from starlette.responses import JSONResponse
-from htag.server import WebApp
+from htag import WebApp
 from my_htag_app import MyApp
 
 main_app = Starlette()

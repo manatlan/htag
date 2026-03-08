@@ -164,8 +164,8 @@ Supported CSS features:
 - Pseudo-selectors (`:hover`, `::before`, `:nth-child`, etc.)
 - Comma-separated selectors and all combinators (`>`, `+`, `~`, spaces)
 
-!!! note
-    `styles` is **declarative** (processed once at class level). For dynamic styling during interactions, use `_style`, `_class`, or `toggle_class()`.
+> [!NOTE]
+> `styles` is **declarative** (processed once at class level). For dynamic styling during interactions, use `_style`, `_class`, or `toggle_class()`.
 
 ---
 
