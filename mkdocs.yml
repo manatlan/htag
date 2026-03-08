@@ -61,8 +61,11 @@ nav:
 
 markdown_extensions:
   - admonition
+  - pymdownx.details
+  - pymdownx.superfences
   - pymdownx.blocks.admonition
   - pymdownx.blocks.details
+  - pymdownx.blocks.html
   - pymdownx.caret
   - pymdownx.mark
   - pymdownx.tilde
@@ -75,7 +78,6 @@ markdown_extensions:
       pygments_lang_class: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
-  - pymdownx.superfences
   - pymdownx.tabbed:
       alternate_style: true
   - tables
