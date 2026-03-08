@@ -61,6 +61,14 @@ nav:
 
 markdown_extensions:
   - admonition
+  - pymdownx.blocks.admonition
+  - pymdownx.blocks.details
+  - pymdownx.caret
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.emoji:
+      emoji_index: !!python/name:pymdownx.emoji.twemoji
+      emoji_generator: !!python/name:pymdownx.emoji.to_svg
   - pymdownx.highlight:
       anchor_linenums: true
       line_spans: __span
