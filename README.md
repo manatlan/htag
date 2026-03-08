@@ -29,8 +29,9 @@ Currently, it works ...
 
 ## Major differences between v1 and v2
 
-- a lot simpler & more reactive
-- websocket communication, if fails : fallback to HTTP SSE
+- A lot simpler & more reactive
+- Full starlette compliant from the ground
+- Websocket communication, if fails : fallback to HTTP SSE
 - No more generic Runner
 - State object for reactivity
 - DX: errors are a lot better handled/viewable
@@ -38,11 +39,11 @@ Currently, it works ...
 - less boilerplate (kiss minded)
 - ...
 
-(more details soon)
 
 ## Get Started
 
 Check the [Official V2 Documentation](https://manatlan.github.io/htag/) for more information. [old v1 docs](https://manatlan.github.io/htag/v1/)
+
 
 ## Install
 
