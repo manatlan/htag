@@ -312,7 +312,8 @@ function htag_event(id, event_name, event) {
         var target = event.target;
         if (target && target.tagName) {  // Ensure target is a DOM element
             // Check if the event source is a form or inside a form
-            var form = (target.tagName === 'FORM') ? target : target.closest('form');
+            //var form = (target.tagName === 'FORM') ? target : target.closest('form');
+            var form = (target.tagName === 'FORM') ? target : null;
             if (form && event_name === 'submit') {
                 // Collect all form data into value attribute (standard htag v2 pattern)
                 var formData = new FormData(form);
@@ -327,6 +328,8 @@ function htag_event(id, event_name, event) {
         data.key = event.key;
         data.pageX = event.pageX;
         data.pageY = event.pageY;
+        data.button = event.button;
+        data.which = event.which;
         
         // HashChangeEvent specifics
         if (event.newURL) data.newURL = event.newURL;
