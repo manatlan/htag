@@ -182,8 +182,9 @@ d = Tag.div("content", _class="foo")
 # Equivalent to <br/> (Void Element)
 b = Tag.br()
 
-# Equivalent to <input type="text" value="hello"/>
-i = Tag.input(_type="text", _value="hello")
+# Equivalent to <input type="text" name="user" value="hello"/>
+# Use '_name' to correctly populate form data in 'submit' events
+i = Tag.input(_type="text", _name="user", _value="hello")
 ```
 
 ### Void Elements

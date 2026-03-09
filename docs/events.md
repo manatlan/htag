@@ -43,7 +43,26 @@ class MyForm(Tag.App):
         self <= Tag.button("Show", _onclick=lambda e: self.add(f"Value is: {self.entry._value}"))
 ```
 
-## Async Handlers
+## Form Handling (Submit)
+
+When you use a `Tag.form`, the `submit` event (triggered by e.g. `_onsubmit`) receives an `Event` object where `event.value` is a dictionary containing all named form fields (`_name="fieldname"`).
+
+You can access these fields directly on the event object using square brackets for convenience:
+
+```python
+class MyForm(Tag.form):
+    def init(self) -> None:
+        # Use '_name' to define the key in the form data
+        self <= Tag.input(_name="user", _value="bob")
+        self <= Tag.input(_name="email", _value="bob@mail.com")
+        self <= Tag.input(_type="submit")
+        self._onsubmit = self.post
+
+    @prevent
+    def post(self, e: Any) -> None:
+        # e.value is {'user': '...', 'email': '...'}
+        print(f"Submitting: {e['user']} ({e['email']})")
+```
 
 `htag` fully supports `asyncio`. You can define callbacks as `async def`:
 

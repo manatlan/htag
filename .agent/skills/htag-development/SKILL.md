@@ -132,6 +132,24 @@ htag automatically binds input events to Python.
 - For text/number inputs, the current value is accessed safely via event handlers: `val = event.value`
 - For checkboxes/toggles, the framework synchronizes the boolean state. Access it safely using `getattr(self.checkbox, "_value", False)`. Do not use `.value` directly on a checkbox component as it will raise an `AttributeError`.
 
+**Form Submission**:
+When using a `Tag.form`, the `submit` event (e.g. `_onsubmit`) receives an `Event` object where `e.value` is a dictionary containing all named form fields (`_name="fieldname"`).
+- **Subscript Access**: For convenience, you can access form fields directly on the event object using brackets: `e["fieldname"]` (this is a shortcut for `e.value["fieldname"]`).
+- **Standard Pattern**: This aligns with other htag v2 events where the primary data payload is always found in `.value`.
+
+```python
+class MySearch(Tag.form):
+    def init(self, term=""):
+        self <= Tag.input(_name="q", _value=term)
+        self <= Tag.input(_type="submit", _value="Search")
+        self._onsubmit = self.do_search
+
+    @prevent
+    def do_search(self, e):
+        # e.value is {'q': '...'}
+        print(f"Searching for: {e['q']}") 
+```
+
 ### 6. Resiliency & Fallback
 The `htag/server.py` implementation is fully robust against network irregularities:
 - **WebSocket to HTTP Fallback**: If a WebSocket drops or fails to connect, the Javascript bridge automatically falls back to utilizing standard HTTP POST requests (`/event`) and Server-Sent Events (`/stream`).

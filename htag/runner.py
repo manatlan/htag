@@ -34,13 +34,18 @@ class Event:
         self.target = target
         self.id: str = msg.get("id", "")
         self.name: str = msg.get("event", "")
+        # The primary data payload (htag v2 pattern)
+        self.value = msg.get("data")
         # Flat access to msg['data'] (e.g., e.value, e.x, etc.)
-        data = msg.get("data", {})
-        if isinstance(data, dict):
-            for k, v in data.items():
-                setattr(self, k, v)
-        else:
-            self.value = data
+        data = self.value if isinstance(self.value, dict) else {}
+        for k, v in data.items():
+            setattr(self, k, v)
+
+    def __getitem__(self, name: str) -> Any:
+        val = getattr(self, "value", None)
+        if isinstance(val, dict) and name in val:
+            return val[name]
+        return getattr(self, name, None)
 
     def __getattr__(self, name: str) -> Any:
         return None

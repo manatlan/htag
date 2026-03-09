@@ -97,6 +97,7 @@ htag is a Python library for building web applications using HTML, CSS, and Java
 *   **Advanced Tag Search (`.find_tag()`)**: Effortlessly locate any component in the tree by its internal htag ID or its manually assigned HTML `id`.
 *   **Custom ID Resilience**: Manual HTML `id` attributes are now supported without breaking htag's reactive partial updates, thanks to an automatic `data-htag-id` fallback mechanism.
 *   **Automatic Attribute Assignment**: Non-prefixed keyword arguments passed during component instantiation are automatically assigned as instance attributes, simplifying data passing to custom components.
+*   **Unified Form Handling**: When a `Tag.form` is submitted, all input fields are automatically collected into a dictionary and passed as `event.value`. You can conveniently access fields using square brackets on the event object (e.g., `e["fieldname"]`).
 
 
 ## History

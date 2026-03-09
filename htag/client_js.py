@@ -288,11 +288,19 @@ function htag_event(id, event_name, event) {
 
     if (event instanceof Event) {
         // Standard DOM Event
-        if (event.target) {
-            if (event.target.type === 'checkbox') {
-                data.value = event.target.checked;
+        var target = event.target;
+        if (target) {
+            // Check if the event source is a form or inside a form
+            var form = (target.tagName === 'FORM') ? target : target.closest('form');
+            if (form && event_name === 'submit') {
+                // Collect all form data into value attribute (standard htag v2 pattern)
+                var formData = new FormData(form);
+                data.value = {};
+                formData.forEach((v, k) => { data.value[k] = v; });
+            } else if (target.type === 'checkbox') {
+                data.value = target.checked;
             } else {
-                data.value = event.target.value;
+                data.value = target.value;
             }
         }
         data.key = event.key;
@@ -311,7 +319,6 @@ function htag_event(id, event_name, event) {
     }
 
     var payload = {id: id, event: event_name, data: data};
-    
     window.htag_transport(payload);
 
     return new Promise(resolve => {
