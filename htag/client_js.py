@@ -143,6 +143,7 @@ function init_ws() {
 
 function handle_payload(data) {
     if(data.action == "update") {
+        console.log("htag: processing payload updates:", Object.keys(data.updates || {}));
         // Apply partial DOM updates received from the server
         for(var id in data.updates) {
             var el = document.getElementById(id) || document.querySelector('[data-htag-id="' + id + '"]');
@@ -153,20 +154,45 @@ function handle_payload(data) {
         if(_error_overlay && _error_overlay.parentNode !== document.body) {
             document.body.appendChild(_error_overlay);
         }
-        // Execute any JavaScript calls emitted by the Python tags
-        if(data.js) {
-            for(var i=0; i<data.js.length; i++) eval(data.js[i]);
-        }
-        // Inject new css/js statics if they haven't been loaded yet
+        // 1. Inject new css/js statics if they haven't been loaded yet (BEFORE JS calls)
         if(data.statics) {
             data.statics.forEach(s => {
-                var div = document.createElement('div');
-                div.innerHTML = s.trim();
-                var node = div.firstChild;
-                if (node && (node.tagName === "STYLE" || node.tagName === "LINK")) {
-                    document.head.appendChild(node);
+                try {
+                    var div = document.createElement('div');
+                    div.innerHTML = s.trim();
+                    var node = div.firstChild;
+                    if (!node) return;
+                    
+                    if (node.tagName === "STYLE" || node.tagName === "LINK") {
+                        document.head.appendChild(node);
+                    } else if (node.tagName === "SCRIPT") {
+                        var script = document.createElement('script');
+                        script.async = false; // Force sequential execution for multiple dynamic scripts
+                        for (var i = 0; i < node.attributes.length; i++) {
+                            var attr = node.attributes[i];
+                            script.setAttribute(attr.name, attr.value);
+                        }
+                        if (node.textContent) script.textContent = node.textContent;
+                        document.head.appendChild(script);
+                    }
+                } catch(e) {
+                    console.error("htag: static injection error", s, e);
                 }
             });
+        }
+
+        // 2. Execute any JavaScript calls emitted by the Python tags
+        if(data.js) {
+            for(var i=0; i<data.js.length; i++) {
+                try {
+                    eval(data.js[i]);
+                } catch(e) {
+                    console.error("htag: eval error for", data.js[i], e);
+                    if(_error_overlay && typeof _error_overlay.show === 'function') {
+                        _error_overlay.show("JS Eval Error", e.message + "\\nSource: " + data.js[i]);
+                    }
+                }
+            }
         }
         // Resolve promise if a result is returned for a callback
         if(data.callback_id && window._htag_callbacks[data.callback_id]) {

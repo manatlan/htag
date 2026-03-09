@@ -93,14 +93,10 @@ class WebApp:
                     token = current_request.set(request_or_ws)
                     try:
                         if inspect.isclass(self.tag_entity):
-                            if issubclass(self.tag_entity, BaseApp):
-                                self.instances[sid] = self.tag_entity()
-                            else:
-                                # Wrap plain GTag class in an App runner
-                                self.instances[sid] = AppRunner(self.tag_entity)
+                            self.instances[sid] = self.tag_entity()
                             logger.info("Created new session instance for sid: %s", sid)
                         else:
-                            # tag_entity is an App instance
+                            # tag_entity is an App instance (shared)
                             self.instances[sid] = self.tag_entity  # type: ignore
                             logger.info(
                                 "Using shared instance for session sid: %s", sid
