@@ -7,11 +7,11 @@ import weakref
 import contextvars
 from typing import Any, Callable
 
-
 from .context import _ctx, current_request
 
-import logging
 logger = logging.getLogger("htag")
+
+
 
 from .css import _scope_css, _scoped_style_cache
 
@@ -819,7 +819,13 @@ class GTag:  # aka "Generic Tag"
 
         if child is None:
             return "" if stringify else None
-        return str(child) if stringify else child
+        
+        if stringify:
+            if isinstance(child, GTag) or (self.tag in ("style", "script")):
+                return str(child)
+            return html.escape(str(child))
+        return child
+
 
     def __str__(self) -> str:
         """Renders the tag and its children to an HTML string."""

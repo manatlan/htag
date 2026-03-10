@@ -93,9 +93,11 @@ async def test_fallback_cycle():
             "data": {"callback_id": "test_123"}
         }
         
-        res = await ac.post("/event", json=event_payload)
+        headers = {"X-HTAG-TOKEN": getattr(app_instance, "htag_csrf", "")}
+        res = await ac.post("/event", json=event_payload, headers=headers)
         assert res.status_code == 200
         assert res.json() == {"status": "ok"}
+
         
         # Wait a tiny bit for the background asyncio task to run `handle_event`
         await asyncio.sleep(0.1)

@@ -53,6 +53,11 @@ def test_webapp_parano_mode():
     payload_obj = {"id": "b1", "event": "click"}
     encoded_payload = _obf_dumps(payload_obj, app_host.parano_key)
     
-    resp_post = client.post("/event", content=encoded_payload.encode('utf-8'))
+    # Find the instance to get its CSRF token
+    inst = app_host.instances[cookies["htag_sid"]]
+    headers = {"X-HTAG-TOKEN": inst.htag_csrf}
+    
+    resp_post = client.post("/event", content=encoded_payload.encode('utf-8'), headers=headers)
     assert resp_post.status_code == 200
     assert resp_post.json() == {"status": "ok"}
+

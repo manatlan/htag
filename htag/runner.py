@@ -111,7 +111,9 @@ class AppRunner(BaseApp):
                 <script>
                     window.HTAG_RELOAD = {"true" if getattr(self, "_reload", False) else "false"};
                     window.PARANO = {f'"{self.parano_key}"' if getattr(self, "parano_key", None) else "null"};
+                    window.HTAG_CSRF = {f'"{self.htag_csrf}"' if getattr(self, "htag_csrf", None) else "null"};
                 </script>
+
                 {statics_html}
             </head>
             {body_html}

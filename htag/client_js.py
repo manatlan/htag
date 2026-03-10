@@ -263,9 +263,13 @@ window.htag_transport = window.htag_transport || function(payload) {
         if (!use_fallback) fallback();
         fetch(_base_path + "event", {
             method: "POST",
-            headers: {"Content-Type": "application/json"},
+            headers: {
+                "Content-Type": "application/json",
+                "X-HTAG-TOKEN": window.HTAG_CSRF
+            },
             body: _enc(payload)
         }).then(response => {
+
             if (!response.ok) {
                 if(_error_overlay && typeof _error_overlay.show === 'function') {
                     _error_overlay.show("HTTP Error", `Server returned status: ${response.status}`);

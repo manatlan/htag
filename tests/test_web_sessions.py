@@ -121,7 +121,9 @@ def test_tag_request_attribute():
     # 2. Simulate an event (triggers on_click via HTTP POST)
     # Note: In real life, it might be WS, but WebApp supports HTTP POST for events too.
     payload = {"id": inst.childs[0].id, "event": "click", "data": {"callback_id": "123"}}
-    res = client.post("/event", json=payload)
+    headers = {"X-HTAG-TOKEN": inst.htag_csrf}
+    res = client.post("/event", json=payload, headers=headers)
+
     assert res.status_code == 200
     
     # Need to wait for background task if using WebApp directly, 

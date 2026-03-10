@@ -18,6 +18,9 @@ Every UI element in htag is a component created via `Tag`.
 - Use `.parent` to access the parent component, and `.childs` to access the list of child components.
 - Use `Tag.add(self, child)` or `Tag.add(lambda: ...)` for explicit addition. This is particularly useful when returning components from reactive lambdas, as it ensures they are properly parented even if they're not direct children.
 
+**XSS Protection**: All strings added as children (e.g. `Tag.div("hello")`) are automatically HTML-escaped to prevent XSS (except for `style` and `script` tags).
+
+
 ```python
 # -*- coding: utf-8 -*-
 from htag import Tag
@@ -154,6 +157,9 @@ The `htag/server.py` implementation is fully robust against network irregulariti
 - **WebSocket to HTTP Fallback**: If a WebSocket drops or fails to connect, the Javascript bridge automatically falls back to utilizing standard HTTP POST requests (`/event`) and Server-Sent Events (`/stream`).
 - **Graceful Reconnections**: A user pressing F5 will not kill the server thread. The server only exits when the browser tab is explicitly closed or navigates away cleanly without returning within the 1-second reconnect window. 
 - **Parano Mode (Payload Obfuscation)**: WebApp accepts a `parano=True` parameter that obfuscates all JSON traffic over WebSockets and HTTP routes. This lightweight symmetric XOR cipher hides data from simple MITM proxies without needing heavy cryptographic libraries on the frontend.
+- **CSRF Protection**: All event requests via HTTP POST are automatically protected by a unique CSRF token generated per session and sent in the `X-HTAG-TOKEN` header.
+
+
 
 ### 7. Session & Request Integration
 When using `WebApp`, every tag has access to the current Starlette `Request` or `WebSocket` via the **`self.request`** property. This allows for direct access to the session, headers, and other request data.

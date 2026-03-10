@@ -119,7 +119,11 @@ class WebApp:
                         # Store a backlink to the webserver for session-aware logic
                         setattr(self.instances[sid], "htag_webserver", self)
 
+                        # Generate CSRF token for this session
+                        setattr(self.instances[sid], "htag_csrf", os.urandom(16).hex())
+
                         # Trigger lifecycle mount on the root App instance
+
                         self.instances[sid]._trigger_mount()
                     finally:
                         current_request.reset(token)
@@ -187,6 +191,14 @@ class WebApp:
             token = current_request.set(request)
             try:
                 msg_body = await request.body()
+                
+                # CSRF Check
+                received_csrf = request.headers.get("X-HTAG-TOKEN")
+                expected_csrf = getattr(instance, "htag_csrf", None)
+                if expected_csrf and received_csrf != expected_csrf:
+                    logger.warning("CSRF Attempt detected! Expected: %s, Received: %s", expected_csrf, received_csrf)
+                    return Response(status_code=403, content="CSRF Token mismatch")
+
                 msg = _obf_loads(
                     msg_body.decode("utf-8"), getattr(instance, "parano_key", None)
                 )
