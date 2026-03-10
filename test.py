@@ -200,6 +200,16 @@ class Showcase(Tag.App):
                     Tag.button("Mount", _onclick=lambda e: self.lc.add(LifecycleComp()), _class="alt")
                     Tag.button("Unmount", _onclick=lambda e: self.lc.clear(), _class="danger")
 
+            # 10. Transport
+            with FeatureSection("10. Transport"):
+                self.ts = Tag.div("WebSocket active", _class="demo-box")
+                def force_sse(e):
+                    self.exit_on_disconnect = False  # Prevent server exit during test
+                    self.ts.text = "SSE Mode (Forced)"
+                    self.ts.add_class("active")
+                    self.call_js("if(window.ws) window.ws.close(); window.fallback();")
+                Tag.button("Force SSE Fallback", _onclick=force_sse, _class="danger")
+
         with Tag.footer():
             Tag.p("htag exhaustive validation • Shared App Instance aware")
 

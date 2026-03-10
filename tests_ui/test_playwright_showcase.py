@@ -33,17 +33,14 @@ def app_port():
     p.start()
     
     # Wait for server to start
-    time.sleep(2)
+    time.sleep(3)
     
     yield port
     
     p.terminate()
     p.join()
 
-def test_showcase_features(app_port, page: Page):
-    url = f"http://127.0.0.1:{app_port}"
-    page.goto(url)
-    
+def run_showcase_checks(page: Page):
     # 1. Reactivity
     expect(page.locator("text=Count: 0 | Items: A")).to_be_visible()
     page.click("button:has-text('+1')")
@@ -59,7 +56,8 @@ def test_showcase_features(app_port, page: Page):
 
     # 3. Binding & Class
     expect(page.locator("text=Live: Edit me")).to_be_visible()
-    page.fill("input[value='Edit me']", "Hello htag")
+    # Find the input that currently has "Edit me" as value
+    page.fill("input", "Hello htag")
     expect(page.locator("text=Live: Hello htag")).to_be_visible()
     
     box = page.locator("text=Live: Hello htag")
@@ -97,7 +95,25 @@ def test_showcase_features(app_port, page: Page):
 
     # 9. Lifecycle
     page.click("button:has-text('Mount')")
-    # It prints 'Mounted: <time>'
     expect(page.locator("text=Mounted:")).to_be_visible()
     page.click("button:has-text('Unmount')")
     expect(page.locator("text=Mounted:")).not_to_be_visible()
+
+def test_showcase_features_dual_transport(app_port, page: Page):
+    url = f"http://127.0.0.1:{app_port}"
+    page.goto(url)
+    
+    print("\n--- PHASE 1: Testing via WebSockets ---")
+    run_showcase_checks(page)
+    
+    print("\n--- PHASE 2: Forcing SSE Fallback ---")
+    page.context.clear_cookies()
+    page.reload()
+    
+    # We must be in WS mode here because it's a new session
+    # We force SSE
+    page.click("button:has-text('Force SSE Fallback')")
+    expect(page.locator("text=SSE Mode (Forced)")).to_be_visible()
+    
+    print("--- PHASE 2: Testing via SSE ---")
+    run_showcase_checks(page)
