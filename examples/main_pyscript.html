@@ -42,21 +42,21 @@ then open http://localhost:8000/examples/main_pyscript.html
                 
                 # Interactive element
                 self.btn = Tag.button("Increment: 0", _onclick=self.increment)
-                self.btn._style = "padding: 10px 20px; font-size: 16px; cursor: pointer; border-radius: 5px; background: #3b82f6; color: white; border: none;"
+                self.btn["style"] = "padding: 10px 20px; font-size: 16px; cursor: pointer; border-radius: 5px; background: #3b82f6; color: white; border: none;"
 
                 self <= Tag.button("Trigger Python Error", _class="btn", _onclick=self.trigger_py_error)
                 
 
                 # Centering wrapper
                 wrapper = Tag.div(self.btn)
-                wrapper._style = "display: flex; justify-content: center; align-items: center; padding: 20px;"
+                wrapper["style"] = "display: flex; justify-content: center; align-items: center; padding: 20px;"
                 
                 self += wrapper
                 
                 # Add styles to App body
-                self._style = "font-family: system-ui, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);"
+                self["style"] = "font-family: system-ui, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);"
 
-                self._onhashchange = self.on_hash
+                self["onhashchange"] = self.on_hash
 
                 with Tag.div():
                     Tag.a("[P1]", _href="#page1")

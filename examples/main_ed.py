@@ -20,12 +20,12 @@ class AceEditor(Tag.div):
 
     def init(self, value: str = "", language: str = "python", **kwargs):
         self.add_class("editor-container")
-        self._value = value
-        self._language = language
+        self._ace_value = value
+        self._ace_language = language
 
     def on_mount(self):
         # Initialize Ace Editor on the client side, waiting for the library AND the DOM element
-        val = json.dumps(self._value)
+        val = json.dumps(self._ace_value)
         script = f"""
             (function initAce() {{
                 var el = document.getElementById("{self.id}");
@@ -33,7 +33,7 @@ class AceEditor(Tag.div):
                     ace.config.set('basePath', 'https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/');
                     var editor = ace.edit(el);
                     editor.setTheme("ace/theme/cobalt");
-                    editor.session.setMode("ace/mode/{self._language}");
+                    editor.session.setMode("ace/mode/{self._ace_language}");
                     editor.setFontSize(15);
                     el._ace_loading = true;
                     editor.setValue({val}, -1);
@@ -54,7 +54,7 @@ class AceEditor(Tag.div):
 
     def set_value(self, value: str):
         print(f"AceEditor.set_value called with {len(value)} chars")
-        self._value = value
+        self._ace_value = value
         val = json.dumps(value)
         # We re-set the mode every time to ensure highlighting is applied to new content
         self.call_js(f"""
@@ -66,7 +66,7 @@ class AceEditor(Tag.div):
                     ed.setValue({val}, -1);
                     setTimeout(function() {{ el._ace_loading = false; }}, 100);
                     ed.setTheme("ace/theme/cobalt");
-                    ed.session.setMode("ace/mode/{self._language}");
+                    ed.session.setMode("ace/mode/{self._ace_language}");
                     ed.setFontSize(15);
                     console.log("Value & Mode set in editor {self.id}");
                 }} else {{
@@ -227,6 +227,9 @@ class App(Tag.App):
         t_class = f"toast toast-{type}"
         # Create toast with an 'expire' event that removes itself
         t = Tag.div(message, _class=t_class, _onexpire=lambda e: t.remove())
+        # The above used _onexpire in instantiation (STILL VALID)
+        # But if we were to set it later:
+        # t["onexpire"] = lambda e: t.remove()
         self.toast_container.add(t)
         
         # Trigger the 'expire' event from client-side after 5 seconds

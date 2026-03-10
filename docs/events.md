@@ -4,7 +4,7 @@
 
 ## Event Handlers
 
-You can attach event handlers to any `Tag` component using the `_on{event}` syntax:
+You can attach event handlers to any `Tag` component using dictionary-style access (e.g., `["onclick"]`). While underscored keyword arguments like `_onclick` are still valid in **constructors**, the dictionary syntax is the standard for direct attribute management.
 
 from typing import Any
 from htag import Tag
@@ -13,11 +13,11 @@ def my_callback(e: Any) -> None:
     print(f"Clicked on {e.target.id}")
     e.target.add(Tag.span("!"))
 
-# Attached via underscore property
-btn = Tag.button("Click me", _onclick=my_callback)
-
 # Attached via dictionary syntax
 btn["onclick"] = my_callback
+
+# OR in constructor
+btn = Tag.button("Click me", _onclick=my_callback)
 ```
 
 ### The Event Object
@@ -32,7 +32,7 @@ The `e` argument passed to the callback is an `Event` object containing:
 
 `htag` automatically synchronizes the state of input elements without requiring explicit event handlers.
 
-When you use an `<input>`, `<textarea>`, or `<select>`, `htag` injects an `_oninput` event that updates the component's `_value` attribute in real-time on the server.
+When you use an `<input>`, `<textarea>`, or `<select>`, `htag` injects an `oninput` event that updates the component's `value` attribute in real-time on the server.
 
 ```python
 class MyForm(Tag.App):
@@ -40,12 +40,12 @@ class MyForm(Tag.App):
         # No '_oninput' needed, it's automatic!
         self.entry = Tag.input(_value="Initial")
         self <= self.entry
-        self <= Tag.button("Show", _onclick=lambda e: self.add(f"Value is: {self.entry._value}"))
+        self <= Tag.button("Show", _onclick=lambda e: self.add(f"Value is: {self.entry['value']}"))
 ```
 
 ## Form Handling (Submit)
 
-When you use a `Tag.form`, the `submit` event (triggered by e.g. `_onsubmit`) receives an `Event` object where `event.value` is a dictionary containing all named form fields (`_name="fieldname"`).
+When you use a `Tag.form`, the `submit` event (triggered by e.g. `["onsubmit"]`) receives an `Event` object where `event.value` is a dictionary containing all named form fields (`_name="fieldname"`).
 
 You can access these fields directly on the event object using square brackets for convenience:
 
@@ -56,7 +56,7 @@ class MyForm(Tag.form):
         self <= Tag.input(_name="user", _value="bob")
         self <= Tag.input(_name="email", _value="bob@mail.com")
         self <= Tag.input(_type="submit")
-        self._onsubmit = self.post
+        self["onsubmit"] = self.post
 
     @prevent
     def post(self, e: Any) -> None:
@@ -130,12 +130,12 @@ def handle_submit(e):
 
 ### HashChange Event
 
-When you set `self._onhashchange`, the Python callback receives an `Event` object with `newURL` and `oldURL` attributes.
+When you set `self["onhashchange"]`, the Python callback receives an `Event` object with `newURL` and `oldURL` attributes.
 
 ```python
 class App(Tag.App):
     def init(self):
-        self._onhashchange = self.on_hash
+        self["onhashchange"] = self.on_hash
         
     def on_hash(self, e):
         print(f"Navigated to: {e.newURL}")
@@ -147,7 +147,7 @@ You can trigger custom events from JavaScript with any data using the global `ht
 
 ```python
 # In Python
-tag._oncustom = lambda e: print(f"Received value: {e.value}")
+tag["oncustom"] = lambda e: print(f"Received value: {e.value}")
 
 # In JavaScript
 htag_event('tag_id', 'custom', 'some string')

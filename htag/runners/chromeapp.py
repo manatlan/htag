@@ -203,7 +203,8 @@ class ChromeApp:
         def on_inst(inst: App) -> None:
             inst.exit_on_disconnect = True
             if self._cleanup_func:
-                setattr(inst, "_browser_cleanup", self._cleanup_func)
+                # Use object.__setattr__ to bypass GTag.__setattr__ and avoid deprecation warning
+                object.__setattr__(inst, "_browser_cleanup", self._cleanup_func)
 
         if not inspect.isclass(self.app):
             self.app.exit_on_disconnect = True

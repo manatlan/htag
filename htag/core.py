@@ -562,15 +562,27 @@ class GTag:  # aka "Generic Tag"
             "parent",
             "tag",
             "id",
+            "_reload",
+            "_browser_cleanup",
         ):
             super().__setattr__(name, value)
         elif name.startswith("_on") and (callable(value) or isinstance(value, str)):
             # Event (e.g., self._onclick = my_callback or self._onclick = "alert(1)")
+            logger.warning(
+                "DEPRECATION: Setting events via underscore prefix ('%s') is deprecated. Use 'self[\"%s\"] = ...' instead.",
+                name,
+                name[1:],
+            )
             with self.__lock:
                 self.__events[name[3:]] = value
                 self.__dirty = True
         elif name.startswith("_"):
             # HTML attribute (e.g., self._class = "foo")
+            logger.warning(
+                "DEPRECATION: Setting HTML attributes via underscore prefix ('%s') is deprecated. Use 'self[\"%s\"] = ...' instead.",
+                name,
+                name[1:].replace("_", "-"),
+            )
             attr_name = name[1:].replace("_", "-")
             with self.__lock:
                 self.__attrs[attr_name] = value
@@ -580,15 +592,33 @@ class GTag:  # aka "Generic Tag"
             super().__setattr__(name, value)
 
     def __getattr__(self, name: str) -> Any:
+        if name in ("_reload", "_browser_cleanup"):
+            return super().__getattribute__(name)
         if name.startswith("_") and "__" not in name:
-            try:
-                # Use super().__getattribute__ to avoid recursion loop with __getattr__
-                attrs = super().__getattribute__("_GTag__attrs")
-                attr_name = name[1:].replace("_", "-")
-                if attr_name in attrs:
-                    return attrs[attr_name]
-            except AttributeError:
-                pass
+            if name.startswith("_on"):
+                event_name = name[3:]
+                events = super().__getattribute__("_GTag__events")
+                if event_name in events:
+                    logger.warning(
+                        "DEPRECATION: Accessing events via underscore prefix ('%s') is deprecated. Use 'self[\"%s\"]' instead.",
+                        name,
+                        name[1:],
+                    )
+                    return events[event_name]
+            else:
+                try:
+                    # Use super().__getattribute__ to avoid recursion loop with __getattr__
+                    attrs = super().__getattribute__("_GTag__attrs")
+                    attr_name = name[1:].replace("_", "-")
+                    if attr_name in attrs:
+                        logger.warning(
+                            "DEPRECATION: Accessing HTML attributes via underscore prefix ('%s') is deprecated. Use 'self[\"%s\"]' instead.",
+                            name,
+                            attr_name,
+                        )
+                        return attrs[attr_name]
+                except AttributeError:
+                    pass
         return super().__getattribute__(name)
 
     def __getitem__(self, name: str) -> Any:

@@ -130,7 +130,7 @@ Attributes can also be reactive by passing a lambda.
     _style=lambda: f"opacity: {self.opacity}%"
 )
 
-# Also works with dictionary syntax
+# Also perfectly valid on any tag instance
 div["class"] = lambda: "active" if self.is_active else "hidden"
 ```
 

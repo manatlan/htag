@@ -23,7 +23,7 @@ class MyApp(Tag.App):
         # (It's updated on every interaction)
         username = self.request.session.get("username", "Anonyme")
 
-        self._style = "font-family: sans-serif; padding: 20px; border: 2px solid #646cff; border-radius: 8px; max-width: 400px; margin: 20px auto; text-align: center;"
+        self["style"] = "font-family: sans-serif; padding: 20px; border: 2px solid #646cff; border-radius: 8px; max-width: 400px; margin: 20px auto; text-align: center;"
         self <= Tag.h2(f"Welcome to htag, {username}!")
         self <= Tag.p("I am mounted at /app")
         

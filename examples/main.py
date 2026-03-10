@@ -15,7 +15,7 @@ class MyApp(Tag.App):
         self <= "hello2"
 
         event.target.a_var += 1
-        event.target._style = "color:red"
+        event.target["style"] = "color:blue"
         event.target <= Tag.span("added")
         event.target.call_js("console.log('Button clicked!')")
 

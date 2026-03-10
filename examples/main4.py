@@ -218,7 +218,7 @@ class Viewer(Tag.div):
     """
 
     def init(self, file_path, close_callback):
-        self._class="preview-panel"
+        self["class"]="preview-panel"
         self.file_path = file_path
         self.close_callback = close_callback
         self.render()

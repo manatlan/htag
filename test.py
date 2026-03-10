@@ -163,7 +163,7 @@ class Showcase(Tag.App):
                 with Tag.div(_class="actions"):
                     Tag.a("#Home", _href="#Home")
                     Tag.a("#Settings", _href="#Settings")
-                self._onhashchange = self.on_hash_change
+                self["onhashchange"] = self.on_hash_change
 
             # 7. Error Handling
             with FeatureSection("7. Errors"):

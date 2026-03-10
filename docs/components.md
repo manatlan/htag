@@ -15,7 +15,7 @@ from htag import Tag
 
 class MyComponent(Tag.div):
     def init(self, name: str) -> None:
-        self._class = "my-class"
+        self["class"] = "my-class"
         self.add(f"Hello {name}!")
 ```
 
@@ -44,7 +44,7 @@ Lifecycle hooks let you run code at specific times in a component's life:
 ```python
 class Clock(Tag.div):
     def init(self) -> None:
-        self._class = "clock"
+        self["class"] = "clock"
         self.taskId: int | None = None
         
     def on_mount(self) -> None:
@@ -93,38 +93,35 @@ Use the `.text` property to quickly replace all children of a tag with a single 
 self.label.text = "Status: OK"
 ```
 
-Attributes can be managed using either properties starting with an underscore or dictionary-style access. Both methods trigger UI updates and are strictly synchronized.
+Attributes can be managed in two ways: using underscore-prefixed keyword arguments during **instantiation**, or using **dictionary-style access** on any `Tag` instance. The dictionary access is the preferred way for dynamic property management as it handles all HTML attributes (including those with dashes) and triggers UI updates.
 
-### Underscore Properties
-Ideal for standard attributes and quick definitions.
+### In Constructors
+Ideal for quick definitions during tag creation.
 
 ```python
 # In constructors
 img = Tag.img(_src="/logo.png", _alt="Logo")
-
-# Direct assignment
-img._width = "100"
 ```
 
 ### Dictionary Access
-Recommended for attributes with dashes (like `data-*` or `aria-*`) or dynamic attribute names. **Note: underscores are automatically converted to dashes internally.**
+Recommended for all dynamic property management, especially for attributes with dashes (like `data-*` or `aria-*`). **Note: internal underscores are automatically converted to dashes.**
 
 ```python
 # Canonical way for dashed attributes
 div["data-user-id"] = "123"
 
-# Also works (auto-normalized to "data-user-id")
-div._data_user_id = "123" 
+# Also perfectly valid (dashes are handle by the dict key)
+div["style"] = "color: red"
 
 # Dynamic access
 attr_name = "class"
 div[attr_name] = "active"
 ```
 
-- `_class` / `["class"]`: Maps to the `class` attribute.
-- `_id` / `["id"]`: Maps to the `id` attribute.
-- `_style` / `["style"]`: Maps to the `style` attribute.
-- `_any_thing` / `["any-thing"]`: Maps to `any-thing` in HTML.
+- `["class"]`: Maps to the `class` attribute.
+- `["id"]`: Maps to the `id` attribute.
+- `["style"]`: Maps to the `style` attribute.
+- `["any-thing"]`: Maps to `any-thing` in HTML.
 
 ### CSS Class Helpers
 
@@ -165,7 +162,7 @@ Supported CSS features:
 - Comma-separated selectors and all combinators (`>`, `+`, `~`, spaces)
 
 > [!NOTE]
-> `styles` is **declarative** (processed once at class level). For dynamic styling during interactions, use `_style`, `_class`, or `toggle_class()`.
+> `styles` is **declarative** (processed once at class level). For dynamic styling during interactions, use dictionary syntax (e.g., `self["style"] = "..."`) or `toggle_class()`.
 
 ---
 

@@ -19,13 +19,13 @@ class Button(Tag.button):
         
         # Variant-specific styles
         if variant == "primary":
-            self._class = f"{base_classes} bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800"
+            self["class"] = f"{base_classes} bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800"
         elif variant == "secondary":
-            self._class = f"{base_classes} bg-slate-200 text-slate-800 hover:bg-slate-300 active:bg-slate-400"
+            self["class"] = f"{base_classes} bg-slate-200 text-slate-800 hover:bg-slate-300 active:bg-slate-400"
         elif variant == "danger":
-            self._class = f"{base_classes} bg-red-600 text-white hover:bg-red-700 active:bg-red-800"
+            self["class"] = f"{base_classes} bg-red-600 text-white hover:bg-red-700 active:bg-red-800"
         else:
-            self._class = base_classes
+            self["class"] = base_classes
             
         # Allow overriding/adding classes via kwargs if needed
         if "_class" in kwargs:
@@ -35,9 +35,9 @@ class Card(Tag.div):
     """A reusable card container component."""
     def init(self, title=None, **kwargs):
         # 1. Initialize logic/styles
-        self._class = "bg-white rounded-xl shadow-md border border-slate-100 overflow-hidden"
+        self["class"] = "bg-white rounded-xl shadow-md border border-slate-100 overflow-hidden"
         if "_class" in kwargs:
-             self._class += f" {kwargs['_class']}"
+             self["class"] += f" {kwargs['_class']}"
 
         # 2. Create body FIRST (so it's available for auto-adding children)
         self.body = Tag.div(_class="p-6")
@@ -63,22 +63,22 @@ class Badge(Tag.span):
     """A small pill badge for status or counts."""
     def init(self, text, color="blue", **kwargs):
         self <= text
-        self._class = f"inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{color}-100 text-{color}-800"
+        self["class"] = f"inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{color}-100 text-{color}-800"
 
 class Alert(Tag.div):
     """An alert banner component."""
     def init(self, message, variant="info", **kwargs):
         if variant == "info":
-            self._class = "p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 border border-blue-200"
+            self["class"] = "p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 border border-blue-200"
         elif variant == "success":
-            self._class = "p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 border border-green-200"
+            self["class"] = "p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 border border-green-200"
         elif variant == "warning":
-            self._class = "p-4 mb-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 border border-yellow-200"
+            self["class"] = "p-4 mb-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 border border-yellow-200"
         elif variant == "error":
-            self._class = "p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 border border-red-200"
+            self["class"] = "p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 border border-red-200"
             
         if "_class" in kwargs:
-            self._class += f" {kwargs['_class']}"
+            self["class"] += f" {kwargs['_class']}"
             
         self <= message
 
@@ -97,7 +97,7 @@ class Toast(Tag.div):
         variant_classes = colors.get(variant, colors["info"])
         
         # Initial classes (invisible and translated)
-        self._class = f"p-4 mb-4 text-sm rounded-lg border shadow-xl transform transition-all duration-300 translate-y-2 opacity-0 {variant_classes}"
+        self["class"] = f"p-4 mb-4 text-sm rounded-lg border shadow-xl transform transition-all duration-300 translate-y-2 opacity-0 {variant_classes}"
         self <= message
         
         # Self-contained JS for animations and removal (using call_js for execution)
@@ -122,9 +122,9 @@ class Toast(Tag.div):
 class Modal(Tag.div):
     """A full-screen modal dialog component."""
     def init(self, title, content, **kwargs):
-        self._class = "fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black bg-opacity-50"
-        self._style = "display: none;"
-        self._onclick = self.hide # Close on overlay click
+        self["class"] = "fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black bg-opacity-50"
+        self["style"] = "display: none;"
+        self["onclick"] = self.hide # Close on overlay click
         
         # The dialog box (prevent closing when clicking inside)
         self.dialog = Tag.div(_class="bg-white rounded-xl shadow-2xl max-w-lg w-full", _onclick="event.stopPropagation()")
@@ -134,7 +134,7 @@ class Modal(Tag.div):
         header <= Tag.h3(title, _class="text-xl font-semibold text-gray-900")
         
         close_btn = Tag.button(_class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center")
-        close_btn._onclick = self.hide
+        close_btn["onclick"] = self.hide
         close_btn <= Tag.span("×", _class="text-2xl leading-none")
         header <= close_btn
         
@@ -148,19 +148,19 @@ class Modal(Tag.div):
         self <= self.dialog
 
     def show(self, event=None):
-        self._style = "display: flex;"
+        self["style"] = "display: flex;"
 
     def hide(self, event=None):
-        self._style = "display: none;"
+        self["style"] = "display: none;"
 
 class Input(Tag.input):
     """A styled text input component."""
     def init(self, placeholder="", **kwargs):
-        self._type = "text"
-        self._placeholder = placeholder
-        self._class = "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 outline-none transition-colors"
+        self["type"] = "text"
+        self["placeholder"] = placeholder
+        self["class"] = "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 outline-none transition-colors"
         if "_class" in kwargs:
-             self._class += f" {kwargs['_class']}"
+             self["class"] += f" {kwargs['_class']}"
 
 class Toggle(Tag.label):
     """A modern toggle switch component."""
@@ -168,13 +168,13 @@ class Toggle(Tag.label):
         # Extract the onchange event from kwargs for the inner checkbox if it exists
         onchange = kwargs.pop("_onchange", kwargs.pop("onchange", None))
         
-        self._class = "relative inline-flex items-center cursor-pointer"
+        self["class"] = "relative inline-flex items-center cursor-pointer"
         
         # The hidden checkbox is what stores the state
         # In htag, an input automatically updates its `value` attribute on client changes
         self.checkbox = Tag.input(_type="checkbox", _class="sr-only peer")
         if onchange:
-             self.checkbox._onchange = onchange
+             self.checkbox["onchange"] = onchange
         self <= self.checkbox
         
         # The visual toggle
@@ -193,9 +193,9 @@ class Toggle(Tag.label):
 class Table(Tag.div):
     """A responsive table component."""
     def init(self, headers, rows, **kwargs):
-        self._class = "relative overflow-x-auto shadow-md sm:rounded-lg"
+        self["class"] = "relative overflow-x-auto shadow-md sm:rounded-lg"
         if "_class" in kwargs:
-             self._class += f" {kwargs['_class']}"
+             self["class"] += f" {kwargs['_class']}"
              
         table = Tag.table(_class="w-full text-sm text-left text-gray-500")
         self <= table
@@ -227,7 +227,7 @@ class Table(Tag.div):
 class ProgressBar(Tag.div):
     """A simple progress bar component."""
     def init(self, progress=0, color="blue", **kwargs):
-        self._class = "w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700"
+        self["class"] = "w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700"
         
         # Internal div for the bar itself, with reactive width
         Tag.div(
@@ -239,9 +239,9 @@ class ProgressBar(Tag.div):
 class CodeBlock(Tag.div):
     """A styled container to display code snippets."""
     def init(self, code, language="python", **kwargs):
-        self._class = "rounded-md bg-slate-800 p-4 overflow-x-auto text-sm text-slate-50 font-mono shadow-inner border border-slate-700"
+        self["class"] = "rounded-md bg-slate-800 p-4 overflow-x-auto text-sm text-slate-50 font-mono shadow-inner border border-slate-700"
         if "_class" in kwargs:
-             self._class += f" {kwargs['_class']}"
+             self["class"] += f" {kwargs['_class']}"
              
         pre = Tag.pre()
         code_tag = Tag.code(code, _class=f"language-{language}")
@@ -263,9 +263,9 @@ class Spinner(Tag.div):
         # We start by making the container a flex center block if we want, or inline. 
         # But we'll just style the spinner SVG directly.
         
-        self._class = "flex justify-center items-center"
+        self["class"] = "flex justify-center items-center"
         if "_class" in kwargs:
-             self._class += f" {kwargs['_class']}"
+             self["class"] += f" {kwargs['_class']}"
              
         # Create an animated SVG for the spinner
         svg = Tag.svg(
@@ -279,7 +279,7 @@ class Accordion(Tag.div):
     """A collapsible accordion item."""
     def init(self, title, content, is_open=False, **kwargs):
         self.is_open = is_open
-        self._class = "border border-gray-200 rounded-lg mb-2 overflow-hidden"
+        self["class"] = "border border-gray-200 rounded-lg mb-2 overflow-hidden"
         
         # Header / Button
         self.header = Tag.button(_type="button", _onclick=self.toggle, _class="flex items-center justify-between w-full p-5 font-medium text-left text-gray-500 bg-gray-50 hover:bg-gray-100 transition-colors bg-white")
@@ -343,9 +343,9 @@ class MessageBox(Tag.div):
             )
         # Modal backdrop (fixed full screen, gray overlay with opacity, flex centering)
         # We start hidden: display: none
-        self._class = "fixed inset-0 z-[100] flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none focus:outline-none bg-gray-900 bg-opacity-50"
-        self._style = "display: none;"
-        self._onclick = self.close_modal
+        self["class"] = "fixed inset-0 z-[100] flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none focus:outline-none bg-gray-900 bg-opacity-50"
+        self["style"] = "display: none;"
+        self["onclick"] = self.close_modal
         
         # Modal Dialog Core
         dialog = Tag.div(_class="relative w-full max-w-md p-4 md:h-auto", _onclick="event.stopPropagation()")
@@ -357,6 +357,7 @@ class MessageBox(Tag.div):
         
         # Close 'X' button in top right
         close_btn = Tag.button(_type="button", _onclick=self.close_modal, _class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center")
+        close_btn["onclick"] = self.close_modal
         close_btn <= Tag.span("✖", _class="w-5 h-5 text-xl leading-none")
         content += close_btn
         
@@ -374,17 +375,17 @@ class MessageBox(Tag.div):
         content += body
         
     def open_modal(self, event=None):
-        self._style = "display: flex;"
+        self["style"] = "display: flex;"
         
     def close_modal(self, event=None):
-        self._style = "display: none;"
+        self["style"] = "display: none;"
         if self.on_close:
             self.on_close()
 
 class Tabs(Tag.div):
     """A tabbed layout component."""
     def init(self, tabs_dict, **kwargs):
-        self._class = "w-full"
+        self["class"] = "w-full"
         self.tabs_dict = tabs_dict
         self.active_tab = list(tabs_dict.keys())[0] if tabs_dict else None
         self.render_tabs()
@@ -428,8 +429,8 @@ class Dropdown(Tag.div):
     """A floating dropdown menu component."""
     def init(self, title, items, **kwargs):
 
-        self._class = "relative inline-block text-left"
-        if "_class" in kwargs: self._class += f" {kwargs['_class']}"
+        self["class"] = "relative inline-block text-left"
+        if "_class" in kwargs: self["class"] += f" {kwargs['_class']}"
         self.is_open = False
         self.items = items
         
@@ -450,7 +451,7 @@ class Dropdown(Tag.div):
     def update_menu(self):
         self.menu.clear()
         if self.is_open:
-            self.menu._class = "absolute left-0 z-10 mt-2 w-44 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 opacity-100 scale-100"
+            self.menu["class"] = "absolute left-0 z-10 mt-2 w-44 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 opacity-100 scale-100"
             py_items = Tag.div(_class="py-1")
             for label, callback in self.items:
                 def make_cb(cb):
@@ -464,7 +465,7 @@ class Dropdown(Tag.div):
                 py_items <= Tag.div(label, _class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer", _onclick=make_cb(callback))
             self.menu <= py_items
         else:
-            self.menu._class = "absolute left-0 z-10 mt-2 w-44 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 opacity-0 scale-95 pointer-events-none"
+            self.menu["class"] = "absolute left-0 z-10 mt-2 w-44 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 opacity-0 scale-95 pointer-events-none"
 
 
 

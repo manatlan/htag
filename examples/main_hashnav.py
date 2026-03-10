@@ -5,7 +5,7 @@ import logging
 class App(Tag.App):
     def init(self):
 
-        self._onhashchange = self.on_hash
+        self["onhashchange"] = self.on_hash
 
         with Tag.div():
             Tag.a("[P1]", _href="#page1")

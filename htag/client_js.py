@@ -289,7 +289,7 @@ function htag_event(id, event_name, event) {
     if (event instanceof Event) {
         // Standard DOM Event
         var target = event.target;
-        if (target) {
+        if (target && target.tagName) {  // Ensure target is a DOM element
             // Check if the event source is a form or inside a form
             var form = (target.tagName === 'FORM') ? target : target.closest('form');
             if (form && event_name === 'submit') {

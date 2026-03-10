@@ -60,7 +60,7 @@ When creating complex UI components (like a Card or a Window), you should overri
 ```python
 class Card(Tag.div):
     def init(self, title, **kwargs):
-        self._class="card"
+        self["class"] = "card"
         self <= Tag.h2(title)
         self.body = Tag.div(_class="card-body")
         # Use Tag.div.add to bypass the overridden add method during init
@@ -95,15 +95,14 @@ htag supports both traditional "dirty-marking" and modern reactive `State`.
 - Use the `.text` property to quickly replace all text content of a tag: `self.my_label.text = "New Status"`. This completely clears existing children and replaces them with a single string.
 
 **Traditional Reactivity (HTML Attributes & Events)**:
-- **HTML Attributes**: MUST start with `_` (or use dictionary syntax) to be rendered as HTML attributes and trigger updates.
-  - **In Tag Constructors**: `Tag.div(_class="btn", _id="myid")`
-  - **Direct Assignment on `self`**: Use the underscore prefix: `self._style = "color:red"`, `self._disabled = True`.
-  - **Dictionary Assignment**: You can also use dictionary syntax for attributes, perfectly handling dashes: `self["data-test"] = 123`, `self["class"] = "btn"`.
-  - **Why?**: Assigning to `self.style` (without underscore) merely sets a private Python attribute that won't be rendered in HTML.
-  - Correct: `_class="btn"`, `_src="image.png"`, `self["data-value"] = 5`
-  - Incorrect: `class="btn"`, `src="image.png"`
-- **Events**: Properties starting with `_on` (or dictionary keys starting with `on`) are mapped to Python callbacks.
-  - Example: `self._onclick = my_func` or `self["onclick"] = my_func`
+- **HTML Attributes**: 
+  - **In Tag Constructors**: Use underscore prefix for keyword arguments: `Tag.div(_class="btn", _id="myid")`. This is only for the constructor.
+  - **Direct Management on `self`**: ALWAYS use dictionary syntax. This handles attributes with dashes perfectly and is the modern standard: `self["style"] = "color:red"`, `self["disabled"] = True`, `self["data-test"] = 123`.
+  - **Why?**: Assigning to `self.style` (without underscore or brackets) merely sets a private Python attribute that won't be rendered in HTML.
+  - Correct: `_class="btn"` (in init), `self["class"] = "btn"`.
+  - Incorrect: `class="btn"`, `self._class = "btn"` (deprecated).
+- **Events**: Properties set via dictionary keys starting with `on` are mapped to Python callbacks.
+  - Example: `self["onclick"] = my_func`
 
 **CSS Class Helpers**:
 - `tag.add_class("active")` — adds a class if not already present
@@ -130,7 +129,7 @@ htag supports setting custom HTML IDs via `_id="myid"`.
 ### 5. Forms & Inputs
 htag automatically binds input events to Python.
 - For text/number inputs, the current value is accessed safely via event handlers: `val = event.value`
-- For checkboxes/toggles, the framework synchronizes the boolean state. Access it safely using `getattr(self.checkbox, "_value", False)`. Do not use `.value` directly on a checkbox component as it will raise an `AttributeError`.
+- For input elements, the current value is synchronized to the `value` attribute. Access it safely using `self.checkbox["value"]` (or `getattr(self.checkbox, "value", False)` for boolean state).
 
 **Form Submission**:
 When using a `Tag.form`, the `submit` event (e.g. `_onsubmit`) receives an `Event` object where `e.value` is a dictionary containing all named form fields (`_name="fieldname"`).
@@ -142,7 +141,7 @@ class MySearch(Tag.form):
     def init(self, term=""):
         self <= Tag.input(_name="q", _value=term)
         self <= Tag.input(_type="submit", _value="Search")
-        self._onsubmit = self.do_search
+        self["onsubmit"] = self.do_search
 
     @prevent
     def do_search(self, e):
@@ -253,13 +252,13 @@ Use CSS keyframes for entry animations (e.g., sliding up or fading in) and disti
 
 htag supports "simple events" where the `htag_event` function can be used to pass primitive values (strings, numbers) or custom objects from JavaScript to Python, bypassing the standard DOM Event extraction.
 
-**`_onhashchange` support**:
-The framework automatically handles the `hashchange` event. When `self._onhashchange` is set, the Python callback receives an `event` object with `newURL` and `oldURL` attributes.
+**`onhashchange` support**:
+The framework automatically handles the `hashchange` event. When `self["onhashchange"]` is set, the Python callback receives an `event` object with `newURL` and `oldURL` attributes.
 
 ```python
 class App(Tag.App):
     def init(self):
-        self._onhashchange = self.on_hash
+        self["onhashchange"] = self.on_hash
         
     def on_hash(self, e):
         # e.newURL and e.oldURL are available
@@ -271,7 +270,7 @@ You can trigger custom events from JavaScript with any data:
 
 ```python
 # In Python
-tag._oncustom = lambda e: print(f"Received: {e.value}")
+tag["oncustom"] = lambda e: print(f"Received: {e.value}")
 
 # In JavaScript (via call_js or statics)
 htag_event('tag_id', 'custom', 'any string or number')
@@ -309,11 +308,11 @@ class MyCard(Tag.div):
 
 The generated CSS will be `.htag-MyCard .title { ... }` — no style leaking. The scoped `<style>` is injected once per class, even with multiple instances. Supports `@media` queries, `@keyframes`, pseudo-selectors (`:hover`, `::before`), and comma-separated selectors.
 
-> **Note**: `styles` is **declarative** (class-level, processed once at init). For **dynamic** styling during interactions, use `_style`, `_class`, or class helpers:
+> **Note**: `styles` is **declarative** (class-level, processed once at init). For **dynamic** styling during interactions, use dictionary syntax or class helpers:
 > ```python
-> self._style = "color: red;"              # inline style
+> self["style"] = "color: red;"              # inline style
 > self.toggle_class("active")              # toggle CSS class
-> Tag.div(_class=lambda: "on" if s else "off")  # reactive
+> Tag.div(_class=lambda: "on" if s else "off")  # reactive (init)
 > ```
 
 ### Global Statics (`Tag.statics`)
