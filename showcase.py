@@ -1,4 +1,4 @@
-from htag import Tag, ChromeApp, State, prevent, stop
+from htag import Tag, ChromeApp, State, WebApp, prevent, stop
 import logging
 import time
 import asyncio

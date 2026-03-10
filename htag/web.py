@@ -59,6 +59,7 @@ class WebApp:
         port: int = 8000,
         open_browser: bool = True,
         exit_on_disconnect: bool = True,
+        reload: bool = False,
         **kwargs: Any,
     ) -> None:
         """
@@ -67,6 +68,18 @@ class WebApp:
         import uvicorn
 
         self.exit_on_disconnect = exit_on_disconnect
+
+        if reload:
+            # Tag the app so the frontend knows to auto-reconnect
+            if inspect.isclass(self.tag_entity):
+                self.tag_entity._reload = True
+            else:
+                setattr(self.tag_entity, "_reload", True)
+
+            if os.environ.get("HTAG_RELOADER") != "1":
+                from .runner import Reloader
+                Reloader.run_with_reloader()
+                return
 
         if open_browser:
 

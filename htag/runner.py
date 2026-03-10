@@ -24,6 +24,82 @@ from .client_js import CLIENT_JS
 logger = logging.getLogger("htag")
 
 
+class Reloader:
+    """
+    Watches for .py file changes in the current directory and restarts the process.
+    Used by ChromeApp and WebApp when reload=True.
+    """
+
+    @staticmethod
+    def get_mtimes() -> dict[str, float]:
+        import stat
+
+        mtimes = {}
+        for root, _, files in os.walk("."):
+            for file in files:
+                if file.endswith(".py"):
+                    path = os.path.join(root, file)
+                    try:
+                        mtimes[path] = os.stat(path)[stat.ST_MTIME]
+                    except OSError:
+                        continue
+        return mtimes
+
+    @classmethod
+    def run_with_reloader(cls) -> None:
+        import signal
+        import subprocess
+        import sys
+        import time
+
+        env = os.environ.copy()
+        env["HTAG_RELOADER"] = "1"
+        cmd = [sys.executable] + sys.argv
+
+        while True:
+            logger.info("Starting htag worker process (RELOADER ACTIVE)...")
+            process = subprocess.Popen(cmd, env=env)
+            last_mtimes = cls.get_mtimes()
+
+            try:
+                while process.poll() is None:
+                    time.sleep(0.5)
+                    current_mtimes = cls.get_mtimes()
+                    changed = False
+                    for path, mtime in current_mtimes.items():
+                        if path not in last_mtimes or mtime > last_mtimes[path]:
+                            logger.warning(
+                                "** Code changed (%s), restarting server... **",
+                                path,
+                            )
+                            changed = True
+                            break
+
+                    if changed:
+                        process.terminate()
+                        try:
+                            process.wait(timeout=2)
+                        except subprocess.TimeoutExpired:
+                            process.kill()
+                        break
+            except KeyboardInterrupt:
+                if process.poll() is None:
+                    process.terminate()
+                break
+
+            if process.returncode is not None and process.returncode not in (
+                0,
+                signal.SIGTERM,
+                -signal.SIGTERM,
+            ):
+                # Only restart if it was a clean exit or a termination (which we triggered)
+                # If it crashed with an error, we still want to watch and restart when code changes
+                # but we add a small delay to avoid hammering the CPU if it's a permanent crash
+                time.sleep(1)
+            elif process.returncode == 0:
+                break
+
+
 class Event:
     """
     Simulates a DOM Event.
