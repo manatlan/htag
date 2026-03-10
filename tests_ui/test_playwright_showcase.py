@@ -8,7 +8,7 @@ import re
 
 from playwright.sync_api import Page, expect
 
-# Ensure root directory is in sys.path so we can import 'test.py'
+# Ensure root directory is in sys.path so we can import 'showcase.py'
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 def get_free_port():
@@ -19,7 +19,7 @@ def get_free_port():
     return port
 
 def run_server(port):
-    from test import Showcase
+    from showcase import Showcase
     from htag.server import WebApp
     
     # Run the Showcase app via WebApp runner on a free port
