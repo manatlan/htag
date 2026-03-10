@@ -568,21 +568,13 @@ class GTag:  # aka "Generic Tag"
             super().__setattr__(name, value)
         elif name.startswith("_on") and (callable(value) or isinstance(value, str)):
             # Event (e.g., self._onclick = my_callback or self._onclick = "alert(1)")
-            logger.warning(
-                "DEPRECATION: Setting events via underscore prefix ('%s') is deprecated. Use 'self[\"%s\"] = ...' instead.",
-                name,
-                name[1:],
-            )
+            print(f"DEPRECATION: Setting events via underscore prefix ('{name}') is deprecated. Use 'self[\"{name[1:]}\"] = ...' instead.")
             with self.__lock:
                 self.__events[name[3:]] = value
                 self.__dirty = True
         elif name.startswith("_"):
             # HTML attribute (e.g., self._class = "foo")
-            logger.warning(
-                "DEPRECATION: Setting HTML attributes via underscore prefix ('%s') is deprecated. Use 'self[\"%s\"] = ...' instead.",
-                name,
-                name[1:].replace("_", "-"),
-            )
+            print(f"DEPRECATION: Setting HTML attributes via underscore prefix ('{name}') is deprecated. Use 'self[\"{name[1:].replace('_', '-')}\"] = ...' instead.")
             attr_name = name[1:].replace("_", "-")
             with self.__lock:
                 self.__attrs[attr_name] = value
@@ -599,11 +591,7 @@ class GTag:  # aka "Generic Tag"
                 event_name = name[3:]
                 events = super().__getattribute__("_GTag__events")
                 if event_name in events:
-                    logger.warning(
-                        "DEPRECATION: Accessing events via underscore prefix ('%s') is deprecated. Use 'self[\"%s\"]' instead.",
-                        name,
-                        name[1:],
-                    )
+                    print(f"DEPRECATION: Accessing events via underscore prefix ('{name}') is deprecated. Use 'self[\"{name[1:]}\"]' instead.")
                     return events[event_name]
             else:
                 try:
@@ -611,11 +599,7 @@ class GTag:  # aka "Generic Tag"
                     attrs = super().__getattribute__("_GTag__attrs")
                     attr_name = name[1:].replace("_", "-")
                     if attr_name in attrs:
-                        logger.warning(
-                            "DEPRECATION: Accessing HTML attributes via underscore prefix ('%s') is deprecated. Use 'self[\"%s\"]' instead.",
-                            name,
-                            attr_name,
-                        )
+                        print(f"DEPRECATION: Accessing HTML attributes via underscore prefix ('{name}') is deprecated. Use 'self[\"{attr_name}\"]' instead.")
                         return attrs[attr_name]
                 except AttributeError:
                     pass
