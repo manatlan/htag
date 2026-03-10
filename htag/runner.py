@@ -84,6 +84,7 @@ class AppRunner(BaseApp):
             body_html = self.render_initial()
         except Exception as e:
             error_trace = traceback.format_exc()
+            print(error_trace)
             logger.error("Error during initial render: %s\n%s", e, error_trace)
             if self.debug:
                 safe_trace = error_trace.replace("`", "\\`").replace("$", "\\$")
@@ -335,6 +336,7 @@ class AppRunner(BaseApp):
                     error_msg: str = (
                         f"Error in {event_name} callback: {str(e)}\n{error_trace}"
                     )
+                    print(error_msg)
                     logger.error(error_msg)
                     # Use broadcast-like update for error reporting
                     err_payload: str = _obf_dumps(
@@ -382,6 +384,7 @@ class AppRunner(BaseApp):
             error_msg = (
                 f"Error during render/update collection: {str(e)}\n{error_trace}"
             )
+            print(error_msg)
             logger.error(error_msg)
 
             err_payload = _obf_dumps(

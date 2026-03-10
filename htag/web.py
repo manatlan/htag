@@ -7,6 +7,7 @@ import sys
 import threading
 import uuid
 import inspect
+import traceback
 from typing import Any, Callable
 
 from starlette.applications import Starlette
@@ -207,7 +208,9 @@ class WebApp:
                 asyncio.create_task(instance.handle_event(msg, None))
                 return JSONResponse({"status": "ok"})
             except Exception as e:
-                logger.error("POST event error: %s", e)
+                error_trace = traceback.format_exc()
+                print(error_trace)
+                logger.error("POST event error: %s\n%s", e, error_trace)
                 return Response(status_code=500, content=str(e))
             finally:
                 current_request.reset(token)
