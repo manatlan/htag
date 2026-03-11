@@ -61,3 +61,22 @@ def test_webapp_parano_mode():
     assert resp_post.status_code == 200
     assert resp_post.json() == {"status": "ok"}
 
+def test_webapp_csrf_failure():
+    app_host = WebApp(MyApp)
+    client = TestClient(app_host.app)
+    
+    # Get session
+    response = client.get("/")
+    cookies = response.cookies
+    
+    # Try to POST without X-HTAG-TOKEN
+    payload = {"id": "b1", "event": "click"}
+    resp = client.post("/event", json=payload, cookies=cookies)
+    assert resp.status_code == 403
+    assert "CSRF Token mismatch" in resp.text
+    
+    # Try with WRONG token
+    headers = {"X-HTAG-TOKEN": "wrong_token"}
+    resp = client.post("/event", json=payload, cookies=cookies, headers=headers)
+    assert resp.status_code == 403
+

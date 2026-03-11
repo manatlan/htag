@@ -154,6 +154,23 @@ async def test_app_handle_event_error():
     assert data["callback_id"] == "error1"
 
 @pytest.mark.asyncio
+async def test_app_handle_event_error_stdout(capsys):
+    app = App()
+    def fail(e):
+        raise ValueError("stdout boom")
+    
+    btn = Tag.button(_onclick=fail)
+    app += btn
+    
+    ws = AsyncMock()
+    msg = {"id": btn.id, "event": "click", "data": {}}
+    
+    await app.handle_event(msg, ws)
+    
+    captured = capsys.readouterr()
+    assert "ValueError: stdout boom" in captured.out
+
+@pytest.mark.asyncio
 async def test_app_handle_event_async_error():
     app = App()
     async def async_fail(e):
