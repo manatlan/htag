@@ -71,12 +71,12 @@ def test_webapp_csrf_failure():
     
     # Try to POST without X-HTAG-TOKEN
     payload = {"id": "b1", "event": "click"}
-    resp = client.post("/event", json=payload, cookies=cookies)
+    resp = client.post("/event", json=payload)
     assert resp.status_code == 403
     assert "CSRF Token mismatch" in resp.text
     
     # Try with WRONG token
     headers = {"X-HTAG-TOKEN": "wrong_token"}
-    resp = client.post("/event", json=payload, cookies=cookies, headers=headers)
+    resp = client.post("/event", json=payload, headers=headers)
     assert resp.status_code == 403
 

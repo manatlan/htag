@@ -42,7 +42,7 @@ async def test_app_handle_simple_event():
     # We simulate a tag that has a custom event handler
     class MyTag(Tag.div):
         def init(self):
-            self._oncustom = my_cb
+            self["oncustom"] = my_cb
             
     tag = MyTag()
     app += tag
@@ -66,7 +66,7 @@ async def test_app_handle_hashchange_event():
         shared["new"] = e.newURL
         shared["old"] = e.oldURL
         
-    app._onhashchange = on_hash
+    app["onhashchange"] = on_hash
     
     ws = AsyncMock()
     msg = {
@@ -129,7 +129,7 @@ async def test_app_handle_form_event():
         
     class MyForm(Tag.form):
         def init(self):
-            self._onsubmit = on_submit
+            self["onsubmit"] = on_submit
             
     tag = MyForm()
     app += tag

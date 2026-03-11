@@ -23,6 +23,8 @@ class MyComponent(Tag.div):
 
 Any non-prefixed keyword argument (not starting with `_` or `_on`) passed during component instantiation is automatically assigned as an instance attribute *before* the `init()` hook is called.
 
+**Important**: Post-instantiation, you MUST use dictionary syntax (e.g., `self["class"] = "foo"`) to set HTML attributes instead of the legacy `self._class = "foo"`.
+
 ```python
 class MyTag(Tag.div):
     def init(self, **kwargs):

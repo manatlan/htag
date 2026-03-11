@@ -549,63 +549,6 @@ class GTag:  # aka "Generic Tag"
     def __le__(self, other: Any) -> "GTag":
         return self.add(other)
 
-    def __setattr__(self, name: str, value: Any) -> None:
-        """
-        Magic attribute handling:
-        - Internal attributes (starting with _ and containing __) are set normally.
-        - Public names (not starting with _) are set normally.
-        - Attributes starting with '_' (HTML-mapped) are treated as HTML attributes.
-        - Attributes starting with '_on' are treated as event callbacks.
-        - Setting an HTML attribute or event marks the tag as 'dirty' for client-side update.
-        """
-        if (name.startswith("_") and "__" in name) or name in (
-            "childs",
-            "parent",
-            "tag",
-            "id",
-            "_reload",
-            "_browser_cleanup",
-        ):
-            super().__setattr__(name, value)
-        elif name.startswith("_on") and (callable(value) or isinstance(value, str)):
-            # Event (e.g., self._onclick = my_callback or self._onclick = "alert(1)")
-            print(f"DEPRECATION: Setting events via underscore prefix ('{name}') is deprecated. Use 'self[\"{name[1:]}\"] = ...' instead.")
-            with self.__lock:
-                self.__events[name[3:]] = value
-                self.__dirty = True
-        elif name.startswith("_"):
-            # HTML attribute (e.g., self._class = "foo")
-            print(f"DEPRECATION: Setting HTML attributes via underscore prefix ('{name}') is deprecated. Use 'self[\"{name[1:].replace('_', '-')}\"] = ...' instead.")
-            attr_name = name[1:].replace("_", "-")
-            with self.__lock:
-                self.__attrs[attr_name] = value
-                self.__dirty = True
-        else:
-            # Regular Python attribute
-            super().__setattr__(name, value)
-
-    def __getattr__(self, name: str) -> Any:
-        if name in ("_reload", "_browser_cleanup"):
-            return super().__getattribute__(name)
-        if name.startswith("_") and "__" not in name:
-            if name.startswith("_on"):
-                event_name = name[3:]
-                events = super().__getattribute__("_GTag__events")
-                if event_name in events:
-                    print(f"DEPRECATION: Accessing events via underscore prefix ('{name}') is deprecated. Use 'self[\"{name[1:]}\"]' instead.")
-                    return events[event_name]
-            else:
-                try:
-                    # Use super().__getattribute__ to avoid recursion loop with __getattr__
-                    attrs = super().__getattribute__("_GTag__attrs")
-                    attr_name = name[1:].replace("_", "-")
-                    if attr_name in attrs:
-                        print(f"DEPRECATION: Accessing HTML attributes via underscore prefix ('{name}') is deprecated. Use 'self[\"{attr_name}\"]' instead.")
-                        return attrs[attr_name]
-                except AttributeError:
-                    pass
-        return super().__getattribute__(name)
-
     def __getitem__(self, name: str) -> Any:
         if isinstance(name, str):
             if name.startswith("on") and name[2:] in self.__events:

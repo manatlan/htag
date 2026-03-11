@@ -286,7 +286,7 @@ async def test_app_handle_event_value_sync():
     ws = AsyncMock()
     msg = {"id": inp.id, "event": "input", "data": {"value": "new"}}
     await app.handle_event(msg, ws)
-    assert inp._value == "new"
+    assert inp["value"] == "new"
 
 @pytest.mark.asyncio
 async def test_app_handle_event_async_generator():
