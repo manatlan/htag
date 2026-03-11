@@ -406,7 +406,7 @@ class AppRunner(BaseApp):
                         res = True  # Convert to a simple truthy value
 
                     # Final broadcast after callback finishes, including the result if any
-                    await self.broadcast_updates(result=res, callback_id=callback_id)
+                    await self.broadcast_updates(result=res, callback_id=callback_id, ws=ws)
                 except Exception as e:
                     error_trace: str = traceback.format_exc()
                     error_msg: str = (
@@ -439,11 +439,19 @@ class AppRunner(BaseApp):
 
                     return
             else:
-                res = None
-                await self.broadcast_updates(result=res, callback_id=callback_id)
+                await self.broadcast_updates(result=None, callback_id=callback_id, ws=ws)
+        else:
+            # tag not found (or missing tag_id)
+            # if we have a callback_id, we MUST respond to resolve the client-side promise
+            data = msg.get("data", {})
+            callback_id = (
+                data.get("callback_id") if isinstance(data, dict) else None
+            )
+            if callback_id:
+                await self.broadcast_updates(result=None, callback_id=callback_id, ws=ws)
 
     async def broadcast_updates(
-        self, result: Any = None, callback_id: str | None = None
+        self, result: Any = None, callback_id: str | None = None, ws: WebSocket | None = None
     ) -> None:
         """
         Collects all pending updates (tags, JS calls, statics)
@@ -475,7 +483,7 @@ class AppRunner(BaseApp):
 
             # Send to websocket clients
             dead_ws: list[WebSocket] = []
-            for client in list(self.websockets):
+            for client in list(self.websockets) + ([ws] if ws and ws not in self.websockets else []):
                 try:
                     await client.send_text(err_payload)
                 except Exception:
@@ -517,7 +525,7 @@ class AppRunner(BaseApp):
 
             # Send to websocket clients
             dead_ws_clients: list[WebSocket] = []
-            for client in list(self.websockets):
+            for client in list(self.websockets) + ([ws] if ws and ws not in self.websockets else []):
                 try:
                     await client.send_text(payload)
                 except Exception:

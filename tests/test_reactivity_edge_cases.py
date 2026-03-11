@@ -89,7 +89,7 @@ async def test_generator_event_handler():
     app = MyApp()
     # We need to mock broadcast_updates to avoid network calls
     broadcasts = []
-    async def mock_broadcast(result=None, callback_id=None):
+    async def mock_broadcast(result=None, callback_id=None, **kwargs):
         broadcasts.append((result, callback_id))
     app.broadcast_updates = mock_broadcast
     
@@ -122,7 +122,7 @@ async def test_async_generator_event_handler():
 
     app = MyApp()
     broadcasts = []
-    async def mock_broadcast(result=None, callback_id=None):
+    async def mock_broadcast(result=None, callback_id=None, **kwargs):
         broadcasts.append((result, callback_id))
     app.broadcast_updates = mock_broadcast
     

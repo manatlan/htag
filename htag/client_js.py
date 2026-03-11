@@ -5,17 +5,16 @@ var use_fallback = false;
 var sse;
 var _base_path = window.location.pathname.endsWith("/") ? window.location.pathname : window.location.pathname + "/";
 window._htag_callbacks = {}; // Store promise resolvers
-var _interacting = 0;
-function _inc_interacting() {
-    _interacting++;
-    document.body.classList.add("interacting");
-}
-function _dec_interacting() {
-    _interacting--;
-    if(_interacting <= 0) {
-        _interacting = 0;
+function _sync_interacting() {
+    if(Object.keys(window._htag_callbacks).length > 0) {
+        document.body.classList.add("interacting");
+    } else {
         document.body.classList.remove("interacting");
     }
+}
+function _dec_interacting(callback_id) {
+    if(callback_id) delete window._htag_callbacks[callback_id];
+    _sync_interacting();
 }
 
 // --- htag-error Web Component (Shadow DOM for style isolation) ---
@@ -215,15 +214,15 @@ function handle_payload(data) {
     }
     // Resolve promise if a result is returned for a callback (even for errors)
     if(data.callback_id && window._htag_callbacks[data.callback_id]) {
-        _dec_interacting();
-        window._htag_callbacks[data.callback_id](data.result);
-        delete window._htag_callbacks[data.callback_id];
+        var resolve = window._htag_callbacks[data.callback_id];
+        _dec_interacting(data.callback_id);
+        resolve(data.result);
     }
 }
 
 function fallback() {
-    _interacting = 0;
-    document.body.classList.remove("interacting");
+    window._htag_callbacks = {};
+    _sync_interacting();
     if (use_fallback) return; 
     use_fallback = true;
     if(ws) ws.close(); // Ensure ws is torn down
@@ -286,13 +285,13 @@ window.htag_transport = window.htag_transport || function(payload) {
         }).then(response => {
 
             if (!response.ok) {
-                _dec_interacting();
+                _dec_interacting(payload.data.callback_id);
                 if(_error_overlay && typeof _error_overlay.show === 'function') {
                     _error_overlay.show("HTTP Error", `Server returned status: ${response.status}`);
                 }
             }
         }).catch(err => {
-            _dec_interacting();
+            _dec_interacting(payload.data.callback_id);
             console.error("htag event POST error:", err);
             if(_error_overlay && typeof _error_overlay.show === 'function') {
                 _error_overlay.show("Network Error", "Could not reach server to trigger event.");
@@ -343,11 +342,11 @@ function htag_event(id, event_name, event) {
     }
 
     var payload = {id: id, event: event_name, data: data};
-    _inc_interacting();
-    window.htag_transport(payload);
 
     return new Promise(resolve => {
         window._htag_callbacks[callback_id] = resolve;
+        _sync_interacting();
+        window.htag_transport(payload);
     });
 }
 """
