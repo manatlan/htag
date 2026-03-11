@@ -17,6 +17,7 @@ Every UI element in htag is a component created via `Tag`.
 - Use the `.root` property to get a reference to the main `Tag.App` instance (useful for triggering app-level events or modals).
 - Use `.parent` to access the parent component, and `.childs` to access the list of child components.
 - Use `Tag.add(self, child)` or `Tag.add(lambda: ...)` for explicit addition. This is particularly useful when returning components from reactive lambdas, as it ensures they are properly parented even if they're not direct children.
+- Use `self.clear(*content)` to remove all children and optionally add new content in one call.
 
 **XSS Protection**: All strings added as children (e.g. `Tag.div("hello")`) are automatically HTML-escaped to prevent XSS (except for `style` and `script` tags).
 

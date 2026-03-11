@@ -40,6 +40,15 @@ def test_gtag_clear():
     assert len(t.childs) == 0
     assert t._GTag__dirty is True
 
+    # Test clear with arguments
+    t.add("one", "two")
+    t._GTag__dirty = False
+    t.clear("three", Tag.span("four"))
+    assert len(t.childs) == 2
+    assert t.childs[0] == "three"
+    assert t.childs[1].tag == "span"
+    assert t._GTag__dirty is True
+
 def test_gtag_attr_magic():
     t = Tag.div(_class="foo", _data_id="123")
     assert t._class == "foo"
@@ -640,3 +649,140 @@ def test_state_repr_str():
     s2 = State("hello")
     assert str(s2) == "hello"
     assert repr(s2) == "'hello'"
+
+def test_state_inplace_operators():
+    s = State(10)
+    s += 5; assert s.value == 15
+    s -= 5; assert s.value == 10
+    s *= 2; assert s.value == 20
+    s /= 2; assert s.value == 10.0
+    s //= 3; assert s.value == 3.0
+    s %= 2; assert s.value == 1.0
+    s **= 2; assert s.value == 1.0
+    
+    s = State(1)
+    s <<= 1; assert s.value == 2
+    s >>= 1; assert s.value == 1
+    s &= 1; assert s.value == 1
+    s ^= 0; assert s.value == 1
+    s |= 2; assert s.value == 3
+
+def test_state_fallback_setattr():
+    class Dummy: pass
+    d = Dummy()
+    s = State(d)
+    s.foo = "bar"
+    assert d.foo == "bar"
+    
+    # Coverage for line 73: AttributeError fallback
+    s2 = State(42) # int doesn't have __dict__ generally
+    s2.not_an_attr = "val"
+    assert s2.not_an_attr == "val"
+
+def test_state_proxy_advanced():
+    s = State([1, 2])
+    proxy = s[0] # Not actually a proxy for an int, it wraps the container
+    
+    # Test with a dict
+    s = State({"a": 1})
+    proxy = s._wrap(s.value)
+    
+    # getattr / setattr / delattr on proxy
+    class Obj:
+        def method(self): return 42
+    o = Obj()
+    s_obj = State(o)
+    proxy_obj = s_obj._wrap(o)
+    assert proxy_obj.method() == 42
+    
+    proxy_obj.x = 10
+    assert o.x == 10
+    del proxy_obj.x
+    assert not hasattr(o, "x")
+    
+    # __delitem__ / __len__ / __iter__ / __contains__
+    s_list = State([10, 20])
+    p_list = s_list._wrap(s_list.value)
+    del p_list[0]
+    assert p_list() == [20]
+    assert len(p_list) == 1
+    assert list(iter(p_list)) == [20]
+    assert 20 in p_list
+    
+    # operators
+    assert p_list == [20]
+    assert p_list < [30]
+    assert p_list + [30] == [20, 30]
+    
+    # __call__ observer reg
+    t = Tag.div()
+    from htag.core import _ctx
+    _ctx.current_eval = t
+    p_list()
+    assert t in s_list._observers
+    _ctx.current_eval = None
+
+def test_gtag_edge_cases():
+    # Tag(None) -> fragment
+    t = GTag(None, "content")
+    assert t.tag is None
+    assert str(t) == "content"
+    
+    # statics as single object + styles to trigger list conversion in __init__
+    class StaticTag(GTag):
+        statics = Tag.style(".foo{}")
+        styles = ".bar {color:red}"
+    st = StaticTag()
+    # Now statics is the list [original_static, scoped_static]
+    all_statics = getattr(StaticTag, "statics")
+    assert isinstance(all_statics, list)
+    assert any(".foo{}" in str(s) for s in all_statics)
+    
+    # add(None)
+    t.add(None)
+    assert len(t.childs) == 1 # still just "content"
+    
+    # __getattr__ missing
+    try:
+        t.non_existent
+    except AttributeError:
+        pass
+    
+    # __getitem__ TypeError
+    try:
+        t[0]
+    except TypeError:
+        pass
+
+    # __delitem__ KeyError
+    try:
+        del t["missing"]
+    except KeyError:
+        pass
+
+def test_gtag_reactive_lifecycle():
+    # Test that components inside lambdas trigger lifecycle
+    c = Tag.span()
+    mounted = False
+    def on_m(): nonlocal mounted; mounted = True
+    c.on_mount = on_m
+    
+    app = Tag.App()
+    t = Tag.div(lambda: c)
+    app.add(t)
+    
+    # Trigger render
+    str(app)
+    assert c.root is app
+    assert mounted is True
+
+def test_gtag_reactive_list_none():
+    t = Tag.div(lambda: [Tag.b("1"), Tag.i("2")])
+    rendered = str(t)
+    assert "<b" in rendered
+    assert ">1</b>" in rendered
+    assert "<i" in rendered
+    assert ">2</i>" in rendered
+    
+    t2 = Tag.div(lambda: None)
+    assert str(t2).strip().endswith("></div>")

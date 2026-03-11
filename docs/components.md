@@ -62,7 +62,7 @@ class Clock(Tag.div):
 - `self <= content`: An elegant shorthand for `self.add(content)`.
 - `self.remove(child)`: Removes a child component or string.
 - `self.remove()`: Removes the component itself from its parent (equivalent to the old `remove_self()`).
-- `self.clear()`: Removes all children.
+- `self.clear(*content)`: Removes all children and optionally adds new content.
 - `self.root`: Returns the `Tag.App` instance this component belongs to (or `None` if unattached).
 - `self.parent`: Returns the parent `GTag` instance (or `None` if unattached).
 - `self.childs`: A list of the component's children (strings or other `GTag` instances).

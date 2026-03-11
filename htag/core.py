@@ -338,6 +338,7 @@ class GTag:  # aka "Generic Tag"
     _alt: str
     _title: str
     _tabindex: int | str
+    __iter__ = None  # Prevent iteration via __getitem__ fallback
 
     # --- Common Events (Type hints for IDE autocompletion) ---
     _onclick: Callable | str
@@ -477,8 +478,8 @@ class GTag:  # aka "Generic Tag"
                 # We use GTag directly to create the style (GTag is already in scope)
                 style_tag = GTag("style", scoped_css)
                 existing_statics = getattr(cls, "statics", [])
-                if not isinstance(existing_statics, list):
-                    existing_statics = []
+                if not isinstance(existing_statics, (list, tuple)):
+                    existing_statics = [existing_statics]
                 setattr(cls, "statics", list(existing_statics) + [style_tag])
                 setattr(cls, "_scoped_static", True)
 
@@ -606,12 +607,14 @@ class GTag:  # aka "Generic Tag"
         return super().__getattribute__(name)
 
     def __getitem__(self, name: str) -> Any:
-        if name.startswith("on") and name[2:] in self.__events:
-            return self.__events[name[2:]]
-        return self.__attrs[name]
+        if isinstance(name, str):
+            if name.startswith("on") and name[2:] in self.__events:
+                return self.__events[name[2:]]
+            return self.__attrs[name]
+        raise TypeError(f"GTag indices must be strings, not {type(name).__name__}")
 
     def __setitem__(self, name: str, value: Any) -> None:
-        if name.startswith("on") and (callable(value) or isinstance(value, str)):
+        if isinstance(name, str) and name.startswith("on") and (callable(value) or isinstance(value, str)):
             with self.__lock:
                 self.__events[name[2:]] = value
                 self.__dirty = True
@@ -621,7 +624,7 @@ class GTag:  # aka "Generic Tag"
                 self.__dirty = True
 
     def __delitem__(self, name: str) -> None:
-        if name.startswith("on") and name[2:] in self.__events:
+        if isinstance(name, str) and name.startswith("on") and name[2:] in self.__events:
             with self.__lock:
                 del self.__events[name[2:]]
                 self.__dirty = True
@@ -694,7 +697,7 @@ class GTag:  # aka "Generic Tag"
         self.clear()
         self.add(str(value))
 
-    def clear(self) -> "GTag":
+    def clear(self, *content: Any) -> "GTag":
         with self.__lock:
             for child in self.childs:
                 if isinstance(child, GTag):
@@ -704,6 +707,9 @@ class GTag:  # aka "Generic Tag"
             self.childs = []
             self.__rendered_callables.clear()
             self.__dirty = True
+
+            if content:
+                self.add(*content)
         return self
 
     def _update_classes(self, fn: Callable[[list[str]], None]) -> "GTag":
@@ -786,6 +792,8 @@ class GTag:  # aka "Generic Tag"
             def collect(item: Any) -> None:
                 if isinstance(item, GTag):
                     item.parent = self
+                    if self.root is not None:
+                        item._trigger_mount()
                     tags.append(item)
                 elif isinstance(item, (list, tuple)):
                     for i in item:
