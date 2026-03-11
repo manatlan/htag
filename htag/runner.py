@@ -354,7 +354,7 @@ class AppRunner(BaseApp):
         self._walk_tree(tag, visitor)
 
     async def handle_event(self, msg: dict[str, Any], ws: WebSocket | None) -> None:
-        print(f"SERVERSIDE: handle_event {msg}")
+        logger.info(f"handle_event {msg}")
         tag_id: str | None = msg.get("id")
         event_name: str | None = msg.get("event")
 
