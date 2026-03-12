@@ -1,3 +1,4 @@
+import ast
 import asyncio
 import importlib
 import logging
@@ -16,16 +17,9 @@ from starlette.types import Receive, Scope, Send
 from htag import Tag
 from htag.server import WebApp
 
-# Configure logging
-logging.basicConfig(
-    format="[%(asctime)s] %(levelname)-8s %(name)-15s: %(message)s",
-    level=logging.INFO,
-    datefmt="%Y-%m-%d %H:%M:%S",
-)
+# Default configuration
 logger = logging.getLogger("pye")
-
 APP_TTL = 10 * 60  # 10 minutes
-AUTO_INDEX = False  # Set to False to disable directory index listing
 
 
 def get_app_mtime(p: Path) -> float:
@@ -65,6 +59,24 @@ def load_htag_app(mod_path: str) -> Type[Tag.App] | None:
     return None
 
 
+def looks_like_htag_app(p: Path) -> bool:
+    """Check if a file content looks like an htag application using AST."""
+    try:
+        tree = ast.parse(p.read_text(encoding="utf-8"))
+        for node in tree.body:
+            # Check for: class App(Tag.App): ...
+            if isinstance(node, ast.ClassDef) and node.name == "App":
+                return True
+            # Check for: App = MyClass
+            if isinstance(node, ast.Assign):
+                for target in node.targets:
+                    if isinstance(target, ast.Name) and target.id == "App":
+                        return True
+    except Exception:
+        pass
+    return False
+
+
 @dataclass
 class AppInfo:
     """Metadata for a discovered htag application."""
@@ -87,7 +99,6 @@ class AppDiscoverer:
         """Scan directory and return mapping of name -> AppInfo."""
         found_apps: dict[str, AppInfo] = {}
         self.logger.info(f"Scanning directory: {self.apps_dir}")
-
         def crawl(current_dir: Path, rel_root: str = "") -> None:
             for p in current_dir.iterdir():
                 if p.name == "__pycache__":
@@ -97,36 +108,33 @@ class AppDiscoverer:
 
                 if p.is_dir():
                     init_file = p / "__init__.py"
-                    if init_file.exists():
+                    if init_file.exists() and looks_like_htag_app(init_file):
                         mod_path = f"www.{rel_path.replace('/', '.')}"
-                        app_class = load_htag_app(mod_path)
-                        if app_class:
-                            self.logger.info(f"Discovered package app: {rel_path} ({mod_path})")
-                            found_apps[rel_path] = AppInfo(
-                                app=WebApp(app_class).app,
-                                file=init_file,
-                                mtime=get_app_mtime(init_file),
-                                mod_path=mod_path,
-                                last_accessed=time.time(),
-                            )
-                            continue
-                    crawl(p, rel_path)
-                elif p.is_file() and p.name.endswith(".py") and p.name != "__init__.py":
-                    app_name = rel_path[:-3]
-                    mod_path = f"www.{app_name.replace('/', '.')}"
-                    app_class = load_htag_app(mod_path)
-                    if app_class:
-                        self.logger.info(f"Discovered file app: {app_name} ({mod_path})")
-                        found_apps[app_name] = AppInfo(
-                            app=WebApp(app_class).app,
-                            file=p,
-                            mtime=get_app_mtime(p),
+                        self.logger.info(f"Discovered package app: {rel_path} ({mod_path})")
+                        found_apps[rel_path] = AppInfo(
+                            app=None,
+                            file=init_file,
+                            mtime=0.0,
                             mod_path=mod_path,
                             last_accessed=time.time(),
                         )
+                        continue
+                    crawl(p, rel_path)
+                elif p.is_file() and p.name.endswith(".py") and p.name != "__init__.py" and looks_like_htag_app(p):
+                    app_name = rel_path[:-3]
+                    mod_path = f"www.{app_name.replace('/', '.')}"
+                    self.logger.info(f"Discovered file app: {app_name} ({mod_path})")
+                    found_apps[app_name] = AppInfo(
+                        app=None,
+                        file=p,
+                        mtime=0.0,
+                        mod_path=mod_path,
+                        last_accessed=time.time(),
+                    )
 
         if self.apps_dir.exists() and self.apps_dir.is_dir():
             crawl(self.apps_dir)
+
         self.logger.info(f"Discovery complete. Found {len(found_apps)} apps.")
         return found_apps
 
@@ -226,15 +234,38 @@ class ScriptRunner:
 class DynamicHtagApps:
     """Dynamic Starlette router for htag apps, scripts, and static files."""
 
-    def __init__(self, apps_dir: str | Path):
-        self.router_logger = logger.getChild("router")
+    def __init__(self, apps_dir: str | Path, script_runner=None, auto_index=None):
+        self.router_logger = logging.getLogger("pye.router")
         self.apps_dir = Path(apps_dir).resolve()
-        parent_dir = str(self.apps_dir.parent)
-        if parent_dir not in sys.path:
-            sys.path.insert(0, parent_dir)
-
+        self.script_runner = script_runner or ScriptRunner
+        self.auto_index = auto_index
         self.discoverer = AppDiscoverer(self.apps_dir)
         self.apps = self.discoverer.discover()
+        self._last_discovery = time.time()
+
+    def _refresh_discovery(self):
+        """Refresh discovery and merge with existing apps to preserve state."""
+        now = time.time()
+        if now - self._last_discovery < 0.1:
+            return  # Throttle to max 10 times per second
+        
+        self._last_discovery = now
+        new_discovery = self.discoverer.discover()
+        
+        # 1. Update/Add apps from discovery
+        for name, info in new_discovery.items():
+            if name in self.apps:
+                # Preserve state (loaded app and last accessed time)
+                existing = self.apps[name]
+                info.app = existing.app
+                info.last_accessed = existing.last_accessed
+            self.apps[name] = info
+            
+        # 2. Remove apps no longer on disk
+        for name in list(self.apps.keys()):
+            if name not in new_discovery:
+                self.router_logger.info(f"App '{name}' removed from disk, unloading...")
+                del self.apps[name]
 
     def _unload_expired_apps(self):
         now = time.time()
@@ -271,7 +302,11 @@ class DynamicHtagApps:
         path = scope["path"]
         rel_path = path.strip("/")
         
-        # 1. Htag App?
+        # 0. Hot Discovery (if directory requested)
+        full_path = self.apps_dir / rel_path
+        if not rel_path or full_path.is_dir():
+            self._refresh_discovery()
+        
         exact_target = self.apps_dir / rel_path
         if not (exact_target.exists() and exact_target.is_file() and exact_target.name != "__init__.py"):
             for name in sorted(self.apps.keys(), key=len, reverse=True):
@@ -280,6 +315,17 @@ class DynamicHtagApps:
                     new_path = path[len("/" + name):] or "/"
                     if await self._serve_htag_app(name, info, scope, receive, send, new_path):
                         return
+            
+            # 1.1 Still htag app? (maybe a newly created .py file?)
+            if rel_path.endswith(".py") or "." not in rel_path.split("/")[-1]:
+                # Try discovery once more for new files
+                self._refresh_discovery()
+                for name in sorted(self.apps.keys(), key=len, reverse=True):
+                    if rel_path == name or rel_path.startswith(name + "/"):
+                        info = self.apps[name]
+                        new_path = path[len("/" + name):] or "/"
+                        if await self._serve_htag_app(name, info, scope, receive, send, new_path):
+                            return
 
         # 2. Directory or Index
         full_path = self.apps_dir / rel_path
@@ -293,25 +339,35 @@ class DynamicHtagApps:
             if scope["type"] == "http":
                 if rel_path and not path.endswith("/"):
                     await HTMLResponse("", status_code=301, headers={"Location": path + "/"})(scope, receive, send)
-                else:
-                    if AUTO_INDEX:
-                        self.router_logger.info(f"Serving directory index: {path}")
-                        await HTMLResponse(IndexGenerator.generate(self.apps_dir, self.apps, rel_path))(scope, receive, send)
-                    else:
-                        index_name = f"{rel_path}/index" if rel_path else "index"
-                        if index_name in self.apps:
-                            if await self._serve_htag_app(index_name, self.apps[index_name], scope, receive, send, "/"):
-                                return
+                    return
 
-                        index_file = full_path / "index.py"
-                        if index_file.is_file():
-                            self.router_logger.info(f"Running default index script: {index_file}")
-                            response = await ScriptRunner.run(index_file, scope)
-                            await response(scope, receive, send)
+                # Priority 1: index.html
+                index_html = full_path / "index.html"
+                if index_html.is_file():
+                    self.router_logger.info(f"Serving default index.html: {index_html}")
+                    await FileResponse(str(index_html))(scope, receive, send)
+                    return
+
+                if self.auto_index:
+                    self.router_logger.info(f"Serving directory index: {path}")
+                    await HTMLResponse(IndexGenerator.generate(self.apps_dir, self.apps, rel_path))(scope, receive, send)
+                else:
+                    # Priority 2: index.py (htag app)
+                    index_name = f"{rel_path}/index" if rel_path else "index"
+                    if index_name in self.apps:
+                        if await self._serve_htag_app(index_name, self.apps[index_name], scope, receive, send, "/"):
                             return
 
-                        self.router_logger.warning(f"No entrypoint found and AUTO_INDEX is False: {path}")
-                        await HTMLResponse("No default entrypoint", status_code=400)(scope, receive, send)
+                    # Priority 3: index.py (script)
+                    index_file = full_path / "index.py"
+                    if index_file.is_file():
+                        self.router_logger.info(f"Running default index script: {index_file}")
+                        response = await self.script_runner.run(index_file, scope)
+                        await response(scope, receive, send)
+                        return
+
+                    self.router_logger.warning(f"No entrypoint found : {path}")
+                    await HTMLResponse("No default entrypoint", status_code=400)(scope, receive, send)
             return
 
         # 3. Static or Script
@@ -322,7 +378,7 @@ class DynamicHtagApps:
         if full_path.is_file():
             if full_path.suffix == ".py":
                 if scope["type"] == "http":
-                    response = await ScriptRunner.run(full_path, scope)
+                    response = await self.script_runner.run(full_path, scope)
                     await response(scope, receive, send)
             elif full_path.suffix == ".pyc":
                 if scope["type"] == "http":
@@ -339,10 +395,20 @@ class DynamicHtagApps:
             await HTMLResponse("Not found", status_code=404)(scope, receive, send)
 
 
-app = DynamicHtagApps(Path(__file__).parent / "www")
-
 if __name__ == "__main__":
     import uvicorn
-    AUTO_INDEX = True  # Enable indexing for demo
+    # Configure logging for demo mode
+    logging.basicConfig(
+        format="[%(asctime)s] %(levelname)-8s %(name)-15s: %(message)s",
+        level=logging.INFO,
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+    # When run directly, we use the local 'www' folder and enable indexing
+    apps_dir = Path(__file__).parent / "www"
+    
+    # Add parent to sys.path for demo discovery
+    sys.path.insert(0, str(apps_dir.parent))
+    
+    app = DynamicHtagApps(apps_dir, auto_index=False)
     uvicorn.run(app, host="0.0.0.0", port=8000)
 
