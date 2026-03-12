@@ -409,6 +409,6 @@ if __name__ == "__main__":
     # Add parent to sys.path for demo discovery
     sys.path.insert(0, str(apps_dir.parent))
     
-    app = DynamicHtagApps(apps_dir, auto_index=False)
+    app = DynamicHtagApps(apps_dir, auto_index=True)
     uvicorn.run(app, host="0.0.0.0", port=8000)
 
