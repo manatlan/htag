@@ -66,15 +66,21 @@ def client(temp_apps_dir):
     return TestClient(app)
 
 def test_root_index(client):
-    response = client.get("/")
-    assert response.status_code == 200
-    assert "text/html" in response.headers["content-type"]
-    assert "Root Index" in response.text
-    # Check that our test files are listed
-    assert "test.txt" in response.text
-    assert "myscript.py" in response.text
-    assert "testapp" in response.text
-    assert "myfolder/" in response.text
+    import server
+    original_val = server.AUTO_INDEX
+    try:
+        server.AUTO_INDEX = True
+        response = client.get("/")
+        assert response.status_code == 200
+        assert "text/html" in response.headers["content-type"]
+        assert "Root Index" in response.text
+        # Check that our test files are listed
+        assert "test.txt" in response.text
+        assert "myscript.py" in response.text
+        assert "testapp" in response.text
+        assert "myfolder/" in response.text
+    finally:
+        server.AUTO_INDEX = original_val
 
 def test_static_file(client, temp_apps_dir):
     response = client.get("/test.txt")
@@ -197,18 +203,130 @@ def test_script_timeout(client, temp_apps_dir):
     assert "done" in response.text
 
 def test_navigation_depth(client, temp_apps_dir):
-    # Test deeper nesting and "Parent Directory" links
-    sub = temp_apps_dir / "folder" / "sub"
+    import server
+    original_val = server.AUTO_INDEX
+    try:
+        server.AUTO_INDEX = True
+        # Test deeper nesting and "Parent Directory" links
+        sub = temp_apps_dir / "folder" / "sub"
+        sub.mkdir(parents=True)
+        (sub / "file.txt").write_text("deep")
+        
+        # Check /folder/ index
+        resp1 = client.get("/folder/")
+        assert 'href="/folder/sub/"' in resp1.text
+        assert 'href="/"' in resp1.text # Parent from /folder/ is /
+        
+        # Check /folder/sub/ index
+        resp2 = client.get("/folder/sub/")
+        assert 'href="/folder/sub/file.txt"' in resp2.text
+        assert 'href="/folder/"' in resp2.text # Parent from /folder/sub/ is /folder/
+    finally:
+        server.AUTO_INDEX = original_val
+
+def test_auto_index_disabled(temp_apps_dir):
+    import server
+    # Backup original
+    original_val = server.AUTO_INDEX
+    try:
+        server.AUTO_INDEX = False
+        router = server.DynamicHtagApps(temp_apps_dir)
+        from starlette.testclient import TestClient
+        client = TestClient(router)
+        
+        response = client.get("/")
+        assert response.status_code == 400
+        assert response.text == "No default entrypoint"
+    finally:
+        server.AUTO_INDEX = original_val
+
+def test_default_index_app(client, temp_apps_dir):
+    # Create an index htag app in a folder
+    idx_dir = temp_apps_dir / "hasindex"
+    idx_dir.mkdir()
+    app_content = """from htag import Tag
+class App(Tag.App):
+    def init(self):
+        self += Tag.h1("I am the index app")
+"""
+    (idx_dir / "index.py").write_text(app_content)
+    
+    import server
+    original_val = server.AUTO_INDEX
+    try:
+        server.AUTO_INDEX = False # Must be False to trigger index check
+        router = server.DynamicHtagApps(temp_apps_dir)
+        from starlette.testclient import TestClient
+        client = TestClient(router)
+
+        response = client.get("/hasindex/")
+        assert response.status_code == 200
+        assert "I am the index app" in response.text
+    finally:
+        server.AUTO_INDEX = original_val
+
+def test_default_index_script(client, temp_apps_dir):
+    # Create an index script in a folder
+    idx_dir = temp_apps_dir / "hasidxscript"
+    idx_dir.mkdir()
+    (idx_dir / "index.py").write_text("print('I am the index script')")
+    
+    import server
+    original_val = server.AUTO_INDEX
+    try:
+        server.AUTO_INDEX = False # Must be False to trigger index check
+        router = server.DynamicHtagApps(temp_apps_dir)
+        from starlette.testclient import TestClient
+        client = TestClient(router)
+
+        response = client.get("/hasidxscript/")
+        assert response.status_code == 200
+        assert "I am the index script" in response.text
+    finally:
+        server.AUTO_INDEX = original_val
+
+def test_auto_index_enabled_ignores_index_file(client, temp_apps_dir):
+    # If AUTO_INDEX is True, it should list the directory even if index.py exists
+    idx_dir = temp_apps_dir / "index_enabled"
+    idx_dir.mkdir()
+    (idx_dir / "index.py").write_text("print('I should not run')")
+    (idx_dir / "other.txt").write_text("other")
+
+    import server
+    original_val = server.AUTO_INDEX
+    try:
+        server.AUTO_INDEX = True 
+        router = server.DynamicHtagApps(temp_apps_dir)
+        from starlette.testclient import TestClient
+        client = TestClient(router)
+
+        response = client.get("/index_enabled/")
+        assert response.status_code == 200
+        # Should be a listing
+        assert "Index of index_enabled/" in response.text
+        assert "index.py" in response.text
+        assert "other.txt" in response.text
+        assert "I should not run" not in response.text
+    finally:
+        server.AUTO_INDEX = original_val
+
+def test_auto_index_disabled_in_subfolder(client, temp_apps_dir):
+    # Verify 400 even in nested folders if AUTO_INDEX=False and no index
+    sub = temp_apps_dir / "mysub" / "deep"
     sub.mkdir(parents=True)
-    (sub / "file.txt").write_text("deep")
-    
-    # Check /folder/ index
-    resp1 = client.get("/folder/")
-    assert 'href="/folder/sub/"' in resp1.text
-    assert 'href="/"' in resp1.text # Parent from /folder/ is /
-    
-    # Check /folder/sub/ index
-    resp2 = client.get("/folder/sub/")
-    assert 'href="/folder/sub/file.txt"' in resp2.text
-    assert 'href="/folder/"' in resp2.text # Parent from /folder/sub/ is /folder/
+    (sub / "hidden.txt").write_text("secret")
+
+    import server
+    original_val = server.AUTO_INDEX
+    try:
+        server.AUTO_INDEX = False
+        router = server.DynamicHtagApps(temp_apps_dir)
+        from starlette.testclient import TestClient
+        client = TestClient(router)
+        
+        response = client.get("/mysub/deep/")
+        assert response.status_code == 400
+        assert response.text == "No default entrypoint"
+    finally:
+        server.AUTO_INDEX = original_val
 

@@ -25,6 +25,7 @@ logging.basicConfig(
 logger = logging.getLogger("pye")
 
 APP_TTL = 10 * 60  # 10 minutes
+AUTO_INDEX = False  # Set to False to disable directory index listing
 
 
 def get_app_mtime(p: Path) -> float:
@@ -242,6 +243,27 @@ class DynamicHtagApps:
                 self.router_logger.info(f"TTL expired for htag app '{name}', unloading...")
                 info.app = None
 
+    async def _serve_htag_app(self, name: str, info: AppInfo, scope: Scope, receive: Receive, send: Send, new_path: str) -> bool:
+        """Loads and serves an htag application."""
+        info.last_accessed = time.time()
+        mtime = get_app_mtime(info.file)
+        
+        if info.app is None or (scope["type"] == "http" and mtime > info.mtime):
+            action = "Reloading" if info.app else "Loading"
+            self.router_logger.info(f"{action} htag app: {name}")
+            app_class = load_htag_app(info.mod_path)
+            if app_class:
+                info.app, info.mtime = WebApp(app_class).app, mtime
+            else:
+                return False
+
+        if info.app:
+            scope["path"] = new_path
+            scope["root_path"] = scope.get("root_path", "") + "/" + name
+            await info.app(scope, receive, send)
+            return True
+        return False
+
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
         if scope["type"] not in ["http", "websocket"]: return
         if scope["type"] == "http": self._unload_expired_apps()
@@ -255,20 +277,8 @@ class DynamicHtagApps:
             for name in sorted(self.apps.keys(), key=len, reverse=True):
                 if rel_path == name or rel_path.startswith(name + "/"):
                     info = self.apps[name]
-                    info.last_accessed = time.time()
-                    mtime = get_app_mtime(info.file)
-                    
-                    if info.app is None or (scope["type"] == "http" and mtime > info.mtime):
-                        action = "Reloading" if info.app else "Loading"
-                        self.router_logger.info(f"{action} htag app: {name}")
-                        app_class = load_htag_app(info.mod_path)
-                        if app_class:
-                            info.app, info.mtime = WebApp(app_class).app, mtime
-
-                    if info.app:
-                        scope["path"] = path[len("/" + name):] or "/"
-                        scope["root_path"] = scope.get("root_path", "") + "/" + name
-                        await info.app(scope, receive, send)
+                    new_path = path[len("/" + name):] or "/"
+                    if await self._serve_htag_app(name, info, scope, receive, send, new_path):
                         return
 
         # 2. Directory or Index
@@ -284,8 +294,24 @@ class DynamicHtagApps:
                 if rel_path and not path.endswith("/"):
                     await HTMLResponse("", status_code=301, headers={"Location": path + "/"})(scope, receive, send)
                 else:
-                    self.router_logger.info(f"Serving directory index: {path}")
-                    await HTMLResponse(IndexGenerator.generate(self.apps_dir, self.apps, rel_path))(scope, receive, send)
+                    if AUTO_INDEX:
+                        self.router_logger.info(f"Serving directory index: {path}")
+                        await HTMLResponse(IndexGenerator.generate(self.apps_dir, self.apps, rel_path))(scope, receive, send)
+                    else:
+                        index_name = f"{rel_path}/index" if rel_path else "index"
+                        if index_name in self.apps:
+                            if await self._serve_htag_app(index_name, self.apps[index_name], scope, receive, send, "/"):
+                                return
+
+                        index_file = full_path / "index.py"
+                        if index_file.is_file():
+                            self.router_logger.info(f"Running default index script: {index_file}")
+                            response = await ScriptRunner.run(index_file, scope)
+                            await response(scope, receive, send)
+                            return
+
+                        self.router_logger.warning(f"No entrypoint found and AUTO_INDEX is False: {path}")
+                        await HTMLResponse("No default entrypoint", status_code=400)(scope, receive, send)
             return
 
         # 3. Static or Script
@@ -317,5 +343,6 @@ app = DynamicHtagApps(Path(__file__).parent / "www")
 
 if __name__ == "__main__":
     import uvicorn
+    AUTO_INDEX = True  # Enable indexing for demo
     uvicorn.run(app, host="0.0.0.0", port=8000)
 
