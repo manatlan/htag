@@ -10,4 +10,4 @@ class Tutu2(Tag.App):
     def do_click(self, o):
         self.msg += "tutu2 Clicked! "
 
-app=Tutu2
+App=Tutu2

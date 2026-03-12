@@ -1,13 +1,13 @@
 import asyncio
 import importlib
+import logging
 import os
 import subprocess
 import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
-
-APP_TTL = 10 * 60  # 10 minutes
+from typing import Type
 
 from starlette.applications import Starlette
 from starlette.responses import HTMLResponse, FileResponse
@@ -16,38 +16,57 @@ from starlette.types import Receive, Scope, Send
 from htag import Tag
 from htag.server import WebApp
 
+# Configure logging
+logging.basicConfig(
+    format="[%(asctime)s] %(levelname)-8s %(name)-15s: %(message)s",
+    level=logging.INFO,
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+logger = logging.getLogger("pye")
+
+APP_TTL = 10 * 60  # 10 minutes
+
 
 def get_app_mtime(p: Path) -> float:
-    """
-    Retrieve the maximum modification time for an htag application.
-
-    If the path is an '__init__.py', it recursively checks all '.py' files
-    in the parent directory to detect any changes in the app's components.
-
-    Args:
-        p (Path): The file path to check.
-
-    Returns:
-        float: The highest modification timestamp found.
-    """
+    """Retrieve the maximum modification time for an htag application."""
     if p.is_file():
         if p.name == "__init__.py":
             try:
-                return max(
+                mtime = max(
                     (f.stat().st_mtime for f in p.parent.rglob("*.py")),
                     default=p.stat().st_mtime,
                 )
+                return mtime
             except Exception:
                 pass
         return p.stat().st_mtime
     return 0.0
 
 
+def load_htag_app(mod_path: str) -> Type[Tag.App] | None:
+    """Helper to load/reload a module and extract the htag App class."""
+    try:
+        if mod_path in sys.modules:
+            mod = importlib.reload(sys.modules[mod_path])
+        else:
+            mod = importlib.import_module(mod_path)
+            
+        app_class = getattr(mod, "App", None)
+        if (
+            app_class
+            and isinstance(app_class, type)
+            and issubclass(app_class, Tag.App)
+        ):
+            return app_class
+        logger.warning(f"Module '{mod_path}' does not contain a valid 'App' class")
+    except Exception as e:
+        logger.error(f"Failed to load module '{mod_path}': {e}", exc_info=True)
+    return None
+
+
 @dataclass
 class AppInfo:
-    """
-    Data class storing metadata for a discovered htag application.
-    """
+    """Metadata for a discovered htag application."""
 
     app: Starlette | None
     file: Path
@@ -56,374 +75,247 @@ class AppInfo:
     last_accessed: float
 
 
-class DynamicHtagApps:
-    """
-    A dynamic Starlette application router that automatically discovers, serves,
-    and hot-reloads htag applications, static files, and standalone Python scripts
-    from a specified directory.
-    """
+class AppDiscoverer:
+    """Handles discovery of htag applications in a directory."""
 
-    def __init__(self, apps_dir: str | Path):
-        """
-        Initialize the DynamicHtagApps router.
+    def __init__(self, apps_dir: Path):
+        self.apps_dir = apps_dir
+        self.logger = logger.getChild("discovery")
 
-        Args:
-            apps_dir (str | Path): The root directory containing apps and files to serve.
-        """
-        self.apps_dir: Path = Path(apps_dir).resolve()
-        self.apps: dict[str, AppInfo] = {}  # name -> AppInfo
-
-        parent_dir: str = str(Path(__file__).resolve().parent)
-        if parent_dir not in sys.path:
-            sys.path.insert(0, parent_dir)
-
-        self._discover_apps()
-
-    def _discover_apps(self) -> None:
-        """
-        Scan the apps_dir to discover htag applications and cache their Starlette instances.
-
-        It looks for `.py` files containing an `app` class extending `Tag.App`, or
-        directories containing an `__init__.py` with the same.
-        """
-        self.apps.clear()
-
-        if not self.apps_dir.exists() or not self.apps_dir.is_dir():
-            return
+    def discover(self) -> dict[str, AppInfo]:
+        """Scan directory and return mapping of name -> AppInfo."""
+        found_apps: dict[str, AppInfo] = {}
+        self.logger.info(f"Scanning directory: {self.apps_dir}")
 
         def crawl(current_dir: Path, rel_root: str = "") -> None:
             for p in current_dir.iterdir():
                 if p.name == "__pycache__":
                     continue
 
-                rel_path: str = f"{rel_root}/{p.name}" if rel_root else p.name
+                rel_path = f"{rel_root}/{p.name}" if rel_root else p.name
 
                 if p.is_dir():
                     init_file = p / "__init__.py"
                     if init_file.exists():
-                        # It's an htag package
-                        mod_path: str = f"www.{rel_path.replace('/', '.')}"
-                        try:
-                            mod = (
-                                importlib.reload(sys.modules[mod_path])
-                                if mod_path in sys.modules
-                                else importlib.import_module(mod_path)
+                        mod_path = f"www.{rel_path.replace('/', '.')}"
+                        app_class = load_htag_app(mod_path)
+                        if app_class:
+                            self.logger.info(f"Discovered package app: {rel_path} ({mod_path})")
+                            found_apps[rel_path] = AppInfo(
+                                app=WebApp(app_class).app,
+                                file=init_file,
+                                mtime=get_app_mtime(init_file),
+                                mod_path=mod_path,
+                                last_accessed=time.time(),
                             )
-                            app_class = getattr(mod, "app", None)
-                            if (
-                                app_class
-                                and isinstance(app_class, type)
-                                and issubclass(app_class, Tag.App)
-                            ):
-                                wa = WebApp(app_class)
-                                self.apps[rel_path] = AppInfo(
-                                    app=wa.app,
-                                    file=init_file,
-                                    mtime=get_app_mtime(init_file),
-                                    mod_path=mod_path,
-                                    last_accessed=time.time(),
-                                )
-                                continue  # Don't descend further into an app package
-                        except Exception as e:
-                            print(f"WARNING: Discovery failed for {mod_path}: {e}")
-                            pass
-
-                    # Not a package, or package failed to load, crawl inside
+                            continue
                     crawl(p, rel_path)
+                elif p.is_file() and p.name.endswith(".py") and p.name != "__init__.py":
+                    app_name = rel_path[:-3]
+                    mod_path = f"www.{app_name.replace('/', '.')}"
+                    app_class = load_htag_app(mod_path)
+                    if app_class:
+                        self.logger.info(f"Discovered file app: {app_name} ({mod_path})")
+                        found_apps[app_name] = AppInfo(
+                            app=WebApp(app_class).app,
+                            file=p,
+                            mtime=get_app_mtime(p),
+                            mod_path=mod_path,
+                            last_accessed=time.time(),
+                        )
 
-                elif p.is_file():
-                    if p.name in ("__init__.py",) or p.name.endswith(".pyc"):
-                        continue
+        if self.apps_dir.exists() and self.apps_dir.is_dir():
+            crawl(self.apps_dir)
+        self.logger.info(f"Discovery complete. Found {len(found_apps)} apps.")
+        return found_apps
 
-                    if p.name.endswith(".py"):
-                        app_name: str = rel_path[:-3]
-                        mod_path = f"www.{app_name.replace('/', '.')}"
-                        try:
-                            mod = (
-                                importlib.reload(sys.modules[mod_path])
-                                if mod_path in sys.modules
-                                else importlib.import_module(mod_path)
-                            )
-                            app_class = getattr(mod, "app", None)
-                            if (
-                                app_class
-                                and isinstance(app_class, type)
-                                and issubclass(app_class, Tag.App)
-                            ):
-                                wa = WebApp(app_class)
-                                self.apps[app_name] = AppInfo(
-                                    app=wa.app,
-                                    file=p,
-                                    mtime=get_app_mtime(p),
-                                    mod_path=mod_path,
-                                    last_accessed=time.time(),
-                                )
-                        except Exception as e:
-                            print(f"WARNING: Discovery failed for {mod_path}: {e}")
-                            pass
 
-        crawl(self.apps_dir)
+class IndexGenerator:
+    """Generates HTML directory listings."""
 
-    def _generate_index(self, prefix: str = "") -> str:
-        """
-        Generate an HTML index of the contents of the given directory prefix.
-
-        Args:
-            prefix (str): The relative path from apps_dir to list.
-
-        Returns:
-            str: An HTML string representing the directory listing.
-        """
-        target_dir: Path = self.apps_dir / prefix
+    @staticmethod
+    def generate(apps_dir: Path, apps: dict[str, AppInfo], prefix: str = "") -> str:
+        target_dir = apps_dir / prefix
         if not target_dir.is_dir():
             return ""
 
-        folders: list[str] = []
-        apps: list[str] = []
-        scripts: list[str] = []
-        statics: list[str] = []
-
-        for p in target_dir.iterdir():
-            name: str = p.name
-            if name == "__pycache__" or name.startswith("."):
-                continue
-
-            if p.is_dir():
-                rel_item: str = f"{prefix}/{name}" if prefix else name
-                if (p / "__init__.py").is_file() and rel_item in self.apps:
-                    apps.append(name)
-                else:
-                    folders.append(name)
-            elif p.is_file():
-                if name == "__init__.py" or name.endswith(".pyc"):
-                    continue
-
-                rel_item = f"{prefix}/{name}" if prefix else name
-                if name.endswith(".py"):
-                    app_name: str = rel_item[:-3]
-                    if app_name in self.apps:
-                        apps.append(name[:-3])
-                    else:
-                        scripts.append(name)
-                else:
-                    statics.append(name)
-
         items: list[str] = []
         if prefix:
-            parent: str = "/".join(prefix.split("/")[:-1])
-            parent_link: str = f"/{parent}/" if parent else "/"
-            items.append(
-                f'<li>📁 <a href="{parent_link}">.. (Parent Directory)</a></li>'
-            )
+            parent = str(Path(prefix).parent)
+            parent_link = f"/{parent}/" if parent != "." else "/"
+            items.append(f'<li>📁 <a href="{parent_link}">.. (Parent Directory)</a></li>')
 
-        def make_link(name: str, is_dir: bool = False) -> str:
-            base: str = f"/{prefix}/{name}" if prefix else f"/{name}"
-            return base + "/" if is_dir else base
+        folders, htag_apps, scripts, statics = [], [], [], []
+        for p in sorted(target_dir.iterdir()):
+            if p.name == "__pycache__" or p.name.startswith("."):
+                continue
+            
+            rel_item = f"{prefix}/{p.name}" if prefix else p.name
+            if p.is_dir():
+                if (p / "__init__.py").is_file() and rel_item in apps:
+                    htag_apps.append(p.name)
+                else:
+                    folders.append(p.name)
+            else:
+                if p.name == "__init__.py": continue
+                if p.name.endswith(".py"):
+                    if rel_item[:-3] in apps: htag_apps.append(p.name[:-3])
+                    else: scripts.append(p.name)
+                else:
+                    statics.append(p.name)
 
-        for f in sorted(folders):
-            items.append(f'<li>📁 <a href="{make_link(f, True)}">{f}/</a></li>')
+        def link(name, is_dir=False):
+            return f"/{prefix}/{name}" + ("/" if is_dir else "") if prefix else f"/{name}" + ("/" if is_dir else "")
 
-        for a in sorted(apps):
-            items.append(
-                f'<li>🚀 <a href="{make_link(a, True)}">{a}</a> <small style="color:#888">(htag App)</small></li>'
-            )
+        for f in sorted(folders): items.append(f'<li>📁 <a href="{link(f, True)}">{f}/</a></li>')
+        for a in sorted(htag_apps): items.append(f'<li>🚀 <a href="{link(a, True)}">{a}</a> <small style="color:#888">(htag App)</small></li>')
+        for s in sorted(scripts): items.append(f'<li>🐍 <a href="{link(s)}">{s}</a> <small style="color:#888">(Script)</small></li>')
+        for s in sorted(statics): items.append(f'<li>📄 <a href="{link(s)}">{s}</a></li>')
 
-        for s in sorted(scripts):
-            items.append(
-                f'<li>🐍 <a href="{make_link(s)}">{s}</a> <small style="color:#888">(Script)</small></li>'
-            )
-
-        for s in sorted(statics):
-            items.append(f'<li>📄 <a href="{make_link(s)}">{s}</a></li>')
-
-        content: str = (
-            f'<ul style="list-style-type: none; padding-left: 10px;">{"".join(items)}</ul>'
-            if items
-            else "<p>No entries found.</p>"
-        )
-        title: str = f"Index of {prefix}/" if prefix else "Root Index"
+        title = f"Index of {prefix}/" if prefix else "Root Index"
+        content = f'<ul style="list-style-type: none; padding-left: 10px;">{"".join(items)}</ul>' if items else "<p>No entries found.</p>"
         return f"<html><head><title>{title}</title><style>body {{ font-family: sans-serif; }} li {{ margin: 6px 0; }} a {{ text-decoration: none; color: #0366d6; font-size: 16px; }} a:hover {{ text-decoration: underline; }}</style></head><body><h1>{title}</h1>{content}</body></html>"
 
+
+class ScriptRunner:
+    """Handles execution of standalone Python scripts."""
+
+    @staticmethod
+    async def run(full_path: Path, scope: Scope) -> HTMLResponse:
+        """Executes a Python script and returns its output as an HTMLResponse."""
+        script_logger = logger.getChild("script")
+        script_name = full_path.name
+        script_logger.info(f"Executing script: {script_name}")
+        
+        try:
+            env = os.environ.copy()
+            if scope["type"] == "http":
+                env.update({
+                    "QUERY_STRING": scope.get("query_string", b"").decode("utf-8", "ignore"),
+                    "REQUEST_METHOD": scope.get("method", "GET"),
+                    "PATH_INFO": scope["path"],
+                })
+
+            proc = await asyncio.create_subprocess_exec(
+                sys.executable, str(full_path),
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env
+            )
+            stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=10.0)
+            
+            if stderr:
+                script_logger.warning(f"Script '{script_name}' produced stderr: {stderr.decode('utf-8', errors='replace')}")
+
+            if proc.returncode == 0:
+                script_logger.info(f"Script '{script_name}' finished successfully")
+                return HTMLResponse(stdout.decode("utf-8", errors="replace"))
+            
+            script_logger.error(f"Script '{script_name}' failed with return code {proc.returncode}")
+            return HTMLResponse(
+                f"<html><body><h1>Script Error</h1><pre>{stderr.decode('utf-8', errors='replace')}</pre></body></html>",
+                status_code=500
+            )
+        except asyncio.TimeoutError:
+            script_logger.error(f"Script '{script_name}' timed out after 10s")
+            return HTMLResponse("<html><body><h1>Script Timeout</h1></body></html>", status_code=504)
+        except Exception as e:
+            script_logger.error(f"Failed to execute script '{script_name}': {e}", exc_info=True)
+            return HTMLResponse(f"Execution failed: {e}", status_code=500)
+
+
+class DynamicHtagApps:
+    """Dynamic Starlette router for htag apps, scripts, and static files."""
+
+    def __init__(self, apps_dir: str | Path):
+        self.router_logger = logger.getChild("router")
+        self.apps_dir = Path(apps_dir).resolve()
+        parent_dir = str(self.apps_dir.parent)
+        if parent_dir not in sys.path:
+            sys.path.insert(0, parent_dir)
+
+        self.discoverer = AppDiscoverer(self.apps_dir)
+        self.apps = self.discoverer.discover()
+
+    def _unload_expired_apps(self):
+        now = time.time()
+        for name, info in list(self.apps.items()):
+            if info.app is not None and (now - info.last_accessed > APP_TTL):
+                self.router_logger.info(f"TTL expired for htag app '{name}', unloading...")
+                info.app = None
+
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
-        """
-        ASGI application callable. Routes incoming requests to htag apps, scripts, static files, or indexes.
+        if scope["type"] not in ["http", "websocket"]: return
+        if scope["type"] == "http": self._unload_expired_apps()
 
-        Args:
-            scope (Scope): ASGI scope dictionary.
-            receive (Receive): ASGI receive callable.
-            send (Send): ASGI send callable.
-        """
-        if scope["type"] not in ["http", "websocket"]:
-            return
-
-        # Garbage collect inactive apps
-        if scope["type"] == "http":
-            now = time.time()
-            for name, info in list(self.apps.items()):
-                if info.app is not None and (now - info.last_accessed > APP_TTL):
-                    print(f"INFO: TTL expired for htag app '{name}' ({APP_TTL}s), unloading...")
-                    info.app = None
-
-        path: str = scope["path"]
-        rel_path: str = path.strip("/")
-
+        path = scope["path"]
+        rel_path = path.strip("/")
+        
         # 1. Htag App?
-        # Try finding the longest matching app prefix
-        matching_app: Starlette | None = None
-        app_path: str = ""
-
-        # Security/Vampirization check: if it's an exact file (not __init__.py), don't match it as an app route
-        # This allows serving static files inside app directories
-        exact_target: Path = self.apps_dir / rel_path
-        is_exact_file: bool = (
-            exact_target.exists()
-            and exact_target.is_file()
-            and exact_target.name != "__init__.py"
-        )
-
-        if not is_exact_file:
-            # Sort keys by length descending to find the most specific match
+        exact_target = self.apps_dir / rel_path
+        if not (exact_target.exists() and exact_target.is_file() and exact_target.name != "__init__.py"):
             for name in sorted(self.apps.keys(), key=len, reverse=True):
                 if rel_path == name or rel_path.startswith(name + "/"):
-                    app_info: AppInfo = self.apps[name]
-                    app_info.last_accessed = time.time()
+                    info = self.apps[name]
+                    info.last_accessed = time.time()
+                    mtime = get_app_mtime(info.file)
+                    
+                    if info.app is None or (scope["type"] == "http" and mtime > info.mtime):
+                        action = "Reloading" if info.app else "Loading"
+                        self.router_logger.info(f"{action} htag app: {name}")
+                        app_class = load_htag_app(info.mod_path)
+                        if app_class:
+                            info.app, info.mtime = WebApp(app_class).app, mtime
 
-                    try:
-                        current_mtime: float = get_app_mtime(app_info.file)
-                        
-                        needs_load = app_info.app is None
-                        needs_reload = (scope["type"] == "http" and current_mtime > app_info.mtime)
+                    if info.app:
+                        scope["path"] = path[len("/" + name):] or "/"
+                        scope["root_path"] = scope.get("root_path", "") + "/" + name
+                        await info.app(scope, receive, send)
+                        return
 
-                        if needs_load or needs_reload:
-                            if needs_load:
-                                print(f"INFO: Loading htag app '{name}'...")
-                            else:
-                                print(f"INFO: Auto-reloading htag app '{name}'...")
-
-                            mod = (
-                                importlib.reload(sys.modules[app_info.mod_path])
-                                if app_info.mod_path in sys.modules
-                                else importlib.import_module(app_info.mod_path)
-                            )
-                            app_class = getattr(mod, "app", None)
-                            if (
-                                app_class
-                                and isinstance(app_class, type)
-                                and issubclass(app_class, Tag.App)
-                            ):
-                                wa = WebApp(app_class)
-                                app_info.app = wa.app
-                                app_info.mtime = current_mtime
-                    except Exception as e:
-                        print(f"WARNING: Failed to load/reload '{name}': {e}")
-
-                    matching_app = app_info.app
-                    app_path = "/" + name
-                    break
-
-        if matching_app:
-            # Adjust scope for the sub-app
-            root_path: str = scope.get("root_path", "")
-            scope["path"] = path[len(app_path) :]
-            if scope["path"] == "":
-                scope["path"] = "/"
-            scope["root_path"] = root_path + app_path
-
-            await matching_app(scope, receive, send)
-            return
-
-        # 2. Root index or Directory index
-        full_path: Path = self.apps_dir / rel_path
-
-        # Security: Prevent directory traversal
+        # 2. Directory or Index
+        full_path = self.apps_dir / rel_path
         if not full_path.resolve().is_relative_to(self.apps_dir):
             if scope["type"] == "http":
+                self.router_logger.warning(f"Forbidden access attempt: {path}")
                 await HTMLResponse("Forbidden", status_code=403)(scope, receive, send)
             return
 
         if not rel_path or full_path.is_dir():
             if scope["type"] == "http":
-                # Ensure trailing slash for directory indexing to keep links working
                 if rel_path and not path.endswith("/"):
-                    await HTMLResponse(
-                        "", status_code=301, headers={"Location": path + "/"}
-                    )(scope, receive, send)
-                    return
-
-                index_html: str = self._generate_index(rel_path)
-                await HTMLResponse(index_html)(scope, receive, send)
+                    await HTMLResponse("", status_code=301, headers={"Location": path + "/"})(scope, receive, send)
+                else:
+                    self.router_logger.info(f"Serving directory index: {path}")
+                    await HTMLResponse(IndexGenerator.generate(self.apps_dir, self.apps, rel_path))(scope, receive, send)
             return
 
-        # 3. Static file or Python script?
-        # Try appending .py if not found and not clearly a file extension
-        if not full_path.is_file() and "." not in Path(rel_path).name:
-            py_attempt: Path = full_path.with_name(full_path.name + ".py")
-            if py_attempt.is_file():
-                full_path = py_attempt
+        # 3. Static or Script
+        if not full_path.is_file() and "." not in full_path.name:
+            py_attempt = full_path.with_name(full_path.name + ".py")
+            if py_attempt.is_file(): full_path = py_attempt
 
         if full_path.is_file():
             if full_path.suffix == ".py":
-                # Always execute, never download
-                try:
-                    env: dict[str, str] = os.environ.copy()
-                    if scope["type"] == "http":
-                        env["QUERY_STRING"] = scope.get("query_string", b"").decode(
-                            "utf-8", "ignore"
-                        )
-                        env["REQUEST_METHOD"] = scope.get("method", "GET")
-                        env["PATH_INFO"] = path
-
-                    proc = await asyncio.create_subprocess_exec(
-                        sys.executable,
-                        str(full_path),
-                        stdout=subprocess.PIPE,
-                        stderr=subprocess.PIPE,
-                        env=env,
-                    )
-                    try:
-                        stdout, stderr = await asyncio.wait_for(
-                            proc.communicate(), timeout=10.0
-                        )
-                        if proc.returncode == 0:
-                            response = HTMLResponse(
-                                stdout.decode("utf-8", errors="replace")
-                            )
-                        else:
-                            response = HTMLResponse(
-                                f"<html><body><h1>Script Error</h1><pre>{stderr.decode('utf-8', errors='replace')}</pre></body></html>",
-                                status_code=500,
-                            )
-                    except asyncio.TimeoutError:
-                        proc.kill()
-                        response = HTMLResponse(
-                            "<html><body><h1>Script Timeout</h1><p>The script took too long to execute.</p></body></html>",
-                            status_code=504,
-                        )
-                except Exception as e:
-                    response = HTMLResponse(f"Execution failed: {e}", status_code=500)
-
                 if scope["type"] == "http":
+                    response = await ScriptRunner.run(full_path, scope)
                     await response(scope, receive, send)
-
             elif full_path.suffix == ".pyc":
                 if scope["type"] == "http":
-                    await HTMLResponse("Forbidden", status_code=403)(
-                        scope, receive, send
-                    )
+                    self.router_logger.warning(f"Attempt to access bytecode: {path}")
+                    await HTMLResponse("Forbidden", status_code=403)(scope, receive, send)
             else:
                 if scope["type"] == "http":
+                    self.router_logger.info(f"Serving static file: {path}")
                     await FileResponse(str(full_path))(scope, receive, send)
             return
 
         if scope["type"] == "http":
-            await HTMLResponse("App or file not found", status_code=404)(
-                scope, receive, send
-            )
+            self.router_logger.info(f"Path not found: {path}")
+            await HTMLResponse("Not found", status_code=404)(scope, receive, send)
 
 
 app = DynamicHtagApps(Path(__file__).parent / "www")
 
 if __name__ == "__main__":
     import uvicorn
-
     uvicorn.run(app, host="0.0.0.0", port=8000)
+

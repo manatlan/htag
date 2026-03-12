@@ -10,4 +10,4 @@ class Tata(Tag.App):
     def do_click(self, o):
         self.msg += "tata Clicked! "
 
-app=Tata
+App=Tata
