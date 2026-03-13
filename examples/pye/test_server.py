@@ -464,3 +464,24 @@ def test_htag_endpoint_routing_in_subpath(client):
     # If it reached the app, it should be 400 (no session)
     assert response.status_code == 400
     assert response.text == "No session cookie"
+
+def test_source_code_leak_protection_comprehensive(client, temp_apps_dir):
+    # 1. Direct access to a flat .py file (script or app) -> 404
+    assert client.get("/myscript.py").status_code == 404
+    assert client.get("/testapp.py").status_code == 404
+    
+    # 2. Direct access to a .py file in a sub-folder -> 404
+    assert client.get("/myfolder/__init__.py").status_code == 404
+    assert client.get("/mymodule/__init__.py").status_code == 404
+    assert client.get("/mymodule/secret.py").status_code == 404
+    
+    # 3. Access to .pyc files -> Always ignored/404
+    (temp_apps_dir / "test.pyc").write_text("bytecode")
+    assert client.get("/test.pyc").status_code == 404
+    
+    # 4. Verify that even if we try to trick the extensionless logic with dots
+    # (The server should only serve it if it's NOT a .py when accessed directly)
+    # Testing that /myscript executes it, but /myscript.py is blocked (already tested, but for clarity)
+    resp = client.get("/myscript")
+    assert resp.status_code == 200
+    assert "print" not in resp.text # Should be executed, not served
