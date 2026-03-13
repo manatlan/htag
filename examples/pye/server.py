@@ -86,6 +86,7 @@ class AppInfo:
     mtime: float
     mod_path: str
     last_accessed: float
+    ttl: float | None = None
 
 
 class AppDiscoverer:
@@ -101,7 +102,7 @@ class AppDiscoverer:
         self.logger.info(f"Scanning directory: {self.apps_dir}")
         def crawl(current_dir: Path, rel_root: str = "") -> None:
             for p in current_dir.iterdir():
-                if p.name == "__pycache__":
+                if p.name == "__pycache__" or p.name.startswith("."):
                     continue
 
                 rel_path = f"{rel_root}/{p.name}" if rel_root else p.name
@@ -169,7 +170,7 @@ class IndexGenerator:
                 if p.name == "__init__.py": continue
                 if p.name.endswith(".py"):
                     if rel_item[:-3] in apps: htag_apps.append(p.name[:-3])
-                    else: scripts.append(p.name)
+                    else: scripts.append(p.name[:-3])
                 else:
                     statics.append(p.name)
 
@@ -240,8 +241,8 @@ class DynamicHtagApps:
         self.script_runner = script_runner or ScriptRunner
         self.auto_index = auto_index
         self.discoverer = AppDiscoverer(self.apps_dir)
-        self.apps = self.discoverer.discover()
-        self._last_discovery = time.time()
+        self.apps = {}
+        self._last_discovery = 0.0
 
     def _refresh_discovery(self):
         """Refresh discovery and merge with existing apps to preserve state."""
@@ -259,6 +260,7 @@ class DynamicHtagApps:
                 existing = self.apps[name]
                 info.app = existing.app
                 info.last_accessed = existing.last_accessed
+                info.ttl = existing.ttl
             self.apps[name] = info
             
         # 2. Remove apps no longer on disk
@@ -270,9 +272,11 @@ class DynamicHtagApps:
     def _unload_expired_apps(self):
         now = time.time()
         for name, info in list(self.apps.items()):
-            if info.app is not None and (now - info.last_accessed > APP_TTL):
-                self.router_logger.info(f"TTL expired for htag app '{name}', unloading...")
-                info.app = None
+            if info.app is not None:
+                ttl = info.ttl if info.ttl is not None else APP_TTL
+                if ttl > 0 and (now - info.last_accessed > ttl):
+                    self.router_logger.info(f"TTL expired for htag app '{name}', unloading...")
+                    info.app = None
 
     async def _serve_htag_app(self, name: str, info: AppInfo, scope: Scope, receive: Receive, send: Send, new_path: str) -> bool:
         """Loads and serves an htag application."""
@@ -284,7 +288,13 @@ class DynamicHtagApps:
             self.router_logger.info(f"{action} htag app: {name}")
             app_class = load_htag_app(info.mod_path)
             if app_class:
-                info.app, info.mtime = WebApp(app_class).app, mtime
+                parano = getattr(app_class, "_parano_", False)
+                if parano:
+                    self.router_logger.info(f"Enabling PARANO mode for app: {name}")
+                info.ttl = getattr(app_class, "_ttl_", None)
+                if info.ttl is not None:
+                    self.router_logger.info(f"Custom TTL for '{name}': {info.ttl}s")
+                info.app, info.mtime = WebApp(app_class, parano=parano).app, mtime
             else:
                 return False
 
@@ -302,92 +312,100 @@ class DynamicHtagApps:
         path = scope["path"]
         rel_path = path.strip("/")
         
-        # 0. Hot Discovery (if directory requested)
-        full_path = self.apps_dir / rel_path
-        if not rel_path or full_path.is_dir():
+        if not self.apps:
             self._refresh_discovery()
-        
+
         exact_target = self.apps_dir / rel_path
-        if not (exact_target.exists() and exact_target.is_file() and exact_target.name != "__init__.py"):
-            for name in sorted(self.apps.keys(), key=len, reverse=True):
-                if rel_path == name or rel_path.startswith(name + "/"):
-                    info = self.apps[name]
+        
+        # Phase 1: Try to match already discovered htag apps (Exact or Sub-path)
+        for name in sorted(self.apps.keys(), key=len, reverse=True):
+            if rel_path == name or rel_path.startswith(name + "/"):
+                info = self.apps[name]
+                if rel_path == name or rel_path == name + "/":
                     new_path = path[len("/" + name):] or "/"
                     if await self._serve_htag_app(name, info, scope, receive, send, new_path):
                         return
-            
-            # 1.1 Still htag app? (maybe a newly created .py file?)
-            if rel_path.endswith(".py") or "." not in rel_path.split("/")[-1]:
-                # Try discovery once more for new files
-                self._refresh_discovery()
-                for name in sorted(self.apps.keys(), key=len, reverse=True):
-                    if rel_path == name or rel_path.startswith(name + "/"):
-                        info = self.apps[name]
-                        new_path = path[len("/" + name):] or "/"
-                        if await self._serve_htag_app(name, info, scope, receive, send, new_path):
-                            return
+                else:
+                    # Potential static/script within app folder
+                    sub_rel = rel_path[len(name):].lstrip("/")
+                    sub_full = info.file.parent / sub_rel
+                    
+                    # Try with .py extension if it's potentially a script
+                    if not sub_full.is_file() and "." not in sub_full.name:
+                        py_attempt = sub_full.with_name(sub_full.name + ".py")
+                        if py_attempt.is_file(): sub_full = py_attempt
 
-        # 2. Directory or Index
-        full_path = self.apps_dir / rel_path
-        if not full_path.resolve().is_relative_to(self.apps_dir):
-            if scope["type"] == "http":
-                self.router_logger.warning(f"Forbidden access attempt: {path}")
-                await HTMLResponse("Forbidden", status_code=403)(scope, receive, send)
+                    if sub_full.is_file():
+                        exact_target = sub_full
+                        break
+                    
+                    # Not a file, so it might be an htag endpoint (/ws, /stream, /event)
+                    new_path = path[len("/" + name):] or "/"
+                    if await self._serve_htag_app(name, info, scope, receive, send, new_path):
+                        return
+
+        # Phase 2: Handle Files (Static or Scripts)
+        full_path = exact_target
+        if not exact_target.is_file() and not rel_path.endswith(".py") and "." not in rel_path.split("/")[-1]:
+            py_attempt = exact_target.with_name(exact_target.name + ".py")
+            if py_attempt.is_file(): full_path = py_attempt
+
+        if full_path.is_file():
+            if full_path.suffix == ".py":
+                if rel_path.endswith(".py"):
+                    if scope["type"] == "http":
+                        await HTMLResponse("Not found", status_code=404)(scope, receive, send)
+                    return
+                if scope["type"] == "http":
+                    response = await self.script_runner.run(full_path, scope)
+                    await response(scope, receive, send)
+            elif full_path.suffix != ".pyc":
+                if scope["type"] == "http":
+                    await FileResponse(str(full_path))(scope, receive, send)
             return
 
+        # Phase 3: Directory Discovery and Indexing
         if not rel_path or full_path.is_dir():
+            if not full_path.resolve().is_relative_to(self.apps_dir):
+                if scope["type"] == "http":
+                    await HTMLResponse("Forbidden", status_code=403)(scope, receive, send)
+                return
+
+            self._refresh_discovery()
+            
+            # Check for newly discovered apps
+            for name, info in self.apps.items():
+                if rel_path == name or rel_path == name + "/":
+                     if await self._serve_htag_app(name, info, scope, receive, send, "/"):
+                        return
+
             if scope["type"] == "http":
                 if rel_path and not path.endswith("/"):
                     await HTMLResponse("", status_code=301, headers={"Location": path + "/"})(scope, receive, send)
                     return
 
-                # Priority 1: index.html
+                if self.auto_index:
+                    await HTMLResponse(IndexGenerator.generate(self.apps_dir, self.apps, rel_path))(scope, receive, send)
+                    return
+                
+                # Default entrypoints
                 index_html = full_path / "index.html"
                 if index_html.is_file():
-                    self.router_logger.info(f"Serving default index.html: {index_html}")
                     await FileResponse(str(index_html))(scope, receive, send)
                     return
 
-                if self.auto_index:
-                    self.router_logger.info(f"Serving directory index: {path}")
-                    await HTMLResponse(IndexGenerator.generate(self.apps_dir, self.apps, rel_path))(scope, receive, send)
-                else:
-                    # Priority 2: index.py (htag app)
-                    index_name = f"{rel_path}/index" if rel_path else "index"
-                    if index_name in self.apps:
-                        if await self._serve_htag_app(index_name, self.apps[index_name], scope, receive, send, "/"):
-                            return
-
-                    # Priority 3: index.py (script)
-                    index_file = full_path / "index.py"
-                    if index_file.is_file():
-                        self.router_logger.info(f"Running default index script: {index_file}")
-                        response = await self.script_runner.run(index_file, scope)
-                        await response(scope, receive, send)
+                index_name = f"{rel_path}/index" if rel_path else "index"
+                if index_name in self.apps:
+                    if await self._serve_htag_app(index_name, self.apps[index_name], scope, receive, send, "/"):
                         return
 
-                    self.router_logger.warning(f"No entrypoint found : {path}")
-                    await HTMLResponse("No default entrypoint", status_code=400)(scope, receive, send)
-            return
-
-        # 3. Static or Script
-        if not full_path.is_file() and "." not in full_path.name:
-            py_attempt = full_path.with_name(full_path.name + ".py")
-            if py_attempt.is_file(): full_path = py_attempt
-
-        if full_path.is_file():
-            if full_path.suffix == ".py":
-                if scope["type"] == "http":
-                    response = await self.script_runner.run(full_path, scope)
+                index_py = full_path / "index.py"
+                if index_py.is_file():
+                    response = await self.script_runner.run(index_py, scope)
                     await response(scope, receive, send)
-            elif full_path.suffix == ".pyc":
-                if scope["type"] == "http":
-                    self.router_logger.warning(f"Attempt to access bytecode: {path}")
-                    await HTMLResponse("Forbidden", status_code=403)(scope, receive, send)
-            else:
-                if scope["type"] == "http":
-                    self.router_logger.info(f"Serving static file: {path}")
-                    await FileResponse(str(full_path))(scope, receive, send)
+                    return
+
+                await HTMLResponse("No default entrypoint", status_code=400)(scope, receive, send)
             return
 
         if scope["type"] == "http":

@@ -78,7 +78,7 @@ def test_root_index(client):
     assert "Root Index" in response.text
     # Check that our test files are listed
     assert "test.txt" in response.text
-    assert "myscript.py" in response.text
+    assert "myscript" in response.text
     assert "testapp" in response.text
     assert "myfolder/" in response.text
 
@@ -88,10 +88,14 @@ def test_static_file(client, temp_apps_dir):
     assert response.text == "hello static"
 
 def test_script_execution(client):
-    response = client.get("/myscript.py?foo=bar")
+    response = client.get("/myscript?foo=bar")
     assert response.status_code == 200
     assert "<h1>Hello from script</h1>" in response.text
     assert "<p>foo=bar</p>" in response.text
+
+def test_script_no_extension_leak(client):
+    response = client.get("/myscript.py")
+    assert response.status_code == 404
 
 def test_flat_htag_app(client):
     response = client.get("/testapp/")
@@ -114,7 +118,7 @@ def test_static_in_module_app(client):
     assert response.text == "module static content"
 
 def test_python_in_module_app_no_source_leak(client):
-    response = client.get("/mymodule/secret.py")
+    response = client.get("/mymodule/secret")
     assert response.status_code == 200
     # It executes the script, we must get the output but NEVER the source code!
     assert "print('SECRET_PYTHON_OUTPUT')" not in response.text
@@ -163,6 +167,7 @@ def test_ttl_unloading(temp_apps_dir):
     router = server.DynamicHtagApps(temp_apps_dir)
     
     # 1. Load an app
+    router._refresh_discovery()
     router.apps["testapp"].last_accessed = time.time()
     from starlette.testclient import TestClient
     local_client = TestClient(router)
@@ -180,7 +185,7 @@ def test_ttl_unloading(temp_apps_dir):
 
 def test_script_error(client, temp_apps_dir):
     (temp_apps_dir / "error.py").write_text("import sys; sys.stderr.write('SOME ERROR'); sys.exit(1)")
-    response = client.get("/error.py")
+    response = client.get("/error")
     assert response.status_code == 500
     assert "SOME ERROR" in response.text
 
@@ -193,7 +198,7 @@ def test_script_timeout(client, temp_apps_dir):
     # We don't want to actually wait 10s, but we've seen the code.
     # We'll just test a script that takes a bit of time but finishes
     (temp_apps_dir / "slow.py").write_text("import time; time.sleep(0.5); print('done')")
-    response = client.get("/slow.py")
+    response = client.get("/slow")
     assert response.status_code == 200
     assert "done" in response.text
 
@@ -270,9 +275,27 @@ def test_auto_index_enabled_ignores_index_file(client, temp_apps_dir):
     assert response.status_code == 200
     # Should be a listing
     assert "Index of index_enabled/" in response.text
-    assert "index.py" in response.text
+    assert ">index</a>" in response.text
     assert "other.txt" in response.text
     assert "I should not run" not in response.text
+
+def test_auto_index_enabled_ignores_index_html(client, temp_apps_dir):
+    # If AUTO_INDEX is True, it should list the directory even if index.html exists
+    idx_dir = temp_apps_dir / "index_html_enabled"
+    idx_dir.mkdir()
+    (idx_dir / "index.html").write_text("I should not be seen")
+    (idx_dir / "other.txt").write_text("other")
+
+    router = DynamicHtagApps(temp_apps_dir, auto_index=True)
+    from starlette.testclient import TestClient
+    client = TestClient(router)
+
+    response = client.get("/index_html_enabled/")
+    assert response.status_code == 200
+    # Should be a listing
+    assert "Index of index_html_enabled/" in response.text
+    assert "index.html" in response.text
+    assert "I should not be seen" not in response.text
 
 def test_auto_index_disabled_in_subfolder(client, temp_apps_dir):
     # Verify 400 even in nested folders if AUTO_INDEX=False and no index
@@ -292,10 +315,10 @@ def test_fake_app_ignored(client):
     # Verify that fakeapp.py is NOT discovered as an htag app
     # but can still be run as a script
     response_index = client.get("/")
-    assert "fakeapp.py" in response_index.text
+    assert "fakeapp" in response_index.text
     assert "fakeapp</a> <small style=\"color:#888\">(htag App)</small>" not in response_index.text
     
-    response_run = client.get("/fakeapp.py")
+    response_run = client.get("/fakeapp")
     assert response_run.status_code == 200
     assert "I am not an htag app" in response_run.text
 
@@ -332,6 +355,11 @@ def test_default_index_html(client, temp_apps_dir):
     sub.mkdir(exist_ok=True)
     (sub / "index.html").write_text("<html><body>Hello HTML Index</body></html>")
     
+    # We use a router with auto_index=False to see the index.html
+    router = DynamicHtagApps(temp_apps_dir, auto_index=False)
+    from starlette.testclient import TestClient
+    client = TestClient(router)
+
     response = client.get("/mysub/")
     assert response.status_code == 200
     assert "Hello HTML Index" in response.text
@@ -346,8 +374,93 @@ def test_index_priority(client, temp_apps_dir):
     # We need to wait for discovery to pick up the new app if it's there
     time.sleep(0.2)
     
+    # We use a router with auto_index=False to test priorities
+    router = DynamicHtagApps(temp_apps_dir, auto_index=False)
+    from starlette.testclient import TestClient
+    client = TestClient(router)
+
     response = client.get("/priority/")
     assert response.status_code == 200
     assert "HTML Index" in response.text
     assert "PY App" not in response.text
 
+def test_parano_detection(temp_apps_dir):
+    # Create an app with _parano_ = True
+    app_file = temp_apps_dir / "parano_app.py"
+    app_file.write_text("from htag import Tag\nclass App(Tag.App):\n    _parano_ = True\n    def init(self): self += 'Secure'")
+    
+    import server
+    router = server.DynamicHtagApps(temp_apps_dir)
+    from starlette.testclient import TestClient
+    local_client = TestClient(router)
+    
+    # Trigger loading
+    response = local_client.get("/parano_app/")
+    assert response.status_code == 200
+    
+    # Verify parano mode is active in the rendered HTML
+    assert 'window.PARANO = "' in response.text
+
+def test_custom_ttl_unloading(temp_apps_dir):
+    # Create an app with 1s TTL
+    app_file = temp_apps_dir / "short_ttl.py"
+    app_file.write_text("from htag import Tag\nclass App(Tag.App):\n    _ttl_ = 1\n    def init(self): self += 'Short'")
+    
+    import server
+    router = server.DynamicHtagApps(temp_apps_dir)
+    from starlette.testclient import TestClient
+    local_client = TestClient(router)
+    
+    # 1. Load the app
+    local_client.get("/short_ttl/")
+    info = router.apps["short_ttl"]
+    assert info.app is not None
+    assert info.ttl == 1
+    
+    # 2. Simulate expiration (wait > 1s)
+    time.sleep(1.1)
+    
+    # Trigger garbage collection (simulating next request)
+    local_client.get("/")
+    
+    # 3. Check it was unloaded
+    assert info.app is None
+
+def test_persistent_app(temp_apps_dir):
+    # Create an app with _ttl_ = 0 (infinite)
+    app_file = temp_apps_dir / "infinite.py"
+    app_file.write_text("from htag import Tag\nclass App(Tag.App):\n    _ttl_ = 0\n    def init(self): self += 'Infinite'")
+    
+    import server
+    router = server.DynamicHtagApps(temp_apps_dir)
+    from starlette.testclient import TestClient
+    local_client = TestClient(router)
+    
+    # 1. Load the app
+    local_client.get("/infinite/")
+    info = router.apps["infinite"]
+    assert info.app is not None
+    
+    # 2. Simulate "long" time (longer than default APP_TTL)
+    import server as server_mod
+    original_ttl = server_mod.APP_TTL
+    try:
+        server_mod.APP_TTL = 0.1 # Temporarily reduce default TTL
+        time.sleep(0.2)
+        
+        # Trigger garbage collection
+        local_client.get("/")
+        
+        # 3. Check it was NOT unloaded because _ttl_ is 0
+        assert info.app is not None
+    finally:
+        server_mod.APP_TTL = original_ttl
+
+
+def test_htag_endpoint_routing_in_subpath(client):
+    # This test ensures that /app/stream is routed to the app even if not a file
+    response = client.get("/myfolder/stream")
+    # Starlette WebApp sse handler returns 400 if no session cookie, but 404 would mean routing failed
+    # If it reached the app, it should be 400 (no session)
+    assert response.status_code == 400
+    assert response.text == "No session cookie"
