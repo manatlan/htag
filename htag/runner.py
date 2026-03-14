@@ -339,16 +339,30 @@ class AppRunner(BaseApp):
 
     def collect_statics(self, tag: GTag, result: list[str]) -> None:
         """Recursively collects statics from the whole tag tree."""
+        seen_ids = set()
+        seen_contents = set(result)
 
         def visitor(t: GTag) -> None:
             s_instance = getattr(t, "statics", [])
             s_class = getattr(t.__class__, "statics", [])
-            for s_list in [s_class, s_instance]:
+
+            # Avoid processing the exact same list twice (common case)
+            lists = [s_class]
+            if s_instance is not s_class:
+                lists.append(s_instance)
+
+            for s_list in lists:
                 if not isinstance(s_list, (list, tuple)):
                     s_list = [s_list]
                 for s in s_list:
+                    sid = id(s)
+                    if sid in seen_ids:
+                        continue
+                    seen_ids.add(sid)
+
                     s_str = str(s)
-                    if s_str not in result:
+                    if s_str not in seen_contents:
+                        seen_contents.add(s_str)
                         result.append(s_str)
 
         self._walk_tree(tag, visitor)

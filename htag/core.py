@@ -438,7 +438,10 @@ class GTag:  # aka "Generic Tag"
             else:
                 self.tag = "div"  # fallback
 
-        self.id = f"{self.tag}-{id(self)}"
+        if getattr(self, "tag", None) in ("style", "script"):
+            self.id = ""
+        else:
+            self.id = f"{self.tag}-{id(self)}"
         logger.debug("Created Tag: %s (id: %s)", self.tag, self.id)
 
         # Scoped style: auto-prefix CSS rules with a unique class per component class
