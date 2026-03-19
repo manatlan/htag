@@ -4,7 +4,7 @@ import time
 class Box(Tag.div):
     styles=".box {border:1px solid green;padding:8px}"
     def init(self):
-        self._class = "box"
+        self["class"] = "box"
 
 class Showcase(Tag.App):
     styles='''html,body {margin:0px;padding:0px}''' # scoped

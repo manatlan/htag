@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.10"
 
 [[package]]
@@ -388,7 +388,7 @@ wheels = [
 
 [[package]]
 name = "htag"
-version = "2.0.6"
+version = "2.0.7"
 source = { editable = "." }
 dependencies = [
     { name = "starlette" },

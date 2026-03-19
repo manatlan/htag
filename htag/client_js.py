@@ -1,4 +1,12 @@
-CLIENT_JS = """
+def __minify_js(js_code: str) -> str:
+    import re
+    # Remove single line comments (but not URL schemes like http://)
+    js = re.sub(r'(?<!:)//.*', '', js_code)
+    # Remove newlines and tabs
+    js = re.sub(r'\s+', ' ', js).strip()
+    return js
+
+CLIENT_JS = __minify_js("""
 // The client-side bridge that connects the browser to the Python server.
 var ws;
 var use_fallback = false;
@@ -158,7 +166,30 @@ function handle_payload(data) {
         // Apply partial DOM updates received from the server
         for(var id in data.updates) {
             var el = document.getElementById(id) || document.querySelector('[data-htag-id="' + id + '"]');
-            if(el) el.outerHTML = data.updates[id];
+            if(el) {
+                if(el.tagName === 'BODY') {
+                    var doc = new DOMParser().parseFromString(data.updates[id], 'text/html');
+                    
+                    // Sync attributes properly
+                    var newAttrNames = new Set();
+                    for(var i = 0; i < doc.body.attributes.length; i++) {
+                        var attr = doc.body.attributes[i];
+                        el.setAttribute(attr.name, attr.value);
+                        newAttrNames.add(attr.name);
+                    }
+                    // Remove old attributes that are not in the new body
+                    for(var i = el.attributes.length - 1; i >= 0; i--) {
+                        var attrName = el.attributes[i].name;
+                        if(!newAttrNames.has(attrName)) {
+                            el.removeAttribute(attrName);
+                        }
+                    }
+                    
+                    el.innerHTML = doc.body.innerHTML;
+                } else {
+                    el.outerHTML = data.updates[id];
+                }
+            }
         }
         
         // Ensure overlays are still in the DOM (in case the body was replaced)
@@ -349,4 +380,5 @@ function htag_event(id, event_name, event) {
         window.htag_transport(payload);
     });
 }
-"""
+""")
+
