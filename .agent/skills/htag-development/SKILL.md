@@ -284,6 +284,22 @@ htag_event('tag_id', 'custom', 'any string or number')
 htag_event('tag_id', 'custom', {any: 'object'})
 ```
 
+### 13. Migrating from htag v1 to v2
+
+If you are migrating legacy htag v1 components, be aware of these core framework changes:
+
+**1. Event Callbacks & Custom Attributes (`e.target`)**:
+- *v1*: Callbacks received the triggering object (`def method(self, o):`), and you accessed custom properties directly (`o.info`).
+- *v2*: All event callbacks receive a standardized `Event` object (`def method(self, e):`). To access custom attributes passed during component instantiation (like `info=dict(...)`), you MUST use the `target` property: `e.target.info`.
+- Form submissions have also been normalized: use `@prevent` on the callback and access form values directly from `e.value` (e.g., `q = e.value["q"]`).
+
+**2. Component Content Replacement (`.clear()`)**:
+- *v1*: Often relied on `.set()` or `Content()` wrappers from external component libraries like `htbulma` to replace the inner HTML of a component.
+- *v2*: The method to completely replace the contents of any component is natively standard: `.clear(new_child)`. The `.set()` method does not exist on native v2 `Tag` instances.
+
+**3. Move to Composition & Tailwind**:
+- Replace heavy Python wrapper components (like `b.VBox`, `b.Progress()`) with native CSS composition (e.g., `Tag.div(_class="flex flex-col")`, `Tag.div(_class="animate-spin")`) leveraging the `.statics` injection of modern CSS frameworks like Tailwind.
+
 ## Best Practices
 
 ### Layout & Styling
