@@ -58,6 +58,8 @@ htag provides three lifecycle hooks to override on custom components:
 - `on_mount()`: Fired when the component is firmly attached to the main `App` tree (`self.root` is ready).
 - `on_unmount(self)`: Fired when the component is removed, ideal for cleaning up tasks, caches, or event listeners.
 
+> **Progressive UI note**: Both `on_mount()` and `on_unmount()` support `yield` (or `yield` in `async` generators) for progressive, multi-step UI rendering, exactly like event handlers. `htag` intelligently queues `on_mount` yields until the browser establishes a connection, and safely broadcasts `on_unmount` updates. *Remember for `on_unmount`: store a reference to external targets before returning the generator (e.g., `self.app_root = self.root`), as the component is detached and `self.parent` relies on `None` when the generator executes.*
+
 ### 3. Composite Components
 When creating complex UI components (like a Card or a Window), you should override the `add(self, o)` method so that when users do `my_card <= content`, the content goes into the correct inner container, not the root tag.
 

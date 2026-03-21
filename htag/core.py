@@ -505,7 +505,16 @@ class GTag:  # aka "Generic Tag"
         pass
 
     def _trigger_mount(self) -> None:
-        self.on_mount()
+        import inspect
+        res = self.on_mount()
+        if inspect.isgenerator(res) or inspect.isasyncgen(res):
+            root = self.root
+            if root is not None and type(root).__name__ != "GTag":
+                # Only root representing the application
+                if not hasattr(root, "_pending_lifecycle_generators"):
+                    root._pending_lifecycle_generators = []
+                root._pending_lifecycle_generators.append((self, res))
+
         for child in self.childs:
             if isinstance(child, GTag):
                 child._trigger_mount()
@@ -514,7 +523,16 @@ class GTag:  # aka "Generic Tag"
                 t._trigger_mount()
 
     def _trigger_unmount(self) -> None:
-        self.on_unmount()
+        import inspect
+        res = self.on_unmount()
+        if inspect.isgenerator(res) or inspect.isasyncgen(res):
+            root = self.root
+            if root is not None and type(root).__name__ != "GTag":
+                # Only root representing the application
+                if not hasattr(root, "_pending_lifecycle_generators"):
+                    root._pending_lifecycle_generators = []
+                root._pending_lifecycle_generators.append((self, res))
+
         for child in self.childs:
             if isinstance(child, GTag):
                 child._trigger_unmount()

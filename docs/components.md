@@ -43,6 +43,9 @@ Lifecycle hooks let you run code at specific times in a component's life:
 - `on_mount()`: Called when the component is attached to the application DOM tree. Use this for subscribing to events or initializing resources that need a live DOM. Good for subscribing to events or doing initial fetches.
 - `on_unmount(self)`: Called when the component (or its parent) is removed from the `Tag.App`. Good for cleaning up tasks or event listeners.
 
+> [!TIP]
+> Both `on_mount()` and `on_unmount()` fully support the `yield` keyword (or `yield` in `async` generators) for **progressive UI rendering**. Just like in event handlers, you can yield intermediate states (e.g., "Loading..."), and `htag` will safely queue and display them to the user. For `on_unmount`, remember to store an eager reference to your targets (like `self.app_root = self.root` in `init`), because by the time the generator runs, the component is already detached from the tree.
+
 ```python
 class Clock(Tag.div):
     def init(self) -> None:

@@ -219,6 +219,7 @@ class AppRunner(BaseApp):
             payload_str = self._build_initial_payload()
             # EventSource requires 'data: {payload}\n\n'
             yield f"data: {payload_str}\n\n"
+            self._flush_pending_lifecycle_generators(None)
         except Exception as e:
             logger.error("Failed to send initial SSE state: %s", e)
 
@@ -248,6 +249,7 @@ class AppRunner(BaseApp):
             payload_str = self._build_initial_payload()
             await websocket.send_text(payload_str)
             logger.debug("Sent initial state to client")
+            self._flush_pending_lifecycle_generators(websocket)
         except Exception as e:
             logger.error("Failed to send initial state: %s", e)
 
@@ -465,6 +467,51 @@ class AppRunner(BaseApp):
             )
             if callback_id:
                 await self.broadcast_updates(result=None, callback_id=callback_id, ws=ws)
+
+        self._flush_pending_lifecycle_generators(ws)
+
+    def _flush_pending_lifecycle_generators(self, ws: WebSocket | None = None) -> None:
+        if hasattr(self, "_pending_lifecycle_generators") and self._pending_lifecycle_generators:
+            while self._pending_lifecycle_generators:
+                tag, gen = self._pending_lifecycle_generators.pop(0)
+                asyncio.create_task(self._consume_generator(gen, ws))
+
+    async def _consume_generator(self, gen: Any, ws: WebSocket | None = None) -> None:
+        try:
+            if inspect.isasyncgen(gen):
+                async for _ in gen:
+                    await self.broadcast_updates(ws=ws)
+            elif inspect.isgenerator(gen):
+                try:
+                    while True:
+                        next(gen)
+                        await self.broadcast_updates(ws=ws)
+                except StopIteration:
+                    pass
+        except Exception as e:
+            error_trace: str = traceback.format_exc()
+            error_msg: str = f"Error in on_mount generator: {str(e)}\n{error_trace}"
+            print(error_msg)
+            logger.error(error_msg)
+            err_payload: str = _obf_dumps(
+                {
+                    "action": "error",
+                    "traceback": error_trace if self.debug else "Internal Server Error",
+                    "callback_id": None,
+                    "result": None,
+                },
+                getattr(self, "parano_key", None),
+            )
+            for queue in self.sse_queues:
+                queue.put_nowait(err_payload)
+            dead_ws = []
+            for client in list(self.websockets):
+                try:
+                    await client.send_text(err_payload)
+                except Exception:
+                    dead_ws.append(client)
+            for client in dead_ws:
+                self.websockets.discard(client)
 
     async def broadcast_updates(
         self, result: Any = None, callback_id: str | None = None, ws: WebSocket | None = None
