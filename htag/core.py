@@ -392,8 +392,8 @@ class GTag:  # aka "Generic Tag"
         # Always append htag's internal unique ID as 'data-htag-id' or just 'id' if not already present
         if "id" not in self.__attrs:
             attrs += f' id="{self.id}"'
-        else:
-            # If user provided a custom ID, we still need htag id for event mapping
+        elif str(self.__attrs["id"]) != self.id:
+            # If user provided a custom ID different from htag internal ID, we still need htag id for event mapping
             attrs += f' data-htag-id="{self.id}"'
         return attrs
 
@@ -440,6 +440,8 @@ class GTag:  # aka "Generic Tag"
 
         if getattr(self, "tag", None) in ("style", "script"):
             self.id = ""
+        elif "_id" in kwargs:
+            self.id = str(kwargs["_id"])
         else:
             self.id = f"{self.tag}-{id(self)}"
         logger.debug("Created Tag: %s (id: %s)", self.tag, self.id)
