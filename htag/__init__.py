@@ -5,12 +5,20 @@ from .web import WebApp
 from .runners import ChromeApp, PyScript
 
 import logging
+from importlib.metadata import version, PackageNotFoundError
+
+try:
+    __version__ = version("htag")
+except PackageNotFoundError:
+    # package is not installed
+    __version__ = "unknown"
 
 # Library best practice: attach NullHandler so apps that don't configure
 # logging won't see "No handler found" warnings.
 logging.getLogger("htag").addHandler(logging.NullHandler())
 
 __all__ = [
+    "__version__",
     "Tag",  # the main thing
     "State",    # State management
     "WebApp",   # the ASGI runner
