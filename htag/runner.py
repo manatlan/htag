@@ -238,7 +238,12 @@ class AppRunner(BaseApp):
             asyncio.create_task(self._handle_disconnect())
 
     async def _handle_websocket(self, websocket: WebSocket) -> None:
-        await websocket.accept()
+        headers = [
+            (b"cache-control", b"no-cache"),
+            (b"connection", b"keep-alive"),
+            (b"x-accel-buffering", b"no"),
+        ]
+        await websocket.accept(headers=headers)
         self.websockets.add(websocket)
         logger.info(
             "New WebSocket connection (Total WS clients: %d)", len(self.websockets)
