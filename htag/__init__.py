@@ -23,7 +23,7 @@ __all__ = [
     "State",    # State management
     "WebApp",   # the ASGI runner
 
-    # Specialize runners
+    # Specialized runners
     "ChromeApp",
     "PyScript",
 

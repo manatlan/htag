@@ -139,6 +139,12 @@ function init_ws() {
     
     ws.onopen = function() {
         console.log("htag: websocket connected");
+        if(window._htag_queue && window._htag_queue.length > 0) {
+            window._htag_queue.forEach(function(payload) {
+                ws.send(_enc(payload));
+            });
+            window._htag_queue = [];
+        }
     };
 
     ws.onmessage = function(event) {
@@ -252,12 +258,32 @@ function handle_payload(data) {
 }
 
 function fallback() {
-    window._htag_callbacks = {};
+    // Preserve callbacks for items in the queue
+    var queued_callbacks = {};
+    if (window._htag_queue) {
+        window._htag_queue.forEach(function(p) {
+            if (p && p.data && p.data.callback_id && window._htag_callbacks[p.data.callback_id]) {
+                queued_callbacks[p.data.callback_id] = window._htag_callbacks[p.data.callback_id];
+            }
+        });
+    }
+    window._htag_callbacks = queued_callbacks;
     _sync_interacting();
+
     if (use_fallback) return; 
     use_fallback = true;
     if(ws) ws.close(); // Ensure ws is torn down
     
+    // Flush the queue via HTTP fallback
+    if (window._htag_queue && window._htag_queue.length > 0) {
+        console.log("htag: flushing queue via fallback");
+        var queue = window._htag_queue;
+        window._htag_queue = [];
+        queue.forEach(function(payload) {
+            window.htag_transport(payload);
+        });
+    }
+
     // Auto-reload mechanism
     if (window.HTAG_RELOAD) {
         console.log("htag: connection lost, starting auto-reload polling...");
@@ -298,38 +324,51 @@ if (!window.HTAG_EXT_INIT) {
     init_ws();
 }
 
+window._htag_queue = window._htag_queue || [];
+
 // Default transport layer (WebSocket + HTTP Fallback)
 window.htag_transport = window.htag_transport || function(payload) {
-    if(!use_fallback && ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(_enc(payload));
+    if(!use_fallback && ws) {
+        if(ws.readyState === WebSocket.OPEN) {
+            ws.send(_enc(payload));
+        } else if(ws.readyState === WebSocket.CONNECTING) {
+            window._htag_queue.push(payload);
+        } else {
+            // Use HTTP POST Fallback
+            if (!use_fallback) fallback();
+            _send_http(payload);
+        }
     } else {
         // Use HTTP POST Fallback
-        // (Fastest trigger even if SSE is still initializing)
         if (!use_fallback) fallback();
-        fetch(_base_path + "event", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-HTAG-TOKEN": window.HTAG_CSRF
-            },
-            body: _enc(payload)
-        }).then(response => {
-
-            if (!response.ok) {
-                _dec_interacting(payload.data.callback_id);
-                if(_error_overlay && typeof _error_overlay.show === 'function') {
-                    _error_overlay.show("HTTP Error", `Server returned status: ${response.status}`);
-                }
-            }
-        }).catch(err => {
-            _dec_interacting(payload.data.callback_id);
-            console.error("htag event POST error:", err);
-            if(_error_overlay && typeof _error_overlay.show === 'function') {
-                _error_overlay.show("Network Error", "Could not reach server to trigger event.");
-            }
-        });
+        _send_http(payload);
     }
 };
+
+function _send_http(payload) {
+    fetch(_base_path + "event", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-HTAG-TOKEN": window.HTAG_CSRF
+        },
+        body: _enc(payload)
+    }).then(response => {
+
+        if (!response.ok) {
+            _dec_interacting(payload.data.callback_id);
+            if(_error_overlay && typeof _error_overlay.show === 'function') {
+                _error_overlay.show("HTTP Error", `Server returned status: ${response.status}`);
+            }
+        }
+    }).catch(err => {
+        _dec_interacting(payload.data.callback_id);
+        console.error("htag event POST error:", err);
+        if(_error_overlay && typeof _error_overlay.show === 'function') {
+            _error_overlay.show("Network Error", "Could not reach server to trigger event.");
+        }
+    });
+}
 
 // Function called by HTML 'on{event}' attributes to send interactions back to Python
 // Returns a Promise that resolves with the server's return value.
