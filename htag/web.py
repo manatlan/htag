@@ -190,8 +190,15 @@ class WebApp:
             instance = self._get_instance(htag_sid, request)
             token = current_request.set(request)
             try:
+                headers = {
+                    "Cache-Control": "no-cache",
+                    "Connection": "keep-alive",
+                    "X-Accel-Buffering": "no",
+                }
                 return StreamingResponse(
-                    instance._handle_sse(request), media_type="text/event-stream"
+                    instance._handle_sse(request),
+                    media_type="text/event-stream",
+                    headers=headers,
                 )
             finally:
                 current_request.reset(token)
