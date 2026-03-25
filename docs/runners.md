@@ -56,6 +56,22 @@ if __name__ == "__main__":
     - Automatic cleanup of temporary browser profiles.
     - **Smart Exit**: Automatically shuts down the Python server when the window is closed.
 
+## Resiliency & Transport Fallback
+
+`htag` implements a robust **3-level transport fallback** mechanism to ensure connectivity across all network environments:
+
+1.  **Level 1: WebSocket** (Primary): Full bidirectional communication.
+2.  **Level 2: SSE (Server-Sent Events)**: Unidirectional push from server; used if WebSockets are blocked by proxies.
+3.  **Level 3: Pure HTTP**: Last-resort synchronous POST communication. The server buffers UI updates in a session-specific queue and returns them directly in the next event response.
+
+This ensures your application remains functional even behind the strictest corporate firewalls or unstable mobile connections.
+
+## Session & Cookie Path
+
+When using `WebApp`, `htag` manages sessions using a `htag_sid` cookie. 
+- **Root Path**: The cookie is automatically set with `path="/"`. This ensures session continuity and CSRF validation even if your application uses multiple sub-paths or is mounted at a non-root location.
+- **CSRF Protection**: Every event request is validated against a session-unique CSRF token passed in the `X-HTAG-TOKEN` header.
+
 ## Development & Hot-Reload (DX)
 
 For an improved Developer Experience (DX), you can pass `reload=True` to the runner during development:

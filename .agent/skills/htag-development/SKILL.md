@@ -56,6 +56,7 @@ htag provides three lifecycle hooks to override on custom components:
     - **Example**: `Tag.div(toto=42)` will result in the instance having a `.toto` attribute set to `42`.
     - **Positional Arguments**: `*args` are automatically appended as children before `init` is evaluated.
 - `on_mount()`: Fired when the component is firmly attached to the main `App` tree (`self.root` is ready).
+    - **F5 / Page Load**: In `WebApp`, `on_mount()` is re-triggered on every initial page load (`GET /`), even if the session instance is reused. This allows components to reset ephemeral UI state (like status labels or timers) whenever the user refreshes the page.
 - `on_unmount(self)`: Fired when the component is removed, ideal for cleaning up tasks, caches, or event listeners.
 
 > **Progressive UI note**: Both `on_mount()` and `on_unmount()` support `yield` (or `yield` in `async` generators) for progressive, multi-step UI rendering, exactly like event handlers. `htag` intelligently queues `on_mount` yields until the browser establishes a connection, and safely broadcasts `on_unmount` updates. *Remember for `on_unmount`: store a reference to external targets before returning the generator (e.g., `self.app_root = self.root`), as the component is detached and `self.parent` relies on `None` when the generator executes.*
@@ -156,11 +157,19 @@ class MySearch(Tag.form):
 ```
 
 ### 6. Resiliency & Fallback
-The `htag/server.py` implementation is fully robust against network irregularities:
-- **WebSocket to HTTP Fallback**: If a WebSocket drops or fails to connect, the Javascript bridge automatically falls back to utilizing standard HTTP POST requests (`/event`) and Server-Sent Events (`/stream`).
-- **Graceful Reconnections**: A user pressing F5 will not kill the server thread. The server only exits when the browser tab is explicitly closed or navigates away cleanly without returning within the 1-second reconnect window. 
-- **Parano Mode (Payload Obfuscation)**: WebApp accepts a `parano=True` parameter that obfuscates all JSON traffic over WebSockets and HTTP routes. This lightweight symmetric XOR cipher hides data from simple MITM proxies without needing heavy cryptographic libraries on the frontend.
-- **CSRF Protection**: All event requests via HTTP POST are automatically protected by a unique CSRF token generated per session and sent in the `X-HTAG-TOKEN` header.
+htag implements a robust **3-level transport fallback** mechanism to ensure connectivity in restricted environments:
+
+1.  **Level 1: WebSocket** (Primary): Full bidirectional communication.
+2.  **Level 2: SSE (Server-Sent Events)**: Unidirectional push from server; fallback for blocked WebSockets.
+3.  **Level 3: Pure HTTP**: Last-resort synchronous POST-based communication.
+    - **Buffered Updates**: When no clients are detected, the server buffers UI payloads in a `_fallback_queue`.
+    - **Synchronous Response**: The next `/event` POST request retrieves and returns all accumulated updates in a single JSON response.
+
+**Key Robustness Rules**:
+- **Global Transport Scope**: For absolute clarity during debugging and to ensure `eval()` calls can always reach them, all transport references should be stored on the global `window` object (e.g., `window.ws`, `window.sse`, `window.use_fallback`).
+- **Forceful Termination**: When switching transport modes, previous links must be forcefully "killed" (nullifying references and unhooking listeners) to avoid spectral activity in browser DevTools.
+- **Origin Logging**: For debugging, it is a best practice to log the update source: `console.log("htag (WS): updates...", ...)` vs `htag (HTTP): ...`.
+- **CSRF & Parano**: All routes are protected by a session-unique CSRF token (`X-HTAG-TOKEN`). `Parano` mode (XOR cipher) provides lightweight obfuscation against MITM proxies.
 
 
 

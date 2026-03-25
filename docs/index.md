@@ -12,6 +12,7 @@
 - **Pythonic & Declarative**: Write UI logic cleanly with `with` blocks (Context Managers).
 - **Reactive State**: True zero-boilerplate `State` management (like React/SolidJS) in pure Python.
 - **Real-time**: Automatic synchronization of UI changes via WebSockets.
+- **Resilient**: Advanced 3-level transport fallback (WebSocket → SSE → Pure HTTP) for 100% connectivity.
 - **Responsive**: Built-in support for multiple runners (Browser, Chrome App).
 - **Type-Safe**: Comprehensive type hints for a great developer experience.
 - **Modern HTML**: Native support for HTML5 void elements.

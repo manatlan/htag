@@ -29,7 +29,7 @@ uvicorn app:app --host 0.0.0.0 --port 80
 
 ### Security Options (Parano Mode)
 
-When exposing your application on the internet, you can use the `parano=True` argument when initializing your `WebApp`. This enables **Parano Mode**, which obfuscates all JSON payloads exchanged between the frontend and backend (over WebSockets and HTTP fallbacks) using a dynamic XOR cipher. This makes your network traffic unreadable to simple Man-In-The-Middle (MITM) proxies without needing complex cryptography libraries.
+When exposing your application on the internet, you can use the `parano=True` argument when initializing your `WebApp`. This enables **Parano Mode**, which obfuscates all JSON payloads exchanged between the frontend and backend (over WebSockets, HTTP SSE, and Pure HTTP fallbacks) using a dynamic XOR cipher. This makes your network traffic unreadable to simple Man-In-The-Middle (MITM) proxies without needing complex cryptography libraries.
 
 ```python
 # Create the WebApp runner with payload obfuscation

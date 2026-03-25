@@ -154,11 +154,16 @@ class WebApp:
             if htag_sid is None:
                 htag_sid = str(uuid.uuid4())
 
+            had_instance = htag_sid and htag_sid in self.instances
             instance = self._get_instance(htag_sid, request)
+            if had_instance:
+                # If session already existed, re-trigger mount to allow state resets (F5)
+                instance._trigger_mount()
+
             token = current_request.set(request)
             try:
                 res = HTMLResponse(instance._render_page())
-                res.set_cookie("htag_sid", htag_sid)
+                res.set_cookie("htag_sid", htag_sid, path="/")
                 return res
             finally:
                 current_request.reset(token)
@@ -223,10 +228,21 @@ class WebApp:
                 msg = _obf_loads(
                     msg_body.decode("utf-8"), getattr(instance, "parano_key", None)
                 )
-                # Run the event in the background to not block the HTTP response
-                # Broadcast will trigger async queues anyway
-                asyncio.create_task(instance.handle_event(msg, None))
-                return JSONResponse({"status": "ok"})
+
+                is_fallback = msg.get("fallback", False)
+
+                if is_fallback:
+                    # Run the event in the foreground and collect generated updates
+                    await instance.handle_event(msg, None)
+                    payloads = getattr(instance, "_fallback_queue", [])
+                    setattr(instance, "_fallback_queue", [])
+                    return JSONResponse({"status": "ok", "payloads": payloads})
+                else:
+                    # Run the event in the background to not block the HTTP response
+                    # Broadcast will trigger async queues anyway
+                    asyncio.create_task(instance.handle_event(msg, None))
+                    return JSONResponse({"status": "ok"})
+
             except Exception as e:
                 error_trace = traceback.format_exc()
                 print(error_trace)

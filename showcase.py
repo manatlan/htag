@@ -202,16 +202,33 @@ class Showcase(Tag.App):
 
             # 10. Transport
             with FeatureSection("10. Transport"):
-                self.ts = Tag.div("WebSocket active", _class="demo-box")
+                self.ts = Tag.div("Level 1: WebSocket active", _class="demo-box")
                 def force_sse(e):
-                    self.exit_on_disconnect = False  # Prevent server exit during test
-                    self.ts.text = "SSE Mode (Forced)"
+                    self.exit_on_disconnect = False
+                    self.ts.text = "Level 2: SSE (Forced) — F5 to reset"
                     self.ts.add_class("active")
-                    self.call_js("if(window.ws) window.ws.close(); window.fallback();")
-                Tag.button("Force SSE Fallback", _onclick=force_sse, _class="danger")
+                    self.call_js("window.HTAG_RELOAD=false; window.fallback();")
+                    
+                def force_http(e):
+                    self.exit_on_disconnect = False
+                    self.ts.text = "Level 3: HTTP Pure (Forced) — F5 to reset"
+                    self.ts.add_class("active")
+                    self.call_js("window.HTAG_RELOAD=false; window.fallback_pure_http();")
+                
+                with Tag.div(_class="actions"):
+                    Tag.button("Force SSE", _onclick=force_sse, _class="alt")
+                    Tag.button("Force HTTP Pure", _onclick=force_http, _class="danger")
+                Tag.div("💡 Hint: F5 / Refresh always restores Level 1 (WebSocket)", _style="font-size:0.75rem; color:#64748b; text-align:center; padding-top:4px;")
+
+
 
         with Tag.footer():
             Tag.p("htag exhaustive validation • Shared App Instance aware")
+
+    def on_mount(self):
+        # Reset transport display on reload (since F5 always restores Level 1)
+        self.ts.text = "Level 1: WebSocket active"
+        self.ts.remove_class("active")
 
     async def stepper(self, e):
         """Demonstrates: Async Generator (Yield)."""
@@ -227,4 +244,4 @@ class Showcase(Tag.App):
         self.h.text = "Hash: " + (e.newURL.split("#")[-1] if "#" in e.newURL else "-")
 
 if __name__ == "__main__":
-    ChromeApp(Showcase).run(reload=True)
+    ChromeApp(Showcase,width=900, height=700).run(reload=False)

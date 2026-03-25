@@ -110,6 +110,17 @@ async def my_async_gen(e: Any) -> AsyncGenerator:
 > Use generators for any operation that takes more than 100ms to keep the UI responsive and provide feedback to the user.
 
 
+## Lifecycle Hooks
+
+`htag` components provide three key lifecycle methods:
+
+- **`init(**kwargs)`**: Called once when the component is created.
+- **`on_mount()`**: Fired when the component is attached to the app. In `WebApp`, this is **re-triggered on every page refresh (F5)**, allowing you to reset volatile UI state (e.g., clearing status messages) while preserving the backend session instance.
+- **`on_unmount()`**: Fired when the component is removed from the tree.
+
+### Generators in Lifecycle Hooks
+Both `on_mount` and `on_unmount` fully support `yield` (standard or async). `htag` intelligently queues `on_mount` updates until the client is ready, and ensures `on_unmount` broadcasts are sent before the component is discarded.
+
 ## Event Decorators
 
 - `@prevent`: Calls `event.preventDefault()` in the browser.

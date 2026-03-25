@@ -8,9 +8,10 @@ def __minify_js(js_code: str) -> str:
 
 CLIENT_JS = __minify_js("""
 // The client-side bridge that connects the browser to the Python server.
-var ws;
-var use_fallback = false;
-var sse;
+window.ws = null;
+window.use_fallback = false;
+window.use_pure_http = false;
+window.sse = null;
 var _base_path = window.location.pathname.endsWith("/") ? window.location.pathname : window.location.pathname + "/";
 window._htag_callbacks = {}; // Store promise resolvers
 function _sync_interacting() {
@@ -135,29 +136,29 @@ function _dec(b64) {
 
 function init_ws() {
     var ws_protocol = window.location.protocol === "https:" ? "wss://" : "ws://";
-    ws = new WebSocket(ws_protocol + window.location.host + _base_path + "ws");
+    window.ws = new WebSocket(ws_protocol + window.location.host + _base_path + "ws");
     
-    ws.onopen = function() {
+    window.ws.onopen = function() {
         console.log("htag: websocket connected");
         if(window._htag_queue && window._htag_queue.length > 0) {
             window._htag_queue.forEach(function(payload) {
-                ws.send(_enc(payload));
+                window.ws.send(_enc(payload));
             });
             window._htag_queue = [];
         }
     };
 
-    ws.onmessage = function(event) {
+    window.ws.onmessage = function(event) {
         var data = _dec(event.data);
-        handle_payload(data);
+        handle_payload(data, "WS");
     };
 
-    ws.onerror = function(err) {
+    window.ws.onerror = function(err) {
         console.warn("htag: websocket error, switching to HTTP fallback (SSE)", err);
         fallback();
     };
 
-    ws.onclose = function(event) {
+    window.ws.onclose = function(event) {
         // If it closes abnormally or very quickly, trigger fallback
         if (event.code !== 1000 && event.code !== 1001) {
              console.warn("htag: websocket closed unexpectedly, switching to HTTP fallback (SSE)", event);
@@ -166,9 +167,9 @@ function init_ws() {
     };
 }
 
-function handle_payload(data) {
+function handle_payload(data, source) {
     if(data.action == "update") {
-        console.log("htag: processing payload updates:", Object.keys(data.updates || {}));
+        console.log("htag (" + (source || "??") + "): processing payload updates:", Object.keys(data.updates || {}));
         // Apply partial DOM updates received from the server
         for(var id in data.updates) {
             var el = document.getElementById(id) || document.querySelector('[data-htag-id="' + id + '"]');
@@ -270,9 +271,16 @@ function fallback() {
     window._htag_callbacks = queued_callbacks;
     _sync_interacting();
 
-    if (use_fallback) return; 
-    use_fallback = true;
-    if(ws) ws.close(); // Ensure ws is torn down
+    if (window.use_fallback) return; 
+    window.use_fallback = true;
+    console.warn("htag: fallback() called, killing transport...");
+    if(window.ws) {
+        console.error("htag: DEBUG - killing websocket now");
+        window.ws.onclose = null; 
+        var _ws = window.ws;
+        window.ws = null;
+        setTimeout(function() { _ws.close(); }, 0);
+    }
     
     // Flush the queue via HTTP fallback
     if (window._htag_queue && window._htag_queue.length > 0) {
@@ -305,17 +313,48 @@ function fallback() {
         return; // Don't try SSE, we just want to reload the page when the server comes back
     }
 
-    sse = new window.EventSource(_base_path + "stream");
-    sse.onopen = () => console.log("htag: SSE connected");
-    sse.onmessage = function(event) {
-        handle_payload(_dec(event.data));
+    window.sse = new window.EventSource(_base_path + "stream");
+    window.sse.onopen = () => console.log("htag: SSE connected");
+    window.sse.onmessage = function(event) {
+        handle_payload(_dec(event.data), "SSE");
     };
-    sse.onerror = function(err) {
+    window.sse.onerror = function(err) {
         console.error("htag: SSE error", err);
-        if(_error_overlay && typeof _error_overlay.show === 'function') {
-            _error_overlay.show("Connection Lost", "Server Sent Events connection failed.");
-        }
+        fallback_pure_http();
     };
+}
+
+function fallback_pure_http() {
+    if (window.use_pure_http) return;
+    window.use_pure_http = true;
+    window.use_fallback = true;
+    console.error("htag: DEBUG - fallback_pure_http() called");
+    console.warn("htag: switching to pure HTTP mode (SSE failed)");
+    if(window.sse) {
+        console.log("htag: killing SSE");
+        window.sse.onerror = null;
+        window.sse.close();
+        window.sse = null;
+    }
+    if(window.ws) {
+        console.log("htag: killing websocket (re-check)");
+        window.ws.onclose = null;
+        window.ws.close();
+        window.ws = null;
+    }
+    
+    // hide error overlay if it was shown by SSE error
+    if(_error_overlay && _error_overlay.hasAttribute('show')) {
+        _error_overlay.removeAttribute('show');
+    }
+    
+    if (window._htag_queue && window._htag_queue.length > 0) {
+        var queue = window._htag_queue;
+        window._htag_queue = [];
+        queue.forEach(function(payload) {
+            window.htag_transport(payload);
+        });
+    }
 }
 
 // Start with WebSockets
@@ -328,24 +367,27 @@ window._htag_queue = window._htag_queue || [];
 
 // Default transport layer (WebSocket + HTTP Fallback)
 window.htag_transport = window.htag_transport || function(payload) {
-    if(!use_fallback && ws) {
-        if(ws.readyState === WebSocket.OPEN) {
-            ws.send(_enc(payload));
-        } else if(ws.readyState === WebSocket.CONNECTING) {
+    if(!window.use_fallback && window.ws) {
+        if(window.ws.readyState === WebSocket.OPEN) {
+            window.ws.send(_enc(payload));
+        } else if(window.ws.readyState === WebSocket.CONNECTING) {
             window._htag_queue.push(payload);
         } else {
             // Use HTTP POST Fallback
-            if (!use_fallback) fallback();
+            if (!window.use_fallback) fallback();
             _send_http(payload);
         }
     } else {
         // Use HTTP POST Fallback
-        if (!use_fallback) fallback();
+        if (!window.use_fallback) fallback();
         _send_http(payload);
     }
 };
 
 function _send_http(payload) {
+    if (window.use_pure_http) {
+        payload.fallback = true;
+    }
     fetch(_base_path + "event", {
         method: "POST",
         headers: {
@@ -354,17 +396,29 @@ function _send_http(payload) {
         },
         body: _enc(payload)
     }).then(response => {
-
         if (!response.ok) {
             _dec_interacting(payload.data.callback_id);
             if(_error_overlay && typeof _error_overlay.show === 'function') {
                 _error_overlay.show("HTTP Error", `Server returned status: ${response.status}`);
             }
+            throw new Error("HTTP " + response.status);
+        }
+        return response.text();
+    }).then(text => {
+        if (!text) return;
+        var res = JSON.parse(text);
+        if (res && res.payloads) {
+            res.payloads.forEach(p_str => {
+                var p = (typeof p_str === "string") ? _dec(p_str) : p_str;
+                handle_payload(p, "HTTP");
+            });
         }
     }).catch(err => {
-        _dec_interacting(payload.data.callback_id);
+        if (payload && payload.data && payload.data.callback_id) {
+            _dec_interacting(payload.data.callback_id);
+        }
         console.error("htag event POST error:", err);
-        if(_error_overlay && typeof _error_overlay.show === 'function') {
+        if(!window.use_pure_http && _error_overlay && typeof _error_overlay.show === 'function') {
             _error_overlay.show("Network Error", "Could not reach server to trigger event.");
         }
     });

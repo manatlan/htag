@@ -32,7 +32,7 @@ Currently, it works ...
 - A lot simpler & more reactive
 - `Tag.App` is the main app component
 - Full starlette compliant from the ground
-- Websocket communication, if fails : fallback to HTTP SSE
+- Websocket communication, fallback to HTTP SSE, and ultimately fallback to Pure HTTP
 - No more generic Runner
 - State object for reactivity
 - DX: errors are a lot better handled/viewable, hot-reload available
@@ -77,7 +77,8 @@ htag is a Python library for building web applications using HTML, CSS, and Java
 ### New Features
 *   **Zero-Config Hot-Reload**: Passing `reload=True` to any runner (e.g. `ChromeApp(App).run(reload=True)`) automatically watches for Python file changes, seamlessly restarts the backend, and gracefully refreshes the frontend without losing your browser window session.
 *   **F5/Reload Robustness**: Refreshing the browser no longer kills the Python backend; the session reconstructs cleanly.
-*   **HTTP Fallback (SSE + POST)**: If WebSockets are blocked (e.g. strict proxies) or fail to connect, the client seamlessly falls back to HTTP POST for events and Server-Sent Events (SSE) for receiving UI updates.
+*   **Level 2: HTTP SSE**: If WebSockets are blocked (e.g. strict proxies) or fail to connect, the client seamlessly falls back to HTTP POST for events and Server-Sent Events (SSE) for receiving UI updates.
+*   **Level 3: Pure HTTP**: If even SSE is unavailable, the application gracefully degrades to purely synchronous HTTP POST requests. The server processes the events and returns the UI updates in the HTTP response directly. (Note: Server-initiated `yield` and background tasks won't reflect on the client until their next interaction).
 *   **Production Debug Mode**: Easily disable error reporting in the client by setting `debug=False` on the runner (e.g. `WebApp(App, debug=False).app`), preventing internal stacktraces from leaking to users.
 *   **Parano Mode (Payload Obfuscation)**: By initializing `WebApp(App, parano=True)`, all data exchanged between the frontend and backend is automatically obfuscated using a dynamic XOR cipher and Base64 wrapping, making network traffic unreadable to MITM proxies.
 *   **Progressive UI in Lifecycle Hooks**: Both `on_mount()` and `on_unmount()` fully support yielding intermediate UI states natively. `htag` intelligently queues `on_mount` generators until the client establishes a connection, and gracefully processes `on_unmount` broadcasts.
@@ -99,6 +100,15 @@ htag is a Python library for building web applications using HTML, CSS, and Java
 *   **Automatic Attribute Assignment**: Non-prefixed keyword arguments passed during component instantiation are automatically assigned as instance attributes, simplifying data passing to custom components.
 *   **Unified Form Handling**: When a `Tag.form` is submitted, all input fields are automatically collected into a dictionary and passed as `event.value`. You can conveniently access fields using square brackets on the event object (e.g., `e["fieldname"]`).
 
+## Tests communication between front and back
+
+By default, htag will use a Websocket (level1). It it cant, it will use HTTP SSE (/stream & /event) (level ). And if it can't, it will use pure HTTP connection (level3).
+
+To tests them in live (debugging):
+
+- 1/ **websocket** : press F5, it will reset to websocket mode
+- 2/ **sse** : in devtools/console : type `fallback();`
+- 3/ **http-pure**: in devtools/console : `fallback_pure_http();` (should always work!)
 
 ## History
 

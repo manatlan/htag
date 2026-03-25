@@ -40,7 +40,7 @@ def app_port():
     p.terminate()
     p.join()
 
-def run_showcase_checks(page: Page):
+def run_showcase_checks(page: Page, is_pure_http=False):
     # 1. Reactivity
     expect(page.locator("text=Count: 0 | Items: A")).to_be_visible()
     page.click("button:has-text('+1')")
@@ -51,7 +51,8 @@ def run_showcase_checks(page: Page):
     # 2. Stepping (Yield)
     expect(page.locator("text=Ready")).to_be_visible()
     page.click("button:has-text('Start Async Process')")
-    expect(page.locator("text=Step 1: Init...")).to_be_visible()
+    if not is_pure_http:
+        expect(page.locator("text=Step 1: Init...")).to_be_visible()
     expect(page.locator("text=Step 3: DONE!")).to_be_visible(timeout=5000)
 
     # 3. Binding & Class
@@ -70,7 +71,6 @@ def run_showcase_checks(page: Page):
     expect(page.locator("text=Found! Childs:")).to_be_visible()
 
     # 5. Events & Context
-    page.on("dialog", lambda dialog: dialog.accept()) # Accept alerts
     page.click("button:has-text('UA')")
     page.click("button:has-text('Stop & Coords')")
     
@@ -103,6 +103,8 @@ def test_showcase_features_dual_transport(app_port, page: Page):
     url = f"http://127.0.0.1:{app_port}"
     page.goto(url)
     
+    page.on("dialog", lambda dialog: dialog.accept()) # Accept alerts globally
+    
     print("\n--- PHASE 1: Testing via WebSockets ---")
     run_showcase_checks(page)
     
@@ -112,8 +114,18 @@ def test_showcase_features_dual_transport(app_port, page: Page):
     
     # We must be in WS mode here because it's a new session
     # We force SSE
-    page.click("button:has-text('Force SSE Fallback')")
-    expect(page.locator("text=SSE Mode (Forced)")).to_be_visible()
+    page.click("button:has-text('Force SSE')")
+    expect(page.locator("text=Level 2: SSE (Forced)")).to_be_visible()
     
     print("--- PHASE 2: Testing via SSE ---")
     run_showcase_checks(page)
+
+    print("\n--- PHASE 3: Forcing HTTP Pure Fallback ---")
+    page.context.clear_cookies()
+    page.reload()
+    
+    page.click("button:has-text('Force HTTP Pure')")
+    expect(page.locator("text=Level 3: HTTP Pure (Forced)")).to_be_visible()
+    
+    print("--- PHASE 3: Testing via HTTP Pure ---")
+    run_showcase_checks(page, is_pure_http=True)

@@ -376,6 +376,13 @@ class AppRunner(BaseApp):
 
         self._walk_tree(tag, visitor)
 
+    def _push_to_fallback(self, payload: str) -> None:
+        if not hasattr(self, "_fallback_queue"):
+            self._fallback_queue = []
+        if len(self._fallback_queue) < 1000:
+            self._fallback_queue.append(payload)
+
+
     async def handle_event(self, msg: dict[str, Any], ws: WebSocket | None) -> None:
         logger.info(f"handle_event {msg}")
         tag_id: str | None = msg.get("id")
@@ -450,15 +457,21 @@ class AppRunner(BaseApp):
                         getattr(self, "parano_key", None),
                     )
 
+                    has_sent = False
                     if ws:
                         try:
                             await ws.send_text(err_payload)
+                            has_sent = True
                         except Exception:
                             pass
                     else:
                         # Fallback Mode: Trigger error broadcast through SSE
                         for queue in self.sse_queues:
                             queue.put_nowait(err_payload)
+                            has_sent = True
+
+                    if not has_sent:
+                        self._push_to_fallback(err_payload)
 
                     return
             else:
@@ -507,16 +520,22 @@ class AppRunner(BaseApp):
                 },
                 getattr(self, "parano_key", None),
             )
+            has_sent = False
             for queue in self.sse_queues:
                 queue.put_nowait(err_payload)
+                has_sent = True
             dead_ws = []
             for client in list(self.websockets):
                 try:
                     await client.send_text(err_payload)
+                    has_sent = True
                 except Exception:
                     dead_ws.append(client)
             for client in dead_ws:
                 self.websockets.discard(client)
+            
+            if not has_sent:
+                self._push_to_fallback(err_payload)
 
     async def broadcast_updates(
         self, result: Any = None, callback_id: str | None = None, ws: WebSocket | None = None
@@ -549,11 +568,13 @@ class AppRunner(BaseApp):
                 getattr(self, "parano_key", None),
             )
 
+            has_sent = False
             # Send to websocket clients
             dead_ws: list[WebSocket] = []
             for client in list(self.websockets) + ([ws] if ws and ws not in self.websockets else []):
                 try:
                     await client.send_text(err_payload)
+                    has_sent = True
                 except Exception:
                     dead_ws.append(client)
             for client in dead_ws:
@@ -562,6 +583,10 @@ class AppRunner(BaseApp):
             # Send to SSE clients
             for queue in self.sse_queues:
                 queue.put_nowait(err_payload)
+                has_sent = True
+
+            if not has_sent:
+                self._push_to_fallback(err_payload)
 
             return  # Abort sending normal updates
 
@@ -591,11 +616,13 @@ class AppRunner(BaseApp):
 
             payload = _obf_dumps(data, getattr(self, "parano_key", None))
 
+            has_sent = False
             # Send to websocket clients
             dead_ws_clients: list[WebSocket] = []
             for client in list(self.websockets) + ([ws] if ws and ws not in self.websockets else []):
                 try:
                     await client.send_text(payload)
+                    has_sent = True
                 except Exception:
                     dead_ws_clients.append(client)
             for client in dead_ws_clients:
@@ -604,6 +631,10 @@ class AppRunner(BaseApp):
             # Send to SSE clients
             for queue in self.sse_queues:
                 queue.put_nowait(payload)
+                has_sent = True
+                
+            if not has_sent:
+                self._push_to_fallback(payload)
 
     def render_tag(self, tag: GTag) -> str:
         """
