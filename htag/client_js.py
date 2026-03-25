@@ -418,9 +418,9 @@ function _send_http(payload) {
             _dec_interacting(payload.data.callback_id);
         }
         console.error("htag event POST error:", err);
-        if(!window.use_pure_http && _error_overlay && typeof _error_overlay.show === 'function') {
-            _error_overlay.show("Network Error", "Could not reach server to trigger event.");
-        }
+        // if(!window.use_pure_http && _error_overlay && typeof _error_overlay.show === 'function') {
+        //     _error_overlay.show("Network Error", "Could not reach server to trigger event.");
+        // }
     });
 }
 
