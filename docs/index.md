@@ -14,10 +14,12 @@
 - **Real-time**: Automatic synchronization of UI changes via WebSockets.
 - **Resilient**: Advanced 3-level transport fallback (WebSocket → SSE → Pure HTTP) for 100% connectivity.
 - **Responsive**: Built-in support for multiple runners (Browser, Chrome App).
+- **Recursive Statics**: Components created dynamically have their CSS/JS collected correctly.
+- **SPA Router**: Native, lightweight hash-based router (`htag.Router`) for SPAs with dynamic routing and lifecycle management.
+- **Port 0 Support**: All runners now support dynamic port assignment from the OS.
+- **Unified Forms**: Automatic collection of all form fields on submission.
+- **Modern Attribute Access**: Simple dictionary-style management of HTML attributes.
 - **Type-Safe**: Comprehensive type hints for a great developer experience.
-- **Modern HTML**: Native support for HTML5 void elements.
-- **Scoped Styles**: Simple, robust CSS scoping via the `styles` attribute.
-- **Class Helpers**: Convenient methods like `toggle_class()` and `has_class()`.
 - **Automatic Attributes**: Non-prefixed keyword arguments are automatically assigned as instance attributes.
 
 ## Quick Start
@@ -53,7 +55,7 @@ if __name__ == "__main__":
 
 ---
 
-[Next: Components →](components.md) | [Reactivity & State →](reactivity.md)
+[Next: Components →](components.md) | [Reactivity & State →](reactivity.md) | [Routing →](routing.md)
 
 ---
 

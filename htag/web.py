@@ -62,6 +62,15 @@ class WebApp:
         reload: bool = False,
         **kwargs: Any,
     ) -> None:
+        if port == 0:
+            if "HTAG_PORT" in os.environ:
+                port = int(os.environ["HTAG_PORT"])
+            else:
+                import socket
+                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                    s.bind((host, 0))
+                    port = s.getsockname()[1]
+                os.environ["HTAG_PORT"] = str(port)
         """
         Runs the WebApp using uvicorn.
         """
@@ -80,6 +89,11 @@ class WebApp:
                 from .runner import Reloader
                 Reloader.run_with_reloader()
                 return
+
+        # Standard uvicorn logging configuration
+        log_config = (
+            None if getattr(sys, "frozen", False) else uvicorn.config.LOGGING_CONFIG
+        )
 
         if open_browser:
 

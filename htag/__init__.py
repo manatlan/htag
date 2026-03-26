@@ -2,6 +2,7 @@ from .core import prevent, stop, State, current_request
 from .tag import Tag
 from .runner import AppRunner as App
 from .web import WebApp
+from .router import Router
 from .runners import ChromeApp, PyScript
 
 import logging
@@ -21,6 +22,7 @@ __all__ = [
     "__version__",
     "Tag",  # the main thing
     "State",    # State management
+    "Router",   # SPA hash-based router
     "WebApp",   # the ASGI runner
 
     # Specialized runners

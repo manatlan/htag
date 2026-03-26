@@ -319,7 +319,49 @@ htag_event('tag_id', 'custom', 'any string or number')
 htag_event('tag_id', 'custom', {any: 'object'})
 ```
 
-### 13. Migrating from htag v1 to v2
+### 13. SPA Router (Hash-Based)
+
+For multi-page behavior in a Single Page Application (SPA), use the built-in `Router`. It maps URL hashes (e.g., `#/users/42`) to component classes and handles synchronization with the browser history.
+
+**Key Features**:
+- **Automatic Lifecycle**: `on_mount()` and `on_unmount()` are called automatically when swapping pages.
+- **Route Parameters**: Dynamic segments (e.g., `:id`) are injected directly as keyword arguments into the page's `init()`.
+- **Programmatic Navigation**: Use `router.navigate("/new-path")` to steer the UI from Python.
+
+```python
+from htag import Tag, Router
+
+class HomePage(Tag.div):
+    def init(self):
+        Tag.h1("Home")
+        Tag.a("Go to User 42", _href="#/users/42")
+
+class UserPage(Tag.div):
+    def init(self, id: str): # 'id' is extracted from the URL
+        self.user_id = id
+        Tag.h1(f"User Profile: {id}")
+    
+    def on_mount(self):
+        # Triggered when navigating TO this page
+        print(f"Loading user {self.user_id}...")
+
+class App(Tag.App):
+    def init(self):
+        # 1. Instantiate the Router
+        self.router = Router()
+        
+        # 2. Register routes
+        self.router.add_route("/", HomePage)
+        self.router.add_route("/users/:id", UserPage)
+        
+        # 3. Add it to the UI
+        self <= self.router
+```
+
+**Custom 404**:
+Provide a component to handle unmatched routes using `router.set_not_found(My404Component)`. The component will receive the requested path as a `path` keyword argument (if its `init()` accepts it).
+
+### 14. Migrating from htag v1 to v2
 
 If you are migrating legacy htag v1 components, be aware of these core framework changes:
 
@@ -416,13 +458,15 @@ async def _onclick(self, event):
 - **Starlette Integration**: Recommended for web access. Mount your `htag_app.app` into a Starlette instance.
 
 **Hot-Reloading for Development**:
-To prevent constantly closing and re-opening your application window during development, pass `reload=True` to the runner:
+To prevent constantly closing and re-opening your application window during development, pass `reload=True` to the runner. The master process will watch for changes and restart the child worker server seamlessly.
+
+**Ephemeral Ports (`port=0`)**:
+If you run multiple htag apps or tests, you might encounter "Address already in use" errors. Pass `port=0` to the runner to pick an available port automatically. htag will resolve the port and open the browser on the correct URL.
 ```python
 if __name__ == "__main__":
     from htag import ChromeApp
-    # Master process watches files; child process runs server. 
-    # Browser auto-reconnects and refreshes seamlessly!
-    ChromeApp(MyApp).run(reload=True) 
+    # Picks a random available port automatically and opens the browser
+    ChromeApp(MyApp).run(port=0, reload=True) 
 ```
 
 ## Build standalone executable

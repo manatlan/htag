@@ -100,6 +100,8 @@ htag is a Python library for building web applications using HTML, CSS, and Java
 *   **Automatic Attribute Assignment**: Non-prefixed keyword arguments passed during component instantiation are automatically assigned as instance attributes, simplifying data passing to custom components.
 *   **Unified Form Handling**: When a `Tag.form` is submitted, all input fields are automatically collected into a dictionary and passed as `event.value`. You can conveniently access fields using square brackets on the event object (e.g., `e["fieldname"]`).
 *   **Background Reactivity & `update()`**: `State` mutations from background tasks (started via `asyncio.create_task`) now automatically trigger UI updates without needing manual user interaction. For non-state-based changes, every component now exposes an `.update()` method (e.g., `self.root.update()` or simply `self.update()`) to manually schedule a throttled UI synchronization.
+*   **Hash-Based SPA Router**: Introducing `Router` for client-side navigation. Define route patterns (e.g., `/tasks/:id`), map them to component classes, and handle navigation seamlessly with browser history support (Back/Forward buttons) and automatic lifecycle management.
+*   **Ephemeral Ports**: Support for `port=0` in all runners to pick a free port automatically.
 
 ## Tests communication between front and back
 

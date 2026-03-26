@@ -4,7 +4,6 @@ import inspect
 import logging
 import os
 import platform
-import signal
 import subprocess
 import sys
 import time
@@ -48,6 +47,16 @@ class ChromeApp:
         reload: bool = False,
         **kwargs: Any,
     ) -> None:
+        if port == 0:
+            if "HTAG_PORT" in os.environ:
+                port = int(os.environ["HTAG_PORT"])
+            else:
+                import socket
+                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                    s.bind((host, 0))
+                    port = s.getsockname()[1]
+                os.environ["HTAG_PORT"] = str(port)
+
         if reload:
             # Tag the app so the frontend knows to auto-reconnect
             if inspect.isclass(self.app):
@@ -215,4 +224,3 @@ class ChromeApp:
             None if getattr(sys, "frozen", False) else uvicorn.config.LOGGING_CONFIG
         )
         uvicorn.run(ws.app, host=host, port=port, log_config=log_config)
-

@@ -87,6 +87,23 @@ When `reload=True` is provided:
 2. **Auto-Restart**: When you save a file, the Python ASGI backend is instantly terminated and restarted with your new code.
 3. **Seamless Browser Refresh**: The UI frontend stays open. It will realize the backend went offline, automatically poll for reconnection, and gracefully refresh the window once the new backend is up.
 
+## Ephemeral Ports (`port=0`)
+
+When developing locally or running automated tests, you may run into "Address already in use" errors if a previous process didn't shut down correctly or if multiple apps are running.
+
+You can pass `port=0` to any runner's `run()` method. `htag` will:
+1.  Ask the Operating System for an available random port.
+2.  Reserve it and ensure it's used by the underlying `uvicorn` server.
+3.  Automatically open the browser (or Chrome window) on that specific port.
+4.  If `reload=True` is used, the port remains consistent across all auto-restarts.
+
+```python
+if __name__ == "__main__":
+    from htag import ChromeApp
+    # Automatically picks a free port
+    ChromeApp(MyApp).run(port=0) 
+```
+
 ---
 
 [← Events](events.md) | [Next: Advanced →](advanced.md)
