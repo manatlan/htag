@@ -537,6 +537,26 @@ class AppRunner(BaseApp):
             if not has_sent:
                 self._push_to_fallback(err_payload)
 
+    def update(self) -> None:
+        """
+        Schedules a broadcast of all pending updates in the next event loop iteration.
+        This provides a throttled, asynchronous update mechanism that can be safely
+        triggered from both synchronous and asynchronous code.
+        """
+        if not getattr(self, "_update_scheduled", False):
+            try:
+                loop = asyncio.get_running_loop()
+                self._update_scheduled = True
+                loop.call_soon(self._do_update)
+            except RuntimeError:
+                # No running loop (might happen during early initialization)
+                pass
+
+    def _do_update(self) -> None:
+        """Internal callback to handle the actual broadcast after call_soon."""
+        self._update_scheduled = False
+        asyncio.create_task(self.broadcast_updates())
+
     async def broadcast_updates(
         self, result: Any = None, callback_id: str | None = None, ws: WebSocket | None = None
     ) -> None:

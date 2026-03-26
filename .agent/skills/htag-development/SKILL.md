@@ -57,9 +57,12 @@ htag provides three lifecycle hooks to override on custom components:
     - **Positional Arguments**: `*args` are automatically appended as children before `init` is evaluated.
 - `on_mount()`: Fired when the component is firmly attached to the main `App` tree (`self.root` is ready).
     - **F5 / Page Load**: In `WebApp`, `on_mount()` is re-triggered on every initial page load (`GET /`), even if the session instance is reused. This allows components to reset ephemeral UI state (like status labels or timers) whenever the user refreshes the page.
-- `on_unmount(self)`: Fired when the component is removed, ideal for cleaning up tasks, caches, or event listeners.
+- `on_unmount(self)`: Fired when the component is removed from the tree. In `WebApp`, it is **also called before every page refresh (F5)**, allowing you to properly clean up resources (e.g., cancelling background tasks) before the view is reset.
 
-> **Progressive UI note**: Both `on_mount()` and `on_unmount()` support `yield` (or `yield` in `async` generators) for progressive, multi-step UI rendering, exactly like event handlers. `htag` intelligently queues `on_mount` yields until the browser establishes a connection, and safely broadcasts `on_unmount` updates. *Remember for `on_unmount`: store a reference to external targets before returning the generator (e.g., `self.app_root = self.root`), as the component is detached and `self.parent` relies on `None` when the generator executes.*
+> [!NOTE]
+> **Multiple Mounts version Init**: You might notice `on_mount` called multiple times during the initial load if you use both `GTag`'s auto-stack mechanism and manual addition (e.g., `self.child = MyChild(); self <= self.child`). This is harmless but good to know when counting mounts in tests.
+
+> **Progressive UI note**: Both `on_mount()` and `on_unmount()` support `yield` (or `yield` in `async` generators) for progressive, multi-step UI rendering. In `WebApp`, `on_unmount()` is correctly called before `on_mount()` version a page refresh (F5), ensuring resource cleanup (e.g. cancelling tasks). `htag` intelligently queues `on_mount` generators until the client connects. *Remember for `on_unmount`: store a reference to external targets before returning the generator (e.g., `self.app_root = self.root`), as the component is detached and `self.parent` relies on `None` when the generator executes.*
 
 ### 3. Composite Components
 When creating complex UI components (like a Card or a Window), you should override the `add(self, o)` method so that when users do `my_card <= content`, the content goes into the correct inner container, not the root tag.
@@ -100,6 +103,27 @@ htag supports both traditional "dirty-marking" and modern reactive `State`.
 
 **Rapid Content Updates**:
 - Use the `.text` property to quickly replace all text content of a tag: `self.my_label.text = "New Status"`. This completely clears existing children and replaces them with a single string.
+**Background Tasks & `update()`**:
+- **Automatic Reactivity**: When using `State`, mutations from background tasks (started via `asyncio.create_task`) automatically trigger UI synchronization.
+- **Manual Synchronization**: For non-state changes or complex manual updates, every component exposes an `.update()` method (e.g., `self.update()`) which schedules a throttled UI broadcast. 
+- **Pattern**: Use `on_mount` to start background tasks and `on_unmount` to cancel them. (This pattern is now robust against page refreshes in `WebApp`).
+
+```python
+class App(Tag.App):
+    def init(self):
+        self.count = State(0)
+        Tag.div(self.count)
+        
+    def on_mount(self):
+        async def run():
+            while True:
+                self.count += 1
+                await asyncio.sleep(1)
+        self.task = asyncio.create_task(run())
+
+    def on_unmount(self):
+        self.task.cancel()
+```
 
 **Traditional Reactivity (HTML Attributes & Events)**:
 - **HTML Attributes**: 

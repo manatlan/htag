@@ -157,7 +157,8 @@ class WebApp:
             had_instance = htag_sid and htag_sid in self.instances
             instance = self._get_instance(htag_sid, request)
             if had_instance:
-                # If session already existed, re-trigger mount to allow state resets (F5)
+                # If session already existed, re-trigger unmount/mount to allow state resets (F5)
+                instance._trigger_unmount()
                 instance._trigger_mount()
 
             token = current_request.set(request)

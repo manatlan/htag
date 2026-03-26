@@ -4,6 +4,7 @@ from htag import State
 class MockTag:
     def __init__(self):
         self._GTag__dirty = False
+        self.root = None
 
 def test_state_proxy_iadd():
     s = State(1)

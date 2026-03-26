@@ -59,6 +59,19 @@ class Clock(Tag.div):
     def on_unmount(self) -> None:
         # We are removed from the screen! Cleanup...
         print("Clock unmounted")
+
+### Background Tasks & `update()`
+
+- **Automatic Reactivity**: `State` mutations from background tasks (started via `asyncio.create_task`) now automatically trigger UI updates.
+- **Manual Synchronization**: For non-state changes, use `self.update()` to schedule a throttled UI sync.
+
+```python
+    def on_mount(self):
+        async def run():
+            while True:
+                self.count += 1
+                await asyncio.sleep(1)
+        self.task = asyncio.create_task(run())
 ```
 
 ### Tree Manipulation

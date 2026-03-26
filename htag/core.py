@@ -44,6 +44,9 @@ class State:
     def _notify_observers(self) -> None:
         for observer in list(self._observers):
             observer._GTag__dirty = True
+            root = observer.root
+            if root and hasattr(root, "update"):
+                root.update()
 
     def _wrap(self, val: Any) -> Any:
         if isinstance(val, (list, dict, set, tuple)):
@@ -707,6 +710,15 @@ class GTag:  # aka "Generic Tag"
     def call_js(self, script: str) -> "GTag":
         self.__js_calls.append(script)
         return self
+
+    def update(self) -> None:
+        """
+        Schedules a UI synchronization.
+        Useful when modifying state from background tasks or outside regular event handlers.
+        """
+        root = self.root
+        if root and hasattr(root, "update"):
+            root.update()
 
     # --- Public API for server-side access (avoids name-mangled access) ---
 

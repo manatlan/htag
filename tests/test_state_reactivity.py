@@ -8,6 +8,7 @@ def test_state_iadd_reactivity():
     class MockTag:
         def __init__(self):
             self._GTag__dirty = False
+            self.root = None
     
     t = MockTag()
     s._observers.add(t)
@@ -22,6 +23,7 @@ def test_state_set_reactivity():
     class MockTag:
         def __init__(self):
             self._GTag__dirty = False
+            self.root = None
     
     t = MockTag()
     s._observers.add(t)
@@ -35,6 +37,7 @@ def test_state_assignment_reactivity():
     class MockTag:
         def __init__(self):
             self._GTag__dirty = False
+            self.root = None
     
     t = MockTag()
     s._observers.add(t)
