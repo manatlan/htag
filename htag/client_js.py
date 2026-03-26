@@ -12,6 +12,7 @@ window.ws = null;
 window.use_fallback = false;
 window.use_pure_http = false;
 window.sse = null;
+window.HTAG_TIMEOUT = 3000; // Timeout for transport establishment (ms)
 var _base_path = window.location.pathname.endsWith("/") ? window.location.pathname : window.location.pathname + "/";
 window._htag_callbacks = {}; // Store promise resolvers
 function _sync_interacting() {
@@ -138,7 +139,15 @@ function init_ws() {
     var ws_protocol = window.location.protocol === "https:" ? "wss://" : "ws://";
     window.ws = new WebSocket(ws_protocol + window.location.host + _base_path + "ws");
     
+    var ws_timeout = setTimeout(() => {
+        if (window.ws && window.ws.readyState === WebSocket.CONNECTING) {
+            console.warn("htag: websocket connection timeout, falling back");
+            fallback();
+        }
+    }, window.HTAG_TIMEOUT);
+
     window.ws.onopen = function() {
+        clearTimeout(ws_timeout);
         console.log("htag: websocket connected");
         if(window._htag_queue && window._htag_queue.length > 0) {
             window._htag_queue.forEach(function(payload) {
@@ -154,11 +163,13 @@ function init_ws() {
     };
 
     window.ws.onerror = function(err) {
+        clearTimeout(ws_timeout);
         console.warn("htag: websocket error, switching to HTTP fallback (SSE)", err);
         fallback();
     };
 
     window.ws.onclose = function(event) {
+        clearTimeout(ws_timeout);
         // If it closes abnormally or very quickly, trigger fallback
         if (event.code !== 1000 && event.code !== 1001) {
              console.warn("htag: websocket closed unexpectedly, switching to HTTP fallback (SSE)", event);
@@ -314,11 +325,22 @@ function fallback() {
     }
 
     window.sse = new window.EventSource(_base_path + "stream");
-    window.sse.onopen = () => console.log("htag: SSE connected");
+    var sse_timeout = setTimeout(() => {
+        if (window.sse && window.sse.readyState === 0) { // 0 is CONNECTING
+            console.warn("htag: SSE connection timeout, falling back to pure HTTP");
+            fallback_pure_http();
+        }
+    }, window.HTAG_TIMEOUT);
+
+    window.sse.onopen = () => {
+        clearTimeout(sse_timeout);
+        console.log("htag: SSE connected");
+    };
     window.sse.onmessage = function(event) {
         handle_payload(_dec(event.data), "SSE");
     };
     window.sse.onerror = function(err) {
+        clearTimeout(sse_timeout);
         console.error("htag: SSE error", err);
         fallback_pure_http();
     };
