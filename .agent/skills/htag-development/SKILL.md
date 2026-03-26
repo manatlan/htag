@@ -430,6 +430,14 @@ class MapWidget(Tag.div):
     
     def init(self):
         self.id = "map-container"
+
+### Page Title
+To set the `<title>` of your application's tab, include a `Tag.title` element in the `statics` list of your main `App` class. htag automatically extracts it to set the initial page title and prevents duplicate title tags in the `<head>`. If omitted, it defaults to the App's class name.
+
+```python
+class MyApp(Tag.App):
+    statics = [Tag.title("My Awesome App")]
+```
 ```
 
 ### Event Control

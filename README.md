@@ -102,6 +102,7 @@ htag is a Python library for building web applications using HTML, CSS, and Java
 *   **Background Reactivity & `update()`**: `State` mutations from background tasks (started via `asyncio.create_task`) now automatically trigger UI updates without needing manual user interaction. For non-state-based changes, every component now exposes an `.update()` method (e.g., `self.root.update()` or simply `self.update()`) to manually schedule a throttled UI synchronization.
 *   **Hash-Based SPA Router**: Introducing `Router` for client-side navigation. Define route patterns (e.g., `/tasks/:id`), map them to component classes, and handle navigation seamlessly with browser history support (Back/Forward buttons) and automatic lifecycle management.
 *   **Ephemeral Ports**: Support for `port=0` in all runners to pick a free port automatically.
+*   **Automatic Page Title**: htag automatically extracts `Tag.title` from your `App.statics` list to set the browser tab title, avoiding duplicate tags in the HTML head. It fallbacks to the class name if none is provided.
 
 ## Tests communication between front and back
 

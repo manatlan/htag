@@ -172,9 +172,9 @@ class AppRunner(BaseApp):
         self.sent_statics.clear()
         all_statics: list[str] = []
         try:
-            self.collect_statics(self, all_statics)
+            title = self.collect_statics(self, all_statics) or self.__class__.__name__
         except Exception:
-            pass  # Fatal error already caught above
+            title = self.__class__.__name__
         self.sent_statics.update(all_statics)
         statics_html = "".join(all_statics)
 
@@ -183,7 +183,7 @@ class AppRunner(BaseApp):
         <html>
             <head>
                 <meta charset="utf-8">
-                <title>{self.__class__.__name__}</title>
+                <title>{title}</title>
                 <meta name="viewport" content="width=device-width, initial-scale=1">
                 <link rel="icon" href="/logo.png">
                 <script>{CLIENT_JS}</script>
@@ -346,10 +346,11 @@ class AppRunner(BaseApp):
 
         self._walk_tree(tag, visitor)
 
-    def collect_statics(self, tag: GTag, result: list[str]) -> None:
-        """Recursively collects statics from the whole tag tree."""
+    def collect_statics(self, tag: GTag, result: list[str]) -> str | None:
+        """Recursively collects statics from the whole tag tree, returns the first title found."""
         seen_ids = set()
         seen_contents = set(result)
+        found_title: list[str | None] = [None]
 
         def visitor(t: GTag) -> None:
             s_instance = getattr(t, "statics", [])
@@ -364,6 +365,11 @@ class AppRunner(BaseApp):
                 if not isinstance(s_list, (list, tuple)):
                     s_list = [s_list]
                 for s in s_list:
+                    if isinstance(s, GTag) and s.tag == "title":
+                        # We extract text, and don't add to results (special head treatment)
+                        found_title[0] = s.text
+                        continue
+
                     sid = id(s)
                     if sid in seen_ids:
                         continue
@@ -375,6 +381,7 @@ class AppRunner(BaseApp):
                         result.append(s_str)
 
         self._walk_tree(tag, visitor)
+        return found_title[0]
 
     def _push_to_fallback(self, payload: str) -> None:
         if not hasattr(self, "_fallback_queue"):
@@ -612,6 +619,7 @@ class AppRunner(BaseApp):
 
         all_statics: list[str] = []
         self.collect_statics(self, all_statics)
+
         new_statics = [s for s in all_statics if s not in self.sent_statics]
 
         if updates or js_calls or new_statics or callback_id:
