@@ -37,15 +37,10 @@ Make the `_render_attrs` method register the `GTag` as an observer of any `State
 
 ---
 
-## 4. Component Scoping vs. Dynamic Classes
-
-### 🚩 Problem
-When a component class defines `styles = "..."`, `GTag` automatically adds a scoped class (e.g., `.htag-Button`) to the tag in `__init__`. 
-If a developer also defines `self["class"] = lambda: ...` in `init()`, subsequent calls to `add_class()` (triggered by the core) will crash because they try to call `.split()` on the lambda function instead of a string.
-
-### ✅ Proposed Fix
-Improve `_update_classes` to handle cases where `self.__attrs["class"]` is a callable.
-*   **Logic:** If `class` is a callable, either wrap it or ensure scoping is appended to the lambda result.
+---
+4. Component Scoping vs. Dynamic Classes ✅ FIXED
+Improve `_update_classes` to handle cases where `self.__attrs["class"]` is a callable or a State object.
+*   **Logic:** If `class` is a callable, it is wrapped to ensure mutations (addition/removal) are preserved and scoping is maintained. If it's a `State` object, its `.value` is updated directly.
 
 ---
 

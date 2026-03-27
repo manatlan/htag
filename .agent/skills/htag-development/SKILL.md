@@ -136,10 +136,11 @@ class App(Tag.App):
   - Example: `self["onclick"] = my_func`
 
 **CSS Class Helpers**:
-- `tag.add_class("active")` — adds a class if not already present
-- `tag.remove_class("active")` — removes a class if present
-- `tag.toggle_class("hidden")` — adds or removes a class
-- `tag.has_class("active")` — returns `bool`
+- `tag.add_class("active")` — adds a class if not already present.
+- `tag.remove_class("active")` — removes a class if present.
+- `tag.toggle_class("hidden")` — adds or removes a class.
+- `tag.has_class("active")` — returns `bool`.
+- **Reactive Support**: These helpers work seamlessly even if the `class` attribute is defined via a lambda or a `State` object. `htag` automatically wraps lambdas or updates the `State` value to preserve reactivity while applying the requested changes.
 
 ### 4a. Finding Tags (`find_tag`)
 You can recursively search for a tag within a tree using `self.find_tag(root, tag_id)`.

@@ -684,7 +684,31 @@ class GTag:  # aka "Generic Tag"
 
     def _update_classes(self, fn: Callable[[list[str]], None]) -> "GTag":
         with self.__lock:
-            classes = self.__attrs.get("class", "").split()
+            current = self.__attrs.get("class", "")
+
+            if isinstance(current, (State, _StateProxy)):
+                # If it's a State, we can just update its value (this preserves reactivity)
+                classes = str(current).split()
+                before = list(classes)
+                fn(classes)
+                if classes != before:
+                    current.value = " ".join(classes)
+                    self.__dirty = True
+                return self
+
+            if callable(current):
+                # If it's a callable, we wrap it to modify its return value (this preserves reactivity)
+                original_callable = current
+                def wrapped_class():
+                    res = original_callable()
+                    classes = str(res).split()
+                    fn(classes)
+                    return " ".join(classes)
+                self.__attrs["class"] = wrapped_class
+                self.__dirty = True
+                return self
+
+            classes = str(current).split()
             before = list(classes)
             fn(classes)
             if classes != before:
