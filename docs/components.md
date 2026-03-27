@@ -141,6 +141,16 @@ div[attr_name] = "active"
 - `["style"]`: Maps to the `style` attribute.
 - `["any-thing"]`: Maps to `any-thing` in HTML.
 
+### Automatic Attribute Synchronization
+
+For form elements (`input`, `textarea`, `select`), `htag` automatically synchronizes their live browser state back to the Python instance's `__attrs` dictionary.
+
+- **`["value"]`**: For text and select inputs, always holds the current string value.
+- **`["checked"]`**: For checkboxes and radios, holds the `bool` state.
+- **`["name"]`**: The name of the input.
+
+This ensures that `Tag` attributes are always up-to-date without manual `oninput` handlers!
+
 ### CSS Class Helpers
 
 Convenience methods for manipulating CSS classes:

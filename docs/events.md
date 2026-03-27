@@ -26,7 +26,18 @@ The `e` argument passed to the callback is an `Event` object containing:
 
 - `e.target`: The `Tag` instance that triggered the event.
 - `e.name`: The name of the event (e.g., "click").
-- Data attributes like `e.value` (for inputs), `e.x`, `e.y` (for mouse events), etc.
+- Data attributes like `e.value` (for inputs), `e.checked` (for checkboxes/radios), `e.x`, `e.y` (for mouse events), etc.
+
+## Attribute Synchronization
+
+When an event is triggered on a form element (`input`, `textarea`, `select`), `htag` automatically synchronizes the client-side state back to the Python `Tag` instance **before** the callback is executed.
+
+The following attributes are synchronized:
+- `["value"]`: The current text or selected value.
+- `["checked"]`: The boolean state (for `checkbox` and `radio`).
+- `["name"]`: The element's name.
+
+This means you can reliably access `e.target["value"]` or `e.target["checked"]` in your event handlers, and they will always match the browser's current state.
 
 ## Automatic Binding (Magic Bind)
 
@@ -61,6 +72,7 @@ class MyForm(Tag.form):
     @prevent
     def post(self, e: Any) -> None:
         # e.value is {'user': '...', 'email': '...'}
+        # For checkboxes in a form, e.value['mycheck'] is the boolean state
         print(f"Submitting: {e['user']} ({e['email']})")
 ```
 

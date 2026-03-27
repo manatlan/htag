@@ -402,9 +402,11 @@ class AppRunner(BaseApp):
         if target_tag:
             data = msg.get("data", {})
             callback_id = data.get("callback_id") if isinstance(data, dict) else None
-            # Auto-sync value from client (bypass __setattr__ to avoid re-rendering the input while typing)
-            if isinstance(data, dict) and "value" in data:
-                target_tag._set_attr_direct("value", data["value"])
+            # Auto-sync values from client (bypass __setattr__ to avoid re-rendering the input while typing)
+            if isinstance(data, dict):
+                for k in ["value", "checked", "name"]:
+                    if k in data:
+                        target_tag._set_attr_direct(k, data[k])
 
             if event_name in target_tag._get_events():
                 logger.info(

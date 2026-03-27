@@ -464,8 +464,9 @@ function htag_event(id, event_name, event) {
                 var formData = new FormData(form);
                 data.value = {};
                 formData.forEach((v, k) => { data.value[k] = v; });
-            } else if (target.type === 'checkbox') {
+            } else if (target.type === 'checkbox' || target.type === 'radio') {
                 data.value = target.checked;
+                data.checked = target.checked;
             } else {
                 data.value = target.value;
             }

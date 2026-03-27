@@ -159,14 +159,22 @@ htag supports setting custom HTML IDs via `_id="myid"`.
 - **Note**: To maintain reactivity with custom IDs, htag automatically injects a `data-htag-id` attribute. The internal communication bridge uses this to ensure partial DOM updates still target the correct element even if the HTML `id` attribute is overridden.
 
 ### 5. Forms & Inputs
-htag automatically binds input events to Python.
-- For text/number inputs, the current value is accessed safely via event handlers: `val = event.value`
-- For input elements, the current value is synchronized to the `value` attribute. Access it safely using `self.checkbox["value"]` (or `getattr(self.checkbox, "value", False)` for boolean state).
+
+htag automatically synchronizes browser state for all form elements (`input`, `textarea`, `select`) before any Python callback is executed.
+
+- **Automatic Sync**: The following attributes are always up-to-date on the `Tag` instance:
+    - **`["value"]`**: Current string value for text/select/number inputs.
+    - **`["checked"]`**: Boolean state for checkboxes and radios.
+    - **`["name"]`**: The original name of the input.
+- **Event Payload**:
+    - **`e.value`**: The primary value (string for text, boolean for checkboxes).
+    - **`e.checked`**: Specifically for checkboxes/radios, always provides the boolean state.
+    - **`e.target["value"]` / `e.target["checked"]`**: Guaranteed to reflect reality.
 
 **Form Submission**:
 When using a `Tag.form`, the `submit` event (e.g. `_onsubmit`) receives an `Event` object where `e.value` is a dictionary containing all named form fields (`_name="fieldname"`).
 - **Subscript Access**: For convenience, you can access form fields directly on the event object using brackets: `e["fieldname"]` (this is a shortcut for `e.value["fieldname"]`).
-- **Standard Pattern**: This aligns with other htag v2 events where the primary data payload is always found in `.value`.
+- **Checkboxes in Forms**: Are correctly mapped to boolean values within the `e.value` dictionary.
 
 ```python
 class MySearch(Tag.form):
