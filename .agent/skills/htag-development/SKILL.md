@@ -96,7 +96,7 @@ htag supports both traditional "dirty-marking" and modern reactive `State`.
 - Data-driven UIs: `Tag.div(self.count)` or `Tag.div(lambda: f"Count: {self.count}")`.
 
 **Reactive & Boolean Attributes**:
-- Attributes support lambdas for dynamic updates: `Tag.div(_class=lambda: "active" if self.is_active else "hidden")`.
+- Attributes support lambdas OR `State` objects directly for dynamic updates: `Tag.button("Submit", _disabled=self.loading)`.
 - Boolean attributes (e.g., `_disabled`, `_checked`, `_required`) are handled automatically:
     - `True`: Renders the attribute name only (e.g., `disabled`).
     - `False` or `None`: Omits the attribute entirely.

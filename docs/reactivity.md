@@ -105,9 +105,10 @@ You can pass a `State` object directly as a child to any tag, or use a lambda fo
 
 ```python
 # Direct usage (recommended for simple values)
+# htag automatically de-references s.value and registers the observer!
 Tag.p(self.count)
 
-# Lambda usage (for expressions)
+# Lambda usage (for more complex expressions)
 Tag.p(lambda: f"The current count is {self.count}")
 ```
 
@@ -121,10 +122,23 @@ Tag.ul(lambda: [Tag.li(user.name) for user in self.users])
 
 ## Reactive & Boolean Attributes
 
-Attributes can also be reactive by passing a lambda.
+Attributes (including boolean attributes like `disabled`, `checked`, etc.) can be reactive by passing a lambda OR a `State` object directly.
 
-### Dynamic Classes and Styles
+### Direct Attribute Reactivity
 
+When you pass a `State` object directly as an attribute, `htag` automatically registers the tag as an observer. This is the most concise way to build reactive UIs:
+
+```python
+# No lambda needed!
+Tag.button("Submit", _disabled=self.is_loading)
+```
+
+### Dynamic Classes and Styles (via Lambda)
+
+For more complex logic, use lambdas:
+
+```python
+Tag.div(
     _class=lambda: "text-red-600" if self.error else "text-green-600",
     _style=lambda: f"opacity: {self.opacity}%"
 )
@@ -139,11 +153,7 @@ htag handles boolean attributes (like `disabled`, `checked`, `required`, `readon
 
 - **True**: Renders the attribute name only (e.g., `<button disabled>`).
 - **False / None**: Omit the attribute entirely (e.g., `<button>`).
-- **Lambda**: Can return `True`, `False`, or `None` for dynamic control.
-
-```python
-Tag.button("Submit", _disabled=lambda: self.is_loading)
-```
+- **Lambda / State**: Can return/contain `True`, `False`, or `None` for dynamic control.
 
 ## How it Works
 
