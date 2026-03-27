@@ -187,10 +187,11 @@ class State:
     def __float__(self) -> float: return float(self.value)
     def __index__(self) -> int: return self.value.__index__()
 
-    def __call__(self) -> Any:
-        return self.value
 
     __hash__ = object.__hash__
+
+    def __call__(self) -> Any:
+        return self.value
 
     def __repr__(self) -> str:
         return repr(self.value)
@@ -755,7 +756,17 @@ class GTag:  # aka "Generic Tag"
             self.__attrs[name] = value
 
     def _eval_child(self, child: Any, stringify: bool = True) -> Any:
-        """Evaluates a child for rendering. If it's a callable, evaluate it recursively and track observers."""
+        """Evaluates a child for rendering. If it's a callable or a State, evaluate it recursively and track observers."""
+        if isinstance(child, (State, _StateProxy)):
+            old_eval = _ctx.current_eval
+            _ctx.current_eval = self
+            try:
+                # State.value property (and _StateProxy.__call__) already records observers
+                res = child.value if isinstance(child, State) else child()
+            finally:
+                _ctx.current_eval = old_eval
+            return self._eval_child(res, stringify)
+
         if callable(child):
             old_eval = _ctx.current_eval
             _ctx.current_eval = self

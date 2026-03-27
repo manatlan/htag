@@ -44,7 +44,8 @@ def test_webapp_refresh_lifecycle():
     assert instance.unmounts == 0
     
     # 2. Second request: refresh (F5)
-    r2 = client.get("/", cookies={"htag_sid": sid})
+    client.cookies.set("htag_sid", sid)
+    r2 = client.get("/")
     assert r2.status_code == 200
     
     # On refresh, it should have unmounted once then mounted again (total 2)
@@ -52,7 +53,8 @@ def test_webapp_refresh_lifecycle():
     assert instance.mounts == 2
 
     # 3. Third request: refresh again
-    client.get("/", cookies={"htag_sid": sid})
+    client.cookies.set("htag_sid", sid)
+    client.get("/")
     assert instance.unmounts == 2
     assert instance.mounts == 3
 
@@ -71,7 +73,8 @@ def test_webapp_refresh_lifecycle_with_child():
     assert child.unmounts == 0
     
     # Page refresh
-    client.get("/", cookies={"htag_sid": sid})
+    client.cookies.set("htag_sid", sid)
+    client.get("/")
     
     # Recursive trigger check: should have unmounted once and mounted once more
     assert child.unmounts == 1
