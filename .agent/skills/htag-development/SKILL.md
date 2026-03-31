@@ -87,6 +87,7 @@ htag supports both traditional "dirty-marking" and modern reactive `State`.
 **Reactive State (Transparent Proxy)**:
 - Use `from htag import State`.
 - Declare state variables: `self.count = State(0)`.
+- **State Promotion**: The `State` constructor is idempotent. You can safely "promote" any input to a `State` using `s = State(value)`. If `value` is already a `State` (or a `_StateProxy`), it is returned as-is, preserving its identity and observers. This is the recommended way for component developers to handle potentially reactive arguments.
 - Use operators directly: `self.count += 1`, `if self.count > 0: ...` (full support for comparison and math).
 - Automatic notification on method calls: `self.items.append("new")`.
 - Nested reactivity: `self.data["users"].append(new_user)` works automatically (nested dicts, lists, sets, and tuples are proxied).

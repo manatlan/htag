@@ -14,6 +14,19 @@ class MyApp(Tag.App):
         self.count = State(0)
 ```
 
+### Idempotent Constructor (Promotion)
+
+The `State` constructor is idempotent: if you pass an existing `State` or `_StateProxy` object, it returns that object directly. This allows component developers to "promote" any input to a `State` without manually checking its type.
+
+```python
+class SubComponent(Tag.div):
+    def init(self, value: Any):
+        # Always safe: ensures self.v is a State object.
+        # If 'value' was already a State, the original identity is preserved.
+        self.v = State(value)
+        self += lambda: f"Value: {self.v}"
+```
+
 ### Direct Operator Usage
 
 You can use standard Python operators directly on the `State` object. The framework automatically proxies the operation to the underlying value and triggers a re-render.

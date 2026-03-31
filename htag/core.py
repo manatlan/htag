@@ -17,7 +17,14 @@ from .css import _scope_css, _scoped_style_cache
 
 
 class State:
+    def __new__(cls, value: Any):
+        if isinstance(value, (State, _StateProxy)):
+            return value
+        return super().__new__(cls)
+
     def __init__(self, value: Any):
+        if value is self:
+            return
         self._value = value
         self._observers: weakref.WeakSet["GTag"] = weakref.WeakSet()
 
