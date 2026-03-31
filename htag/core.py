@@ -37,6 +37,9 @@ class State:
         self.value = value
         return value
 
+    def get(self) -> Any:
+        return self.value
+
     def notify(self) -> None:
         """Force notification after in-place mutation of mutable values (lists, dicts)."""
         self._notify_observers()
@@ -206,6 +209,11 @@ class _StateProxy:
     def __init__(self, state: State, value: Any):
         self._state = state
         self._value = value
+
+    def get(self) -> Any:
+        if _ctx.current_eval is not None:
+            self._state._observers.add(_ctx.current_eval)
+        return self._value
 
     def __getattr__(self, name: str) -> Any:
         attr = getattr(self._value, name)

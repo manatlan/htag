@@ -94,9 +94,10 @@ def update_val(e):
 Tag.p(lambda: f"Items: {len(self.items)}")
 ```
 
-### Advanced: `.set()` and `.notify()`
+### Advanced: `.set()`, `.get()` and `.notify()`
 
 - **`.set(new_value)`**: Updates the state and returns the new value. Useful for expressions within lambdas.
+- **`.get()`**: Safely retrieves the underlying value from a `State` or `_StateProxy` object. This is essential when the wrapped value (like a `bool`) doesn't have a `.get()` method itself, and you want to dereference it safely.
 - **`.notify()`**: Manually triggers observers. Useful if you've deeply mutated an object in a way that the proxy couldn't detect (though this is extremely rare with nested reactivity).
 
 ---

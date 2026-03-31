@@ -94,6 +94,7 @@ htag supports both traditional "dirty-marking" and modern reactive `State`.
 - Attribute delegation: `self.user.name = "Bob"` (where `self.user` is a `State(User())`) delegates setting to the underlying object and notifies automatically.
 - Type conversions: `int(self.count)`, `bool(self.status)` work transparently.
 - Data-driven UIs: `Tag.div(self.count)` or `Tag.div(lambda: f"Count: {self.count}")`.
+- Safe value retrieval: Use `self.count.get()` to retrieve the underlying value regardless of its type (essential for `bool` values that don't have a `.get()` method themselves).
 
 **Reactive & Boolean Attributes**:
 - Attributes support lambdas OR `State` objects directly for dynamic updates: `Tag.button("Submit", _disabled=self.loading)`.
