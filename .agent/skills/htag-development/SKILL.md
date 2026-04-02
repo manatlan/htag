@@ -85,8 +85,13 @@ class Card(Tag.div):
 htag supports both traditional "dirty-marking" and modern reactive `State`.
 
 **Reactive State (Transparent Proxy)**:
-- Use `from htag import State`.
-- Declare state variables: `self.count = State(0)`.
+- Use `from htag import States` (preferred) or `from htag import State`.
+- **`States` Container (Recommended)**: Create multiple states effortlessly in one go using keyword arguments. The `States` object delegates attribute access to individual `State` instances. It supports bulk `.dump()` (to dictionary) and `.load(dict)`.
+  ```python
+  self.s = States(count=0, loading=False)
+  self.s.count += 1
+  ```
+- **Single `State`**: Declare state variables individually: `self.count = State(0)`.
 - **State Promotion**: The `State` constructor is idempotent. You can safely "promote" any input to a `State` using `s = State(value)`. If `value` is already a `State` (or a `_StateProxy`), it is returned as-is, preserving its identity and observers. This is the recommended way for component developers to handle potentially reactive arguments.
 - Use operators directly: `self.count += 1`, `if self.count > 0: ...` (full support for comparison and math).
 - Automatic notification on method calls: `self.items.append("new")`.

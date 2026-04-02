@@ -1,4 +1,4 @@
-from .core import prevent, stop, State, current_request
+from .core import prevent, stop, State, States, current_request
 from .tag import Tag
 from .runner import AppRunner as App
 from .web import WebApp
@@ -22,6 +22,7 @@ __all__ = [
     "__version__",
     "Tag",  # the main thing
     "State",    # State management
+    "States",   # Multi-State management container
     "Router",   # SPA hash-based router
     "WebApp",   # the ASGI runner
 

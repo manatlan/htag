@@ -210,6 +210,43 @@ class State:
         return str(self.value)
 
 
+class States:
+    """A container for multiple State objects, allowing bulk save (dump) and load."""
+    def __init__(self, **kwargs):
+        object.__setattr__(self, "_states", {})
+        for key, value in kwargs.items():
+            self._states[key] = State(value)
+
+    def __getattr__(self, name: str) -> Any:
+        if name in self._states:
+            return self._states[name]
+        raise AttributeError(f"'States' object has no attribute '{name}'")
+
+    def __setattr__(self, name: str, value: Any) -> None:
+        if name.startswith("_"):
+            object.__setattr__(self, name, value)
+        elif name in self._states:
+            if value is self._states[name]:
+                return
+            if isinstance(value, State):
+                value = value.value
+            self._states[name].value = value
+        else:
+            raise AttributeError(f"Cannot create attribute '{name}'. Declare it in States() initialization.")
+
+    def dump(self) -> dict:
+        """Returns a dictionary of all state values."""
+        return {k: v.get() for k, v in self._states.items()}
+
+    def load(self, data: dict) -> None:
+        """Loads values from a dictionary into the existing states."""
+        for key, value in data.items():
+            if key in self._states:
+                self._states[key].value = value
+            else:
+                self._states[key] = State(value)
+
+
 class _StateProxy:
     """A proxy that delegates everything to a value and notifies a parent State on mutations."""
 
