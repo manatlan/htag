@@ -1,14 +1,14 @@
 import pytest
 from htag.core import States, State
 
-def test_states_init_jules():
+def test_states_init():
     s = States(a=1, b="hello")
     assert isinstance(s.a, State)
     assert s.a.get() == 1
     assert isinstance(s.b, State)
     assert s.b.get() == "hello"
 
-def test_states_getattr_jules():
+def test_states_getattr():
     s = States(val=42)
     assert s.val == 42 # Uses State's __eq__
     assert s.val.get() == 42
@@ -16,7 +16,7 @@ def test_states_getattr_jules():
     with pytest.raises(AttributeError):
         _ = s.missing
 
-def test_states_setattr_jules():
+def test_states_setattr():
     s = States(val=10)
     s.val = 20
     assert s.val.get() == 20
@@ -28,13 +28,13 @@ def test_states_setattr_jules():
     with pytest.raises(AttributeError, match="Cannot create attribute"):
         s.new_val = 100
 
-def test_states_dump_jules():
+def test_states_dump():
     s = States(x=1, y=2, z=[1, 2])
     s.z.append(3)
     data = s.dump()
     assert data == {"x": 1, "y": 2, "z": [1, 2, 3]}
 
-def test_states_load_jules():
+def test_states_load():
     s = States(x=1, y=2)
     s.load({"x": 10, "new_var": "created"})
 

@@ -1,6 +1,6 @@
 import logging
 import asyncio
-from htag import Tag, ChromeApp, State
+from htag import Tag, ChromeApp, States
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("tailwind-demo")
@@ -187,8 +187,7 @@ class Toggle(Tag.label):
     @property
     def value(self):
         # We read the 'checked' state from the underlying input checkbox
-        # htag stores synced values in _attrs (accessed via _value)
-        return getattr(self.checkbox, "_value", False) == True
+        return self.checkbox["checked"] == True
 
 class Table(Tag.div):
     """A responsive table component."""
@@ -483,11 +482,13 @@ class DemoApp(Tag.App):
 
     def init(self):
         # 1. State Initialization
-        self.count = State(0)
-        self.user_name = State("")
-        self.dark_mode = State(False)
-        self.progress = State(30)
-        self.is_loading = State(False)
+        self.state = States(
+            count=0,
+            user_name="",
+            dark_mode=False,
+            progress=30,
+            is_loading=False
+        )
 
         # 2. Declarative Layout (Zero-Boilerplate)
         with Tag.div(_class="min-h-screen p-8 flex flex-col items-center justify-center"):
@@ -503,18 +504,18 @@ class DemoApp(Tag.App):
                 with Card(title="Counter Example"):
                     # Reactive Counter Display
                     Tag.div(
-                        lambda: str(self.count.value), 
+                        lambda: str(self.state.count.value), 
                         _class=lambda: "text-5xl font-bold text-center mb-6 " + (
-                            "text-red-600" if self.count.value < 0 else 
-                            "text-green-600" if self.count.value > 0 else 
+                            "text-red-600" if self.state.count.value < 0 else 
+                            "text-green-600" if self.state.count.value > 0 else 
                             "text-blue-600"
                         )
                     )
                     
                     with Tag.div(_class="flex justify-center gap-4"):
-                        Button("-1", variant="secondary", _onclick=lambda e: self.count.set(self.count.value - 1))
-                        Button("+1", variant="primary", _onclick=lambda e: self.count.set(self.count.value + 1))
-                        Button("Reset", variant="danger", _onclick=lambda e: self.count.set(0))
+                        Button("-1", variant="secondary", _onclick=lambda e: self.state.count.set(self.state.count.value - 1))
+                        Button("+1", variant="primary", _onclick=lambda e: self.state.count.set(self.state.count.value + 1))
+                        Button("Reset", variant="danger", _onclick=lambda e: self.state.count.set(0))
 
                 # --- Card 2: Status Indicators ---
                 with Card(title="Status Indicators"):
@@ -532,20 +533,20 @@ class DemoApp(Tag.App):
                         # Text input example
                         with Tag.div(_class="flex flex-col gap-2"):
                             Tag.label("Your Name", _class="text-sm font-medium text-gray-700")
-                            Input(placeholder="Type your name...", _oninput=lambda e: self.user_name.set(e.value))
+                            Input(placeholder="Type your name...", _oninput=lambda e: self.state.user_name.set(e.value))
                             # Hello message is purely reactive
                             Tag.div(
-                                lambda: f"Hello, {self.user_name.value}!" if self.user_name.value else "Hello, stranger!",
-                                _class=lambda: "text-sm mt-1 " + ("text-blue-600 font-medium" if self.user_name.value else "text-gray-500")
+                                lambda: f"Hello, {self.state.user_name.value}!" if self.state.user_name.value else "Hello, stranger!",
+                                _class=lambda: "text-sm mt-1 " + ("text-blue-600 font-medium" if self.state.user_name.value else "text-gray-500")
                             )
                         
                         # Toggle example
                         with Tag.div(_class="flex items-center justify-between mt-2 pt-4 border-t border-gray-100"):
-                            Toggle("Enable Dark Text", _onchange=lambda e: self.dark_mode.set(e.target.value))
+                            Toggle("Enable Dark Text", _onchange=lambda e: self.state.dark_mode.set(e.target.value))
                         
                         # Alert area is reactive to the toggle
                         Tag.div(lambda: 
-                            Alert("Feature activated! This would normally switch themes.", variant="success") if self.dark_mode.value else 
+                            Alert("Feature activated! This would normally switch themes.", variant="success") if self.state.dark_mode.value else 
                             Alert("Feature disabled. Back to normal.", variant="warning")
                         )
 
@@ -573,10 +574,10 @@ class DemoApp(Tag.App):
                         with Tag.div():
                             Tag.h3("Task Progress", _class="text-sm font-semibold text-gray-700 mb-2")
                             # Progress bar is now fully reactive by passing a lambda
-                            ProgressBar(progress=lambda: self.progress.value, color="blue")
+                            ProgressBar(progress=lambda: self.state.progress.value, color="blue")
                             with Tag.div(_class="flex gap-2 mt-4"):
-                                Button("+10%", "secondary", _onclick=lambda e: self.progress.set(min(100, self.progress.value + 10)))
-                                Button("Reset", "danger", _class="ml-auto", _onclick=lambda e: self.progress.set(0))
+                                Button("+10%", "secondary", _onclick=lambda e: self.state.progress.set(min(100, self.state.progress.value + 10)))
+                                Button("Reset", "danger", _class="ml-auto", _onclick=lambda e: self.state.progress.set(0))
                         
                         with Tag.div():
                             Tag.h3("Code Snippet", _class="text-sm font-semibold text-gray-700 mb-2")
@@ -598,10 +599,10 @@ class DemoApp(Tag.App):
                                 Tag.div([Spinner("lg", "green"), Tag.span("Large", _class="text-xs text-gray-500 mt-2 block text-center")])
                             
                             with Button("Save Changes", variant="primary", _class="mt-4 flex items-center justify-center gap-2", 
-                                       _disabled=lambda: self.is_loading.value,
+                                       _disabled=lambda: self.state.is_loading.value,
                                        _onclick=self.fake_loading) as btn:
                                 # Reactive spinner inside button
-                                Tag.span(lambda: Spinner("sm", "white") if self.is_loading.value else "")
+                                Tag.span(lambda: Spinner("sm", "white") if self.state.is_loading.value else "")
 
                 # --- Card 8: Tabs & Dropdowns ---
                 with Card(title="Navigation & Menus", _class="md:col-span-2 border-t-4 border-t-teal-500"):
@@ -636,10 +637,10 @@ class DemoApp(Tag.App):
         self.toaster <= Toast(message, variant)
 
     async def fake_loading(self, event):
-        self.is_loading.set(True)
+        self.state.is_loading.set(True)
         yield
         await asyncio.sleep(2)
-        self.is_loading.set(False)
+        self.state.is_loading.set(False)
         self.fire_toast("Sauvegardé avec succès !")
 
 

@@ -2,7 +2,7 @@ import os
 import sys
 import html
 from pathlib import Path
-from htag import Tag, ChromeApp, State
+from htag import Tag, ChromeApp, States
 
 class Sidebar(Tag.div):
     """Navigation sidebar for quick access."""
@@ -364,8 +364,10 @@ class FileNavigator(Tag.App):
 
     def init(self):
         # 1. State Initialization
-        self.path = State(Path(os.getcwd()).resolve())
-        self.selected = State(None)
+        self.state = States(
+            path=Path(os.getcwd()).resolve(),
+            selected=None
+        )
 
         # 2. Declarative Layout
         with Tag.div(_class="main-container"):
@@ -374,7 +376,7 @@ class FileNavigator(Tag.App):
                 Tag.h1("htag Explorer")
                 Tag.button("↑ Back", 
                     _class="btn", 
-                    _disabled=lambda: self.path.value.parent == self.path.value,
+                    _disabled=lambda: self.state.path.value.parent == self.state.path.value,
                     _onclick=self.go_up
                 )
 
@@ -385,30 +387,30 @@ class FileNavigator(Tag.App):
 
                 # Explorer Main Area
                 with Tag.div(_class="explorer-container") as explorer_container:
-                    Tag.div(lambda: str(self.path.value), _class="breadcrumb")
+                    Tag.div(lambda: str(self.state.path.value), _class="breadcrumb")
                     
                     # Explorer Grid
-                    explorer_container.add(lambda: Explorer(self.path.value, self.selected.value, self.on_item_click))
+                    explorer_container.add(lambda: Explorer(self.state.path.value, self.state.selected.value, self.on_item_click))
                 
                 # Viewer (Right side)
-                split_view.add(lambda: Viewer(self.selected.value, self.on_close_viewer) if self.selected.value else "")
+                split_view.add(lambda: Viewer(self.state.selected.value, self.on_close_viewer) if self.state.selected.value else "")
 
     def on_item_click(self, item):
         if item.is_dir():
             self.go_to(item)
         else:
-            self.selected.value = item
+            self.state.selected.value = item
 
     def go_to(self, target_path):
-        self.path.value = Path(target_path).resolve()
-        self.selected.value = None
+        self.state.path.value = Path(target_path).resolve()
+        self.state.selected.value = None
 
     def go_up(self, e):
-        if self.path.value.parent != self.path.value:
-            self.go_to(self.path.value.parent)
+        if self.state.path.value.parent != self.state.path.value:
+            self.go_to(self.state.path.value.parent)
 
     def on_close_viewer(self):
-        self.selected.value = None
+        self.state.selected.value = None
 
 if __name__ == "__main__":
     ChromeApp(FileNavigator, width=1280, height=900).run()

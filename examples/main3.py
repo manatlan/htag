@@ -1,6 +1,6 @@
 import random
 import logging
-from htag import Tag, ChromeApp, State
+from htag import Tag, ChromeApp, States
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("sudoku")
@@ -138,8 +138,7 @@ class Sudoku(Tag.App):
         # 1. State Initialization
         self.solution, grid = SudokuLogic.generate(45)
         self.fixed = [[col != 0 for col in row] for row in grid]
-        self.grid = State(grid)
-        self.selected = State(None)
+        self.state = States(grid=grid, selected=None)
         
         # 2. Declarative Layout
         with Tag.div(_class="container"):
@@ -165,13 +164,13 @@ class Sudoku(Tag.App):
                 Tag.button("NEW GAME", _class="btn", _onclick=lambda e: self.new_game())
 
     def _get_cell_val(self, r, c):
-        val = self.grid.value[r][c]
+        val = self.state.grid.value[r][c]
         return str(val) if val != 0 else ""
 
     def _get_cell_cls(self, r, c):
-        val = self.grid.value[r][c]
+        val = self.state.grid.value[r][c]
         is_fixed = self.fixed[r][c]
-        sel = self.selected.value
+        sel = self.state.selected.value
         
         cls = ["cell"]
         if is_fixed: cls.append("fixed")
@@ -183,26 +182,26 @@ class Sudoku(Tag.App):
     def new_game(self):
         self.solution, grid = SudokuLogic.generate(45)
         self.fixed = [[col != 0 for col in row] for row in grid]
-        self.grid.value = grid
-        self.selected.value = None
+        self.state.grid.value = grid
+        self.state.selected.value = None
         self.status_box.text = ""
 
     def select_cell(self, r, c):
         if not self.fixed[r][c]:
-            self.selected.value = (r, c)
+            self.state.selected.value = (r, c)
 
     def input_num(self, n):
-        if self.selected.value:
-            r, c = self.selected.value
+        if self.state.selected.value:
+            r, c = self.state.selected.value
             # Shallow copy and update to trigger State
-            new_grid = [row[:] for row in self.grid.value]
+            new_grid = [row[:] for row in self.state.grid.value]
             new_grid[r][c] = n
-            self.grid.value = new_grid
+            self.state.grid.value = new_grid
             
             # Check for win
             if all(new_grid[r][c] == self.solution[r][c] for r in range(9) for c in range(9)):
                 self.status_box.text = "CONGRATULATIONS! GRAVITY DEFIED."
-                self.selected.value = None
+                self.state.selected.value = None
 
 if __name__ == "__main__":
     ChromeApp(Sudoku, width=600, height=850).run()

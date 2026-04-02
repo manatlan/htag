@@ -28,20 +28,21 @@
 Creating a basic `htag` app is simple:
 
 ```python
-from htag import Tag, WebApp, State
+from htag import Tag, WebApp, States
 
 
 class HelloApp(Tag.App):
     def init(self) -> None:
-        self.count = State(0)
+        # Use States container (recommended)
+        self.s = States(count=0)
         
         with Tag.div(_class="container"):
             Tag.h1("Hello htag!")
-            Tag.p(self.count)  # Direct state usage!
+            Tag.p(self.s.count)  # Direct state usage!
             Tag.button("Click Me", _onclick=self.increment)
 
     def increment(self, e: Any) -> None:
-        self.count += 1
+        self.s.count += 1
 
 if __name__ == "__main__":
     WebApp(HelloApp).run()

@@ -1,4 +1,4 @@
-from htag import Tag, State
+from htag import Tag, States
 import logging
 
 class MessageBox(Tag.div):
@@ -49,7 +49,7 @@ class MyApp(Tag.App):
 
     def init(self):
         # 1. État Réactif
-        self.users = State([
+        self.state = States(users=[
             {"name": "Alice Cooper", "age": 75},
             {"name": "Bob Marley", "age": 36}
         ])
@@ -74,7 +74,7 @@ class MyApp(Tag.App):
                             Tag.th("")
                     
                     # 3. Rendu réactif des lignes
-                    # Se rafraîchit à chaque fois que self.users.value change !
+                    # Se rafraîchit à chaque fois que self.state.users.value change !
                     Tag.tbody(lambda: [
                         Tag.tr([
                             Tag.td(person["name"], _class="name-cell"),
@@ -87,23 +87,23 @@ class MyApp(Tag.App):
                                 ), 
                                 _style="text-align: right;"
                             )
-                        ]) for person in self.users.value
+                        ]) for person in self.state.users.value
                     ])
 
     def del_person(self, person):
         # On modifie la donnée "pûrement"
-        new_list = [p for p in self.users.value if p != person]
-        self.users.value = new_list
+        new_list = [p for p in self.state.users.value if p != person]
+        self.state.users.value = new_list
         logger.info("Deleted person: %s", person["name"])
 
     def add_person(self, event):
-        name = self.i_name._value
-        age = self.i_age._value
+        name = self.i_name["value"]
+        age = self.i_age["value"]
         if name and age:
             # On ajoute à la liste et on réassigne pour trigger la réactivité
-            self.users.value = self.users.value + [{"name": name, "age": int(age)}]
-            self.i_name._value = ""
-            self.i_age._value = ""
+            self.state.users.value = self.state.users.value + [{"name": name, "age": int(age)}]
+            self.i_name["value"] = ""
+            self.i_age["value"] = ""
             logger.info("Added person: %s", name)
         else:
             self <= MessageBox("Validation Error", "Please provide both a name and an age to continue.")

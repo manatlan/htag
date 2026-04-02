@@ -1,4 +1,4 @@
-from htag import Tag, ChromeApp, State, WebApp, prevent, stop
+from htag import Tag, ChromeApp, States, WebApp, prevent, stop
 import logging
 import time
 import asyncio
@@ -105,14 +105,17 @@ class Showcase(Tag.App):
             Tag.p("Ultimate Feature Validation Suite")
 
         with Tag.div(_class="grid"):
-            # 1. State & Mutation
-            self.counter = State(0)
-            self.items = State(["A"])
+            self.states = States(
+                counter=0,
+                items=["A"],
+                val="Edit me",
+                crash=False
+            )
             with FeatureSection("1. Reactivity"):
-                Tag.div(lambda: f"Count: {self.counter} | Items: {','.join(self.items)}", _class="demo-box")
+                Tag.div(lambda: f"Count: {self.states.counter} | Items: {','.join(self.states.items)}", _class="demo-box")
                 with Tag.div(_class="actions"):
-                    Tag.button("+1", _onclick=lambda e: self.counter.set(self.counter.value + 1))
-                    Tag.button("Mutate", _onclick=lambda e: self.items.append("X"), _class="alt")
+                    Tag.button("+1", _onclick=lambda e: self.states.counter.set(self.states.counter.value + 1))
+                    Tag.button("Mutate", _onclick=lambda e: self.states.items.append("X"), _class="alt")
 
             # 2. Async Stepping (Yield)
             with FeatureSection("2. Stepping (Yield)"):
@@ -121,9 +124,8 @@ class Showcase(Tag.App):
 
             # 3. Input Auto-Binding & Toggle Class
             with FeatureSection("3. Binding & Class"):
-                self.val = State("Edit me")
-                box = Tag.div(lambda: f"Live: {self.val}", _class="demo-box")
-                Tag.input(_value=self.val.value, _oninput=lambda e: self.val.set(e.value))
+                box = Tag.div(lambda: f"Live: {self.states.val}", _class="demo-box")
+                Tag.input(_value=self.states.val.value, _oninput=lambda e: self.states.val.set(e.value))
                 def toggle(e): box.toggle_class("active")
                 Tag.button("Toggle State", _onclick=toggle, _class="alt")
 
@@ -167,16 +169,15 @@ class Showcase(Tag.App):
 
             # 7. Error Handling
             with FeatureSection("7. Errors"):
-                self.crash = State(False)
                 def rr():
-                    if self.crash.value: raise ValueError("Render Crash")
+                    if self.states.crash.value: raise ValueError("Render Crash")
                     return Tag.span("System Stable", _style="color:green;font-size:0.7rem")
                 Tag.div(rr, _class="demo-box")
                 with Tag.div(_class="actions"):
                     Tag.button("Py", _onclick=lambda e: 1/0, _class="danger")
                     Tag.button("JS", _onclick="err()", _class="danger")
-                    Tag.button("Render", _onclick=lambda e: setattr(self.crash, 'value', True), _class="danger")
-                    Tag.button("Reset", _onclick=lambda e: setattr(self.crash, 'value', False))
+                    Tag.button("Render", _onclick=lambda e: self.states.crash.set(True), _class="danger")
+                    Tag.button("Reset", _onclick=lambda e: self.states.crash.set(False))
 
             # 8. Safe Playground
             with FeatureSection("8. Playground"):

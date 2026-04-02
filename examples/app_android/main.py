@@ -1,13 +1,13 @@
 import logging
-from htag import Tag, WebApp, State
+from htag import Tag, WebApp, States
 
 logging.basicConfig(level=logging.INFO)
 
 class DemoApp(Tag.App):
     def init(self):
-        # 1. État Réactif (State)
+        # 1. État Réactif (States)
         # On déclare une variable réactive.
-        self.compteur = State(0)
+        self.state = States(compteur=0)
 
         # 2. Syntaxe "with" (Context Manager)
         # Permet d'imbriquer visuellement les balises sans avoir à faire de "self <= ..." à chaque ligne.
@@ -17,11 +17,11 @@ class DemoApp(Tag.App):
             
             # --- Cas 1 : Le State Réactif ---
             with Tag.div(_style="border: 1px solid #ddd; padding: 15px; border-radius: 8px; margin-bottom: 20px; background: #f9f9f9;"):
-                Tag.h3("1. L'État Réactif (State)", _style="margin-top: 0;")
+                Tag.h3("1. L'État Réactif (States)", _style="margin-top: 0;")
                 Tag.p("Le texte ci-dessous se met à jour TOUT SEUL quand la valeur change.")
                 
                 # La fonction lambda permet à htag de s'abonner automatiquement au "State".
-                Tag.div(lambda: f"👉 Valeur actuelle du compteur : {self.compteur.value}", _style="font-size: 1.2em; font-weight: bold; margin-bottom: 15px; color: #e74c3c;")
+                Tag.div(lambda: f"👉 Valeur actuelle du compteur : {self.state.compteur.value}", _style="font-size: 1.2em; font-weight: bold; margin-bottom: 15px; color: #e74c3c;")
                 
                 # Le bouton modifie seulement la variable, pas l'interface
                 Tag.button("Incrémenter le State", _onclick=self.incrementer_state, _style="padding: 8px 12px; cursor: pointer;")
@@ -40,7 +40,7 @@ class DemoApp(Tag.App):
     def incrementer_state(self, e):
         # On modifie PUREMENT la logique métier. 
         # htag détecte ce changement et rafraîchit l'UI correspondante instantanément.
-        self.compteur.value += 1
+        self.state.compteur.value += 1
 
     def changer_texte(self, e):
         # Sans le '.text', on aurait dû faire :

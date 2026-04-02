@@ -1,4 +1,4 @@
-from htag import Tag,State,ChromeApp
+from htag import Tag,States,ChromeApp
 from time import time
 import asyncio
 
@@ -6,19 +6,18 @@ class LifeCycleApp(Tag.App):
     statics = [Tag.title("Life Cycle Demo")]
     def init(self):
         # initial states (executed one time)
-        self.s_cpt = State(0)
-        self.s_time = State(0)
+        self.states = States(cpt=0, time=0)
 
     
         with self:        
             # manual update
-            Tag.button(self.s_cpt,"+", _onclick=self.on_click)
+            Tag.button(self.states.cpt,"+", _onclick=self.on_click)
             
             # task update
-            Tag.div( self.s_time )
+            Tag.div( self.states.time )
 
             # computed
-            Tag.div( lambda: f"computed=({self.s_cpt} & {self.s_time})" )
+            Tag.div( lambda: f"computed=({self.states.cpt} & {self.states.time})" )
 
 
     def on_mount(self):
@@ -26,7 +25,7 @@ class LifeCycleApp(Tag.App):
         # to mount things
         async def process():
             while 1:
-                self.s_time += 1
+                self.states.time += 1
                 await asyncio.sleep(0.5)
         self.task = asyncio.create_task(process())
         
@@ -36,7 +35,7 @@ class LifeCycleApp(Tag.App):
         self.task.cancel()
     
     def on_click(self, o):
-        self.s_cpt += 1
+        self.states.cpt += 1
 
 
 if __name__ == "__main__":

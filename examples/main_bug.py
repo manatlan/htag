@@ -1,5 +1,5 @@
 import time
-from htag import Tag, State
+from htag import Tag, States
 
 # hi2 !!
 
@@ -10,10 +10,10 @@ class App(Tag.App):
         self <= Tag.button("Trigger Async Python Error", _class="btn", _onclick=self.trigger_async_error)
         self <= Tag.button("Trigger Render Error", _class="btn", _onclick=self.trigger_render_error)
         
-        self.should_crash = State(False)
+        self.state = States(should_crash=False)
         
         def crashing_render():
-            if self.should_crash.value:
+            if self.state.should_crash.value:
                 # This will cause a crash during the component re-rendering phase
                 raise TypeError("This component crashed while rendering!")
             return ""
@@ -29,7 +29,7 @@ class App(Tag.App):
         raise RuntimeError("Async work failed!")
         
     def trigger_render_error(self, event):
-        self.should_crash.value = True
+        self.state.should_crash.value = True
 
 if __name__ == "__main__":
     from htag import ChromeApp

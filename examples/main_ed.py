@@ -1,7 +1,7 @@
 import os
 import asyncio
 import json
-from htag import Tag, ChromeApp, State
+from htag import Tag, ChromeApp, States
 
 class AceEditor(Tag.div):
     """A GTag component wrapping the Ace Editor."""
@@ -115,8 +115,10 @@ class App(Tag.App):
     ]
 
     def init(self):
-        self.current_file = State(None)
-        self.expanded_dirs = State(set())
+        self.state = States(
+            current_file=None,
+            expanded_dirs=set()
+        )
         self.files_tree = self.scan_directory(".")
         
         # Flattened list for auto-load first file logic
@@ -138,20 +140,20 @@ class App(Tag.App):
             with Tag.div(_class="main"):
                 # Header
                 with Tag.div(_class="p-4 bg-slate-800 border-b border-slate-700 flex justify-between items-center"):
-                    Tag.div(lambda: self.current_file.value or "Select a file", _class="font-mono text-sm text-gray-400")
+                    Tag.div(lambda: self.state.current_file.value or "Select a file", _class="font-mono text-sm text-gray-400")
                     Tag.button("Save", 
-                               _class=lambda: f"bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm {'hidden' if self.current_file.value is None else ''}", 
+                               _class=lambda: f"bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm {'hidden' if self.state.current_file.value is None else ''}", 
                                _onclick=self.save_file)
 
                 # Content Area (Editor + Placeholder)
                 with Tag.div(_class="editor-wrapper"):
                     # Welcome Placeholder
-                    with Tag.div(_class=lambda: f"h-full flex flex-col items-center justify-center text-gray-500 {'hidden' if self.current_file.value else ''}"):
+                    with Tag.div(_class=lambda: f"h-full flex flex-col items-center justify-center text-gray-500 {'hidden' if self.state.current_file.value else ''}"):
                         Tag.span("🐍", style="font-size: 64px; opacity: 0.2;")
                         Tag.p("Select a Python file to start editing", _class="mt-4 text-center")
                     
                     # The Editor
-                    self.editor_wrapper = Tag.div(_class=lambda: f"h-full {'hidden' if self.current_file.value is None else ''}")
+                    self.editor_wrapper = Tag.div(_class=lambda: f"h-full {'hidden' if self.state.current_file.value is None else ''}")
                     self.ace_editor = AceEditor("", _onsave=self._on_editor_save)
                     Tag.div.add(self.editor_wrapper, self.ace_editor)
                 
@@ -184,17 +186,17 @@ class App(Tag.App):
                 with Tag.div(_class="file-item flex items-center", 
                            _onclick=lambda e, p=path: self.toggle_dir(p),
                            style="padding-left: 8px"):
-                    Tag.span(lambda p=path: "▼" if p in self.expanded_dirs.value else "▶", 
+                    Tag.span(lambda p=path: "▼" if p in self.state.expanded_dirs.value else "▶", 
                              _class="mr-1 text-[10px] text-gray-500 w-3 inline-block")
                     Tag.span("📁", _class="mr-2 opacity-70")
                     Tag.span(item["name"], _class="truncate")
                 
                 # Children Container (Nested with margin and border)
-                with Tag.div(_class=lambda p=path: "ml-4 border-l border-slate-700/50" if p in self.expanded_dirs.value else "hidden"):
+                with Tag.div(_class=lambda p=path: "ml-4 border-l border-slate-700/50" if p in self.state.expanded_dirs.value else "hidden"):
                     self.build_tree(item["children"], level + 1)
             else:
                 # File Row
-                with Tag.div(_class=lambda p=path: f"file-item flex items-center {'active' if self.current_file.value == p else ''}", 
+                with Tag.div(_class=lambda p=path: f"file-item flex items-center {'active' if self.state.current_file.value == p else ''}", 
                            _onclick=lambda e, p=path: self.load_file(p),
                            style="padding-left: 24px"):
                     Tag.span("📄", _class="mr-2 opacity-70")
@@ -202,15 +204,15 @@ class App(Tag.App):
 
     def toggle_dir(self, path):
         path = os.path.normpath(path)
-        current = set(self.expanded_dirs.value)
+        current = set(self.state.expanded_dirs.value)
         if path in current:
             current.remove(path)
         else:
             current.add(path)
-        self.expanded_dirs.set(current)
+        self.state.expanded_dirs.set(current)
 
     def load_file(self, filename):
-        self.current_file.value = filename
+        self.state.current_file.value = filename
         try:
             with open(filename, "r", encoding="utf-8") as f:
                 content = f.read()
@@ -236,7 +238,7 @@ class App(Tag.App):
         t.call_js(f"setTimeout(() => htag_event('{t.id}', 'expire', {{}}), 5000)")
 
     def save_file(self, event):
-        if self.current_file.value:
+        if self.state.current_file.value:
             # We need to get the value from the JS side.
             self.call_js(f"""
                 (function save() {{
@@ -253,7 +255,7 @@ class App(Tag.App):
     def _on_editor_save(self, event):
         # This is a custom event handler triggered by the JS above
         content = event.value
-        filename = self.current_file.value
+        filename = self.state.current_file.value
         if filename and content is not None:
             try:
                 with open(filename, "w", encoding="utf-8") as f:

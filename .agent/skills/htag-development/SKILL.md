@@ -84,14 +84,22 @@ class Card(Tag.div):
 ### 4. State & Reactivity
 htag supports both traditional "dirty-marking" and modern reactive `State`.
 
-**Reactive State (Transparent Proxy)**:
-- Use `from htag import States` (preferred) or `from htag import State`.
-- **`States` Container (Recommended)**: Create multiple states effortlessly in one go using keyword arguments. The `States` object delegates attribute access to individual `State` instances. It supports bulk `.dump()` (to dictionary) and `.load(dict)`.
-  ```python
-  self.s = States(count=0, loading=False)
-  self.s.count += 1
-  ```
-- **Single `State`**: Declare state variables individually: `self.count = State(0)`.
+**Multiple States: `States` Container (Recommended)**:
+For any application managing more than one reactive variable, the `States` class is the **preferred approach**. It acts as a single container for multiple `State` objects, allowing for cleaner code and bulk data operations.
+
+- **Direct Attribute Access**: Access and mutate state variables directly on the container (e.g. `self.s.count += 1`).
+- **Bulk Save/Load**: Use `.dump()` to get a dictionary of all values and `.load(dict)` to restore them at once.
+- **Initialization**: Create all states in one go using keyword arguments.
+
+```python
+from htag import States
+self.s = States(count=0, loading=False, user={"name": "Guest"})
+self.s.count += 1              # Triggers re-render for count observers
+self.s.user["name"] = "Alice"   # Triggers re-render for user observers
+```
+
+**Single `State` Object**:
+Declare individual state variables when you only need one or are passing it as a component argument: `self.count = State(0)`.
 - **State Promotion**: The `State` constructor is idempotent. You can safely "promote" any input to a `State` using `s = State(value)`. If `value` is already a `State` (or a `_StateProxy`), it is returned as-is, preserving its identity and observers. This is the recommended way for component developers to handle potentially reactive arguments.
 - Use operators directly: `self.count += 1`, `if self.count > 0: ...` (full support for comparison and math).
 - Automatic notification on method calls: `self.items.append("new")`.

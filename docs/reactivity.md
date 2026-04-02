@@ -14,6 +14,43 @@ class MyApp(Tag.App):
         self.count = State(0)
 ```
 
+## The States Container (Preferred)
+
+For managing multiple reactive variables, the `States` class is the **recommended** approach. it creates multiple `State` objects in a single container, allowing for cleaner code and bulk data operations.
+
+```python
+from htag import Tag, States
+
+class MyApp(Tag.App):
+    def init(self) -> None:
+        # Initialize multiple states at once
+        self.s = States(
+            count=0,
+            loading=False,
+            user={"name": "Guest"}
+        )
+
+    def login(self, username: str):
+        # Access and mutate attributes directly!
+        self.s.count += 1
+        self.s.user["name"] = username
+```
+
+### Bulk Save & Load
+
+The `States` container provides two powerful methods for persistence or initialization:
+
+- **`.dump()`**: Returns a plain dictionary mapping state names to their current values.
+- **`.load(dict)`**: Updates all matching states from a dictionary.
+
+```python
+# Save current state
+data = self.s.dump() # {'count': 1, 'loading': False, ...}
+
+# Restore state
+self.s.load({'count': 42}) # Triggers re-render for count observers
+```
+
 ### Idempotent Constructor (Promotion)
 
 The `State` constructor is idempotent: if you pass an existing `State` or `_StateProxy` object, it returns that object directly. This allows component developers to "promote" any input to a `State` without manually checking its type.

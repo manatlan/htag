@@ -1,4 +1,4 @@
-from htag import Tag, ChromeApp, State, prevent, stop
+from htag import Tag, ChromeApp, States, prevent, stop
 import time
 
 class Box(Tag.div):
@@ -10,34 +10,36 @@ class Showcase(Tag.App):
     styles='''html,body {margin:0px;padding:0px}''' # scoped
     
     def init(self):
-        self.s_cpt=State(0)
-        self.s_liste=State(["A",]) #mutable
-        self.s_dico=State({}) #mutable
-        self.s_text=State("hello")
+        self.states=States(
+            cpt=0,
+            liste=["A",],
+            dico={},
+            text="hello"
+        )
         
 
         with self:
             with Box():
-                Tag.button("+1", _onclick=lambda ev: self.s_cpt.set(self.s_cpt.value + 1))
-                Tag.div(self.s_cpt)
+                Tag.button("+1", _onclick=lambda ev: self.states.cpt.set(self.states.cpt.value + 1))
+                Tag.div(self.states.cpt)
 
             with Box():
-                Tag.button("+liste", _onclick=lambda ev: self.s_liste.append("b"))
-                Tag.div(self.s_liste)
+                Tag.button("+liste", _onclick=lambda ev: self.states.liste.append("b"))
+                Tag.div(self.states.liste)
 
             with Box():
-                Tag.button("+dict", _onclick=lambda ev: self.s_dico.update({time.time(): 42}))
-                Tag.div(self.s_dico)
+                Tag.button("+dict", _onclick=lambda ev: self.states.dico.update({time.time(): 42}))
+                Tag.div(self.states.dico)
 
             with Box():
 
                 # change on each key press
-                Tag.input(_value=self.s_text.value, _onkeyup=lambda ev: self.s_text.set(ev.value))
-                Tag.div(self.s_text)
+                Tag.input(_value=self.states.text.value, _onkeyup=lambda ev: self.states.text.set(ev.value))
+                Tag.div(self.states.text)
 
                 # change on blur
-                Tag.input(_value=self.s_text, _onchange=lambda ev: self.s_text.set(ev.value))
-                Tag.div(self.s_text)
+                Tag.input(_value=self.states.text, _onchange=lambda ev: self.states.text.set(ev.value))
+                Tag.div(self.states.text)
 
 
 if __name__ == "__main__":
