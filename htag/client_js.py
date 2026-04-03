@@ -16,6 +16,7 @@ window.HTAG_TIMEOUT = 3000; // Timeout for transport establishment (ms)
 var _base_path = window.location.pathname.endsWith("/") ? window.location.pathname : window.location.pathname + "/";
 window._htag_callbacks = {}; // Store promise resolvers
 function _sync_interacting() {
+    if(!document.body) return;
     if(Object.keys(window._htag_callbacks).length > 0) {
         document.body.classList.add("interacting");
     } else {

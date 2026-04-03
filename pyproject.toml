@@ -9,7 +9,7 @@ include-package-data = true
 
 [project]
 name = "htag"
-version = "2.0.22"
+version = "2.0.23"
 description = "Python3 GUI toolkit for building 'beautiful' applications for mobile, web, and desktop from a single codebase"
 readme = "README.md"
 requires-python = ">=3.10"
