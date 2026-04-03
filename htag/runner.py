@@ -184,10 +184,13 @@ class AppRunner(BaseApp):
         request = current_request.get()
         if request and hasattr(request, "cookies"):
             mode = request.cookies.get("htag_mode")
-            if mode == "http":
-                protocol_patch = "window.WebSocket=window.EventSource=function(){var self=this;setTimeout(function(){if(self.onerror)self.onerror(new Error('Forced HTTP mode'))},0)};"
-            elif mode == "sse":
-                protocol_patch = "window.WebSocket=function(){var self=this;setTimeout(function(){if(self.onerror)self.onerror(new Error('Forced SSE mode'))},0)};"
+            if mode in ("http", "sse"):
+                # Robust mock for WebSocket (and EventSource for http mode)
+                mock_js = "class{constructor(){Object.assign(this,{readyState:3,close:()=>{},send:()=>{}});setTimeout(()=>this.onerror&&this.onerror(new Event('error')),0)}}; ['CONNECTING','OPEN','CLOSING','CLOSED'].forEach((name,i)=>{if(window.WebSocket)window.WebSocket[name]=i; if(window.EventSource)window.EventSource[name]=i;});"
+                if mode == "http":
+                    protocol_patch = f"window.WebSocket=window.EventSource={mock_js}"
+                else:
+                    protocol_patch = f"window.WebSocket={mock_js}"
 
         html_content = f"""
         <!DOCTYPE html>

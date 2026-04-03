@@ -22,8 +22,8 @@ def test_htag_mode_http():
     response = client.get("/", cookies={"htag_mode": "http"})
     assert response.status_code == 200
     # Both WebSocket and EventSource should be mocked
-    assert "window.WebSocket=window.EventSource=function()" in response.text
-    assert "Forced HTTP mode" in response.text
+    assert "window.WebSocket=window.EventSource=class{" in response.text
+    assert "new Event('error')" in response.text
 
 def test_htag_mode_sse():
     """Verify protocol mocking for 'sse' mode."""
@@ -32,9 +32,9 @@ def test_htag_mode_sse():
     response = client.get("/", cookies={"htag_mode": "sse"})
     assert response.status_code == 200
     # Only WebSocket should be mocked
-    assert "window.WebSocket=function()" in response.text
-    assert "window.EventSource=function()" not in response.text
-    assert "Forced SSE mode" in response.text
+    assert "window.WebSocket=class{" in response.text
+    assert "window.EventSource=class{" not in response.text
+    assert "new Event('error')" in response.text
 
 def test_htag_mode_invalid():
     """Verify that invalid cookie values are ignored."""
