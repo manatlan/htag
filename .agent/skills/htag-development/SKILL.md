@@ -401,6 +401,21 @@ If you are migrating legacy htag v1 components, be aware of these core framework
 **3. Move to Composition & Tailwind**:
 - Replace heavy Python wrapper components (like `b.VBox`, `b.Progress()`) with native CSS composition (e.g., `Tag.div(_class="flex flex-col")`, `Tag.div(_class="animate-spin")`) leveraging the `.statics` injection of modern CSS frameworks like Tailwind.
 
+### 15. Forcing Interaction Mode (`htag_mode` cookie)
+
+In some network environments (e.g., restrictive corporate proxies), WebSockets or SSE might be technically "available" but extremely slow to time out, causing a frustrating delay before falling back to a working mode.
+
+htag supports a special cookie `htag_mode` to manually force a specific transport protocol, bypassing the standard auto-detection/timeout logic:
+
+- **`htag_mode=http`**: Forces the application into pure HTTP mode immediately. Both WebSocket and EventSource are mocked to fail instantly.
+- **`htag_mode=sse`**: Forces the application to use SSE (Server-Sent Events) by making the initial WebSocket connection fail immediately.
+- **(Absent)**: Default behavior (WebSocket -> SSE -> HTTP fallback).
+
+**How to use**:
+- Users can set this cookie via browser developer tools (`document.cookie="htag_mode=http;path=/"`).
+- It can be used by external load balancers or scripts to pre-configure the best transport for a specific environment.
+- The server detects this cookie during the initial `GET /` request and injects a specialized JS bootstrap patch into the page.
+
 ## Best Practices
 
 ### Layout & Styling

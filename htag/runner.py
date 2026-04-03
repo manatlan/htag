@@ -19,6 +19,7 @@ from starlette.websockets import WebSocket
 from .core import GTag, App as BaseApp
 from .tag import Tag
 from .utils import _obf_dumps, _obf_loads
+from .context import current_request
 from .client_js import CLIENT_JS
 
 logger = logging.getLogger("htag")
@@ -178,6 +179,16 @@ class AppRunner(BaseApp):
         self.sent_statics.update(all_statics)
         statics_html = "".join(all_statics)
 
+        # Force protocol via cookie if present
+        protocol_patch = ""
+        request = current_request.get()
+        if request and hasattr(request, "cookies"):
+            mode = request.cookies.get("htag_mode")
+            if mode == "http":
+                protocol_patch = "window.WebSocket=window.EventSource=function(){var self=this;setTimeout(function(){if(self.onerror)self.onerror(new Error('Forced HTTP mode'))},0)};"
+            elif mode == "sse":
+                protocol_patch = "window.WebSocket=function(){var self=this;setTimeout(function(){if(self.onerror)self.onerror(new Error('Forced SSE mode'))},0)};"
+
         html_content = f"""
         <!DOCTYPE html>
         <html>
@@ -186,6 +197,7 @@ class AppRunner(BaseApp):
                 <title>{title}</title>
                 <meta name="viewport" content="width=device-width, initial-scale=1">
                 <link rel="icon" href="/logo.png">
+                {f"<script>{protocol_patch}</script>" if protocol_patch else ""}
                 <script>{CLIENT_JS}</script>
                 <script>
                     window.HTAG_RELOAD = {"true" if getattr(self, "_reload", False) else "false"};

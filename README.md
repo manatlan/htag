@@ -18,6 +18,7 @@
 
 **htag** is a Python3 GUI toolkit for building "beautiful" applications for mobile, web, and desktop from a single codebase
 
+
 Here is a full rewrite of **htag 1.0.0**, using only antigravity and prompts/intentions. It's the future of **htag**.
 
 Currently, it works ...
@@ -119,6 +120,13 @@ To tests them in live (debugging):
 - 1/ **websocket** : press F5, it will reset to websocket mode
 - 2/ **sse** : in devtools/console : type `fallback();`
 - 3/ **http-pure**: in devtools/console : `fallback_pure_http();` (should always work!)
+
+### Forcing Interaction Mode (htag_mode cookie)
+
+To manually test or force a specific mode (bypassing auto-detection), set the `htag_mode` cookie:
+- `document.cookie="htag_mode=http;path=/"` -> Force pure HTTP
+- `document.cookie="htag_mode=sse;path=/"` -> Force SSE
+- `document.cookie="htag_mode=;Max-Age=0;path=/"` -> Back to default (WS)
 
 ## History
 

@@ -66,6 +66,21 @@ if __name__ == "__main__":
 
 This ensures your application remains functional even behind the strictest corporate firewalls or unstable mobile connections.
 
+## Forcing Protocol via Cookie (`htag_mode`)
+
+In some restricted network environments (e.g., corporate proxies), WebSockets or SSE might be technically "available" but extremely slow to time out, causing a long delay before falling back to a working mode.
+
+`htag` supports forcing a specific protocol via the `htag_mode` cookie, bypassing the standard auto-detection:
+
+- **`htag_mode=http`**: Forces the application into pure HTTP mode (Level 3) immediately.
+- **`htag_mode=sse`**: Forces the application into SSE mode (Level 2).
+- **(Absent)**: Default behavior (WebSocket -> SSE -> HTTP).
+
+**Usage**:
+You can set this cookie manually in the browser console:
+`document.cookie="htag_mode=http;path=/"`
+Refresh the page to apply the change.
+
 ## Session & Cookie Path
 
 When using `WebApp`, `htag` manages sessions using a `htag_sid` cookie. 
