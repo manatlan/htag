@@ -5,6 +5,7 @@ import logging
 import threading
 import weakref
 import contextvars
+import functools
 from typing import Any, Callable
 
 from .context import _ctx, current_request
@@ -907,14 +908,32 @@ class App(GTag):
 
 def prevent(func: Callable) -> Callable:
     """Decorator to mark an event handler as needing preventDefault()"""
-    setattr(func, "_htag_prevent", True)
-    return func
+    try:
+        setattr(func, "_htag_prevent", True)
+        return func
+    except AttributeError:
+        # For bound methods or others that don't allow setattr
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            return func(*args, **kwargs)
+
+        setattr(wrapper, "_htag_prevent", True)
+        return wrapper
 
 
 def stop(func: Callable) -> Callable:
     """Decorator to mark an event handler as needing stopPropagation()"""
-    setattr(func, "_htag_stop", True)
-    return func
+    try:
+        setattr(func, "_htag_stop", True)
+        return func
+    except AttributeError:
+        # For bound methods or others that don't allow setattr
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            return func(*args, **kwargs)
+
+        setattr(wrapper, "_htag_stop", True)
+        return wrapper
 
 
 

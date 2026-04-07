@@ -790,3 +790,21 @@ def test_gtag_reactive_list_none():
     
     t2 = Tag.div(lambda: None)
     assert str(t2).strip().endswith("></div>")
+
+def test_decorators_bound_methods():
+    class T:
+        def my_method(self): pass
+    t = T()
+    cb_p = prevent(t.my_method)
+    cb_s = stop(t.my_method)
+    assert cb_p._htag_prevent is True
+    assert cb_s._htag_stop is True
+    # Verify they are callable
+    assert callable(cb_p)
+    assert callable(cb_s)
+    # Check that it works (wrapper calls original)
+    called = False
+    def my_handler(): nonlocal called; called = True
+    cb = prevent(my_handler)
+    cb()
+    assert called is True

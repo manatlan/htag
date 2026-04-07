@@ -138,13 +138,19 @@ Both `on_mount` and `on_unmount` fully support `yield` (standard or async). `hta
 - `@prevent`: Calls `event.preventDefault()` in the browser.
 - `@stop`: Calls `event.stopPropagation()` in the browser.
 
+These decorators can be used directly on class methods as decorators, or applied to any callable (including bound methods like `self.my_method`) at runtime.
+
 ```python
 from htag import prevent, stop
 
-@prevent
-def handle_submit(e):
-    # Form won't reload the page
-    pass
+class MyTag(Tag.form):
+    def init(self):
+        # Applied at runtime on a bound method
+        self["onsubmit"] = prevent(self.handle_submit)
+
+    def handle_submit(self, e):
+        # Form won't reload the page
+        pass
 ```
 
 ## Simple Events & HashChange
