@@ -80,6 +80,13 @@ In some restricted network environments (e.g., corporate proxies), WebSockets or
 You can set this cookie manually in the browser console:
 `document.cookie="htag_mode=http;path=/"`
 Refresh the page to apply the change.
+    
+## Forcing a New Session (`?n`)
+
+If you want to discard your current session and start fresh without clearing your cookies manually, you can append `?n` (for **n**ew) to your application URL.
+
+- **Effect**: The runner will immediately terminate the current session instance, triggering its `on_destroy()` hook, and will create a brand new instance for you.
+- **Example**: `http://localhost:8000/?n`
 
 ## Session & Cookie Path
 

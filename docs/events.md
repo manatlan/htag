@@ -129,6 +129,7 @@ async def my_async_gen(e: Any) -> AsyncGenerator:
 - **`init(**kwargs)`**: Called once when the component is created.
 - **`on_mount()`**: Fired when the component is attached to the app. In `WebApp`, this is **re-triggered on every page refresh (F5)**, allowing you to reset volatile UI state (e.g., clearing status messages) while preserving the backend session instance.
 - **`on_unmount()`**: Fired when the component is removed from the tree. In `WebApp`, it is **also called before every page refresh (F5)**, allowing you to properly clean up resources (e.g., cancelling background tasks) before the view is reset.
+- **`on_destroy()`**: Fired only on the `App` instance when it is definitively discarded by the runner. Unlike `on_unmount`, it is **not called on page refresh (F5)**, making it the ideal place to release session-level resources (e.g. database connections, background servers) without interrupting them during UI navigation.
 
 ### Generators in Lifecycle Hooks
 Both `on_mount` and `on_unmount` fully support `yield` (standard or async). `htag` intelligently queues `on_mount` updates until the client is ready, and ensures `on_unmount` broadcasts are sent before the component is discarded.

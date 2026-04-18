@@ -22,6 +22,8 @@
 - **Type-Safe**: Comprehensive type hints for a great developer experience.
 - **Automatic Attributes**: Non-prefixed keyword arguments are automatically assigned as instance attributes.
 - **Automatic Page Title**: htag Extracts `Tag.title` from `App.statics` list to set the browser tab title.
+- **Session Lifecycle (`on_destroy`)**: A definitive cleanup hook on `App` instances for clean resource management.
+- **Forced Session Reset (`?n`)**: Effortlessly reset any session from the URL, triggering the full cleanup lifecycle.
 
 ## Quick Start
 

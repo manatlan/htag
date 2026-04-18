@@ -110,6 +110,8 @@ htag is a Python library for building web applications using HTML, CSS, and Java
 *   **Hash-Based SPA Router**: Introducing `Router` for client-side navigation. Define route patterns (e.g., `/tasks/:id`), map them to component classes, and handle navigation seamlessly with browser history support (Back/Forward buttons) and automatic lifecycle management.
 *   **Ephemeral Ports**: Support for `port=0` in all runners to pick a free port automatically.
 *   **Automatic Page Title**: htag automatically extracts `Tag.title` from your `App.statics` list to set the browser tab title, avoiding duplicate tags in the HTML head. It fallbacks to the class name if none is provided.
+*   **Session Lifecycle & `on_destroy`**: Introducing `on_destroy()` on `App` instances, a definitive cleanup hook called only when the runner discards the session. Unlike `on_unmount()`, it doesn't trigger on page refreshes (F5), making it perfect for closing database connections or stopping background servers.
+*   **Forced Session Reset (`?n`)**: Users can now append `?n` to any application URL to force the destruction of their current session and create a fresh one from scratch, immediately triggering the `on_destroy()` hook on the old instance.
 
 ## Tests communication between front and back
 

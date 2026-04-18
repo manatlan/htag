@@ -168,6 +168,13 @@ class WebApp:
             if htag_sid is None:
                 htag_sid = str(uuid.uuid4())
 
+            # Forced reset via ?n
+            if "n" in request.query_params:
+                with self._lock:
+                    old_instance = self.instances.pop(htag_sid, None)
+                    if old_instance and hasattr(old_instance, "_trigger_destroy"):
+                        old_instance._trigger_destroy()
+
             had_instance = htag_sid and htag_sid in self.instances
             instance = self._get_instance(htag_sid, request)
             if had_instance:

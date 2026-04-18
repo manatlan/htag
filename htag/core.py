@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import asyncio
+import contextvars
+import functools
 import html
+import inspect
 import logging
 import threading
 import weakref
-import contextvars
-import functools
 from typing import Any, Callable
 
 from .context import _ctx, current_request
@@ -903,7 +905,27 @@ class GTag:  # aka "Generic Tag"
 class App(GTag):
     """Base class for the root of a htag application tree."""
 
-    pass
+    def on_destroy(self):
+        """
+        Hook called when the application instance is definitively discarded
+        by the runner (e.g., forced reload via ?n).
+        Can be synchronous or asynchronous.
+        """
+        pass
+
+    def _trigger_destroy(self):
+        """Internal helper to trigger the destroy hook safely (sync or async)."""
+        res = self.on_destroy()
+        if inspect.iscoroutine(res):
+            try:
+                loop = asyncio.get_running_loop()
+                if loop.is_running():
+                    loop.create_task(res)
+                else:
+                    asyncio.run(res)
+            except RuntimeError:
+                # No running loop, run it synchronously
+                asyncio.run(res)
 
 
 def prevent(func: Callable) -> Callable:

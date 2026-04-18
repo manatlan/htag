@@ -58,6 +58,7 @@ htag provides three lifecycle hooks to override on custom components:
 - `on_mount()`: Fired when the component is firmly attached to the main `App` tree (`self.root` is ready).
     - **F5 / Page Load**: In `WebApp`, `on_mount()` is re-triggered on every initial page load (`GET /`), even if the session instance is reused. This allows components to reset ephemeral UI state (like status labels or timers) whenever the user refreshes the page.
 - `on_unmount(self)`: Fired when the component is removed from the tree. In `WebApp`, it is **also called before every page refresh (F5)**, allowing you to properly clean up resources (e.g., cancelling background tasks) before the view is reset.
+- `on_destroy(self)`: Fired when the application instance is definitively discarded by the runner. Unlike `on_unmount`, it is **not called on page refresh (F5)**, making it the ideal place to release session-level resources (e.g., closing database connections or stopping companion servers) without interrupting them during UI navigation. It can be synchronous or asynchronous.
 
 > [!NOTE]
 > **Multiple Mounts version Init**: You might notice `on_mount` called multiple times during the initial load if you use both `GTag`'s auto-stack mechanism and manual addition (e.g., `self.child = MyChild(); self <= self.child`). This is harmless but good to know when counting mounts in tests.
