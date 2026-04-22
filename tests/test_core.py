@@ -808,3 +808,28 @@ def test_decorators_bound_methods():
     cb = prevent(my_handler)
     cb()
     assert called is True
+
+def test_html_escape_bypass():
+    from htag import Tag, HTML
+
+    # Standard string is escaped
+    t = Tag.div("<b>test</b>")
+    assert "&lt;b&gt;test&lt;/b&gt;" in str(t)
+    assert "<b>" not in str(t)
+
+    # HTML wrapper bypasses escape
+    t2 = Tag.div(HTML("<b>test</b>"))
+    assert "<b>test</b>" in str(t2)
+    assert "&lt;b&gt;" not in str(t2)
+
+    # Mix and match via __add__
+    t3 = Tag.div()
+    t3 += "<i>hello</i>"
+    t3 += HTML("<b>world</b>")
+    assert "&lt;i&gt;hello&lt;/i&gt;" in str(t3)
+    assert "<b>world</b>" in str(t3)
+
+    # Mix and match via childs
+    t4 = Tag.div(["<i>hello</i>", HTML("<b>world</b>")])
+    assert "&lt;i&gt;hello&lt;/i&gt;" in str(t4)
+    assert "<b>world</b>" in str(t4)
