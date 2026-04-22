@@ -15,6 +15,15 @@ from .context import _ctx, current_request
 logger = logging.getLogger("htag")
 
 
+class HTML(str):
+    """
+    A string subclass to mark HTML code as safe so it is not escaped
+    when rendered in a GTag.
+    """
+    pass
+
+
+
 
 from .css import _scope_css, _scoped_style_cache
 
@@ -882,6 +891,8 @@ class GTag:  # aka "Generic Tag"
         
         if stringify:
             if isinstance(child, GTag) or (self.tag in ("style", "script")):
+                return str(child)
+            if isinstance(child, HTML):
                 return str(child)
             return html.escape(str(child))
         return child

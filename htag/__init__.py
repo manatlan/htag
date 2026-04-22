@@ -1,4 +1,4 @@
-from .core import prevent, stop, State, States, current_request
+from .core import prevent, stop, State, States, current_request, HTML
 from .tag import Tag
 from .runner import AppRunner as App
 from .web import WebApp
@@ -20,6 +20,7 @@ logging.getLogger("htag").addHandler(logging.NullHandler())
 
 __all__ = [
     "__version__",
+    "HTML", # safe string wrapper
     "Tag",  # the main thing
     "State",    # State management
     "States",   # Multi-State management container
