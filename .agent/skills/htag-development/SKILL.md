@@ -352,6 +352,7 @@ For multi-page behavior in a Single Page Application (SPA), use the built-in `Ro
 - **Automatic Lifecycle**: `on_mount()` and `on_unmount()` are called automatically when swapping pages.
 - **Route Parameters**: Dynamic segments (e.g., `:id`) are injected directly as keyword arguments into the page's `init()`.
 - **Programmatic Navigation**: Use `router.navigate("/new-path")` to steer the UI from Python.
+- **Reactive Path**: `router.path` is a `State("")` reflecting the current route, enabling reactive tab/link styling.
 
 ```python
 from htag import Tag, Router
@@ -379,7 +380,12 @@ class App(Tag.App):
         self.router.add_route("/", HomePage)
         self.router.add_route("/users/:id", UserPage)
         
-        # 3. Add it to the UI
+        # 3. Navigation with active link highlighting (reactive!)
+        with Tag.nav():
+            Tag.a("Home",  _href="#/",          _class=lambda: "active" if self.router.path == "/" else "")
+            Tag.a("Users", _href="#/users/42",  _class=lambda: "active" if str(self.router.path).startswith("/users") else "")
+        
+        # 4. Add it to the UI
         self <= self.router
 ```
 

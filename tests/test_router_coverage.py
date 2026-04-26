@@ -13,11 +13,11 @@ def test_router_on_hash_change_variants():
         def __init__(self, url): self.newURL = url
         
     router._on_hash_change(MockEvent("http://localhost/#/p"))
-    assert router._current_path == "/p"
+    assert router.path == "/p"
     
     # Test line 137: fallback to / (already on /p, so it should clear and hit / which is 404)
     router._on_hash_change(MockEvent("http://localhost/"))
-    assert router._current_path == "/"
+    assert router.path == "/"
     assert "404" in str(router.childs[0])
 
 def test_router_init_route_legacy_event():
@@ -28,7 +28,7 @@ def test_router_init_route_legacy_event():
     class LegacyEvent:
         hash = "#/home"
     router._on_init_route(LegacyEvent())
-    assert router._current_path == "/home"
+    assert router.path == "/home"
 
 def test_router_redundant_navigation():
     router = Router()

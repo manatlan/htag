@@ -72,5 +72,29 @@ def test_router_initial_route_event():
     router.add_route("/", Page1)
     
     # Simulate htag_event from JS
-    router._on_init_route(type('Event', (object,), {'value': {'hash': '#/'}}))
+    router._on_init_route(type('Event', (object,), {'value': {'hash': '#/'}})())
     assert isinstance(router.childs[0], Page1)
+
+def test_router_path_is_reactive_state():
+    """router.path should be a State, enabling reactive tab styling."""
+    from htag.core import State
+    router = Router()
+    router.add_route("/", Page1)
+    router.add_route("/hello/:name", Page2)
+    
+    # path is a State instance
+    assert isinstance(router.path, State)
+    
+    # Initially empty
+    assert router.path == ""
+    
+    # After navigation, path reflects the route
+    router._navigate_to("/")
+    assert router.path == "/"
+    
+    router._navigate_to("/hello/World")
+    assert router.path == "/hello/World"
+    
+    # Comparison operators work (essential for lambda: "active" if router.path == "/" else "")
+    assert router.path != "/"
+    assert router.path == "/hello/World"

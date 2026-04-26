@@ -78,6 +78,27 @@ def on_login_success(self, e):
 
 This method updates the browser hash, ensuring that the **Back/Forward buttons** continue to work as expected.
 
+## Active Route Styling (`router.path`)
+
+The `router.path` attribute is a reactive `State("")` that always reflects the current route. Use it in lambda attributes to **automatically highlight active navigation links** or tabs:
+
+```python
+class MyApp(Tag.App):
+    def init(self):
+        self.router = Router()
+        self.router.add_route("/", HomePage)
+        self.router.add_route("/settings", SettingsPage)
+
+        # Navigation links with automatic "active" class
+        with Tag.nav():
+            Tag.a("Home",     _href="#/",         _class=lambda: "active" if self.router.path == "/" else "")
+            Tag.a("Settings", _href="#/settings",  _class=lambda: "active" if self.router.path == "/settings" else "")
+
+        self <= self.router
+```
+
+Since `path` is a standard htag `State`, it integrates with the full reactivity system — any component observing it will re-render automatically when the route changes.
+
 ## Custom 404 Pages
 
 If no route matches the current path, a default "404 Not Found" message is displayed. You can customize this by providing your own component:

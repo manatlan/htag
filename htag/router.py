@@ -22,7 +22,7 @@ import logging
 from dataclasses import dataclass, field
 from typing import Any
 
-from .core import GTag
+from .core import GTag, State
 
 logger = logging.getLogger("htag")
 
@@ -73,13 +73,18 @@ class Router(GTag):
 
     Route parameters (e.g. `:id` in `/tasks/:id`) are passed as keyword
     arguments to the page component's init().
+
+    The `path` attribute is a reactive `State("")` holding the current route.
+    Use it in lambdas to style active navigation links::
+
+        Tag.a("Home", _href="#/", _class=lambda: "active" if router.path == "/" else "")
     """
 
     tag: str = "div"
 
     def init(self, **kwargs: Any) -> None:
         self._routes: list[_Route] = []
-        self._current_path: str = ""
+        self.path: State = State("")
         self._not_found_component: type[GTag] | None = None
 
     def add_route(self, path: str, component: type[GTag]) -> None:
@@ -137,8 +142,8 @@ class Router(GTag):
 
     def _navigate_to(self, path: str) -> None:
         """Match a path against registered routes and swap the view."""
-        logger.debug("Router: navigating to '%s' (current='%s')", path, self._current_path)
-        if path == self._current_path and self._current_path != "":
+        logger.debug("Router: navigating to '%s' (current='%s')", path, self.path)
+        if path == self.path and self.path != "":
             return  # Already on this page
 
         for route in self._routes:
@@ -147,13 +152,13 @@ class Router(GTag):
                 params = match.groupdict()
                 logger.info("Router match: %s → %s(%s)", path, route.component.__name__, params)
                 self._swap(route.component, params)
-                self._current_path = path
+                self.path.value = path
                 return
 
         # No match → 404
         logger.warning("Router: no route matched for '%s'", path)
         self._swap_not_found(path)
-        self._current_path = path
+        self.path.value = path
 
     def _swap(self, component_class: type[GTag], params: dict[str, str]) -> None:
         """Replace the current view with a new component instance."""
