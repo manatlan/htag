@@ -102,16 +102,12 @@ class Router(GTag):
         # We use a name that htag_event will match
         self["oninit_route"] = self._on_init_route
         
-        # Ask the browser for the current hash after a small delay to ensure
-        # the client-side bridge is fully ready.
+        # Ask the browser for the current hash to resolve the initial route.
+        # The JS round-trip is the single source of truth — no server-side
+        # fallback to avoid double-rendering when the hash is not "/".
         self.call_js(
             f"setTimeout(() => htag_event('{self.id}', 'init_route', {{hash: window.location.hash}}), 50)"
         )
-        
-        # Immediate fallback to root if nothing is displayed yet
-        if not self.childs and self._routes:
-             # Try to match "/" immediately if available
-             self._navigate_to("/")
 
     def _on_init_route(self, event: Any) -> None:
         """Handle the initial hash value sent from the browser."""
