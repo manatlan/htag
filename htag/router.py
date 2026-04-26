@@ -17,6 +17,7 @@ Usage:
 """
 from __future__ import annotations
 
+import inspect
 import re
 import logging
 from dataclasses import dataclass, field
@@ -172,11 +173,10 @@ class Router(GTag):
         """Show 404 content."""
         self.clear()
         if self._not_found_component:
-            try:
-                # Try to pass the path to the custom 404 component
+            sig = inspect.signature(self._not_found_component.init)
+            if "path" in sig.parameters:
                 view = self._not_found_component(path=path)
-            except TypeError:
-                # Fallback to no-arg instantiation if it fails
+            else:
                 view = self._not_found_component()
             self.add(view)
         else:

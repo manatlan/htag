@@ -48,3 +48,54 @@ def test_router_navigate_js():
     router.navigate("/target")
     # Verify the call_js was recorded in the internal __js_calls list of the Tag
     assert any("window.location.hash='/target'" in js for js in router._consume_js_calls())
+
+def test_router_on_mount_wires_events():
+    """Cover on_mount(): wires hashchange, init_route event, and call_js."""
+    class App(Tag.App):
+        def init(self):
+            self.router = Router()
+            self.router.add_route("/", Page)
+            self <= self.router
+
+    app = App()
+    # on_mount should have wired onhashchange on root
+    assert app["onhashchange"] is not None
+    # on_mount should have wired oninit_route on the router
+    assert app.router["oninit_route"] is not None
+    # on_mount should have queued a call_js for initial hash resolution
+    js_calls = app.router._consume_js_calls()
+    assert any("init_route" in js for js in js_calls)
+
+def test_router_init_route_hash_without_slash():
+    """Cover L129: hash value without leading slash (e.g. '#home' instead of '#/home')."""
+    router = Router()
+    router.add_route("/home", Page)
+
+    class MockEvent:
+        hash = "#home"  # no leading slash
+    router._on_init_route(MockEvent())
+    assert router.path == "/home"
+
+def test_router_hashchange_without_slash():
+    """Cover L141: newURL hash segment without leading slash."""
+    router = Router()
+    router.add_route("/p", Page)
+
+    class MockEvent:
+        newURL = "http://localhost/#p"  # no leading slash after #
+    router._on_hash_change(MockEvent())
+    assert router.path == "/p"
+
+def test_router_not_found_with_path_param():
+    """Cover L178: custom 404 component that accepts a 'path' keyword argument."""
+    class My404WithPath(Tag.div):
+        def init(self, path: str = "") -> None:
+            self.text = f"Lost at: {path}"
+
+    router = Router()
+    router.add_route("/", Page)
+    router.set_not_found(My404WithPath)
+
+    router._navigate_to("/nonexistent")
+    assert isinstance(router.childs[0], My404WithPath)
+    assert "Lost at: /nonexistent" in router.childs[0].text
