@@ -80,6 +80,12 @@ class HtagError extends HTMLElement {
             </div>
         `;
         this.shadowRoot.querySelector('.close').onclick = () => this.removeAttribute('show');
+        this.addEventListener('click', (e) => {
+            const dialog = this.shadowRoot.querySelector('.dialog');
+            if (!e.composedPath().includes(dialog)) {
+                this.removeAttribute('show');
+            }
+        });
         this.shadowRoot.getElementById('copy-btn').onclick = () => {
             const trace = this.shadowRoot.getElementById('trace').textContent;
             navigator.clipboard.writeText(trace).then(() => {
@@ -106,14 +112,18 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 window.onerror = function(message, source, lineno, colno, error) {
+    var trace = `${message}\\n${source}:${lineno}:${colno}\\n${error ? error.stack : ''}`;
     if(_error_overlay && typeof _error_overlay.show === 'function') {
-        _error_overlay.show("Client JavaScript Error", `${message}\\n${source}:${lineno}:${colno}\\n${error ? error.stack : ''}`);
+        _error_overlay.show("Client JavaScript Error", trace);
     }
+    if(window.htag_transport) window.htag_transport({action: "log_error", error: trace});
 };
 window.onunhandledrejection = function(event) {
+    var trace = String(event.reason);
     if(_error_overlay && typeof _error_overlay.show === 'function') {
-        _error_overlay.show("Unhandled Promise Rejection", String(event.reason));
+        _error_overlay.show("Unhandled Promise Rejection", trace);
     }
+    if(window.htag_transport) window.htag_transport({action: "log_error", error: trace});
 };
 
 function _enc(obj) {
@@ -249,9 +259,11 @@ function handle_payload(data, source) {
                     eval(data.js[i]);
                 } catch(e) {
                     console.error("htag: eval error for", data.js[i], e);
+                    var trace = e.message + "\\nSource: " + data.js[i];
                     if(_error_overlay && typeof _error_overlay.show === 'function') {
-                        _error_overlay.show("JS Eval Error", e.message + "\\nSource: " + data.js[i]);
+                        _error_overlay.show("JS Eval Error", trace);
                     }
+                    if(window.htag_transport) window.htag_transport({action: "log_error", error: "JS Eval Error: " + trace});
                 }
             }
         }

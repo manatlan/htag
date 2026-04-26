@@ -407,6 +407,11 @@ class AppRunner(BaseApp):
 
     async def handle_event(self, msg: dict[str, Any], ws: WebSocket | None) -> None:
         logger.info(f"handle_event {msg}")
+        
+        if msg.get("action") == "log_error":
+            logger.error("Client JavaScript Error:\n%s", msg.get("error", "Unknown error"))
+            return
+
         tag_id: str | None = msg.get("id")
         event_name: str | None = msg.get("event")
 
