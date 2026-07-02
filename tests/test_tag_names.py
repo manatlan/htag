@@ -28,3 +28,13 @@ def test_no_underscore_still_works():
     # Tag.span() should still be "span"
     s = Tag.span()
     assert s.tag == "span"
+
+
+def test_forbidden_tag_names():
+    import pytest
+    for name in ["add", "remove", "clear", "update", "call", "bind"]:
+        with pytest.raises(AttributeError):
+            getattr(Tag, name)
+        with pytest.raises(AttributeError):
+            getattr(Tag, name.upper())
+

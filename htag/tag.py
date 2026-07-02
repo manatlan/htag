@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from typing import Any
 from .core import GTag, App
 
 
@@ -19,6 +20,12 @@ class TagCreator:
         Dynamically creates GTag subclasses on the fly.
         Allows using 'Tag.Div(...)', 'Tag.Button(...)', etc.
         """
+        # Prevent collisions with existing GTag methods/attributes (e.g. add, remove, update, clear, etc.)
+        if name in dir(GTag) or name.lower() in dir(GTag) or name.lower() in ("call", "bind"):
+            raise AttributeError(
+                f"'{name}' is a reserved GTag method/attribute and cannot be used as a tag name."
+            )
+
         if name in self._registry:
             return self._registry[name]
 

@@ -41,7 +41,7 @@ def test_recursive_statics_and_js_collection():
     class MyApp(App):
         def init(self):
             # MyComp is inside a lambda
-            Tag.add(lambda: MyComp())
+            Tag.div(lambda: MyComp())
     
     app = MyApp()
     html = app._render_page()
