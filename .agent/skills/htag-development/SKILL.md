@@ -109,7 +109,7 @@ Declare individual state variables when you only need one or are passing it as a
 - Attribute delegation: `self.user.name = "Bob"` (where `self.user` is a `State(User())`) delegates setting to the underlying object and notifies automatically.
 - Type conversions: `int(self.count)`, `bool(self.status)` work transparently.
 - Data-driven UIs: `Tag.div(self.count)` or `Tag.div(lambda: f"Count: {self.count}")`.
-- Safe value retrieval: Use `self.count.get()` to retrieve the underlying value regardless of its type (essential for `bool` values that don't have a `.get()` method themselves).
+- Safe value retrieval: Use `self.count.get()` to retrieve the underlying value regardless of its type. If the wrapped object has a `.get()` method (such as a dictionary) and arguments are provided, it automatically delegates to it (e.g. `state.get("key", default)`).
 
 **Reactive & Boolean Attributes**:
 - Attributes support lambdas OR `State` objects directly for dynamic updates: `Tag.button("Submit", _disabled=self.loading)`.

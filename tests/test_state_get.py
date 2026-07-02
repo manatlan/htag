@@ -69,3 +69,20 @@ def test_state_get_no_side_effects():
     # Calling get() again should NOT mark observer as dirty
     s.get()
     assert t._GTag__dirty is False
+
+
+def test_state_dict_get_collision():
+    """Verify that State and _StateProxy wrapping a dict can call get() representing dict.get()."""
+    # 1. State wrapping dict
+    s = State({"a": 1, "b": 2})
+    assert s.get("a") == 1
+    assert s.get("c", 3) == 3
+    assert s.get() == {"a": 1, "b": 2}
+    
+    # 2. _StateProxy wrapping dict
+    s2 = State({"nested": {"a": 1, "b": 2}})
+    proxy = s2["nested"] # This returns a _StateProxy wrapping the dict
+    assert proxy.get("b") == 2
+    assert proxy.get("c", 4) == 4
+    assert proxy.get() == {"a": 1, "b": 2}
+

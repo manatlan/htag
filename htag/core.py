@@ -56,7 +56,9 @@ class State:
         self.value = value
         return value
 
-    def get(self) -> Any:
+    def get(self, *args: Any, **kwargs: Any) -> Any:
+        if (args or kwargs) and hasattr(self.value, "get") and callable(self.value.get):
+            return self.value.get(*args, **kwargs)
         return self.value
 
     def notify(self) -> None:
@@ -266,7 +268,10 @@ class _StateProxy:
         self._state = state
         self._value = value
 
-    def get(self) -> Any:
+    def get(self, *args: Any, **kwargs: Any) -> Any:
+        if (args or kwargs) and hasattr(self._value, "get") and callable(self._value.get):
+            return self._value.get(*args, **kwargs)
+            
         if _ctx.current_eval is not None:
             self._state._observers.add(_ctx.current_eval)
         return self._value
