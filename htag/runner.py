@@ -146,6 +146,8 @@ class AppRunner(BaseApp):
         self.websockets: set[WebSocket] = set()
         self.sse_queues: set[asyncio.Queue] = set()  # Queues for active SSE connections
         self.sent_statics: set[str] = set()  # Track assets already in browser
+        self.throttle_delay: float = 0.05
+        self._last_broadcast_time: float = 0.0
 
     @property
     def app(self) -> Any:
@@ -566,24 +568,48 @@ class AppRunner(BaseApp):
             if not has_sent:
                 self._push_to_fallback(err_payload)
 
-    def update(self) -> None:
+    def update(self, throttle: float | None = None) -> None:
         """
-        Schedules a broadcast of all pending updates in the next event loop iteration.
-        This provides a throttled, asynchronous update mechanism that can be safely
-        triggered from both synchronous and asynchronous code.
+        Schedules a broadcast of all pending updates after a throttle delay.
         """
-        if not getattr(self, "_update_scheduled", False):
-            try:
-                loop = asyncio.get_running_loop()
-                self._update_scheduled = True
-                loop.call_soon(self._do_update)
-            except RuntimeError:
-                # No running loop (might happen during early initialization)
-                pass
+        try:
+            loop = asyncio.get_running_loop()
+            now = loop.time()
+            elapsed = now - getattr(self, "_last_broadcast_time", 0.0)
+            throttle_delay = throttle if throttle is not None else getattr(self, "throttle_delay", 0.05)
+            
+            target_delay = 0.0 if elapsed >= throttle_delay else (throttle_delay - elapsed)
+            
+            if getattr(self, "_update_scheduled", False):
+                scheduled_at = getattr(self, "_update_scheduled_at", 0.0)
+                remaining = scheduled_at - now
+                if target_delay < remaining:
+                    if getattr(self, "_update_handle", None) is not None:
+                        self._update_handle.cancel()
+                else:
+                    return
+            
+            self._update_scheduled = True
+            self._update_scheduled_at = now + target_delay
+            
+            if target_delay == 0.0:
+                self._update_handle = loop.call_soon(self._do_update)
+            else:
+                self._update_handle = loop.call_later(target_delay, self._do_update)
+        except RuntimeError:
+            # No running loop
+            pass
 
     def _do_update(self) -> None:
-        """Internal callback to handle the actual broadcast after call_soon."""
+        """Internal callback to handle the actual broadcast after call_soon/call_later."""
         self._update_scheduled = False
+        self._update_handle = None
+        try:
+            loop = asyncio.get_running_loop()
+            self._last_broadcast_time = loop.time()
+        except RuntimeError:
+            import time
+            self._last_broadcast_time = time.time()
         asyncio.create_task(self.broadcast_updates())
 
     async def broadcast_updates(

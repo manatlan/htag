@@ -121,7 +121,7 @@ Declare individual state variables when you only need one or are passing it as a
 - Use the `.text` property to quickly replace all text content of a tag: `self.my_label.text = "New Status"`. This completely clears existing children and replaces them with a single string.
 **Background Tasks & `update()`**:
 - **Automatic Reactivity**: When using `State`, mutations from background tasks (started via `asyncio.create_task`) automatically trigger UI synchronization.
-- **Manual Synchronization**: For non-state changes or complex manual updates, every component exposes an `.update()` method (e.g., `self.update()`) which schedules a throttled UI broadcast. 
+- **Manual Synchronization**: For non-state changes or complex manual updates, every component exposes an `.update()` method (e.g., `self.update()`) which schedules a throttled UI broadcast. By default, updates are throttled at 50ms (configurable). You can adjust this on the fly: use `self.update(throttle=0.1)` for 100ms throttle, or `self.update(throttle=0)` to force an immediate broadcast.
 - **Pattern**: Use `on_mount` to start background tasks and `on_unmount` to cancel them. (This pattern is now robust against page refreshes in `WebApp`).
 
 ```python

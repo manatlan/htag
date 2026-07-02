@@ -177,3 +177,43 @@ def test_eval_child_non_stringify():
     assert val is True
     val_str = t._eval_child(True, stringify=True)
     assert val_str == "True"
+
+
+@pytest.mark.asyncio
+async def test_update_throttle():
+    """Test that Runner.update() properly throttles high-frequency updates"""
+    import time
+    class MyApp(App):
+        def init(self):
+            self.val = 0
+
+    app = MyApp()
+    broadcasts = []
+    
+    async def mock_broadcast(*args, **kwargs):
+        broadcasts.append(asyncio.get_running_loop().time())
+        
+    app.broadcast_updates = mock_broadcast
+    app.throttle_delay = 0.1  # 100ms throttle
+    
+    # 1. Trigger multiple updates in a row
+    app.update()
+    app.update()
+    app.update()
+    
+    # Give the event loop a tick to run call_soon
+    await asyncio.sleep(0.01)
+    assert len(broadcasts) == 1
+    
+    # 2. Trigger updates while throttled
+    app.update()  # should be scheduled for +100ms
+    app.update()
+    
+    await asyncio.sleep(0.05)
+    # Still only 1 broadcast (since we are at 50ms and delay is 100ms)
+    assert len(broadcasts) == 1
+    
+    await asyncio.sleep(0.06)
+    # Now we reached 110ms, the throttled update should have executed
+    assert len(broadcasts) == 2
+

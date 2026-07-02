@@ -800,14 +800,14 @@ class GTag:  # aka "Generic Tag"
         self.__js_calls.append(script)
         return self
 
-    def update(self) -> None:
+    def update(self, throttle: float | None = None) -> None:
         """
         Schedules a UI synchronization.
         Useful when modifying state from background tasks or outside regular event handlers.
         """
         root = self.root
         if root and hasattr(root, "update"):
-            root.update()
+            root.update(throttle=throttle)
 
     # --- Public API for server-side access (avoids name-mangled access) ---
 

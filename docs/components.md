@@ -63,7 +63,7 @@ class Clock(Tag.div):
 ### Background Tasks & `update()`
 
 - **Automatic Reactivity**: `State` mutations from background tasks (started via `asyncio.create_task`) now automatically trigger UI updates.
-- **Manual Synchronization**: For non-state changes, use `self.update()` to schedule a throttled UI sync.
+- **Manual Synchronization**: For non-state changes, use `self.update()` to schedule a throttled UI sync. By default, it is throttled at 50ms. You can adjust it on the fly (e.g. `self.update(throttle=0.1)` for a 100ms delay, or `self.update(throttle=0)` to force an immediate broadcast).
 
 ```python
     def on_mount(self):
