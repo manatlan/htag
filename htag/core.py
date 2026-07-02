@@ -640,6 +640,11 @@ class GTag:  # aka "Generic Tag"
     def __le__(self, other: Any) -> "GTag":
         return self.add(other)
 
+    def __lshift__(self, other: Any) -> Any:
+        raise TypeError(
+            "L'opérateur '<<' n'est pas supporté par htag. Utilisez '<=' ou '+=' pour ajouter un enfant."
+        )
+
     def __getitem__(self, name: str) -> Any:
         if isinstance(name, str):
             if name.startswith("on") and name[2:] in self.__events:
