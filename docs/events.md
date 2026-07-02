@@ -131,8 +131,8 @@ async def my_async_gen(e: Any) -> AsyncGenerator:
 - **`on_unmount()`**: Fired when the component is removed from the tree. In `WebApp`, it is **also called before every page refresh (F5)**, allowing you to properly clean up resources (e.g., cancelling background tasks) before the view is reset.
 - **`on_destroy()`**: Fired only on the `App` instance when it is definitively discarded by the runner. Unlike `on_unmount`, it is **not called on page refresh (F5)**, making it the ideal place to release session-level resources (e.g. database connections, background servers) without interrupting them during UI navigation.
 
-### Generators in Lifecycle Hooks
-Both `on_mount` and `on_unmount` fully support `yield` (standard or async). `htag` intelligently queues `on_mount` updates until the client is ready, and ensures `on_unmount` broadcasts are sent before the component is discarded.
+### Generators & Coroutines in Lifecycle Hooks
+Both `on_mount` and `on_unmount` fully support generators (using `yield`, either synchronous or asynchronous) as well as standard async coroutines (`async def` without `yield`). `htag` intelligently queues `on_mount` tasks/generators until the client is ready, executing them once the client connects, and ensures `on_unmount` broadcasts are sent before the component is discarded.
 
 ## Event Decorators
 

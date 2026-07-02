@@ -575,7 +575,7 @@ class GTag:  # aka "Generic Tag"
     def _trigger_mount(self) -> None:
         import inspect
         res = self.on_mount()
-        if inspect.isgenerator(res) or inspect.isasyncgen(res):
+        if inspect.isgenerator(res) or inspect.isasyncgen(res) or inspect.iscoroutine(res):
             root = self.root
             if root is not None and type(root).__name__ != "GTag":
                 # Only root representing the application
@@ -593,7 +593,7 @@ class GTag:  # aka "Generic Tag"
     def _trigger_unmount(self) -> None:
         import inspect
         res = self.on_unmount()
-        if inspect.isgenerator(res) or inspect.isasyncgen(res):
+        if inspect.isgenerator(res) or inspect.isasyncgen(res) or inspect.iscoroutine(res):
             root = self.root
             if root is not None and type(root).__name__ != "GTag":
                 # Only root representing the application

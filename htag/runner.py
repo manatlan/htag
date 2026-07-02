@@ -527,7 +527,10 @@ class AppRunner(BaseApp):
 
     async def _consume_generator(self, gen: Any, ws: WebSocket | None = None) -> None:
         try:
-            if inspect.isasyncgen(gen):
+            if inspect.iscoroutine(gen):
+                await gen
+                await self.broadcast_updates(ws=ws)
+            elif inspect.isasyncgen(gen):
                 async for _ in gen:
                     await self.broadcast_updates(ws=ws)
             elif inspect.isgenerator(gen):

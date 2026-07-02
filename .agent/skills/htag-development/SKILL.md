@@ -122,7 +122,7 @@ Declare individual state variables when you only need one or are passing it as a
 **Background Tasks & `update()`**:
 - **Automatic Reactivity**: When using `State`, mutations from background tasks (started via `asyncio.create_task`) automatically trigger UI synchronization.
 - **Manual Synchronization**: For non-state changes or complex manual updates, every component exposes an `.update()` method (e.g., `self.update()`) which schedules a throttled UI broadcast. By default, updates are throttled at 50ms (configurable). You can adjust this on the fly: use `self.update(throttle=0.1)` for 100ms throttle, or `self.update(throttle=0)` to force an immediate broadcast.
-- **Pattern**: Use `on_mount` to start background tasks and `on_unmount` to cancel them. (This pattern is now robust against page refreshes in `WebApp`).
+- **Pattern**: Use `on_mount` and `on_unmount` for component initialization and cleanup. Both hooks fully support synchronous/asynchronous generators (for yielding intermediate UI states) as well as standard async coroutines (`async def` without `yield`) which are executed once the client connects. (This pattern is now robust against page refreshes in `WebApp`).
 
 ```python
 class App(Tag.App):

@@ -88,3 +88,38 @@ async def test_on_mount_yields_sse():
         
         # Cleanup tasks
         instance.sse_queues.clear()
+
+
+class AppWithCoroutine(App):
+    def init(self):
+        self += Tag.div("init", _id="status")
+        
+    async def on_mount(self):
+        self.clear()
+        self += Tag.div("loading...", _id="status")
+        await asyncio.sleep(0.02)
+        self.clear()
+        self += Tag.div("done", _id="status")
+
+
+@pytest.mark.asyncio
+async def test_on_mount_coroutine_websocket():
+    web = WebApp(AppWithCoroutine)
+    
+    with TestClient(web.app) as client:
+        # 1. Initial page load
+        response = client.get("/")
+        assert response.status_code == 200
+        assert "status" in response.text
+        assert "init" in response.text
+        
+        # 2. Connect websocket
+        with client.websocket_connect("/ws") as websocket:
+            # First message received is the initial broadcast
+            data = websocket.receive_text()
+            assert "init" in data or "done" in data
+            
+            # The pending coroutine starts and once it is done, we expect updates
+            data = websocket.receive_text()
+            assert "done" in data
+
