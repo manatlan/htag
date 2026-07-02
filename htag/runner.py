@@ -448,6 +448,13 @@ class AppRunner(BaseApp):
                         res = await callback(event)
                     else:
                         res = callback(event)
+                        if inspect.iscoroutine(res):
+                            from .exceptions import HtagEventError
+                            res.close()
+                            raise HtagEventError(
+                                f"Callback '{getattr(callback, '__name__', str(callback))}' returned a coroutine. "
+                                "If you call async functions, the callback itself must be declared 'async def' and use 'await'."
+                            )
 
                     # Handle generators/async generators for intermediate rendering
                     if inspect.isasyncgen(res):

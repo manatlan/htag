@@ -188,3 +188,40 @@ async def test_event_empty_data():
     e = Event(target, msg)
     assert e.value is None
     assert e["id"] == "123"
+
+
+@pytest.mark.asyncio
+async def test_app_handle_coroutine_callback_error():
+    app = App()
+    
+    async def some_async_func():
+        pass
+        
+    def my_cb(e):
+        return some_async_func() # returns a coroutine!
+        
+    class MyTag(Tag.div):
+        def init(self):
+            self["oncustom"] = my_cb
+            
+    tag = MyTag()
+    app += tag
+    
+    ws = AsyncMock()
+    msg = {
+        "id": tag.id,
+        "event": "custom",
+        "data": "hello"
+    }
+    
+    app.broadcast_updates = AsyncMock()
+    
+    await app.handle_event(msg, ws)
+    
+    ws.send_text.assert_called_once()
+    payload_str = ws.send_text.call_args[0][0]
+    from htag.utils import _obf_loads
+    payload = _obf_loads(payload_str, getattr(app, "parano_key", None))
+    assert payload["action"] == "error"
+    assert "Callback 'my_cb' returned a coroutine" in payload["traceback"]
+
